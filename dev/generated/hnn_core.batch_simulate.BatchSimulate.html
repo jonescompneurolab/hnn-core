@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -38,10 +38,10 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=7f76b32a3354e82990f2"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
     <script src="../_static/documentation_options.js?v=215e94d7"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
@@ -50,7 +50,7 @@
     <script src="../_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'generated/hnn_core.batch_simulate.BatchSimulate';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.17.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.17.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
@@ -93,7 +93,9 @@
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
+  
+  
+  
   
   <dialog id="pst-search-dialog">
     
@@ -630,7 +632,7 @@ during initialization. Defaults to None.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.batch_simulate.BatchSimulate.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">combinations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'loky'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/batch_simulate.html#BatchSimulate.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.batch_simulate.BatchSimulate.run" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">combinations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'loky'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/batch_simulate.html#BatchSimulate.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.batch_simulate.BatchSimulate.run" title="Link to this definition">#</a></dt>
 <dd><p>Run batch simulations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -650,7 +652,7 @@ Default is True.</p>
 completely operationable; all other backends are in
 development. Default is <em class="xref py py-obj">loky</em>.</p>
 </dd>
-<dt><strong>verbose</strong><span class="classifier">int, optional</span></dt><dd><p>The verbosity level for parallel execution. Default is 50.</p>
+<dt><strong>verbose</strong><span class="classifier">bool</span></dt><dd><p>If True, print build steps and simulation progress to console. Default: True.</p>
 </dd>
 </dl>
 </dd>
@@ -670,7 +672,7 @@ development. Default is <em class="xref py py-obj">loky</em>.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.batch_simulate.BatchSimulate.simulate_batch">
-<span class="sig-name descname"><span class="pre">simulate_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_combinations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'loky'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/batch_simulate.html#BatchSimulate.simulate_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.batch_simulate.BatchSimulate.simulate_batch" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">simulate_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_combinations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'loky'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/batch_simulate.html#BatchSimulate.simulate_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.batch_simulate.BatchSimulate.simulate_batch" title="Link to this definition">#</a></dt>
 <dd><p>Simulate a batch of parameter sets in parallel.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -683,8 +685,6 @@ development. Default is <em class="xref py py-obj">loky</em>.</p>
 <a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#module-multiprocessing" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">multiprocessing</span></code></a>, or <em class="xref py py-obj">dask</em>. WARNING: currently only <em class="xref py py-obj">loky</em> is
 completely operationable; all other backends are in
 development. Default is <em class="xref py py-obj">loky</em>.</p>
-</dd>
-<dt><strong>verbose</strong><span class="classifier">int, optional</span></dt><dd><p>The verbosity level for parallel execution. Default is 50.</p>
 </dd>
 </dl>
 </dd>
@@ -706,7 +706,13 @@ associated values:</p>
 
 </dd></dl>
 
-<span class="target" id="sphx-glr-backreferences-hnn-core-batch-simulate-batchsimulate"></span></section>
+<section id="examples-using-hnn-core-batch-simulate-batchsimulate">
+<span id="sphx-glr-backreferences-hnn-core-batch-simulate-batchsimulate"></span><h2>Examples using <code class="docutils literal notranslate"><span class="pre">hnn_core.batch_simulate.BatchSimulate</span></code><a class="headerlink" href="#examples-using-hnn-core-batch-simulate-batchsimulate" title="Link to this heading">#</a></h2>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example shows how to do batch simulations in HNN-core, allowing users to efficiently run multiple simulations with different parameters for comprehensive analysis."><img alt="" src="../_images/sphx_glr_plot_batch_simulate_thumb.png" />
+<p><a class="reference internal" href="../auto_examples/howto/plot_batch_simulate.html"><span class="doc">07. Batch Simulation</span></a></p>
+  <div class="sphx-glr-thumbnail-title">07. Batch Simulation</div>
+</div></div></section>
+</section>
 
 
                 </article>
@@ -762,6 +768,7 @@ associated values:</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.batch_simulate.BatchSimulate.simulate_batch"><code class="docutils literal notranslate"><span class="pre">BatchSimulate.simulate_batch()</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples-using-hnn-core-batch-simulate-batchsimulate">Examples using <code class="docutils literal notranslate"><span class="pre">hnn_core.batch_simulate.BatchSimulate</span></code></a></li>
 </ul>
   </nav></div>
 
@@ -787,8 +794,8 @@ associated values:</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -822,7 +829,7 @@ associated values:</p>
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.1.
 </p></div>
       
     </div>

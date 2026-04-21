@@ -26,8 +26,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -37,10 +37,10 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../_static/scripts/fontawesome.js?digest=7f76b32a3354e82990f2"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
     <script src="../../../_static/documentation_options.js?v=215e94d7"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -49,7 +49,7 @@
     <script src="../../../_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/hnn_core/optimization/general_optimization';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.17.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.17.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
@@ -90,7 +90,9 @@
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
+  
+  
+  
   
   <dialog id="pst-search-dialog">
     
@@ -488,7 +490,7 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">.objective_functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">_rmse_evoked</span><span class="p">,</span> <span class="n">_maximize_psd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.objective_functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">_rmse_evoked</span><span class="p">,</span> <span class="n">_anticorr_evoked</span><span class="p">,</span> <span class="n">_maximize_psd</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..externals.mne</span><span class="w"> </span><span class="kn">import</span> <span class="n">_validate_type</span>
 
 
@@ -528,10 +530,10 @@
 <span class="sd">            names, values are initial parameters. The default is None.</span>
 <span class="sd">            If None, the parameters will be set to the midpoints of parameter ranges.</span>
 <span class="sd">        solver : str</span>
-<span class="sd">            The optimizer, &#39;bayesian&#39; or &#39;cobyla&#39;.</span>
+<span class="sd">            The optimizer, &#39;bayesian&#39;, &#39;cobyla&#39;, or &#39;cma&#39;.</span>
 <span class="sd">        obj_fun : str | func</span>
 <span class="sd">            The objective function to be minimized. Can be &#39;dipole_rmse&#39;,</span>
-<span class="sd">            &#39;maximize_psd&#39;, or a user-defined function. The default is</span>
+<span class="sd">            &#39;maximize_psd&#39;, &quot;dipole_corr&quot;, or a user-defined function. The default is</span>
 <span class="sd">            &#39;dipole_rmse&#39;.</span>
 <span class="sd">        max_iter : int, optional</span>
 <span class="sd">            The max number of calls to the objective function. The default is</span>
@@ -541,8 +543,9 @@
 <span class="sd">        ----------</span>
 <span class="sd">        constraints : dict</span>
 <span class="sd">            The user-defined constraints.</span>
-<span class="sd">        initial_params : dict</span>
-<span class="sd">            Initial parameters for the objective function.</span>
+<span class="sd">        initial_params : dict, None</span>
+<span class="sd">            Initial parameters for the objective function. If None, initial_params</span>
+<span class="sd">            is set to the midpoint of upper/lower bounds defined in constraints.</span>
 <span class="sd">        max_iter : int</span>
 <span class="sd">            The max number of calls to the objective function.</span>
 <span class="sd">        solver : func</span>
@@ -560,13 +563,6 @@
 <span class="sd">        opt_params_ : list</span>
 <span class="sd">            The list of optimized parameter values.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="k">if</span> <span class="n">initial_net</span><span class="o">.</span><span class="n">external_drives</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;The current Network instance has external &quot;</span>
-                <span class="o">+</span> <span class="s2">&quot;drives, provide a Network object with no &quot;</span>
-                <span class="o">+</span> <span class="s2">&quot;external drives.&quot;</span>
-            <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_initial_net</span> <span class="o">=</span> <span class="n">initial_net</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">=</span> <span class="n">constraints</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_params</span> <span class="o">=</span> <span class="n">set_params</span>
@@ -580,6 +576,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">solver</span> <span class="o">=</span> <span class="s2">&quot;cobyla&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_assemble_constraints</span> <span class="o">=</span> <span class="n">_assemble_constraints_cobyla</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_run_opt</span> <span class="o">=</span> <span class="n">_run_opt_cobyla</span>
+        <span class="k">elif</span> <span class="n">solver</span> <span class="o">==</span> <span class="s2">&quot;cma&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">solver</span> <span class="o">=</span> <span class="s2">&quot;cma&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_assemble_constraints</span> <span class="o">=</span> <span class="n">_assemble_constraints_cma</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_run_opt</span> <span class="o">=</span> <span class="n">_run_opt_cma</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;solver must be &#39;bayesian&#39; or &#39;cobyla&#39;&quot;</span><span class="p">)</span>
         <span class="c1"># Response to be optimized</span>
@@ -589,6 +589,9 @@
         <span class="k">elif</span> <span class="n">obj_fun</span> <span class="o">==</span> <span class="s2">&quot;maximize_psd&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun</span> <span class="o">=</span> <span class="n">_maximize_psd</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">=</span> <span class="s2">&quot;maximize_psd&quot;</span>
+        <span class="k">elif</span> <span class="n">obj_fun</span> <span class="o">==</span> <span class="s2">&quot;dipole_corr&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun</span> <span class="o">=</span> <span class="n">_anticorr_evoked</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">=</span> <span class="s2">&quot;dipole_corr&quot;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun</span> <span class="o">=</span> <span class="n">obj_fun</span>  <span class="c1"># user-defined function</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">=</span> <span class="kc">None</span>
@@ -653,12 +656,41 @@
 <span class="sd">        relative_bandpower : list of float | float (Required if obj_fun=&#39;maximize_psd&#39;)</span>
 <span class="sd">            Weight for each frequency band in f_bands. If a single float is provided,</span>
 <span class="sd">            the same weight is applied to all frequency bands.</span>
+<span class="sd">        sigma0 : float| array-like (Only used if solver=&#39;cma&#39;)</span>
+<span class="sd">            Initial standard deviation of CME-ES algorithm. If float,</span>
+<span class="sd">            sigma0 is scaled by bounds defined in the constraints for each parameter.</span>
+<span class="sd">            If array-like, The length of sigma0 must equal the length of constraints.</span>
+<span class="sd">            Default: 0.25</span>
+<span class="sd">        popsize : int (Only used if solver=&#39;cma&#39;)</span>
+<span class="sd">            Number of parameter samples simulated per epoch. Default: 16</span>
+<span class="sd">        n_jobs : int (Only used if solver=&#39;cma&#39;)</span>
+<span class="sd">            The number of jobs to start in parallel. If None, then 1 trial will be</span>
+<span class="sd">            started without parallelism.</span>
+<span class="sd">        tolfun : float</span>
+<span class="sd">            Termination criteria. Stops if the range of the best objective function</span>
+<span class="sd">            values of the last 10 + ((30 * n_parameters) / popsize) generations and all</span>
+<span class="sd">            function values of the recent generation is below tolfun. Default 0.01.</span>
+<span class="sd">        dt : float</span>
+<span class="sd">            The integration time step of h.CVode (ms). Default: 0.025 ms</span>
 <span class="sd">        scale_factor : float, optional</span>
 <span class="sd">            The dipole scale factor.</span>
 <span class="sd">        smooth_window_len : float, optional</span>
 <span class="sd">            The smooth window length.</span>
+<span class="sd">        verbose : bool</span>
+<span class="sd">            If True, print build steps and simulation progress to console. Default: True.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        When defining sigma0 for CMA-ES as a float, the sigma0 applied to each parameter</span>
+<span class="sd">        is calculated as sigma0 * (upper_bound - lower_bound) based on the constraints.</span>
+<span class="sd">        It is recommended to choose a sigma0 such that the optimum is expected to lie within</span>
+<span class="sd">        about initial_params +- 3*sigma0. A smaller sigma0 searches closer to initial_params.</span>
+
+<span class="sd">        When defining popsize for CMA-ES, it is recommended to increase popsize relative to</span>
+<span class="sd">        the number of parameters being optimized (N). 4+3*log(N)</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">==</span> <span class="s2">&quot;dipole_rmse&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">==</span> <span class="s2">&quot;dipole_rmse&quot;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">==</span> <span class="s2">&quot;dipole_corr&quot;</span><span class="p">:</span>
             <span class="k">if</span> <span class="s2">&quot;target&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;target must be specified&quot;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="s2">&quot;n_trials&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span><span class="p">:</span>
@@ -799,6 +831,27 @@
     <span class="k">return</span> <span class="n">cons_cobyla</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_assemble_constraints_cma</span><span class="p">(</span><span class="n">constraints</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Assembles constraints in format required by cma.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    constraints : dict</span>
+<span class="sd">        The user-defined constraints.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    cons_cma : list of lists</span>
+<span class="sd">        Lower and higher limit for each parameter.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># assemble constraints in solver-specific format</span>
+    <span class="n">lower_bounds</span> <span class="o">=</span> <span class="p">[</span><span class="n">bound</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">bound</span> <span class="ow">in</span> <span class="n">constraints</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+    <span class="n">upper_bounds</span> <span class="o">=</span> <span class="p">[</span><span class="n">bound</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">bound</span> <span class="ow">in</span> <span class="n">constraints</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+    <span class="n">cons_cma</span> <span class="o">=</span> <span class="p">[</span><span class="n">lower_bounds</span><span class="p">,</span> <span class="n">upper_bounds</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">cons_cma</span>
+
+
 <span class="k">def</span><span class="w"> </span><span class="nf">_update_params</span><span class="p">(</span><span class="n">initial_params</span><span class="p">,</span> <span class="n">predicted_params</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Update params with predicted parameters.</span>
 
@@ -866,6 +919,8 @@
 
     <span class="kn">from</span><span class="w"> </span><span class="nn">..externals.bayesopt</span><span class="w"> </span><span class="kn">import</span> <span class="n">bayes_opt</span><span class="p">,</span> <span class="n">expected_improvement</span>
 
+    <span class="c1"># `obj_values` tracks optimizer loss over all epochs</span>
+    <span class="c1"># the list is passed to `_obj_func()` and updated in place</span>
     <span class="n">obj_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_obj_func</span><span class="p">(</span><span class="n">predicted_params</span><span class="p">):</span>
@@ -900,6 +955,114 @@
     <span class="n">set_params</span><span class="p">(</span><span class="n">net_</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">opt_params</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">net_</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_run_opt_cma</span><span class="p">(</span>
+    <span class="n">initial_net</span><span class="p">,</span>
+    <span class="n">tstop</span><span class="p">,</span>
+    <span class="n">constraints</span><span class="p">,</span>
+    <span class="n">set_params</span><span class="p">,</span>
+    <span class="n">initial_params</span><span class="p">,</span>
+    <span class="n">obj_fun</span><span class="p">,</span>
+    <span class="n">max_iter</span><span class="p">,</span>
+    <span class="n">obj_fun_kwargs</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Runs optimization routine with CMA-ES</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    initial_net : instance of Network</span>
+<span class="sd">        The network object.</span>
+<span class="sd">    tstop : float</span>
+<span class="sd">        The simulated dipole&#39;s duration.</span>
+<span class="sd">    constraints : list of tuples</span>
+<span class="sd">        Parameter constraints in solver-specific format.</span>
+<span class="sd">    set_params : func</span>
+<span class="sd">        User-defined function that sets parameters in network drives.</span>
+<span class="sd">    initial_params : dict</span>
+<span class="sd">        Keys are parameter names, values are initial parameters.</span>
+<span class="sd">    obj_fun : func</span>
+<span class="sd">        The objective function.</span>
+<span class="sd">    max_iter : int</span>
+<span class="sd">        Number of calls the optimizer makes.</span>
+<span class="sd">    obj_fun_kwargs : dict</span>
+<span class="sd">        Additional arguments along with their respective values to be passed</span>
+<span class="sd">        to the objective function.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    opt_params : list</span>
+<span class="sd">        Optimized parameters.</span>
+<span class="sd">    obj : list</span>
+<span class="sd">        Objective values.</span>
+<span class="sd">    net_ : instance of Network</span>
+<span class="sd">        Optimized network object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">import</span><span class="w"> </span><span class="nn">cma</span>
+
+    <span class="c1"># `obj_values` tracks optimizer loss over all epochs</span>
+    <span class="c1"># the list is passed to `_obj_func()` and updated in place</span>
+    <span class="n">obj_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_obj_func</span><span class="p">(</span><span class="n">predicted_params</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">obj_fun</span><span class="p">(</span>
+            <span class="n">initial_net</span><span class="o">=</span><span class="n">initial_net</span><span class="p">,</span>
+            <span class="n">initial_params</span><span class="o">=</span><span class="n">initial_params</span><span class="p">,</span>
+            <span class="n">set_params</span><span class="o">=</span><span class="n">set_params</span><span class="p">,</span>
+            <span class="n">predicted_params</span><span class="o">=</span><span class="n">predicted_params</span><span class="p">,</span>
+            <span class="n">update_params</span><span class="o">=</span><span class="n">_update_params</span><span class="p">,</span>
+            <span class="n">obj_values</span><span class="o">=</span><span class="n">obj_values</span><span class="p">,</span>
+            <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">,</span>
+            <span class="n">obj_fun_kwargs</span><span class="o">=</span><span class="n">obj_fun_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">default_sigma0</span> <span class="o">=</span> <span class="mf">0.25</span>
+    <span class="n">sigma0</span> <span class="o">=</span> <span class="n">obj_fun_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sigma0&quot;</span><span class="p">,</span> <span class="n">default_sigma0</span><span class="p">)</span>
+    <span class="n">_validate_type</span><span class="p">(</span><span class="n">sigma0</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sigma0</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">sigma0</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;sigma0 must be greater than zero&quot;</span><span class="p">)</span>
+        <span class="n">sigma0</span> <span class="o">=</span> <span class="n">sigma0</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">constraints</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">constraints</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sigma0</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sigma0</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;When sigma0 is array-like, it must be shape (N,), got shape </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sigma0</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sigma0</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">constraints</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;When sigma0 is array-like, the length must be the same as the constraints.&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">constraints</span><span class="p">)</span><span class="si">}</span><span class="s2"> elements, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">sigma0</span><span class="p">)</span><span class="si">}</span><span class="s2"> elements)&quot;</span>
+            <span class="p">)</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="n">cma</span><span class="o">.</span><span class="n">CMAEvolutionStrategy</span><span class="p">(</span>
+        <span class="nb">list</span><span class="p">(</span><span class="n">initial_params</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+        <span class="mi">1</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;bounds&quot;</span><span class="p">:</span> <span class="n">constraints</span><span class="p">,</span>
+            <span class="s2">&quot;tolfun&quot;</span><span class="p">:</span> <span class="n">obj_fun_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;tolfun&quot;</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">),</span>
+            <span class="s2">&quot;maxiter&quot;</span><span class="p">:</span> <span class="n">max_iter</span><span class="p">,</span>
+            <span class="s2">&quot;popsize&quot;</span><span class="p">:</span> <span class="n">obj_fun_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;popsize&quot;</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span>
+            <span class="s2">&quot;CMA_stds&quot;</span><span class="p">:</span> <span class="n">sigma0</span><span class="p">,</span>
+            <span class="s2">&quot;verbose&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">es</span><span class="o">.</span><span class="n">stop</span><span class="p">():</span>
+        <span class="n">solutions</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">ask</span><span class="p">()</span>
+        <span class="n">es</span><span class="o">.</span><span class="n">tell</span><span class="p">(</span><span class="n">solutions</span><span class="p">,</span> <span class="n">_obj_func</span><span class="p">(</span><span class="n">solutions</span><span class="p">))</span>
+    <span class="n">es</span><span class="o">.</span><span class="n">result_pretty</span><span class="p">()</span>
+
+    <span class="c1"># get best params</span>
+    <span class="n">best_params</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">xbest</span>
+
+    <span class="c1"># get objective values</span>
+    <span class="n">obj</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">obj_values</span><span class="p">[:</span><span class="n">idx</span><span class="p">])</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iter</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+
+    <span class="c1"># get optimized net</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">_update_params</span><span class="p">(</span><span class="n">initial_params</span><span class="p">,</span> <span class="n">best_params</span><span class="p">)</span>
+    <span class="n">net_</span> <span class="o">=</span> <span class="n">initial_net</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">set_params</span><span class="p">(</span><span class="n">net_</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">best_params</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">net_</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_run_opt_cobyla</span><span class="p">(</span>
@@ -946,6 +1109,8 @@
 
     <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">fmin_cobyla</span>
 
+    <span class="c1"># `obj_values` tracks optimizer loss over all epochs</span>
+    <span class="c1"># the list is passed to `_obj_func()` and updated in place</span>
     <span class="n">obj_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_obj_func</span><span class="p">(</span><span class="n">predicted_params</span><span class="p">):</span>
@@ -1011,8 +1176,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1046,7 +1211,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.1.
 </p></div>
       
     </div>

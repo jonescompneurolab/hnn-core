@@ -26,8 +26,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -37,10 +37,10 @@
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../_static/scripts/fontawesome.js?digest=7f76b32a3354e82990f2"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
     <script src="../../_static/documentation_options.js?v=215e94d7"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -49,7 +49,7 @@
     <script src="../../_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/hnn_core/batch_simulate';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.17.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.17.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
@@ -90,7 +90,9 @@
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
+  
+  
+  
   
   <dialog id="pst-search-dialog">
     
@@ -651,6 +653,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">postproc</span> <span class="o">=</span> <span class="n">postproc</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">clear_cache</span> <span class="o">=</span> <span class="n">clear_cache</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">summary_func</span> <span class="o">=</span> <span class="n">summary_func</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="BatchSimulate.run">
 <a class="viewcode-back" href="../../generated/hnn_core.batch_simulate.BatchSimulate.html#hnn_core.batch_simulate.BatchSimulate.run">[docs]</a>
@@ -661,7 +664,7 @@
         <span class="n">combinations</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;loky&quot;</span><span class="p">,</span>
-        <span class="n">verbose</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run batch simulations.</span>
 
@@ -682,8 +685,8 @@
 <span class="sd">            `multiprocessing`, or `dask`. WARNING: currently only `loky` is</span>
 <span class="sd">            completely operationable; all other backends are in</span>
 <span class="sd">            development. Default is `loky`.</span>
-<span class="sd">        verbose : int, optional</span>
-<span class="sd">            The verbosity level for parallel execution. Default is 50.</span>
+<span class="sd">        verbose : bool</span>
+<span class="sd">            If True, print build steps and simulation progress to console. Default: True.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -702,7 +705,8 @@
         <span class="n">_check_option</span><span class="p">(</span>
             <span class="s2">&quot;backend&quot;</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;loky&quot;</span><span class="p">,</span> <span class="s2">&quot;threading&quot;</span><span class="p">,</span> <span class="s2">&quot;multiprocessing&quot;</span><span class="p">,</span> <span class="s2">&quot;dask&quot;</span><span class="p">]</span>
         <span class="p">)</span>
-        <span class="n">_validate_type</span><span class="p">(</span><span class="n">verbose</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">&quot;verbose&quot;</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">verbose</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="p">(</span><span class="nb">bool</span><span class="p">,),</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">&quot;verbose&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span> <span class="o">=</span> <span class="n">verbose</span>
 
         <span class="n">param_combinations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_param_combinations</span><span class="p">(</span><span class="n">param_grid</span><span class="p">,</span> <span class="n">combinations</span><span class="p">)</span>
         <span class="n">total_sims</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">param_combinations</span><span class="p">)</span>
@@ -717,7 +721,6 @@
                 <span class="n">param_combinations</span><span class="p">[</span><span class="n">start_idx</span><span class="p">:</span><span class="n">end_idx</span><span class="p">],</span>
                 <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span>
                 <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span>
-                <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
             <span class="p">)</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_outputs</span><span class="p">:</span>
@@ -749,7 +752,6 @@
         <span class="n">param_combinations</span><span class="p">,</span>
         <span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;loky&quot;</span><span class="p">,</span>
-        <span class="n">verbose</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Simulate a batch of parameter sets in parallel.</span>
 
@@ -764,8 +766,6 @@
 <span class="sd">            `multiprocessing`, or `dask`. WARNING: currently only `loky` is</span>
 <span class="sd">            completely operationable; all other backends are in</span>
 <span class="sd">            development. Default is `loky`.</span>
-<span class="sd">        verbose : int, optional</span>
-<span class="sd">            The verbosity level for parallel execution. Default is 50.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -785,10 +785,9 @@
         <span class="n">_check_option</span><span class="p">(</span>
             <span class="s2">&quot;backend&quot;</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;loky&quot;</span><span class="p">,</span> <span class="s2">&quot;threading&quot;</span><span class="p">,</span> <span class="s2">&quot;multiprocessing&quot;</span><span class="p">,</span> <span class="s2">&quot;dask&quot;</span><span class="p">]</span>
         <span class="p">)</span>
-        <span class="n">_validate_type</span><span class="p">(</span><span class="n">verbose</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">&quot;verbose&quot;</span><span class="p">)</span>
 
         <span class="k">with</span> <span class="n">parallel_config</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">):</span>
-            <span class="n">res</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)(</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">)(</span>
                 <span class="n">delayed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_run_single_sim</span><span class="p">)(</span><span class="n">params</span><span class="p">)</span> <span class="k">for</span> <span class="n">params</span> <span class="ow">in</span> <span class="n">param_combinations</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">res</span></div>
@@ -826,6 +825,7 @@
                 <span class="n">record_vsec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">record_vsec</span><span class="p">,</span>
                 <span class="n">record_isec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">record_isec</span><span class="p">,</span>
                 <span class="n">postproc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">postproc</span><span class="p">,</span>
+                <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">results</span><span class="p">[</span><span class="s2">&quot;dpl&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dpl</span>
 
@@ -1019,8 +1019,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1054,7 +1054,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.1.
 </p></div>
       
     </div>
