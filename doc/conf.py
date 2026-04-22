@@ -254,6 +254,7 @@ linkcheck_ignore = [
     'https://doi.org/10.7554/eLife.51214',
     'https://groups.google.com/g/hnnsolver',
     'https://github.com/jonescompneurolab/hnn-core/settings/',
+    'https://www.timeanddate.com/worldclock/usa/providence',
     r'(http|https):\/\/localhost:\d+',
     r'(http|https):\/\/github\.com\/jonescompneurolab\/hnn-core\/(issues|pull)\/\d+',
 ]
