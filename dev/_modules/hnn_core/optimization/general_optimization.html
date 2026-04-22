@@ -676,6 +676,8 @@
 <span class="sd">            The dipole scale factor.</span>
 <span class="sd">        smooth_window_len : float, optional</span>
 <span class="sd">            The smooth window length.</span>
+<span class="sd">        seed : int, optional (Only used if solver=&#39;cma&#39;)</span>
+<span class="sd">            Optional seed for random number generator of optimizer.</span>
 <span class="sd">        verbose : bool</span>
 <span class="sd">            If True, print build steps and simulation progress to console. Default: True.</span>
 
@@ -1044,6 +1046,7 @@
             <span class="s2">&quot;popsize&quot;</span><span class="p">:</span> <span class="n">obj_fun_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;popsize&quot;</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span>
             <span class="s2">&quot;CMA_stds&quot;</span><span class="p">:</span> <span class="n">sigma0</span><span class="p">,</span>
             <span class="s2">&quot;verbose&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="n">obj_fun_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;seed&quot;</span><span class="p">,</span> <span class="mi">123</span><span class="p">),</span>
         <span class="p">},</span>
     <span class="p">)</span>
     <span class="k">while</span> <span class="ow">not</span> <span class="n">es</span><span class="o">.</span><span class="n">stop</span><span class="p">():</span>
