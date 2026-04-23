@@ -6016,7 +6016,7 @@ def run_opt_button_clicked(
                 )
             else:
                 new_name = main_execution(inside_backend_flag=False)
-
+        else:
             # Setup non-CMA simulation backends
             if backend_selection.value == "MPI":
                 # 'use_hwthreading_if_found' and 'sensible_default_cores' have

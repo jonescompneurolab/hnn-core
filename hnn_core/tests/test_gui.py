@@ -1786,6 +1786,7 @@ def test_gui_run_optimization(backend_selection, opt_solver):
     gui.widget_ntrials.value = 1
     gui.widget_opt_max_iter.value = 3
     gui.widget_n_jobs.value = gui.n_cores  # use the safe default max of available cores
+    gui.opt_solver_widgets["popsize"].value = 2
 
     # Add at least one of every drive and bias type
     for val_drive_type in ("Poisson", "Evoked", "Rhythmic", "Tonic"):
@@ -1828,9 +1829,7 @@ def test_gui_run_optimization(backend_selection, opt_solver):
     initial_amplitude = gui.opt_drive_widgets[9]["amplitude"]["L2_pyramidal"].value
 
     # Perform the first run of optimization
-    breakpoint()
     gui.run_opt_button.click()
-    breakpoint()
 
     # Give the GUI time to regenerate
     time.sleep(2)
