@@ -5853,7 +5853,7 @@ def run_opt_button_clicked(
 
         # Define the main execution function for the optimization, which is necessary
         # due to CMA and non-CMA solvers using different approaches to parallelization:
-        def main_execution(inside_backend_flag=False):
+        def main_execution():
             simulation_status_bar.value = simulation_status_contents["opt_running"]
             logger.info("Optimization started.")
             logger.info(f"Solver: {opt_solver}")
@@ -5866,7 +5866,10 @@ def run_opt_button_clicked(
             try:
                 if opt_obj_fun in ("dipole_corr", "dipole_rmse"):
                     # AES: Not including the kwarg for "verbose" since the GUI log is
-                    # already pretty "busy"
+                    # already pretty "busy".
+                    #
+                    # Note: In this case, we are adding certain solver arguments (like
+                    # for CMA) even if the solver is not set to CMA:
                     obj_fun_kwargs = dict(
                         dt=dt.value,
                         target=target_dipole,
@@ -5875,11 +5878,7 @@ def run_opt_button_clicked(
                         scale_factor=opt_scaling,
                         n_jobs=n_jobs.value,
                         seed=opt_solver_widgets["seed"].value,
-                        popsize=(
-                            None
-                            if inside_backend_flag
-                            else opt_solver_widgets["popsize"].value
-                        ),
+                        popsize=opt_solver_widgets["popsize"].value,
                         sigma0=opt_solver_widgets["sigma0"].value,
                     )
                     optim.fit(**obj_fun_kwargs)
@@ -6009,13 +6008,17 @@ def run_opt_button_clicked(
         # --------------------------------------------------------------------------
         if opt_solver == "cma":
             # Do not setup any backends, since CMA will use BatchSimulate to use its own
-            # JoblibBackend internally.
+            # custom Joblib backend internally.
+            logger.warning(
+                textwrap.dedent("""
+                Please note that using the CMA solver uses neither MPIBackend or
+                JoblibBackend, instead using a custom backend through BatchSimulate.  
+                """).replace("\n", " ")
+            )
             if opt_obj_fun == "maximize_psd":
-                new_name, psd_f_bands, psd_relative_bandpower = main_execution(
-                    inside_backend_flag=False
-                )
+                new_name, psd_f_bands, psd_relative_bandpower = main_execution()
             else:
-                new_name = main_execution(inside_backend_flag=False)
+                new_name = main_execution()
         else:
             # Setup non-CMA simulation backends
             if backend_selection.value == "MPI":
@@ -6035,12 +6038,9 @@ def run_opt_button_clicked(
 
             with backend:
                 if opt_obj_fun == "maximize_psd":
-                    # AES TODO DEBUG
-                    new_name, psd_f_bands, psd_relative_bandpower = main_execution(
-                        inside_backend_flag=True
-                    )
+                    new_name, psd_f_bands, psd_relative_bandpower = main_execution()
                 else:
-                    new_name = main_execution(inside_backend_flag=True)
+                    new_name = main_execution()
 
         # ------------------------------------------------------------------------------
         # The remainder of this function is just repeating some post-run visualization
