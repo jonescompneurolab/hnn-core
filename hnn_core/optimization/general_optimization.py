@@ -7,7 +7,7 @@
 
 import numpy as np
 
-from .objective_functions import _rmse_evoked, _corr_evoked, _maximize_psd
+from .objective_functions import _rmse_evoked, _anticorr_evoked, _maximize_psd
 from ..externals.mne import _validate_type
 
 
@@ -105,7 +105,7 @@ class Optimizer:
             self.obj_fun = _maximize_psd
             self.obj_fun_name = "maximize_psd"
         elif obj_fun == "dipole_corr":
-            self.obj_fun = _corr_evoked
+            self.obj_fun = _anticorr_evoked
             self.obj_fun_name = "dipole_corr"
         else:
             self.obj_fun = obj_fun  # user-defined function
@@ -186,6 +186,8 @@ class Optimizer:
             The dipole scale factor.
         smooth_window_len : float, optional
             The smooth window length.
+        seed : int, optional (Only used if solver='cma')
+            Optional seed for random number generator of optimizer.
         verbose : bool
             If True, print build steps and simulation progress to console. Default: True.
 
@@ -549,6 +551,7 @@ def _run_opt_cma(
             "popsize": obj_fun_kwargs.get("popsize", 16),
             "CMA_stds": sigma0,
             "verbose": 0,
+            "seed": obj_fun_kwargs.get("seed", 123),
         },
     )
     while not es.stop():

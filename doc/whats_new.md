@@ -31,12 +31,16 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 ### People who contributed to this release:
 
 - [Muhammad Ahmad Amin][]
+- [Vaishnavi Baghel][]
 - [Tushar Jamdade][]
 - [Karthikeya Kodlai][]
 - [M Yaswanth Reddy][]
 - [Satvik Saluja][]
 
 ### Changelog
+
+- Update and re-enable Codecov usage in CI,
+  by [Vaishnavi Baghel][] in {gh}`1272`. This was their first PR, thanks Vaishnavi!
 
 - Fix testing of `mesh_shape` to include all available network models,
   by [Satvik Saluja][] in {gh}`1268`. This was their first PR, thanks Satvik!
@@ -1287,3 +1291,4 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [M Yaswanth Reddy]: https://github.com/Yaswanth8390
 [Muhammad Ahmad Amin]: https://github.com/m-ahmad-amin
 [Satvik Saluja]: https://github.com/SatvikSaluja
+[Vaishnavi Baghel]: https://github.com/vshnvii

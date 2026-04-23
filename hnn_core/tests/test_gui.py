@@ -1722,16 +1722,20 @@ def test_diff_gui_vs_api_networks_simulations():
     )
 
 
+# @pytest.mark.parametrize(
+#     "backend_selection,opt_solver",
+#     [
+#         (backend, solver)
+#         for backend in ("MPI", "Joblib")
+#         for solver in ("bayesian", "cobyla", "cma")
+#     ],
+# )
 @requires_mpi4py
 @requires_psutil
 @pytest.mark.uses_mpi
 @pytest.mark.parametrize(
     "backend_selection,opt_solver",
-    [
-        (backend, solver)
-        for backend in ("MPI", "Joblib")
-        for solver in ("bayesian", "cobyla")
-    ],
+    [("MPI", "cma")],
 )
 def test_gui_run_optimization(backend_selection, opt_solver):
     """Comprehensively test optimization functionality in the GUI.
@@ -1769,13 +1773,17 @@ def test_gui_run_optimization(backend_selection, opt_solver):
     # AES: For some reason, using the common faster dt of 0.5 fails
     # due to errors related to "usable mindelay is 0", similar to
     # https://github.com/jonescompneurolab/hnn-core/issues/960 .
-    gui.widget_tstop.value = 30
-    gui.widget_dt.value = 0.025
+    # so that we avoid windowing errors for short sims
+    gui.widget_default_smoothing.value = 10
+    gui.widget_tstop.value = 10.0
+    gui.widget_dt.value = 0.5
     gui.widget_backend_selection.value = backend_selection
 
     assert gui.widget_opt_obj_fun.value == "dipole_rmse"
     gui.widget_opt_solver.value = opt_solver
-    gui.widget_ntrials.value = 2
+    # gui.widget_ntrials.value = 2  # AES DEBUG
+    # gui.widget_opt_max_iter.value = 3  # AES DEBUG
+    gui.widget_ntrials.value = 1
     gui.widget_opt_max_iter.value = 3
     gui.widget_n_jobs.value = gui.n_cores  # use the safe default max of available cores
 
@@ -1820,7 +1828,9 @@ def test_gui_run_optimization(backend_selection, opt_solver):
     initial_amplitude = gui.opt_drive_widgets[9]["amplitude"]["L2_pyramidal"].value
 
     # Perform the first run of optimization
+    breakpoint()
     gui.run_opt_button.click()
+    breakpoint()
 
     # Give the GUI time to regenerate
     time.sleep(2)

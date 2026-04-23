@@ -941,7 +941,7 @@ class HNNGUI:
             style=self.layout["opt_dropdown_style"],
         ).add_class("opt-objective-function")
         self.widget_opt_solver = Dropdown(
-            options=["bayesian", "cobyla"],
+            options=["bayesian", "cobyla", "cma"],
             value="bayesian",
             description="Solver:",
             disabled=False,
@@ -1025,6 +1025,7 @@ class HNNGUI:
         self.opt_drive_widgets = list()
         self.opt_drive_boxes = list()
         self.opt_target_widgets = {}
+        self.opt_solver_widgets = {}
         self.opt_drive_accordion = Accordion()
         self.opt_results = list()
 
@@ -1110,6 +1111,7 @@ class HNNGUI:
         self._cell_params_out = Output().add_class("cell-parameters-widgets")
         self._global_gain_out = Output().add_class("connectivity-gains-widgets")
         self._opt_target_out = Output().add_class("opt-target-input-widgets")
+        self._opt_solver_out = Output().add_class("opt-solver-input-widgets")
         self._opt_drives_out = Output().add_class("opt-drives-accordion-widgets")
 
         self._log_out = Output()
@@ -1365,6 +1367,7 @@ class HNNGUI:
                 self.widget_opt_smoothing.value,
                 self.widget_opt_scaling.value,
                 self.opt_target_widgets,
+                self.opt_solver_widgets,
             )
             # Re-load our NEW, optimized drive parameters after an optimization run:
             if result:
@@ -1451,6 +1454,9 @@ class HNNGUI:
         def _opt_obj_fun_change(value):
             self._update_opt_target_hbox(value.new)
 
+        def _opt_solver_change(value):
+            self._update_opt_solver_hbox(value.new)
+
         self.widget_backend_selection.observe(_handle_backend_change, "value")
         self.add_drive_button.on_click(_add_drive_button_clicked)
         self.delete_drive_button.on_click(_delete_drives_clicked)
@@ -1469,6 +1475,7 @@ class HNNGUI:
         # Many Optimization tab observations, including dual-linking widgets with their
         # equivalent in the Run tab:
         self.widget_opt_obj_fun.observe(_opt_obj_fun_change, "value")
+        self.widget_opt_solver.observe(_opt_solver_change, "value")
 
         link(
             (self.widget_opt_tstop, "value"),
@@ -1675,8 +1682,9 @@ class HNNGUI:
 
         1. The always-shown top-level optimization parameters
         2. The "target" parameters box (dynamic, depending on your objective function)
-        3. The always-shown "Run Optimization" and "Save Optimization History" buttons
-        4. The drives accordion (dynamic, depending on existing drives in the Drives
+        3. The "solver" parameters box (dynamic, depending on if using CMA)
+        4. The always-shown "Run Optimization" and "Save Optimization History" buttons
+        5. The drives accordion (dynamic, depending on existing drives in the Drives
            tab)
         """
         optimization_tab_contents = VBox(
@@ -1704,7 +1712,9 @@ class HNNGUI:
                 ),
                 # 2. Target parameters box (a dynamic Output widget)
                 self._opt_target_out,
-                # 3. Run and Save History buttons
+                # 3. Solver-specific parameters box (a dynamic Output widget)
+                self._opt_solver_out,
+                # 4. Run and Save History buttons
                 HBox(
                     [
                         self.run_opt_button,
@@ -1712,7 +1722,7 @@ class HNNGUI:
                     ],
                     layout=Layout(width="100%"),
                 ),
-                # 4. Drives accordion (a dynamic Output widget)
+                # 5. Drives accordion (a dynamic Output widget)
                 self._opt_drives_out,
             ]
         ).add_class("optimization-tab-contents")
@@ -2058,6 +2068,7 @@ class HNNGUI:
 
             # Add optimization
             self.update_opt_tab_target_widgets()
+            self.update_opt_tab_solver_widgets()
             self.update_opt_tab_accordion(self.params)
 
     def add_drive_tab_drive_widget(
@@ -2221,6 +2232,7 @@ class HNNGUI:
             elif load_type == "drives":
                 self.update_drive_tab_accordion(params)
                 self.update_opt_tab_target_widgets()
+                self.update_opt_tab_solver_widgets()
                 self.update_opt_tab_accordion(params)
             else:
                 raise ValueError
@@ -2269,6 +2281,27 @@ class HNNGUI:
         with self._opt_target_out:
             display(displayed_target_widgets)
 
+    def _update_opt_solver_hbox(self, opt_solver):
+        self._opt_solver_out.clear_output()
+
+        if opt_solver in ("bayesian", "cobyla"):
+            displayed_solver_widgets = VBox()
+        elif opt_solver == "cma":
+            displayed_solver_widgets = VBox(
+                [
+                    HBox(
+                        [
+                            self.opt_solver_widgets["seed"],
+                            self.opt_solver_widgets["popsize"],
+                            self.opt_solver_widgets["sigma0"],
+                        ]
+                    )
+                ]
+            )
+
+        with self._opt_solver_out:
+            display(displayed_solver_widgets)
+
     def update_opt_tab_target_widgets(self):
         # Preserve prior widget state for "target data" if widgets already exist
         # ------------------------------------------------------------------------------
@@ -2288,7 +2321,7 @@ class HNNGUI:
             value=prior_target_state.get("target_dipole_data", None),
             description="Target Data:",
             disabled=False,
-            layout=Layout(width="500px"),
+            layout=Layout(width="378px"),
             style={"description_width": "80px"},
         )
         # Set `_external_data_widget` to `opt_target_widgets["target_dipole_data"]` when simulation
@@ -2568,6 +2601,57 @@ class HNNGUI:
                 prior_opt_widget_values=prior_opt_widget_values,
                 **kwargs,
             )
+
+    def update_opt_tab_solver_widgets(self):
+        # Preserve prior widget state for "target data" if widgets already exist
+        # ------------------------------------------------------------------------------
+        prior_solver_state = {}
+        # solver data widgets are unfortunately reset after run. The below functions to restore the
+        # previous states:
+        if self.opt_solver_widgets:
+            # Save current state of all solver widgets
+            for key, widget in self.opt_solver_widgets.items():
+                if hasattr(widget, "value"):
+                    prior_solver_state[key] = widget.value
+
+        # The obj_fun="dipole_corr" and "dipole_rmse" cases are very simple
+        # ------------------------------------------------------------------------------
+        self.opt_solver_widgets["seed"] = BoundedIntText(
+            value=prior_solver_state.get("seed", 123),
+            description="CMA Solver seed:",
+            disabled=False,
+            min=0,
+            max=9e9,
+            layout=Layout(width="214px"),
+            style={"description_width": "120px"},
+        )
+
+        self.opt_solver_widgets["popsize"] = BoundedIntText(
+            value=prior_solver_state.get("popsize", 3),
+            description="Popsize:",
+            disabled=False,
+            min=0,
+            max=100,
+            layout=Layout(width="130px"),
+            style={"description_width": "60px"},
+        )
+
+        self.opt_solver_widgets["sigma0"] = BoundedFloatText(
+            value=prior_solver_state.get("sigma0", 0.25),
+            description="Sigma0:",
+            min=0,
+            max=1e6,
+            step=0.01,
+            disabled=False,
+            layout=Layout(width="150px"),
+            style={"description_width": "60px"},
+        )
+
+        # FINALLY, actually display all this stuff
+        # ------------------------------------------------------------------------------
+        self._update_opt_solver_hbox(
+            self.widget_opt_solver.value,
+        )
 
     def add_opt_tab_drive_widget(
         self,
@@ -5286,54 +5370,112 @@ def _name_check(var, drive, params, syn_type=None):
         return None
 
 
-def _use_nonsyn_params_if_exists(var_name, drive, params):
-    """Retrieve a non-synaptice parameter value from `params` (if it exists), else from `drive`.
+def _use_params_if_exists(var_name, drive, params, syn_type=None):
+    """Get a parameter value from `params` (if exists), else from `drive`.
+
+    This is intended for use in the `set_params` closure used in
+    `_generate_constraints_and_func` in the GUI's Optimization running.
+
+    Note that `drive` should NOT contain actual Widgets, and instead must be picklable
+    such as output from `_snapshot_drive_widgets`!
+
+    Due to how the GUI handles drives with celltype-specific "synaptic" properties,
+    `drive` is accessed differently depending on if you are using the "synaptic" case or
+    not.
 
     Parameters
     ----------
     var_name : str
         The full, unique variable name to look for.
     drive : dict
-        Dictionary containing metadata and widgets for a specific drive.
+        Dictionary containing metadata and widgets for a specific drive. Values MUST be
+        picklable, meaning they should NOT be widgets, and instead be outputs of
+        `_snapshot_drive_widgets`!
     params : dict
         Dictionary of "prior" parameters to check first for the variable.
+    syn_type : {"weights_ampa", "weights_nmda", "delays", "rate_constant", "amplitude"},
+    optional
+        If passed, this acts as a trigger to access `drive` differently, since in the
+        GUI, drives with synaptic properties are organized with an additional nested
+        dictionary, like `drive[<syn_type>][<celltype>]`.
 
     Returns
     -------
     value : various
-        The parameter value from params dict if the name-checked key exists, otherwise the value
-        from the drive dict's `value` of the widget for `var_name`.
+        The parameter value from params dict if the name-checked key exists, otherwise
+        the value from the drive dict's `value` of the widget for `var_name`.
     """
-    return (
-        params[_name_check(var_name, drive, params)]
-        if _name_check(var_name, drive, params)
-        else drive[var_name].value
-    )
+    key = _name_check(var_name, drive, params, syn_type)
+    if key:
+        # In this case, there appears to be a "prior" parameter for the passed var and
+        # drive, so let's use that:
+        return params[key]
+
+    elif syn_type:
+        # We are in the weird "synaptic" case, so need to access `drive` differently
+        if hasattr(drive[syn_type][var_name], "value"):
+            raise ValueError(
+                "Values in `drive` must not be widgets! You should use "
+                "`_snapshot_drive_widgets` before passing to `drive`. If you are "
+                "doing so and still seeing this error, then something is wrong with "
+                "the snapshot creation."
+            )
+        else:
+            # If this is not a widget (in the case of drive "snapshots"), then just
+            # return the value itself:
+            return drive[syn_type][var_name]
+
+    else:
+        # We are in the normal non-synaptic case
+        if hasattr(drive[var_name], "value"):
+            raise ValueError(
+                "Values in `drive` must not be widgets! You should use "
+                "`_snapshot_drive_widgets` before passing to `drive`. If you are "
+                "doing so and still seeing this error, then something is wrong with "
+                "the snapshot creation."
+            )
+        else:
+            # If this is not a widget (in the case of drive "snapshots"), then just
+            # return the value itself:
+            return drive[var_name]
 
 
 def _create_parametrized_syn_dicts_if_exist(syn_type, drive, params):
-    """Create dict of synaptic parameters if they exist in `params`, else use values from `drive`.
+    """Create dict of synaptic parameters if they exist in `params`, else use values
+    from `drive`.
 
-    This function creates a dictionary of synaptic parameters for different cell types, checking if
-    parametrized versions exist in the `params` dict. If a parametrized version exists, it uses that
-    value; otherwise, it falls back to the drive's default value. In the special case of
-    'amplitude', it also excludes the `L5_basket` cell type if the drive location is 'distal'.
+    This function creates a dictionary of synaptic parameters for different cell types,
+    checking if parametrized versions exist in the `params` dict. If a parametrized
+    version exists, it uses that value; otherwise, it falls back to the drive's default
+    value. In the special case of 'amplitude', it also excludes the `L5_basket` cell
+    type if the drive location is 'distal'. This is necessary because celltype-specific
+    parameters of drives are nested inside `syn_type` dictionaries, unlike general
+    parameters.
+
+    Note that `drive` should NOT contain actual Widgets, and instead must be picklable
+    such as output from `_snapshot_drive_widgets`!
+
+    This is intended for use in the `set_params` closure used in
+    `_generate_constraints_and_func` in the GUI's Optimization running.
 
     Parameters
     ----------
     syn_type : {"weights_ampa", "weights_nmda", "delays", "rate_constant", "amplitude"}
         The type of synaptic parameter to create the dictionary for.
     drive : dict
-        Dictionary containing metadata and widgets for a specific drive.
+        Dictionary containing metadata and widgets for a specific drive. Values MUST be
+        picklable, meaning they should NOT be widgets, and instead be outputs of
+        `_snapshot_drive_widgets`!
     params : dict
-        Dictionary of "prior" parameters that may contain parametrized versions of synaptic
-        parameters.
+        Dictionary of "prior" parameters that *may* contain parametrized versions of
+        synaptic parameters.
 
     Returns
     -------
     output_dict : dict
-        A nested dictionary with `syn_type` as the outer key and cell types as inner keys, each
-        mapping to their respective values for the parameter inherent to `syn_type`.
+        A nested dictionary with `syn_type` as the outer key and cell types as inner
+        keys, each mapping to their respective values for the parameter inherent to
+        `syn_type`.
     """
     cell_types = [
         "L5_pyramidal",
@@ -5346,16 +5488,35 @@ def _create_parametrized_syn_dicts_if_exist(syn_type, drive, params):
             cell_types.remove("L5_basket")
     output_dict = {syn_type: {}}
     for ct in cell_types:
-        output_dict[syn_type].update(
-            {
-                ct: (
-                    params[_name_check(ct, drive, params, syn_type)]
-                    if _name_check(ct, drive, params, syn_type)
-                    else drive[syn_type][ct].value
-                )
-            }
-        )
+        output_dict[syn_type][ct] = _use_params_if_exists(ct, drive, params, syn_type)
+
     return output_dict
+
+
+def _snapshot_drive_widgets(opt_drive_widgets):
+    """Extract plain values from the Opt tab's drive widget, so closures are picklable.
+
+    The resulting list of dicts contains only plain Python values (no widget objects),
+    making it safe to capture in closures that will be serialized by joblib/loky for
+    parallel execution.
+    """
+    snapshots = []
+    for drive in opt_drive_widgets:
+        snap = {}
+        for drive_key, drive_val in drive.items():
+            if isinstance(drive_val, dict):
+                snap[drive_key] = {
+                    syn_key: syn_value.value
+                    if hasattr(syn_value, "value")
+                    else syn_value
+                    for syn_key, syn_value in drive_val.items()
+                }
+            elif hasattr(drive_val, "value"):
+                snap[drive_key] = drive_val.value
+            else:
+                snap[drive_key] = drive_val
+        snapshots.append(snap)
+    return snapshots
 
 
 def _generate_constraints_and_func(net, opt_drive_widgets):
@@ -5416,11 +5577,16 @@ def _generate_constraints_and_func(net, opt_drive_widgets):
             elif drive["type"] in ("Rhythmic", "Bursty"):
                 constraints.update(_build_constraints(drive, apply_percentages=True))
 
+    # Snapshot all widget values into plain dicts so the closure is picklable
+    # (required for joblib/loky parallel execution in BatchSimulate).
+    # ------------------------------------------------------------------------------
+    drive_snapshots = _snapshot_drive_widgets(opt_drive_widgets)
+
     # Second, create a new `set_params` function that iterates through the drive
-    # widgets AGAIN, but which deploys our newly-created `constraints` dict:
+    # snapshots and deploys our newly-created `constraints` dict:
     # ------------------------------------------------------------------------------
     def set_params(net, params):
-        for drive in opt_drive_widgets:
+        for drive in drive_snapshots:
             if drive["type"] in ("Tonic"):
                 deployed_syn_dicts = {}
                 deployed_syn_dicts.update(
@@ -5428,18 +5594,18 @@ def _generate_constraints_and_func(net, opt_drive_widgets):
                 )
                 net.add_tonic_bias(
                     amplitude=deployed_syn_dicts["amplitude"],
-                    t0=_use_nonsyn_params_if_exists("t0", drive, params),
-                    tstop=_use_nonsyn_params_if_exists("tstop", drive, params),
+                    t0=_use_params_if_exists("t0", drive, params),
+                    tstop=_use_params_if_exists("tstop", drive, params),
                     bias_name=drive["name"],
                 )
             else:
                 sync_inputs_kwargs = dict(
                     n_drive_cells=(
                         "n_cells"
-                        if drive["is_cell_specific"].value
-                        else drive["n_drive_cells"].value
+                        if drive["is_cell_specific"]
+                        else drive["n_drive_cells"]
                     ),
-                    cell_specific=drive["is_cell_specific"].value,
+                    cell_specific=drive["is_cell_specific"],
                 )
 
                 deployed_syn_dicts = {}
@@ -5458,52 +5624,46 @@ def _generate_constraints_and_func(net, opt_drive_widgets):
 
                     net.add_poisson_drive(
                         name=drive["name"],
-                        tstart=_use_nonsyn_params_if_exists("tstart", drive, params),
-                        tstop=_use_nonsyn_params_if_exists("tstop", drive, params),
+                        tstart=_use_params_if_exists("tstart", drive, params),
+                        tstop=_use_params_if_exists("tstop", drive, params),
                         rate_constant=deployed_syn_dicts["rate_constant"],
                         location=drive["location"],
                         weights_ampa=deployed_syn_dicts["weights_ampa"],
                         weights_nmda=deployed_syn_dicts["weights_nmda"],
                         synaptic_delays=deployed_syn_dicts["delays"],
                         space_constant=100.0,
-                        event_seed=drive["seedcore"].value,
+                        event_seed=drive["seedcore"],
                         **sync_inputs_kwargs,
                     )
                 elif drive["type"] in ("Evoked", "Gaussian"):
                     net.add_evoked_drive(
                         name=drive["name"],
-                        mu=_use_nonsyn_params_if_exists("mu", drive, params),
-                        sigma=_use_nonsyn_params_if_exists("sigma", drive, params),
-                        numspikes=drive["numspikes"].value,
+                        mu=_use_params_if_exists("mu", drive, params),
+                        sigma=_use_params_if_exists("sigma", drive, params),
+                        numspikes=drive["numspikes"],
                         location=drive["location"],
                         weights_ampa=deployed_syn_dicts["weights_ampa"],
                         weights_nmda=deployed_syn_dicts["weights_nmda"],
                         synaptic_delays=deployed_syn_dicts["delays"],
                         space_constant=3.0,
-                        event_seed=drive["seedcore"].value,
+                        event_seed=drive["seedcore"],
                         **sync_inputs_kwargs,
                     )
 
                 elif drive["type"] in ("Rhythmic", "Bursty"):
                     net.add_bursty_drive(
                         name=drive["name"],
-                        tstart=_use_nonsyn_params_if_exists("tstart", drive, params),
-                        tstart_std=_use_nonsyn_params_if_exists(
-                            "tstart_std", drive, params
-                        ),
-                        tstop=_use_nonsyn_params_if_exists("tstop", drive, params),
+                        tstart=_use_params_if_exists("tstart", drive, params),
+                        tstart_std=_use_params_if_exists("tstart_std", drive, params),
+                        tstop=_use_params_if_exists("tstop", drive, params),
                         location=drive["location"],
-                        burst_rate=_use_nonsyn_params_if_exists(
-                            "burst_rate", drive, params
-                        ),
-                        burst_std=_use_nonsyn_params_if_exists(
-                            "burst_std", drive, params
-                        ),
-                        numspikes=drive["numspikes"].value,
+                        burst_rate=_use_params_if_exists("burst_rate", drive, params),
+                        burst_std=_use_params_if_exists("burst_std", drive, params),
+                        numspikes=drive["numspikes"],
                         weights_ampa=deployed_syn_dicts["weights_ampa"],
                         weights_nmda=deployed_syn_dicts["weights_nmda"],
                         synaptic_delays=deployed_syn_dicts["delays"],
-                        event_seed=drive["seedcore"].value,
+                        event_seed=drive["seedcore"],
                         **sync_inputs_kwargs,
                     )
 
@@ -5540,6 +5700,7 @@ def run_opt_button_clicked(
     opt_smoothing,
     opt_scaling,
     opt_target_widgets,
+    opt_solver_widgets,
 ):
     """Run an Optimization, then re-run its final simulation and plot its outputs.
 
@@ -5690,24 +5851,9 @@ def run_opt_button_clicked(
             max_iter=opt_max_iter,
         )
 
-        # Setup simulation backends
-        # ------------------------------------------------------------------------------
-        if backend_selection.value == "MPI":
-            # 'use_hwthreading_if_found' and 'sensible_default_cores' have
-            # already been set elsewhere, and do not need to be re-set here.
-            # Hardware-threading and oversubscription will always be disabled
-            # to prevent edge cases in the GUI.
-            backend = MPIBackend(
-                n_procs=n_jobs.value,
-                mpi_cmd=mpi_cmd.value,
-                override_hwthreading_option=False,
-                override_oversubscribe_option=False,
-            )
-        else:
-            backend = JoblibBackend(n_jobs=n_jobs.value)
-            print(f"Using Joblib with {n_jobs.value} core(s).")
-
-        with backend:
+        # Define the main execution function for the optimization, which is necessary
+        # due to CMA and non-CMA solvers using different approaches to parallelization:
+        def main_execution(inside_backend_flag=False):
             simulation_status_bar.value = simulation_status_contents["opt_running"]
             logger.info("Optimization started.")
             logger.info(f"Solver: {opt_solver}")
@@ -5717,10 +5863,6 @@ def run_opt_button_clicked(
 
             # Execute optimization
             # --------------------------------------------------------------------------
-            # Store PSD parameters for history tracking
-            psd_f_bands = None
-            psd_relative_bandpower = None
-
             try:
                 if opt_obj_fun in ("dipole_corr", "dipole_rmse"):
                     # AES: Not including the kwarg for "verbose" since the GUI log is
@@ -5731,6 +5873,14 @@ def run_opt_button_clicked(
                         n_trials=opt_target_widgets["n_trials"].value,
                         smooth_window_len=opt_smoothing,
                         scale_factor=opt_scaling,
+                        n_jobs=n_jobs.value,
+                        seed=opt_solver_widgets["seed"].value,
+                        popsize=(
+                            None
+                            if inside_backend_flag
+                            else opt_solver_widgets["popsize"].value
+                        ),
+                        sigma0=opt_solver_widgets["sigma0"].value,
                     )
                     optim.fit(**obj_fun_kwargs)
                 elif opt_obj_fun == "maximize_psd":
@@ -5759,10 +5909,6 @@ def run_opt_button_clicked(
                         relative_bandpower = [
                             opt_target_widgets["psd_target_band1_proportion"].value,
                         ]
-
-                    # Store for history tracking
-                    psd_f_bands = f_bands
-                    psd_relative_bandpower = relative_bandpower
 
                     # Note: `maximize_psd` does not currently support multiple trials.
                     obj_fun_kwargs = dict(
@@ -5854,6 +6000,47 @@ def run_opt_button_clicked(
                 simulation_status_bar.value = simulation_status_contents["failed"]
             else:
                 simulation_status_bar.value = simulation_status_contents["finished"]
+
+            if opt_obj_fun == "maximize_psd":
+                return new_name, f_bands, relative_bandpower
+            else:
+                return new_name
+
+        # --------------------------------------------------------------------------
+        if opt_solver == "cma":
+            # Do not setup any backends, since CMA will use BatchSimulate to use its own
+            # JoblibBackend internally.
+            if opt_obj_fun == "maximize_psd":
+                new_name, psd_f_bands, psd_relative_bandpower = main_execution(
+                    inside_backend_flag=False
+                )
+            else:
+                new_name = main_execution(inside_backend_flag=False)
+
+            # Setup non-CMA simulation backends
+            if backend_selection.value == "MPI":
+                # 'use_hwthreading_if_found' and 'sensible_default_cores' have
+                # already been set elsewhere, and do not need to be re-set here.
+                # Hardware-threading and oversubscription will always be disabled
+                # to prevent edge cases in the GUI.
+                backend = MPIBackend(
+                    n_procs=n_jobs.value,
+                    mpi_cmd=mpi_cmd.value,
+                    override_hwthreading_option=False,
+                    override_oversubscribe_option=False,
+                )
+            else:
+                backend = JoblibBackend(n_jobs=n_jobs.value)
+                print(f"Using Joblib with {n_jobs.value} core(s).")
+
+            with backend:
+                if opt_obj_fun == "maximize_psd":
+                    # AES TODO DEBUG
+                    new_name, psd_f_bands, psd_relative_bandpower = main_execution(
+                        inside_backend_flag=True
+                    )
+                else:
+                    new_name = main_execution(inside_backend_flag=True)
 
         # ------------------------------------------------------------------------------
         # The remainder of this function is just repeating some post-run visualization

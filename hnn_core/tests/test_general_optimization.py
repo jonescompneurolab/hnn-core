@@ -82,14 +82,14 @@ def test_optimize_evoked(solver, obj_fun):
         constraints=constraints,
         set_params=set_params,
         solver=solver,
-        obj_fun="dipole_rmse",
+        obj_fun=obj_fun,
         max_iter=max_iter,
     )
 
     # test repr before fitting
     assert "fit=False" in repr(optim), "optimizer is already fit"
 
-    optim.fit(target=dpl_orig, n_trials=3)
+    optim.fit(target=dpl_orig, n_trials=3, scale_factor=3000, smooth_window_len=1)
 
     # test repr after fitting
     assert "fit=True" in repr(optim), "optimizer was not fit"
@@ -110,7 +110,8 @@ def test_optimize_evoked(solver, obj_fun):
 
 
 @pytest.mark.parametrize("solver", ["bayesian", "cobyla", "cma"])
-def test_rhythmic(solver):
+@pytest.mark.parametrize("relative_bandpower", [[1, 2], 0.5])
+def test_rhythmic(solver, relative_bandpower):
     """Test optimization routines for rhythmic drives in a reduced network."""
 
     max_iter = 2
@@ -190,7 +191,10 @@ def test_rhythmic(solver):
     # test repr before fitting
     assert "fit=False" in repr(optim), "optimizer is already fit"
 
-    optim.fit(f_bands=[(8, 12), (18, 22)], relative_bandpower=[1, 2])
+    with pytest.raises(ValueError, match="Length of relative_bandpower"):
+        optim.fit(f_bands=[(8, 12), (18, 22)], relative_bandpower=[1, 2, 3])
+
+    optim.fit(f_bands=[(8, 12), (18, 22)], relative_bandpower=relative_bandpower)
 
     # test repr after fitting
     assert "fit=True" in repr(optim), "optimizer was not fit"
@@ -357,6 +361,7 @@ def test_initial_params_validation(solver, initial_params, error_type):
 
 
 def test_cma_validation():
+    """Test validation of CMA specific parameters"""
     net = jones_2009_model(mesh_shape=(3, 3))
     tstop = 10.0
     constraints = {"mu": (1, 10), "sigma": (1, 10)}
@@ -389,3 +394,82 @@ def test_cma_validation():
         optim.fit(target=dpl_target, sigma0=[1, 2, 3])
 
     optim.fit(target=dpl_target, sigma0=[1, 2])
+
+
+def test_cma_seed():
+    """Test random seed control during CMA optimization"""
+    # Define parameters for a very short optimization run
+    max_iter = 3
+    popsize = 4
+    tstop = 10.0
+    dt = 0.5
+    n_trials = 3
+    solver = "cma"
+    obj_fun = "dipole_corr"
+
+    def set_params(net, params):
+        weights_ampa = {
+            "L2_basket": 0.5,
+            "L2_pyramidal": 0.5,
+            "L5_basket": 0.5,
+            "L5_pyramidal": 0.5,
+        }
+        synaptic_delays = {
+            "L2_basket": 0.1,
+            "L2_pyramidal": 0.1,
+            "L5_basket": 1.0,
+            "L5_pyramidal": 1.0,
+        }
+        net.add_evoked_drive(
+            "evprox",
+            mu=params["mu"],
+            sigma=params["sigma"],
+            numspikes=1,
+            location="proximal",
+            weights_ampa=weights_ampa,
+            synaptic_delays=synaptic_delays,
+        )
+
+    # Simulate a dipole to establish the target
+    net_target = jones_2009_model(mesh_shape=(3, 3))
+    params_target = {"mu": 2.0, "sigma": 1.0}
+
+    set_params(net_target, params_target)
+    dpl_target = simulate_dipole(net_target, tstop=tstop, dt=dt, n_trials=n_trials)[0]
+
+    # define set_params function and constraints
+    net_opt = jones_2009_model(mesh_shape=(3, 3))
+
+    # define constraints
+    constraints = dict()
+    constraints.update({"mu": (0, tstop), "sigma": (0.1, 10)})
+
+    opt_kwargs = {
+        "initial_net": net_opt,
+        "tstop": tstop,
+        "constraints": constraints,
+        "set_params": set_params,
+        "solver": solver,
+        "obj_fun": obj_fun,
+        "max_iter": max_iter,
+    }
+
+    optim_seed1 = Optimizer(**opt_kwargs)
+    optim_seed1_repeat = Optimizer(**opt_kwargs)
+    optim_seed2 = Optimizer(**opt_kwargs)
+
+    seed1, seed2 = 111, 999999
+    # Run two different instances of an optimizer with the same seed
+    optim_seed1.fit(target=dpl_target, seed=seed1, popsize=popsize, dt=dt)
+    optim_seed1_repeat.fit(target=dpl_target, seed=seed1, popsize=popsize, dt=dt)
+
+    # Run one more instance of an optimizer with a different seed
+    optim_seed2.fit(target=dpl_target, seed=seed2, popsize=popsize, dt=dt)
+
+    # The optimization results with the same seed should match
+    assert np.allclose(optim_seed1.obj_, optim_seed1_repeat.obj_)
+    assert np.allclose(optim_seed1.opt_params_, optim_seed1_repeat.opt_params_)
+
+    # The optimization results with different seeds should be different
+    assert not np.allclose(optim_seed1.obj_, optim_seed2.obj_)
+    assert not np.allclose(optim_seed1.opt_params_, optim_seed2.opt_params_)
