@@ -1767,10 +1767,14 @@ def test_gui_run_optimization(backend_selection, opt_solver):
 
     # Setup initial params:
     # so that we avoid windowing errors for short sims
-    gui.widget_default_smoothing.value = 10
-    gui.widget_tstop.value = 10.0
+    # TODO we may need to add an option to disable preprocessing on RMSE opt function
+    gui.widget_default_smoothing.value = 1
+    gui.widget_tstop.value = 3.0
     # still getting `mindelay` errors with dt=0.5 using bayesian solver
-    gui.widget_dt.value = 0.025
+    # gui.widget_dt.value = 0.1
+    gui.widget_dt.value = 0.075  # maybe works
+    # gui.widget_dt.value = 0.05
+    # gui.widget_dt.value = 0.025
     gui.widget_backend_selection.value = backend_selection
 
     assert gui.widget_opt_obj_fun.value == "dipole_rmse"
