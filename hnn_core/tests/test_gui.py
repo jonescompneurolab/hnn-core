@@ -1733,7 +1733,7 @@ def test_diff_gui_vs_api_networks_simulations():
         for solver in ("bayesian", "cobyla", "cma")
     ],
 )
-def test_gui_run_optimization(backend_selection, opt_solver):
+def test_gui_run_optimization(backend_selection, opt_solver, setup_gui):
     """Comprehensively test optimization functionality in the GUI.
 
     This is a pretty comprehensive test of optimization usage in the GUI (but of course
@@ -1761,20 +1761,13 @@ def test_gui_run_optimization(backend_selection, opt_solver):
         - All of the above works after a second optimization run, including in the case
           that the objective function is different between runs
     """
-    # Not using setup_gui because we want to test the true default network
-    gui = HNNGUI()
-    _ = gui.compose()
+    gui = setup_gui
 
     # Setup initial params:
     # so that we avoid windowing errors for short sims
-    # TODO we may need to add an option to disable preprocessing on RMSE opt function
     gui.widget_default_smoothing.value = 1
     gui.widget_tstop.value = 3.0
-    # still getting `mindelay` errors with dt=0.5 using bayesian solver
-    # gui.widget_dt.value = 0.1
     gui.widget_dt.value = 0.075  # maybe works
-    # gui.widget_dt.value = 0.05
-    # gui.widget_dt.value = 0.025
     gui.widget_backend_selection.value = backend_selection
 
     assert gui.widget_opt_obj_fun.value == "dipole_rmse"
@@ -1783,13 +1776,6 @@ def test_gui_run_optimization(backend_selection, opt_solver):
     gui.widget_opt_max_iter.value = 3
     gui.widget_n_jobs.value = gui.n_cores  # use the safe default max of available cores
     gui.opt_solver_widgets["popsize"].value = 2
-
-    # Add at least one of every drive and bias type
-    for val_drive_type in ("Poisson", "Evoked", "Rhythmic", "Tonic"):
-        for val_location in ("Distal", "Proximal"):
-            gui.widget_drive_type_selection.value = val_drive_type
-            gui.widget_location_selection.value = val_location
-            gui.add_drive_button.click()
 
     # Load target data (and download if necessary)
     file_path = Path("S1_SupraT.txt")
@@ -1804,25 +1790,38 @@ def test_gui_run_optimization(backend_selection, opt_solver):
     # Set our target data
     gui.opt_target_widgets["target_dipole_data"].value = file_path.stem
 
+    drive_index_evoked = 0
+    drive_index_poisson = 4
+    drive_index_rhythmic = 3
+    drive_index_tonic = 5
+
     # Enable at least one constraint from each type of drive and bias to ensure they are
     # all included in the optimization
     # ----------------------------------------------------------------------------------
     # This checks an Evoked drive
-    gui.opt_drive_widgets[0]["mu_opt_checkbox"].value = True
+    gui.opt_drive_widgets[drive_index_evoked]["mu_opt_checkbox"].value = True
     # This checks a Poisson drive
-    gui.opt_drive_widgets[4]["rate_constant"]["L5_pyramidal_opt_checkbox"].value = True
+    gui.opt_drive_widgets[drive_index_poisson]["rate_constant"][
+        "L5_pyramidal_opt_checkbox"
+    ].value = True
     # This checks a Rhythmic drive
-    gui.opt_drive_widgets[8]["burst_rate_opt_checkbox"].value = True
+    gui.opt_drive_widgets[drive_index_rhythmic]["burst_rate_opt_checkbox"].value = True
     # This checks a Tonic bias
-    gui.opt_drive_widgets[9]["amplitude"]["L2_pyramidal_opt_checkbox"].value = True
+    gui.opt_drive_widgets[drive_index_tonic]["amplitude"][
+        "L2_pyramidal_opt_checkbox"
+    ].value = True
     # Give it a non-zero value so it actually affects the simulation
-    gui.opt_drive_widgets[9]["amplitude"]["L2_pyramidal"].value = 0.2
+    gui.opt_drive_widgets[drive_index_tonic]["amplitude"]["L2_pyramidal"].value = 0.2
 
     # Record the initial values of these parameters
-    initial_mu = gui.opt_drive_widgets[0]["mu"].value
-    initial_rate_const = gui.opt_drive_widgets[4]["rate_constant"]["L5_pyramidal"].value
-    initial_burst_rate = gui.opt_drive_widgets[8]["burst_rate"].value
-    initial_amplitude = gui.opt_drive_widgets[9]["amplitude"]["L2_pyramidal"].value
+    initial_mu = gui.opt_drive_widgets[drive_index_evoked]["mu"].value
+    initial_rate_const = gui.opt_drive_widgets[drive_index_poisson]["rate_constant"][
+        "L5_pyramidal"
+    ].value
+    initial_burst_rate = gui.opt_drive_widgets[drive_index_rhythmic]["burst_rate"].value
+    initial_amplitude = gui.opt_drive_widgets[drive_index_tonic]["amplitude"][
+        "L2_pyramidal"
+    ].value
 
     # Perform the first run of optimization
     gui.run_opt_button.click()
@@ -1838,14 +1837,18 @@ def test_gui_run_optimization(backend_selection, opt_solver):
     # jones_2009_model (evdist1 mu), gui.py defaults (Poisson rate_constant, Rhythmic
     # burst_rate), and the explicit assignment above (tonic amplitude).
     constrained_vars = [
-        (gui.opt_drive_widgets[0], "mu", initial_mu),
+        (gui.opt_drive_widgets[drive_index_evoked], "mu", initial_mu),
         (
-            gui.opt_drive_widgets[4]["rate_constant"],
+            gui.opt_drive_widgets[drive_index_poisson]["rate_constant"],
             "L5_pyramidal",
             initial_rate_const,
         ),
-        (gui.opt_drive_widgets[8], "burst_rate", initial_burst_rate),
-        (gui.opt_drive_widgets[9]["amplitude"], "L2_pyramidal", initial_amplitude),
+        (gui.opt_drive_widgets[drive_index_rhythmic], "burst_rate", initial_burst_rate),
+        (
+            gui.opt_drive_widgets[drive_index_tonic]["amplitude"],
+            "L2_pyramidal",
+            initial_amplitude,
+        ),
     ]
     for drive, var, initial in constrained_vars:
         assert (
@@ -1854,10 +1857,14 @@ def test_gui_run_optimization(backend_selection, opt_solver):
             <= drive[f"{var}_opt_max"].value / 100 * initial
         )
 
-    assert gui.opt_drive_widgets[0]["mu_opt_checkbox"].value
-    assert gui.opt_drive_widgets[4]["rate_constant"]["L5_pyramidal_opt_checkbox"].value
-    assert gui.opt_drive_widgets[8]["burst_rate_opt_checkbox"].value
-    assert gui.opt_drive_widgets[9]["amplitude"]["L2_pyramidal_opt_checkbox"].value
+    assert gui.opt_drive_widgets[drive_index_evoked]["mu_opt_checkbox"].value
+    assert gui.opt_drive_widgets[drive_index_poisson]["rate_constant"][
+        "L5_pyramidal_opt_checkbox"
+    ].value
+    assert gui.opt_drive_widgets[drive_index_rhythmic]["burst_rate_opt_checkbox"].value
+    assert gui.opt_drive_widgets[drive_index_tonic]["amplitude"][
+        "L2_pyramidal_opt_checkbox"
+    ].value
 
     # Perform some basic checks, like that the optimized sim name has changed, there is
     # existent Dipole data, etc.
@@ -1880,10 +1887,14 @@ def test_gui_run_optimization(backend_selection, opt_solver):
     time.sleep(2)
 
     # Check that our target data and constraint checkboxes have not been reset
-    assert gui.opt_drive_widgets[0]["mu_opt_checkbox"].value
-    assert gui.opt_drive_widgets[4]["rate_constant"]["L5_pyramidal_opt_checkbox"].value
-    assert gui.opt_drive_widgets[8]["burst_rate_opt_checkbox"].value
-    assert gui.opt_drive_widgets[9]["amplitude"]["L2_pyramidal_opt_checkbox"].value
+    assert gui.opt_drive_widgets[drive_index_evoked]["mu_opt_checkbox"].value
+    assert gui.opt_drive_widgets[drive_index_poisson]["rate_constant"][
+        "L5_pyramidal_opt_checkbox"
+    ].value
+    assert gui.opt_drive_widgets[drive_index_rhythmic]["burst_rate_opt_checkbox"].value
+    assert gui.opt_drive_widgets[drive_index_tonic]["amplitude"][
+        "L2_pyramidal_opt_checkbox"
+    ].value
 
     # Perform some basic checks, like that the optimized sim name has changed, there is
     # existent Dipole data, etc. This also tests the auto-rename of multiple consecutive
@@ -1914,10 +1925,14 @@ def test_gui_run_optimization(backend_selection, opt_solver):
     time.sleep(2)
 
     # Check that our target data and constraint checkboxes have not been reset
-    assert gui.opt_drive_widgets[0]["mu_opt_checkbox"].value
-    assert gui.opt_drive_widgets[4]["rate_constant"]["L5_pyramidal_opt_checkbox"].value
-    assert gui.opt_drive_widgets[8]["burst_rate_opt_checkbox"].value
-    assert gui.opt_drive_widgets[9]["amplitude"]["L2_pyramidal_opt_checkbox"].value
+    assert gui.opt_drive_widgets[drive_index_evoked]["mu_opt_checkbox"].value
+    assert gui.opt_drive_widgets[drive_index_poisson]["rate_constant"][
+        "L5_pyramidal_opt_checkbox"
+    ].value
+    assert gui.opt_drive_widgets[drive_index_rhythmic]["burst_rate_opt_checkbox"].value
+    assert gui.opt_drive_widgets[drive_index_tonic]["amplitude"][
+        "L2_pyramidal_opt_checkbox"
+    ].value
 
     # Perform some basic checks, like that the optimized sim name has changed, there is
     # existent Dipole data, etc. This also tests the auto-rename of multiple consecutive
