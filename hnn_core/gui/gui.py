@@ -4051,11 +4051,13 @@ def _create_widgets_for_tonic(
             "amplitude": {},
         }
         amplitudes_list = []
+        # AES TODO
+        # data[cell_type]["amplitude"],
         for cell_type in cell_types:
             syn_widgets_dict["amplitude"].update(
                 _create_opt_widgets_for_drive_var(
                     cell_type,
-                    data[cell_type]["amplitude"],
+                    data["amplitude"][cell_type],
                     f"{cell_type}:",
                     syn_type="amplitude",
                     **complex_opt_widget_kwargs,
