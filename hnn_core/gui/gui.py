@@ -4055,7 +4055,7 @@ def _create_widgets_for_tonic(
             syn_widgets_dict["amplitude"].update(
                 _create_opt_widgets_for_drive_var(
                     cell_type,
-                    data["amplitude"][cell_type],
+                    data[cell_type]["amplitude"],
                     f"{cell_type}:",
                     syn_type="amplitude",
                     **complex_opt_widget_kwargs,
