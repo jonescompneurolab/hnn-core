@@ -1796,7 +1796,6 @@ def test_gui_run_optimization(backend_selection, opt_solver, setup_gui):
     for _ in range(0, len(gui.drive_widgets) + 1):
         gui.delete_drive_button.click()
 
-
     drive_index_evoked = 0
     drive_index_poisson = 2
     drive_index_rhythmic = 4
