@@ -1774,7 +1774,10 @@ def test_gui_run_optimization(backend_selection, opt_solver, setup_gui):
     gui.widget_opt_solver.value = opt_solver
     gui.widget_ntrials.value = 2
     gui.widget_opt_max_iter.value = 3
-    gui.widget_n_jobs.value = gui.n_cores  # use the safe default max of available cores
+    # Paradoxically, because the simulation is so short, using more cores actually makes
+    # the whole operation more slow. So we want the minimum number of cores that are
+    # needed for MPI, which is 2
+    gui.widget_n_jobs.value = 2
     gui.opt_solver_widgets["popsize"].value = 2
 
     # Load target data (and download if necessary)
@@ -1790,10 +1793,22 @@ def test_gui_run_optimization(backend_selection, opt_solver, setup_gui):
     # Set our target data
     gui.opt_target_widgets["target_dipole_data"].value = file_path.stem
 
+    for _ in range(0, len(gui.drive_widgets) + 1):
+        gui.delete_drive_button.click()
+
+
     drive_index_evoked = 0
-    drive_index_poisson = 4
-    drive_index_rhythmic = 3
-    drive_index_tonic = 5
+    drive_index_poisson = 2
+    drive_index_rhythmic = 4
+    drive_index_tonic = 6
+
+    assert len(gui.drive_widgets) == len(gui.opt_drive_widgets)
+
+    for val_drive_type in ("Evoked", "Poisson", "Rhythmic", "Tonic"):
+        for val_location in ("Distal", "Proximal"):
+            gui.widget_drive_type_selection.value = val_drive_type
+            gui.widget_location_selection.value = val_location
+            gui.add_drive_button.click()
 
     # Enable at least one constraint from each type of drive and bias to ensure they are
     # all included in the optimization
