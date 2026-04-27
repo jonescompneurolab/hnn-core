@@ -3959,8 +3959,12 @@ def _create_widgets_for_tonic(
 
     # Initialize our data dict with default values:
     if choose_tab_drive_or_opt == "opt":
-        # Note that unlike the similar "weights_ampa" etc., the drive_widgets
-        # use "amplitude" in the singular, not plural "amplitudes".
+        # Note that unlike the similar "weights_ampa" etc., the drive_widgets use
+        # "amplitude" in the singular, not plural "amplitudes".
+        #
+        # Also note that Tonic drives are inconsistent about whether amplitude is a
+        # child key of each cell type, or each cell type has a child key of amplitude
+        # for its value. TODO This should be refactored in the future.
         default_data = {
             "t0": 0,
             "tstop": tstop_widget.value,
@@ -3970,6 +3974,7 @@ def _create_widgets_for_tonic(
                 "L5_basket": 0.0,
                 "L2_basket": 0.0,
             },
+            **{cell_type: {"amplitude": 0.0} for cell_type in cell_types},
         }
     elif choose_tab_drive_or_opt == "drive":
         default_values = {"amplitude": 0, "t0": 0, "tstop": tstop_widget.value}
@@ -4051,13 +4056,11 @@ def _create_widgets_for_tonic(
             "amplitude": {},
         }
         amplitudes_list = []
-        # AES TODO
-        # data[cell_type]["amplitude"],
         for cell_type in cell_types:
             syn_widgets_dict["amplitude"].update(
                 _create_opt_widgets_for_drive_var(
                     cell_type,
-                    data["amplitude"][cell_type],
+                    data[cell_type]["amplitude"],
                     f"{cell_type}:",
                     syn_type="amplitude",
                     **complex_opt_widget_kwargs,
@@ -5325,6 +5328,13 @@ def _build_constraints(drive, syn_type=None, apply_percentages=False):
                 #       then min_value = 10*(50/100) = 5
                 min_value = current_value * (min_pct / 100)
                 max_value = current_value * (max_pct / 100)
+                # Skip degenerate constraints: CMA requires strictly lb < ub, so it
+                # fails if the user checks that they want to optimize over a parameter
+                # whose value is 0. Skipping inclusion of this value when it's 0 is the
+                # most elegant solution, since CMA won't fail, and cobyla and bayesian
+                # silently ignore it.
+                if max_value <= min_value:
+                    continue
                 # Use the unique name as the key, and add the bounds as actual values
                 output_constraints.update(
                     {unique_param_name: tuple([min_value, max_value])}
