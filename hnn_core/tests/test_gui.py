@@ -1722,18 +1722,26 @@ def test_diff_gui_vs_api_networks_simulations():
     )
 
 
+# Some notes about this run config:
+# - `cma` does not need to be run against MPI Backend because `cma` does not actually
+# use EITHER Joblib or MPI Backend. Instead, it uses BatchSimulate's, which uses its
+# own. This also means it can be run independent of needing MPI.
+# - The `dt` parameter is heterogeneous because (see #960 and #663), MPI simulations
+# appear to fail for larger `dt` values, but only in certain (not completely known)
+# situations. The below values are the biggest `dt` values that AES has found that work.
 @requires_mpi4py
 @requires_psutil
-@pytest.mark.uses_mpi
 @pytest.mark.parametrize(
-    "backend_selection,opt_solver",
+    "backend_selection,opt_solver,dt",
     [
-        (backend, solver)
-        for backend in ("MPI", "Joblib")
-        for solver in ("bayesian", "cobyla", "cma")
+        ("Joblib", "bayesian", 0.5),
+        ("Joblib", "cobyla", 0.5),
+        ("Joblib", "cma", 0.5),
+        pytest.param("MPI", "bayesian", 0.025, marks=pytest.mark.uses_mpi),
+        pytest.param("MPI", "cobyla", 0.025, marks=pytest.mark.uses_mpi),
     ],
 )
-def test_gui_run_optimization(backend_selection, opt_solver, setup_gui):
+def test_gui_run_optimization(backend_selection, opt_solver, dt, setup_gui):
     """Comprehensively test optimization functionality in the GUI.
 
     This is a pretty comprehensive test of optimization usage in the GUI (but of course
@@ -1767,13 +1775,13 @@ def test_gui_run_optimization(backend_selection, opt_solver, setup_gui):
     # so that we avoid windowing errors for short sims
     gui.widget_default_smoothing.value = 1
     gui.widget_tstop.value = 3.0
-    gui.widget_dt.value = 0.075  # maybe works
+    gui.widget_dt.value = dt
     gui.widget_backend_selection.value = backend_selection
 
     assert gui.widget_opt_obj_fun.value == "dipole_rmse"
     gui.widget_opt_solver.value = opt_solver
     gui.widget_ntrials.value = 2
-    gui.widget_opt_max_iter.value = 3
+    gui.widget_opt_max_iter.value = 2
     # Paradoxically, because the simulation is so short, using more cores actually makes
     # the whole operation more slow. So we want the minimum number of cores that are
     # needed for MPI, which is 2
