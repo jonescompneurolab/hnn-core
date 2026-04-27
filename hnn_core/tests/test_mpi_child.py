@@ -6,7 +6,7 @@ from queue import Queue
 import pytest
 
 import hnn_core
-from hnn_core import read_params, Network, jones_2009_model
+from hnn_core import read_params, Network, neymotin_2020_model
 from hnn_core.mpi_child import MPISimulation, _str_to_net, _pickle_data
 from hnn_core.parallel_backends import (
     _gather_trial_data,
@@ -83,7 +83,7 @@ def test_str_to_net():
     # prepare network
     params_fname = op.join(hnn_core_root, "param", "default.json")
     params = read_params(params_fname)
-    net = jones_2009_model(params, add_drives_from_params=True)
+    net = neymotin_2020_model(params, add_drives_from_params=True)
 
     pickled_net = _pickle_data(net)
 
@@ -123,7 +123,7 @@ def test_child_run():
     params_reduced = params.copy()
     params_reduced.update({"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20})
     tstop, n_trials = 25, 2
-    net_reduced = jones_2009_model(
+    net_reduced = neymotin_2020_model(
         params_reduced, add_drives_from_params=True, mesh_shape=(3, 3)
     )
     net_reduced._instantiate_drives(tstop=tstop, n_trials=n_trials)

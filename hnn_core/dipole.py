@@ -81,7 +81,7 @@ def simulate_dipole(
     if not net.connectivity:
         warnings.warn(
             "No connections instantiated in network. Consider using "
-            "net = jones_2009_model() or net = law_2021_model() to "
+            "net = neymotin_2020_model() or net = law_2021_model() to "
             "create a predefined network from published models.",
             UserWarning,
         )

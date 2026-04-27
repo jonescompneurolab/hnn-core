@@ -61,7 +61,7 @@ from hnn_core.params_default import get_L2Pyr_params_default, get_L5Pyr_params_d
 from ..externals.mne import _validate_type
 
 hnn_core_root = Path(hnn_core.__file__).parent
-default_network_configuration = hnn_core_root / "param" / "jones2009_base.json"
+default_network_configuration = hnn_core_root / "param" / "neymotin2020_base.json"
 
 cell_parameters_dict = {
     "Geometry L2": [
@@ -248,7 +248,7 @@ class HNNGUI:
         The pixel density specified in dots per inch
     network configuration : str
         The relative path to the hierarchical json file defining the network and
-        drives to be used, typically "jones2009_base.json"
+        drives to be used, typically "neymotin2020_base.json"
 
     Attributes
     ----------
