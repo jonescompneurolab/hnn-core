@@ -162,8 +162,14 @@ def _rmse_evoked(
         new_net = initial_net.copy()
         set_params(new_net, params)
 
+        # ATTN: @ntolley: Is this right? I think this is what is run during the non-CMA
+        # case, but I think there was a tiny mistake where applying the defaults to
+        # obj_fun_kwargs was forgotten (compare to BatchSimulate above)
         dpls = simulate_dipole(
-            new_net, tstop=tstop, n_trials=obj_fun_kwargs["n_trials"]
+            new_net,
+            tstop=tstop,
+            dt=obj_fun_kwargs.get("dt", 0.025),
+            n_trials=obj_fun_kwargs.get("n_trials", 1),
         )
 
         # smooth & scale all dipoles
@@ -291,7 +297,10 @@ def _maximize_psd(
         # simulate dpl with predicted params
         new_net = initial_net.copy()
         set_params(new_net, params)
-        dpls = simulate_dipole(new_net, tstop=tstop, n_trials=1)
+        # `_maximize_psd` is currently only implemented for single-trial simulations
+        dpls = simulate_dipole(
+            new_net, tstop=tstop, dt=obj_fun_kwargs.get("dt", 0.025), n_trials=1
+        )
 
         # smooth & scale all dipoles
         _preprocess_dipole(dpls, obj_fun_kwargs)
@@ -403,7 +412,10 @@ def _anticorr_evoked(
         set_params(new_net, params)
 
         dpls = simulate_dipole(
-            new_net, tstop=tstop, n_trials=obj_fun_kwargs["n_trials"]
+            new_net,
+            tstop=tstop,
+            dt=obj_fun_kwargs.get("dt", 0.025),
+            n_trials=obj_fun_kwargs.get("n_trials", 1),
         )
 
         # smooth & scale all dipoles
