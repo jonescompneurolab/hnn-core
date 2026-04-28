@@ -38,21 +38,22 @@ class Optimizer:
 
                 ``set_params(net, params) -> None``
 
-            where ``net`` is a Network object and ``params`` is a dictionary
-            of the parameters that will be set inside the function.
+            where ``net`` is a Network object and ``params`` is a dictionary of the
+            parameters that will be set inside the function.
         initial_params : dict, optional
-            Initial parameters for the objective function. Keys are parameter
-            names, values are initial parameters. The default is None.
-            If None, the parameters will be set to the midpoints of parameter ranges.
+            Initial parameters for the objective function. Keys are parameter names,
+            values are initial parameters. The default is None. If None, the parameters
+            will be set to the midpoints of parameter ranges.
         solver : str
             The optimizer, 'bayesian', 'cobyla', or 'cma'.
         obj_fun : str | func
             The objective function to be minimized. Can be 'dipole_rmse',
-            'maximize_psd', "dipole_corr", or a user-defined function. The default is
-            'dipole_rmse'.
+            'maximize_psd', or a user-defined function. The default is 'dipole_rmse'. If
+            a user-defined function is provided, it must have the same function
+            signature as the existing objective functions (i.e. `_rmse_evoked` and
+            `_maximize_psd` in objective_functions.py).
         max_iter : int, optional
-            The max number of calls to the objective function. The default is
-            200.
+            The max number of calls to the objective function. The default is 200.
 
         Attributes
         ----------
