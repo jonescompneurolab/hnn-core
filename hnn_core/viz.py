@@ -141,7 +141,6 @@ def plot_laminar_lfp(
         The matplotlib figure handle into which time series were plotted.
     """
 
-
     _validate_type(times, (list, np.ndarray), "times")
     _validate_type(data, (list, np.ndarray), "data")
     if isinstance(times, list):
@@ -238,8 +237,6 @@ def plot_laminar_lfp(
             voltage_scalebar = voltage_offset
 
     if voltage_scalebar is not None:
-
-
         scalebar = AnchoredSizeBar(
             ax.transData,
             1,
@@ -305,7 +302,6 @@ def plot_dipole(
     fig : instance of plt.fig
         The matplotlib figure handle.
     """
-
 
     from .dipole import Dipole, average_dipoles
 
@@ -461,7 +457,6 @@ def plot_spikes_hist(
     fig : instance of matplotlib Figure
         The matplotlib figure handle.
     """
-
 
     n_trials = len(cell_response.spike_times)
     if trial_idx is None:
@@ -685,7 +680,6 @@ def plot_spikes_raster(
     fig : instance of matplotlib Figure
         The matplotlib figure object.
     """
-
 
     from .dipole import Dipole, average_dipoles
 
@@ -912,7 +906,6 @@ def plot_cells(net, ax=None, show=True):
         The matplotlib figure handle.
     """
 
-
     if ax is None:
         fig = plt.figure()
         ax = fig.add_subplot(111, projection="3d")
@@ -1016,7 +1009,6 @@ def plot_tfr_morlet(
     fig : instance of matplotlib Figure
         The matplotlib figure handle.
     """
-
 
     from .externals.mne import tfr_array_morlet
     from .dipole import Dipole
@@ -1176,7 +1168,6 @@ def plot_psd(
         The matplotlib figure handle.
     """
 
-
     from scipy.signal import periodogram
 
     from .dipole import Dipole
@@ -1279,7 +1270,6 @@ def plot_cell_morphology(
         The matplotlib 3D axis handle.
     """
 
-
     if ax is None:
         plt.figure()
         ax = plt.axes(projection="3d")
@@ -1354,7 +1344,6 @@ def plot_connectivity_matrix(
     fig : instance of matplotlib Figure
         The matplotlib figure handle.
     """
-
 
     from .network import Network
     from .cell import _get_gaussian_connection
@@ -1457,7 +1446,6 @@ def plot_drive_strength(
     fig : matplotlib.figure.Figure
         The figure handle.
     """
-
 
     from .network import Network
     from .cell import _get_gaussian_connection
@@ -1664,7 +1652,6 @@ def plot_cell_connectivity(
 
     """
 
-
     from .network import Network
 
     _validate_type(net, Network, "net", "Network")
@@ -1823,7 +1810,6 @@ def plot_laminar_csd(
     fig : instance of matplotlib Figure
         The matplotlib figure handle.
     """
-
 
     from scipy.interpolate import RectBivariateSpline
 
@@ -2019,7 +2005,6 @@ class NetworkPlotter:
         return times, vsec_recorded
 
     def _initialize_plots(self):
-    
 
         # Create figure
         if self.ax is None:
