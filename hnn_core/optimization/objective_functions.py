@@ -91,18 +91,23 @@ def _rmse_evoked(
         List to store objective function values.
     tstop : float
         The simulated dipole's duration.
-    target : instance of Dipole
-        A dipole object with experimental data.
-    n_trials : int
-        Number of trials to simulate and average.
-    verbose : bool
-        If True, print build steps and simulation progress to console. Default: True.
+    obj_fun_kwargs : dict
+        A kwargs-style dictionary that contains additional arguments for this particular
+        objective function and/or a particular solver. See `Optimizer.fit` for more
+        details. The key-value pairs specific to this objective function are:
+
+        target : instance of Dipole
+            Required. A dipole object with experimental data.
+        n_trials : int, default=1
+            Number of trials to simulate and average.
+
     best : dict, optional
         Dictionary with keys "obj" and "params" to store the best objective value and
-        corresponding parameters. Note that `best` will be updated as a "side-effect",
-        and is not returned by the function; this is necessary because the optimization
-        routines in `scipy.optimize` require the objective functions to return a single
-        scalar value.
+        corresponding parameters. Note that `best` will be updated as a "side-effect"
+        (similar to "pass-by-reference"), and is not returned by the function; this is
+        necessary because the optimization routines in `scipy.optimize` require the
+        objective functions to return a single scalar value. Only used if the solver is
+        set to "cobyla" or "cma".
 
     Returns
     -------
@@ -181,7 +186,8 @@ def _rmse_evoked(
     obj_values.append(obj)
     print(f"Mean Loss: {np.mean(obj):.2f}; Min Loss: {np.min(obj):.2f}")
 
-    # update best params
+    # update best params; this is a "side-effect" that changes the `best` dictionary
+    # in-place in the parent scope
     if best is not None and obj < best["obj"]:
         best["obj"] = obj
         best["params"] = predicted_params.copy()
@@ -218,19 +224,25 @@ def _maximize_psd(
         List to store objective function values.
     tstop : float
         The simulated dipole's duration.
-    f_bands : list of tuples
-        Lower and higher limit for each frequency band.
-    relative_bandpower : list of float | float
-        Weight for each frequency band in f_bands. If a single float is provided,
-        the same weight is applied to all frequency bands.
-    verbose : bool
-        If True, print build steps and simulation progress to console. Default: True.
+    obj_fun_kwargs : dict
+        A kwargs-style dictionary that contains additional arguments for this particular
+        objective function and/or a particular solver. See `Optimizer.fit` for more
+        details. The key-value pairs specific to this objective function are:
+
+        f_bands : list of tuples
+            Required. Lower and higher limit for each frequency band in Hz.
+        relative_bandpower : list of float | float
+            Required. Weight for each frequency band in f_bands. If a single float is
+            provided, the same weight is applied to all frequency bands.
+
     best : dict, optional
         Dictionary with keys "obj" and "params" to store the best objective value and
-        corresponding parameters. Note that `best` will be updated as a "side-effect",
-        and is not returned by the function; this is necessary because the optimization
-        routines in `scipy.optimize` require the objective functions to return a single
-        scalar value.
+        corresponding parameters. Note that `best` will be updated as a "side-effect"
+        (similar to "pass-by-reference"), and is not returned by the function; this is
+        necessary because the optimization routines in `scipy.optimize` require the
+        objective functions to return a single scalar value. Only used if the solver is
+        set to "cobyla" or "cma".
+
     Returns
     -------
     obj : float
@@ -309,7 +321,8 @@ def _maximize_psd(
 
     obj_values.append(obj)
 
-    # update best params
+    # update best params; this is a "side-effect" that changes the `best` dictionary
+    # in-place in the parent scope
     if best is not None and obj < best["obj"]:
         best["obj"] = obj
         best["params"] = predicted_params.copy()
@@ -344,12 +357,23 @@ def _anticorr_evoked(
         Function to update params.
     tstop : float
         The simulated dipole's duration.
-    target : instance of Dipole
-        A dipole object with experimental data.
-    n_trials : int
-        Number of trials to simulate and average.
-    verbose : bool
-        If True, print build steps and simulation progress to console. Default: True.
+    obj_fun_kwargs : dict
+        A kwargs-style dictionary that contains additional arguments for this particular
+        objective function and/or a particular solver. See `Optimizer.fit` for more
+        details. The key-value pairs specific to this objective function are:
+
+        target : instance of Dipole
+            Required. A dipole object with experimental data.
+        n_trials : int, default=1
+            Number of trials to simulate and average.
+
+    best : dict, optional
+        Dictionary with keys "obj" and "params" to store the best objective value and
+        corresponding parameters. Note that `best` will be updated as a "side-effect"
+        (similar to "pass-by-reference"), and is not returned by the function; this is
+        necessary because the optimization routines in `scipy.optimize` require the
+        objective functions to return a single scalar value. Only used if the solver is
+        set to "cobyla" or "cma".
 
     Returns
     -------
@@ -426,7 +450,8 @@ def _anticorr_evoked(
     print(f"Mean Loss: {np.mean(obj):.2f}; Min Loss: {np.min(obj):.2f}")
     obj_values.append(obj)
 
-    # update best params
+    # update best params; this is a "side-effect" that changes the `best` dictionary
+    # in-place in the parent scope
     if best is not None and obj < best["obj"]:
         best["obj"] = obj
         best["params"] = predicted_params.copy()
