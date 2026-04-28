@@ -634,9 +634,9 @@ def _run_opt_cobyla(
             predicted_params=predicted_params,
             update_params=_update_params,
             obj_values=obj_values,
-            best=best,
             tstop=tstop,
             obj_fun_kwargs=obj_fun_kwargs,
+            best=best,
         )
 
     fmin_cobyla(
