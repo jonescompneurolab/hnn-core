@@ -9,6 +9,10 @@ These are short examples that show how to use HNN-core API to accomplish specifi
 tasks.
 
 
+.. raw:: html
+
+  <div id='sg-tag-list' class='sphx-glr-tag-list'></div>
+
 
 .. raw:: html
 
