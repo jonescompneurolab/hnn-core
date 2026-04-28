@@ -2093,9 +2093,11 @@ def test_verbose():
         simulate_dipole(net, dt=0.5, tstop=20.0, verbose=False)
         assert buf.getvalue() == ""
 
+
 def test_deprecated_jones_2009_model():
-    with pytest.warns(DeprecationWarning, match="default model with `jones_2009_model`"):
+    with pytest.warns(
+        DeprecationWarning, match="default model with `jones_2009_model`"
+    ):
         net = jones_2009_model(add_drives_from_params=True, mesh_shape=(3, 3))
 
     simulate_dipole(net, dt=0.5, tstop=20.0, verbose=True)
-
