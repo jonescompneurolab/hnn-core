@@ -317,6 +317,7 @@ def _anticorr_evoked(
     obj_values,
     tstop,
     obj_fun_kwargs,
+    best=None,
 ):
     """The objective function for evoked responses.
 
@@ -412,5 +413,10 @@ def _anticorr_evoked(
 
     print(f"Mean Loss: {np.mean(obj):.2f}; Min Loss: {np.min(obj):.2f}")
     obj_values.append(obj)
+
+    # update best params
+    if best is not None and obj < best["obj"]:
+        best["obj"] = obj
+        best["params"] = predicted_params.copy()
 
     return obj
