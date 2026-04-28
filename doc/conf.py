@@ -153,7 +153,6 @@ html_theme_options = {
     "navbar_start": ["navbar-logo"],
     "navbar_center": ["navbar-nav"],
     "navbar_end": ["version-switcher"],
-    "pygments_dark_style": "monokai",
     "switcher": {
         "json_url": json_versions_url,
         "version_match": switcher_version_match,
