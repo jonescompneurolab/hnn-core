@@ -285,3 +285,5 @@ sphinx_gallery_conf = {
                'dependencies': 'Dockerfile'
                }
 }
+
+html_css_files = ["custom.css"]
