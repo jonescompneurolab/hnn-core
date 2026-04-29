@@ -9,6 +9,7 @@ import re
 import shlex
 import pickle
 import base64
+import time
 from warnings import warn
 from subprocess import Popen, PIPE, TimeoutExpired
 import binascii
@@ -127,6 +128,10 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
     threads_started = False
 
     try:
+        # print(command)
+
+        ## Timing subproces
+        t_start = time.time()
         proc = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE, *args, **kwargs)
 
         # now that the process has started, add it to the queue
@@ -146,12 +151,26 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
         sent_network = False
         count_since_last_output = 0
 
+        ## Camilo's code
+        first_output_received = False
+        t_start = time.time()
+
         # loop while the process is running the simulation
         while True:
             child_terminated = proc.poll() is not None
 
             if not data_received:
-                if _echo_child_output(out_q):
+                child_out = _echo_child_output(out_q)
+                if child_out:
+                    ## Camilo's code
+                    if not first_output_received:
+                        print(
+                            f"nrniv startup time: {time.time() - t_start:.2f}s | "
+                            f"first output: {repr(child_out[:200])}",
+                            flush=True,
+                        )
+                        first_output_received = True
+                    ## end Camilo's code
                     count_since_last_output = 0
                 else:
                     count_since_last_output += 1
@@ -189,15 +208,20 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
             if child_terminated and data_received:
                 # both exit conditions have been met (also we know that
                 # the network has been sent)
+                print(f"process terminated after {time.time() - t_start:.2f}s")
                 break
 
             if not child_terminated and count_since_last_output > timeout_cycles:
-                warn(
-                    "Timeout exceeded while waiting for child process output"
-                    ". Terminating..."
-                )
-                kill_proc_name("nrniv")
-                break
+                if sent_network:
+                    # nrniv child is computing silently ,dont timeout
+                    count_since_last_output = 0
+                else:
+                    warn(
+                        "Timeout exceeded while waiting for child process output"
+                        ". Terminating..."
+                    )
+                    kill_proc_name("nrniv")
+                    break
     except KeyboardInterrupt:
         warn("Received KeyboardInterrupt. Stopping simulation process...")
 
@@ -294,8 +318,8 @@ def _echo_child_output(out_q):
 
     if len(out) > 0:
         sys.stdout.write(out)
-        return True
-    return False
+        return out
+    return ""
 
 
 def _get_data_from_child_err(err_q):
@@ -992,11 +1016,10 @@ class MPIBackend(object):
         )
 
         env = _get_mpi_env()
-
         self.proc, sim_data = run_subprocess(
             command=self.mpi_cmd,
             obj=[net, tstop, dt, n_trials],
-            timeout=60,
+            timeout=10,
             proc_queue=self.proc_queue,
             env=env,
             cwd=os.getcwd(),
