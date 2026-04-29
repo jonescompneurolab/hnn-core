@@ -629,7 +629,7 @@ class HNNGUI:
                 <div
                 class='sim-status-box'
                 style='
-                    background:gray;
+                    background:#545454;
                     padding-left:10px;
                     color:white;
                 '>
@@ -642,7 +642,7 @@ class HNNGUI:
                 style='
                     background:var(--statusbar-running);
                     padding-left:10px;
-                    color:white;
+                    color:black;
                 '>
                     Running...
                 </div>
@@ -653,7 +653,7 @@ class HNNGUI:
                 style='
                     background:var(--gentle-green);
                     padding-left:10px;
-                    color:white;
+                    color:black;
                 '>
                     Simulation finished
                 </div>
@@ -664,7 +664,7 @@ class HNNGUI:
                 style='
                     background:var(--gentle-red);
                     padding-left:10px;
-                    color:white;
+                    color:black;
                 '>
                     Simulation failed
                 </div>
@@ -2859,7 +2859,7 @@ def add_network_connectivity_tab(
         """
         <div
         style="
-            background: gray;
+            background: #545454;
             color: white;
             width: 100%;
             margin-bottom: 2px;
