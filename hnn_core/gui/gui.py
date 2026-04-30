@@ -629,7 +629,7 @@ class HNNGUI:
                 <div
                 class='sim-status-box'
                 style='
-                    background:#545454;
+                    background:var(--acs-friendly-background);
                     padding-left:10px;
                     color:white;
                 '>
@@ -2859,7 +2859,7 @@ def add_network_connectivity_tab(
         """
         <div
         style="
-            background: #545454;
+            background: var(--acs-friendly-background);
             color: white;
             width: 100%;
             margin-bottom: 2px;

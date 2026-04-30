@@ -15,6 +15,7 @@
     --jp-error-color1: var(--gentle-red) !important;
     --tab-color: white;
     --tab-border: lightgrey;
+    --acs-friendly-background: #595959;
 }
 
 /*  center the entire AppLayout container
@@ -214,7 +215,7 @@ padding-bottom: 10px !important;
     default visualization parameters
 */
 .sim-tab-titles {
-    background: #545454;
+    background: var(--acs-friendly-background);
     color: white;
     width: 300px;
     padding: 0px 5px;
@@ -456,7 +457,7 @@ padding-bottom: 10px !important;
 
 /*  style figure placeholder text  */
 .fig-placeholder .widget-html-content {
-    color: #545454;
+    color: var(--acs-friendly-background);
     font-size: 13px;
     margin-top: 6px;
     text-align: center;
@@ -691,7 +692,7 @@ padding-bottom: 10px !important;
 /*  adjust the style for all TabBar tabs  */
 /* Change the non-dark-mode tab title color */
 .lm-TabBar-tab {
-    color: #545454 !important;
+    color: var(--acs-friendly-background) !important;
 }
 .dark-mode .lm-TabBar-tab {
     background-color: var(--dm-bg-secondary) !important;
@@ -866,7 +867,7 @@ padding-bottom: 10px !important;
 
 /*  restore background color for the simulation tab titles  */
 .dark-mode .widget-html.sim-tab-titles {
-    background-color: #545454 !important;
+    background-color: var(--acs-friendly-background) !important;
 
 }
 
