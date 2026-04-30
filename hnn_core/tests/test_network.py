@@ -611,13 +611,10 @@ def test_network_drives():
             ]:
                 assert kw in drive["dynamics"].keys()
             assert len(drive["events"][0]) == n_drive_cells
-            n_events = (
-                drive["dynamics"]["numspikes"]  # 2
-                * (
-                    1
-                    + (drive["dynamics"]["tstop"] - drive["dynamics"]["tstart"] - 1)
-                    // (1000.0 / drive["dynamics"]["burst_rate"])
-                )
+            n_events = drive["dynamics"]["numspikes"] * (  # 2
+                1
+                + (drive["dynamics"]["tstop"] - drive["dynamics"]["tstart"] - 1)
+                // (1000.0 / drive["dynamics"]["burst_rate"])
             )
             assert len(drive["events"][0][0]) == n_events  # 4
 
@@ -799,13 +796,10 @@ def test_network_drives_legacy():
             ]:
                 assert kw in drive["dynamics"].keys()
             assert len(drive["events"][0]) == n_drive_cells
-            n_events = (
-                drive["dynamics"]["numspikes"]  # 2
-                * (
-                    1
-                    + (drive["dynamics"]["tstop"] - drive["dynamics"]["tstart"] - 1)
-                    // (1000.0 / drive["dynamics"]["burst_rate"])
-                )
+            n_events = drive["dynamics"]["numspikes"] * (  # 2
+                1
+                + (drive["dynamics"]["tstop"] - drive["dynamics"]["tstart"] - 1)
+                // (1000.0 / drive["dynamics"]["burst_rate"])
             )
             assert len(drive["events"][0][0]) == n_events  # 4
 
@@ -1209,8 +1203,7 @@ def test_tonic_biases():
     assert net.external_biases["tonic"]["L2_pyramidal"]["t0"] == 0
     with pytest.raises(
         ValueError,
-        match=r"Bias named tonic already defined "
-        r"for.*$",
+        match=r"Bias named tonic already defined " r"for.*$",
     ):
         net.add_tonic_bias(amplitude=tonic_bias_2)
 
@@ -1224,10 +1217,7 @@ def test_tonic_biases():
 
     with pytest.raises(
         ValueError,
-        match=(
-            r"section must be one of .*"
-            " Got apical_4."
-        ),
+        match=(r"section must be one of .*" " Got apical_4."),
     ):
         net.add_tonic_bias(amplitude={"L2_pyramidal": 0.5}, section="apical_4")
 
@@ -2091,3 +2081,55 @@ def test_verbose():
     with io.StringIO() as buf, redirect_stdout(buf):
         simulate_dipole(net, dt=0.5, tstop=20.0, verbose=False)
         assert buf.getvalue() == ""
+
+
+def test_network_diff():
+    """Test Network.diff returns correct dictionary describing differences."""
+    net1 = jones_2009_model(mesh_shape=(2, 2))
+    net2 = jones_2009_model(mesh_shape=(2, 2))
+
+    # They should be identical
+    diffs = net1.diff(net2)
+    assert diffs == {}
+
+    # Change a threshold in one and verify diff captures it
+    net1.threshold = -10.0
+    net2.threshold = -20.0
+    diffs = net1.diff(net2)
+    assert "threshold" in diffs
+    assert diffs["threshold"]["self"] == -10.0
+    assert diffs["threshold"]["other"] == -20.0
+
+    # Test cell_object diffs
+    # We modify one synapse tau in L5_pyramidal for net1
+    net1.cell_types["L5_pyramidal"]["cell_object"].synapses["ampa"]["tau1"] += 10.0
+
+    diffs = net1.diff(net2)
+    assert "cell_types" in diffs
+    assert "L5_pyramidal" in diffs["cell_types"]
+    assert "cell_object" in diffs["cell_types"]["L5_pyramidal"]
+    assert "synapses" in diffs["cell_types"]["L5_pyramidal"]["cell_object"]
+    assert "ampa" in diffs["cell_types"]["L5_pyramidal"]["cell_object"]["synapses"]
+    assert (
+        "tau1" in diffs["cell_types"]["L5_pyramidal"]["cell_object"]["synapses"]["ampa"]
+    )
+
+    # Revert to keep looking clean
+    net1.cell_types["L5_pyramidal"]["cell_object"].synapses["ampa"]["tau1"] -= 10.0
+
+    # Add external drive to net1 but not net2
+    net1.add_poisson_drive(
+        "test_poisson",
+        tstart=0,
+        tstop=40.0,
+        rate_constant=10.0,
+        location="proximal",
+        weights_ampa={"L2_pyramidal": 0.001, "L5_pyramidal": 0.001},
+        synaptic_delays=0.1,
+        event_seed=45,
+    )
+    diffs = net1.diff(net2)
+    # The external drive should be flagged
+    assert "external_drives" in diffs
+    assert "test_poisson" in diffs["external_drives"]
+    assert diffs["external_drives"]["test_poisson"]["other"] is None
