@@ -623,7 +623,7 @@ def create_pext(p, tstop):
             "L5_pyramidal": (
                 p["gbar_" + skey + "_L5Pyr_ampa"],
                 p["gbar_" + skey + "_L5Pyr_nmda"],
-                0.1,
+                1.0,
                 p["sigma_t_" + skey],
             ),
             "L2_basket": (
@@ -649,7 +649,7 @@ def create_pext(p, tstop):
         "L2_basket": (
             p["L2Basket_Gauss_A_weight"],
             p["L2Basket_Gauss_A_weight"],
-            1.0,
+            0.1,
             p["L2Basket_Gauss_mu"],
             p["L2Basket_Gauss_sigma"],
         ),
@@ -689,7 +689,7 @@ def create_pext(p, tstop):
         "L2_basket": (
             p["L2Basket_Pois_A_weight_ampa"],
             p["L2Basket_Pois_A_weight_nmda"],
-            1.0,
+            0.1,
             p["L2Basket_Pois_lamtha"],
         ),
         "L2_pyramidal": (
