@@ -57,7 +57,7 @@ Let us import hnn_core
     import os.path as op
 
     import hnn_core
-    from hnn_core import simulate_dipole, jones_2009_model
+    from hnn_core import simulate_dipole, neymotin_2020_model
 
 
 
@@ -80,7 +80,7 @@ time with unique randomization.
 
 .. code-block:: Python
 
-    net = jones_2009_model()
+    net = neymotin_2020_model()
 
     weights_ampa = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
     net.add_bursty_drive(
@@ -172,7 +172,7 @@ start the simulation across the number of processors (cores) specified by
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 53.668 seconds)
+   **Total running time of the script:** (0 minutes 40.256 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_simulate_mpi_backend.py:

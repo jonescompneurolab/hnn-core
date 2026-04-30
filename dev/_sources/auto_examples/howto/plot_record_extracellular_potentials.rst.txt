@@ -44,7 +44,7 @@ placed in and around the HNN network model.
 
     import matplotlib.pyplot as plt
 
-    from hnn_core import jones_2009_model, simulate_dipole
+    from hnn_core import neymotin_2020_model, simulate_dipole
     from hnn_core.network_models import add_erp_drives_to_jones_model
 
 
@@ -69,7 +69,7 @@ drives; see the event-related potential (ERP) example for details.
 .. code-block:: Python
 
 
-    net = jones_2009_model()
+    net = neymotin_2020_model()
     add_erp_drives_to_jones_model(net)
 
     net.set_cell_positions(inplane_distance=30.)
@@ -258,7 +258,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 57.224 seconds)
+   **Total running time of the script:** (0 minutes 40.529 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_record_extracellular_potentials.py:

@@ -522,13 +522,13 @@ running a simulation that we would like to animate.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">op</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">hnn_core</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core</span><span class="w"> </span><span class="kn">import</span> <a href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model" title="hnn_core.jones_2009_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">jones_2009_model</span></a><span class="p">,</span> <a href="../../generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">,</span> <span class="n">read_params</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core</span><span class="w"> </span><span class="kn">import</span> <span class="n">neymotin_2020_model</span><span class="p">,</span> <a href="../../generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">,</span> <span class="n">read_params</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core.network_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">add_erp_drives_to_jones_model</span>
 </pre></div>
 </div>
 <p>We begin by instantiating the network. For this example, we will reduce the
 number of cells in the network to speed up the simulations.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a> <span class="o">=</span> <a href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model" title="hnn_core.jones_2009_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">jones_2009_model</span></a><span class="p">(</span><span class="n">mesh_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a> <span class="o">=</span> <span class="n">neymotin_2020_model</span><span class="p">(</span><span class="n">mesh_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
 
 <span class="c1"># Note that we move the cells further apart to allow better visualization of</span>
 <span class="c1"># the network (default inplane_distance=1.0 µm).</span>
@@ -599,10 +599,10 @@ can adjust the xyz limits of the plot to better visualize the network.</p>
 <a href="../../generated/hnn_core.viz.NetworkPlotter.html#hnn_core.viz.NetworkPlotter.export_movie" title="hnn_core.viz.NetworkPlotter.export_movie" class="sphx-glr-backref-module-hnn_core-viz sphx-glr-backref-type-py-method"><span class="n">net_plot</span><span class="o">.</span><span class="n">export_movie</span></a><span class="p">(</span><span class="s1">&#39;animation_demo.gif&#39;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.animation.FuncAnimation object at 0x766714a16250&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.animation.FuncAnimation object at 0x7d95396d30d0&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 39.496 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 33.715 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-howto-plot-hnn-animation-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/plot_hnn_animation.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo.svg" style="width: 150px;" />

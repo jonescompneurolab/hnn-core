@@ -37,7 +37,7 @@ of the beta event, and the incoming sensory information.
 
     # Authors: Nick Tolley <nicholas_tolley@brown.edu>
 
-    from hnn_core import simulate_dipole, law_2021_model, jones_2009_model
+    from hnn_core import simulate_dipole, law_2021_model, neymotin_2020_model
     from hnn_core.viz import plot_dipole
 
 
@@ -79,7 +79,7 @@ contains information on the biophysics and geometry of each cell.
 
 .. code-block:: Python
 
-    net_jones = jones_2009_model()
+    net_jones = neymotin_2020_model()
 
     jones_rise = net_jones.cell_types['L5_pyramidal']['cell_object'].synapses['gabab']['tau1']
     law_rise = net.cell_types['L5_pyramidal']['cell_object'].synapses['gabab']['tau1']
@@ -623,7 +623,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (4 minutes 28.819 seconds)
+   **Total running time of the script:** (3 minutes 0.511 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_beta.py:

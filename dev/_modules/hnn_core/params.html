@@ -1332,7 +1332,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">.network_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">jones_2009_model</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.network_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">neymotin_2020_model</span>
 
     <span class="c1"># Validate inputs</span>
     <span class="n">_validate_type</span><span class="p">(</span><span class="n">params_fname</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">),</span> <span class="s2">&quot;params_fname&quot;</span><span class="p">)</span>
@@ -1346,7 +1346,7 @@
     <span class="k">if</span> <span class="n">out_fname</span><span class="o">.</span><span class="n">suffix</span> <span class="o">!=</span> <span class="s2">&quot;.json&quot;</span><span class="p">:</span>
         <span class="n">out_fname</span> <span class="o">=</span> <span class="n">out_fname</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.json&quot;</span><span class="p">)</span>
 
-    <span class="n">net</span> <span class="o">=</span> <span class="n">jones_2009_model</span><span class="p">(</span>
+    <span class="n">net</span> <span class="o">=</span> <span class="n">neymotin_2020_model</span><span class="p">(</span>
         <span class="n">params</span><span class="o">=</span><span class="n">read_params</span><span class="p">(</span><span class="n">params_fname</span><span class="p">),</span>
         <span class="n">add_drives_from_params</span><span class="o">=</span><span class="n">include_drives</span><span class="p">,</span>
         <span class="n">legacy_mode</span><span class="o">=</span><span class="p">(</span><span class="kc">True</span> <span class="k">if</span> <span class="n">params_suffix</span> <span class="o">==</span> <span class="s2">&quot;param&quot;</span> <span class="k">else</span> <span class="kc">False</span><span class="p">),</span>

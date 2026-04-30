@@ -513,7 +513,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.network</span><span class="w"> </span><span class="kn">import</span> <span class="n">Network</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.externals.mne</span><span class="w"> </span><span class="kn">import</span> <span class="n">_validate_type</span><span class="p">,</span> <span class="n">_check_option</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.dipole</span><span class="w"> </span><span class="kn">import</span> <span class="n">simulate_dipole</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.network_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">jones_2009_model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.network_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">neymotin_2020_model</span>
 
 
 <div class="viewcode-block" id="BatchSimulate">
@@ -534,11 +534,11 @@
 <span class="sd">        The network model to use for simulations. Examples include the</span>
 <span class="sd">        returned value of the following functions:</span>
 
-<span class="sd">        - `jones_2009_model`: A network model based on Jones et al. (2009).</span>
+<span class="sd">        - `neymotin_2020_model`: A network model based on Jones et al. (2009).</span>
 <span class="sd">        - `law_2021_model`: A network model based on Law et al. (2021).</span>
 <span class="sd">        - `calcium_model`: A network model incorporating calcium dynamics.</span>
 
-<span class="sd">        Default is ``jones_2009_model()``.</span>
+<span class="sd">        Default is ``neymotin_2020_model()``.</span>
 <span class="sd">    tstop : float, optional</span>
 <span class="sd">        The stop time for the simulation. Default is 170 ms.</span>
 <span class="sd">    dt : float, optional</span>
@@ -608,7 +608,7 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">set_params</span><span class="p">,</span>
-        <span class="n">net</span><span class="o">=</span><span class="n">jones_2009_model</span><span class="p">(),</span>
+        <span class="n">net</span><span class="o">=</span><span class="n">neymotin_2020_model</span><span class="p">(),</span>
         <span class="n">tstop</span><span class="o">=</span><span class="mi">170</span><span class="p">,</span>
         <span class="n">dt</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span>
         <span class="n">n_trials</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>

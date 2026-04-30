@@ -62,7 +62,7 @@ Let us import hnn_core
 
 
     import hnn_core
-    from hnn_core import simulate_dipole, jones_2009_model
+    from hnn_core import simulate_dipole, neymotin_2020_model
 
 
 
@@ -85,7 +85,7 @@ time with unique randomization. The drive is only connected to the
 
 .. code-block:: Python
 
-    net = jones_2009_model()
+    net = neymotin_2020_model()
 
     location = 'proximal'
     burst_std = 20
@@ -147,7 +147,7 @@ time with unique randomization. The drive is only connected to the
     Trial 1: 290.0 ms...
     Trial 1: 300.0 ms...
 
-    <hnn_core.dipole.Dipole object at 0x76671d88bf50>
+    <hnn_core.dipole.Dipole object at 0x7d953282e710>
 
 
 
@@ -326,7 +326,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (2 minutes 27.162 seconds)
+   **Total running time of the script:** (1 minutes 31.227 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_alpha.py:

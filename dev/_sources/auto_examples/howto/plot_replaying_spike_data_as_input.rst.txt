@@ -48,7 +48,7 @@ Step 1: Setting Up the Source Network (Network A)
 -------------------------------------------------
 
 Our journey begins with Network A, the source of neural activity. We'll use the
-`jones_2009_model` to create a realistic neocortical network and simulate it with an
+`neymotin_2020_model` to create a realistic neocortical network and simulate it with an
 evoked drive to generate spike data. This step mimics how a network might produce
 activity in a real brain region, which we'll later transmit to another network.
 
@@ -61,13 +61,13 @@ efficient handling.
 
     import numpy as np
     import matplotlib.pyplot as plt
-    from hnn_core import jones_2009_model, simulate_dipole, read_spikes
+    from hnn_core import neymotin_2020_model, simulate_dipole, read_spikes
     import os.path as op
     import tempfile
 
     # Create and simulate Network A
     print("Creating and simulating Network A...")
-    net_A = jones_2009_model()
+    net_A = neymotin_2020_model()
     net_A._params.update({'tstop': 170.0})
 
     # Add a drive to generate activity
@@ -126,7 +126,7 @@ efficient handling.
     Trial 1: 140.0 ms...
     Trial 1: 150.0 ms...
     Trial 1: 160.0 ms...
-    Writing file /tmp/tmpmkhg_qlo/spk_0.txt
+    Writing file /tmp/tmp1pv1ne5e/spk_0.txt
     /home/circleci/project/examples/howto/plot_replaying_spike_data_as_input.py:59: DeprecationWarning: Reading cell response from txt files is deprecated and will be removed in future versions. Please load cell response along with simulated network
       cell_response = read_spikes(op.join(tmp_dir, 'spk_*.txt'))
     Extracted 616 spikes from Network A
@@ -154,7 +154,7 @@ B's layers, ensuring a realistic interaction.
 .. code-block:: Python
 
     print("Creating and configuring Network B...")
-    net_B = jones_2009_model()
+    net_B = neymotin_2020_model()
     net_B._params.update({'tstop': 225.0})
 
     # Extract spike data from first trial and filter for pyramidal cells
@@ -347,7 +347,7 @@ results!
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 34.224 seconds)
+   **Total running time of the script:** (1 minutes 6.993 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_replaying_spike_data_as_input.py:

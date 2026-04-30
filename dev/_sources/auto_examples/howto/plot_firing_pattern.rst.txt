@@ -53,7 +53,7 @@ Let us import ``hnn_core``.
 
 
     import hnn_core
-    from hnn_core import read_spikes, jones_2009_model, simulate_dipole
+    from hnn_core import read_spikes, neymotin_2020_model, simulate_dipole
 
 
 
@@ -73,7 +73,7 @@ Now let's build the network. We have used the same weights as in the
 
     import matplotlib.pyplot as plt
 
-    net = jones_2009_model()
+    net = neymotin_2020_model()
 
 
 
@@ -319,7 +319,7 @@ read spikes back in, we can use wildcard expressions.
 
  .. code-block:: none
 
-    Writing file /tmp/tmp_nob0oe8/spk_0.txt
+    Writing file /tmp/tmplkf462xg/spk_0.txt
     /home/circleci/project/examples/howto/plot_firing_pattern.py:112: DeprecationWarning: Reading cell response from txt files is deprecated and will be removed in future versions. Please load cell response along with simulated network
       cell_response = read_spikes(op.join(tmp_dir_name, 'spk_*.txt'))
 
@@ -405,7 +405,7 @@ raster plots and histograms for the pyramidal cells.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 44.313 seconds)
+   **Total running time of the script:** (0 minutes 29.241 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_firing_pattern.py:

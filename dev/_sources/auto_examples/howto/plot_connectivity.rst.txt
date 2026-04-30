@@ -52,7 +52,7 @@ Let us import ``hnn_core``.
 
 
     import hnn_core
-    from hnn_core import jones_2009_model, simulate_dipole
+    from hnn_core import neymotin_2020_model, simulate_dipole
 
 
 
@@ -74,7 +74,7 @@ predefined drives without the drives API shown previously).
 
 .. code-block:: Python
 
-    net_erp = jones_2009_model(add_drives_from_params=True)
+    net_erp = neymotin_2020_model(add_drives_from_params=True)
 
 
 
@@ -219,7 +219,7 @@ directly.
 .. code-block:: Python
 
     def get_network(probability=1.0):
-        net = jones_2009_model(add_drives_from_params=True)
+        net = neymotin_2020_model(add_drives_from_params=True)
         net.clear_connectivity()
 
         # Pyramidal cell connections
@@ -524,7 +524,7 @@ the aggregate current dipole.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (2 minutes 10.162 seconds)
+   **Total running time of the script:** (1 minutes 24.953 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_connectivity.py:

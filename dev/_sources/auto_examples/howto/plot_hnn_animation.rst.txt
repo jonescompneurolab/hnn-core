@@ -51,7 +51,7 @@ running a simulation that we would like to animate.
     import os.path as op
 
     import hnn_core
-    from hnn_core import jones_2009_model, simulate_dipole, read_params
+    from hnn_core import neymotin_2020_model, simulate_dipole, read_params
     from hnn_core.network_models import add_erp_drives_to_jones_model
 
 
@@ -70,7 +70,7 @@ number of cells in the network to speed up the simulations.
 
 .. code-block:: Python
 
-    net = jones_2009_model(mesh_shape=(3, 3))
+    net = neymotin_2020_model(mesh_shape=(3, 3))
 
     # Note that we move the cells further apart to allow better visualization of
     # the network (default inplane_distance=1.0 µm).
@@ -219,14 +219,14 @@ can adjust the xyz limits of the plot to better visualize the network.
  .. code-block:: none
 
 
-    <matplotlib.animation.FuncAnimation object at 0x766714a16250>
+    <matplotlib.animation.FuncAnimation object at 0x7d95396d30d0>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 39.496 seconds)
+   **Total running time of the script:** (1 minutes 33.715 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_hnn_animation.py:

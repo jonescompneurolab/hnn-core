@@ -581,7 +581,7 @@
 <ol class="arabic simple" start="4">
 <li><p>Test that it can successfully run a simulation using the following:</p></li>
 </ol>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;from hnn_core import jones_2009_model, simulate_dipole ; simulate_dipole(jones_2009_model(), tstop=20) ; print(&#39;--&gt; SUCCESS: The test worked&#39;)&quot;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;from hnn_core import neymotin_2020_model, simulate_dipole ; simulate_dipole(neymotin_2020_model(), tstop=20) ; print(&#39;--&gt; SUCCESS: The test worked&#39;)&quot;</span>
 </pre></div>
 </div>
 <p>Simply testing the import with <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-c</span> <span class="pre">&quot;import</span> <span class="pre">hnn_core&quot;</span></code> is NOT enough! You must test an actual simulation run. If you encounter issues with your compiled MOD files, then run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">clean</span></code> to delete the existing ones, then try running a simulation again. If you continue to have issues, then halt the release and investigate!</p>
@@ -595,9 +595,9 @@
 <li><p>Test that MPI simulations work as well, using the following command:</p></li>
 </ol>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core</span><span class="w"> </span><span class="kn">import</span> <span class="n">jones_2009_model</span><span class="p">,</span> <span class="n">MPIBackend</span><span class="p">,</span> <span class="n">simulate_dipole</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core</span><span class="w"> </span><span class="kn">import</span> <span class="n">neymotin_2020_model</span><span class="p">,</span> <span class="n">MPIBackend</span><span class="p">,</span> <span class="n">simulate_dipole</span>
 <span class="k">with</span> <span class="n">MPIBackend</span><span class="p">():</span>
-    <span class="n">simulate_dipole</span><span class="p">(</span><span class="n">jones_2009_model</span><span class="p">(),</span> <span class="n">tstop</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">simulate_dipole</span><span class="p">(</span><span class="n">neymotin_2020_model</span><span class="p">(),</span> <span class="n">tstop</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;--&gt; SUCCESS: The test worked&#39;</span><span class="p">)</span>
 <span class="s2">&quot;</span>
 </pre></div>
@@ -766,7 +766,7 @@
 <ol class="arabic simple" start="5">
 <li><p>Similar to before, test that a basic simulation runs, such as using:</p></li>
 </ol>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;from hnn_core import jones_2009_model, simulate_dipole ; simulate_dipole(jones_2009_model(), tstop=20)&quot;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;from hnn_core import neymotin_2020_model, simulate_dipole ; simulate_dipole(neymotin_2020_model(), tstop=20)&quot;</span>
 </pre></div>
 </div>
 <ol class="arabic simple" start="6">
