@@ -11,6 +11,27 @@ import warnings
 from .externals.mne import _validate_type
 
 
+def _get_cell_colors_from_metadata(cell_types_dict):
+    """Get color and marker mappings (WIP) from cell_metadata.
+
+    Parameters
+    ----------
+    cell_types_dict : dict
+
+    Returns
+    -------
+    colors : dict
+    markers : dict
+    """
+    colors = dict()
+    markers = dict()
+    for cell_name in sorted(cell_types_dict.keys()):
+        meta = cell_types_dict[cell_name].get("cell_metadata", {})
+        colors[cell_name] = meta.get("color", "k")
+        markers[cell_name] = meta.get("marker", "o")
+    return colors, markers
+
+
 def _lighten_color(color, amount=0.5):
     import matplotlib.colors as mc
 
@@ -481,7 +502,11 @@ def plot_spikes_hist(
     spike_types_mask = {
         s_type: np.isin(spike_types_data, s_type) for s_type in unique_types
     }
-    cell_types = ["L5_pyramidal", "L5_basket", "L2_pyramidal", "L2_basket"]
+    # fetching the cell types
+    from .network_models import default_cell_metadata
+
+    known_cell_types = set(default_cell_metadata.keys())
+    cell_types = sorted([ct for ct in unique_types if ct in known_cell_types])
     input_types = np.setdiff1d(unique_types, cell_types)
 
     if isinstance(spike_types, str):
@@ -705,14 +730,17 @@ def plot_spikes_raster(
                 f"Got {cell_types}"
             )
     else:
-        # Use default cell types
-        cell_types = ["L2_basket", "L2_pyramidal", "L5_basket", "L5_pyramidal"]
+        from .network_models import default_cell_metadata
 
-    # Set default colors
-    default_colors = plt.rcParams["axes.prop_cycle"].by_key()["color"][
-        : len(cell_types)
-    ]
-    cell_colors = {cell: color for cell, color in zip(cell_types, default_colors)}
+        known_cell_types = set(default_cell_metadata.keys())
+        cell_types = sorted([ct for ct in unique_spike_types if ct in known_cell_types])
+        if not cell_types:
+            cell_types = sorted(list(known_cell_types))
+
+    # default colors from cell metadata
+    from .network_models import default_cell_metadata as _meta
+
+    cell_colors = {cell: _meta.get(cell, {}).get("color", "k") for cell in cell_types}
 
     # validate colors argument
     _validate_type(colors, (list, dict, None), "color", "list of str, or dict")
@@ -917,27 +945,20 @@ def plot_cells(net, ax=None, show=True):
             f"Expected 'ax' to be an instance of Axes3D, but got {type(ax).__name__}"
         )
 
-    colors = {
-        "L5_pyramidal": "b",
-        "L2_pyramidal": "c",
-        "L5_basket": "r",
-        "L2_basket": "m",
-    }
-    markers = {
-        "L5_pyramidal": "^",
-        "L2_pyramidal": "^",
-        "L5_basket": "x",
-        "L2_basket": "x",
-    }
+    # colors and markers from cell metadata
+    if net.cell_types:
+        colors, markers = _get_cell_colors_from_metadata(net.cell_types)
+    else:
+        colors = dict()
+        markers = dict()
 
-    for cell_type in net.cell_types:
+    for cell_type in sorted(net.cell_types.keys()):
         x = [pos[0] for pos in net.pos_dict[cell_type]]
         y = [pos[1] for pos in net.pos_dict[cell_type]]
         z = [pos[2] for pos in net.pos_dict[cell_type]]
-        if cell_type in colors:
-            color = colors[cell_type]
-            marker = markers[cell_type]
-            ax.scatter(x, y, z, c=color, s=50, marker=marker, label=cell_type)
+        color = colors.get(cell_type, "k")
+        marker = markers.get(cell_type, "o")
+        ax.scatter(x, y, z, c=color, s=50, marker=marker, label=cell_type)
 
     if net.rec_arrays:
         cols = plt.get_cmap("inferno", len(net.rec_arrays) + 2)

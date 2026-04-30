@@ -522,46 +522,31 @@ class Network:
                     )
         else:
             # Default behavior - create standard network
+            """
+            wip:
+            so why not put cell name direct right?
+            1. will always need to create a cell object for using, might not satisfy the current problem solving reqs
+            2. What if more added in the future? makes the code modular aka, future proof!
+            """
+            # wip: getting it from network_models this time
+            from .network_models import default_cell_metadata
+
             cell_types_default = {
                 "L2_basket": {
                     "cell_object": basket(cell_name="L2_basket"),
-                    "cell_metadata": {
-                        "morpho_type": "basket",
-                        "electro_type": "inhibitory",
-                        "layer": "2",
-                        "measure_dipole": False,
-                        "reference": "https://doi.org/10.7554/eLife.51214",
-                    },
+                    "cell_metadata": deepcopy(default_cell_metadata["L2_basket"]),
                 },
                 "L2_pyramidal": {
                     "cell_object": pyramidal(cell_name="L2_pyramidal"),
-                    "cell_metadata": {
-                        "morpho_type": "pyramidal",
-                        "electro_type": "excitatory",
-                        "layer": "2",
-                        "measure_dipole": True,
-                        "reference": "https://doi.org/10.7554/eLife.51214",
-                    },
+                    "cell_metadata": deepcopy(default_cell_metadata["L2_pyramidal"]),
                 },
                 "L5_basket": {
                     "cell_object": basket(cell_name="L5_basket"),
-                    "cell_metadata": {
-                        "morpho_type": "basket",
-                        "electro_type": "inhibitory",
-                        "layer": "5",
-                        "measure_dipole": False,
-                        "reference": "https://doi.org/10.7554/eLife.51214",
-                    },
+                    "cell_metadata": deepcopy(default_cell_metadata["L5_basket"]),
                 },
                 "L5_pyramidal": {
                     "cell_object": pyramidal(cell_name="L5_pyramidal"),
-                    "cell_metadata": {
-                        "morpho_type": "pyramidal",
-                        "electro_type": "excitatory",
-                        "layer": "5",
-                        "measure_dipole": True,
-                        "reference": "https://doi.org/10.7554/eLife.51214",
-                    },
+                    "cell_metadata": deepcopy(default_cell_metadata["L5_pyramidal"]),
                 },
             }
 

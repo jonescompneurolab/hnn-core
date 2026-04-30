@@ -3,12 +3,65 @@
 # Authors: Nick Tolley <nicholas_tolley@brown.edu>
 
 import os.path as op
+from copy import deepcopy
 import hnn_core
 from hnn_core import read_params
 from .network import Network, _create_cell_coords
 from .params import _short_name
 from .cells_default import pyramidal_ca, pyramidal, basket
 from .externals.mne import _validate_type
+
+# Default cell metadata for the standard Jones 2009 network cell types.
+# Defined here at module level so that other code (e.g. JSON
+# serialisation / deserialisation) can import it without instantiating
+# a full Network object.
+
+# colors are a wip placeholder that will change post dev meet discussion
+default_cell_metadata = {
+    "L2_basket": {
+        "morpho_type": "basket",
+        "electro_type": "inhibitory",
+        "layer": "2",
+        "measure_dipole": False,
+        "reference": "https://doi.org/10.7554/eLife.51214",
+        "color": "m",
+        "marker": "x",  # shape from prev viz.py line:926
+    },
+    "L2_pyramidal": {
+        "morpho_type": "pyramidal",
+        "electro_type": "excitatory",
+        "layer": "2",
+        "measure_dipole": True,
+        "reference": "https://doi.org/10.7554/eLife.51214",
+        "color": "c",
+        "marker": "^",
+    },
+    "L5_basket": {
+        "morpho_type": "basket",
+        "electro_type": "inhibitory",
+        "layer": "5",
+        "measure_dipole": False,
+        "reference": "https://doi.org/10.7554/eLife.51214",
+        "color": "r",
+        "marker": "x",
+    },
+    "L5_pyramidal": {
+        "morpho_type": "pyramidal",
+        "electro_type": "excitatory",
+        "layer": "5",
+        "measure_dipole": True,
+        "reference": "https://doi.org/10.7554/eLife.51214",
+        "color": "b",
+        "marker": "^",
+    },
+}
+
+# same, placeholder, wip
+default_drive_colors = {
+    "proximal": "r",
+    "distal": "g",
+    "default": "#8B4513",
+}
 
 # ToDO -> direct _cell_L2Pyr calling
 
@@ -78,43 +131,19 @@ def jones_2009_model(
     cell_types = {
         "L2_basket": {
             "cell_object": basket(cell_name="L2_basket"),
-            "cell_metadata": {
-                "morpho_type": "basket",
-                "electro_type": "inhibitory",
-                "layer": "2",
-                "measure_dipole": False,
-                "reference": "https://doi.org/10.7554/eLife.51214",
-            },
+            "cell_metadata": deepcopy(default_cell_metadata["L2_basket"]),
         },
         "L2_pyramidal": {
             "cell_object": pyramidal(cell_name="L2_pyramidal"),
-            "cell_metadata": {
-                "morpho_type": "pyramidal",
-                "electro_type": "excitatory",
-                "layer": "2",
-                "measure_dipole": True,
-                "reference": "https://doi.org/10.7554/eLife.51214",
-            },
+            "cell_metadata": deepcopy(default_cell_metadata["L2_pyramidal"]),
         },
         "L5_basket": {
             "cell_object": basket(cell_name="L5_basket"),
-            "cell_metadata": {
-                "morpho_type": "basket",
-                "electro_type": "inhibitory",
-                "layer": "5",
-                "measure_dipole": False,
-                "reference": "https://doi.org/10.7554/eLife.51214",
-            },
+            "cell_metadata": deepcopy(default_cell_metadata["L5_basket"]),
         },
         "L5_pyramidal": {
             "cell_object": pyramidal(cell_name="L5_pyramidal"),
-            "cell_metadata": {
-                "morpho_type": "pyramidal",
-                "electro_type": "excitatory",
-                "layer": "5",
-                "measure_dipole": True,
-                "reference": "https://doi.org/10.7554/eLife.51214",
-            },
+            "cell_metadata": deepcopy(default_cell_metadata["L5_pyramidal"]),
         },
     }
 
