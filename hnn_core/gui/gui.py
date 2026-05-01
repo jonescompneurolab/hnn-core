@@ -5984,9 +5984,14 @@ def run_opt_button_clicked(
                         seed=opt_solver_widgets["seed"].value,
                         popsize=opt_solver_widgets["popsize"].value,
                         sigma0=opt_solver_widgets["sigma0"].value,
+                        verbose=False,
                     )
                     optim.fit(**obj_fun_kwargs)
                 elif opt_obj_fun == "maximize_psd":
+                    # Note that when band2 is unchecked, the objective is simply to
+                    # maximize band1. From the GUI, when the checkbox is disabled, the
+                    # proportion of band2 will not change the optimization behavior,
+                    # even if it is nonzero.
                     if opt_target_widgets["psd_target_band2_checkbox"].value:
                         f_bands = [
                             (
@@ -6044,7 +6049,7 @@ def run_opt_button_clicked(
                 if (_sim_name + "_optimized" + "_1") in simulation_data.keys():
                     predecessor_sim_suffix_number = []
                     for key in simulation_data.keys():
-                        match = re.search(r"_(\d+)$", key)
+                        match = re.search(r"_optimized_(\d+)$", key)
                         if match:
                             predecessor_sim_suffix_number.append(int(match.group(1)))
                     new_name = (
@@ -6074,7 +6079,7 @@ def run_opt_button_clicked(
                 if simulation_data[sim_name]["net"] is not None
             ]
             simulations_list_widget.options = sim_names
-            simulations_list_widget.value = sim_names[-1]
+            simulations_list_widget.value = new_name
 
             # Report back to the user, now that all simulations/output are completed:
             logger.info(
@@ -6088,15 +6093,10 @@ def run_opt_button_clicked(
             )
             # Check if optimization showed ANY difference in the objective function. If
             # it did not, then we made no progress.
-            #
-            # TODO: If we want to include something like the following in our automated
-            # testing, then we need to be sure (or at least very confident) that the
-            # same inputs will produce the same outputs (i.e. that our optimization is
-            # deterministic). Is it?
-            if np.all(optim.obj_ == optim.obj_[0]):
+            if np.all(optim.obj_ >= optim.obj_[0]):
                 logger.warning(
                     textwrap.dedent("""
-                    The objective function did not change over the course of the
+                    The objective function did not improve over the course of the
                     optimization. You probably need to increase the number of max
                     iterations in order to start converging.
                     """).replace("\n", " ")
