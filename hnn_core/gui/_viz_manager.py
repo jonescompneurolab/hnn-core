@@ -1233,12 +1233,19 @@ class _VizManager:
     def update_external_data_widget(self):
         """Enable exfiltration of simulation data by `HNNGUI` objects.
 
-        This allows external registered widgets (such as `HNNGUI.opt_target_widgets`), which are
-        "external" to `_VizManager`, to access `_VizManager`'s available simulation data entries.
+        This allows external registered widgets (such as `HNNGUI.opt_target_widgets`),
+        which are "external" to `_VizManager`, to access `_VizManager`'s available
+        simulation data entries.
+
+        Note: this relies on the assumption that `HNNGUI` has externally added the
+        attribute `_external_data_widget` to `_VizManager`, which it does inside
+        `HNNGUI.update_opt_tab_target_widgets()` which is always called at the time of
+        `HNNGUI.compose()` (see here:
+        https://github.com/asoplata/hnn-core/blob/4c52a1aeed522ee1071d1acef13e29254d5447c0/hnn_core/gui/gui.py#L2329
+        ). Initializing `_VizManager` is NOT enough to create this attribute.
         """
-        if (
-            hasattr(self, "_external_data_widget")
-            and self._external_data_widget is not None
+        if hasattr(self, "_external_data_widget") and isinstance(
+            self._external_data_widget, Dropdown
         ):
             all_sim_names = list(self.data["simulations"].keys())
             if len(all_sim_names) == 0:
@@ -1247,11 +1254,11 @@ class _VizManager:
             prior_value = self._external_data_widget.value
             # Note updating the options of the widget resets the value
             self._external_data_widget.options = all_sim_names
-
-            if prior_value in all_sim_names:
-                self._external_data_widget.value = prior_value
-            else:
-                self._external_data_widget.value = all_sim_names[0]
+            self._external_data_widget.value = prior_value
+        else:
+            logger.warning(
+                "No external data widget found for visualization manager to update."
+            )
 
     def _layout_template_change(self, template_type):
         # check if plot set type requires loaded sim-data

@@ -759,11 +759,7 @@ def generate_opt_history_table(opt_results, report_timestamp):
             lines.append(line)
 
         lines.append("")
-        # Display objective function values with RMSE context if applicable
-        if obj_fun == "dipole_rmse":
-            lines.append("Objective Function (RMSE) Values:")
-        else:
-            lines.append(f"Objective Function ({obj_fun}) Values:")
+        lines.append(f"Objective Function ({obj_fun}) Values:")
 
         for obj_idx, obj_out in enumerate(opt_result["obj_values"]):
             lines.append(f"  Iteration {obj_idx}: {obj_out:>15.6f}")

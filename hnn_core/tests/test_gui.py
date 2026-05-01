@@ -1184,6 +1184,8 @@ def test_gui_add_tonic_input():
     )
 
     tonic_drive_name = last_drive["name"]
+    assert tonic_drive_name == "Tonic3"
+
     net = _single_simulation["net"]
     assert net.external_biases[tonic_drive_name] is not None
     assert net.external_biases[tonic_drive_name]["L5_pyramidal"]["t0"] == 0.0
@@ -1762,7 +1764,7 @@ def test_gui_run_optimization(backend_selection, opt_solver, dt, setup_gui):
       consecutive, heterogeneous optimization runs, including that:
         - Enabled constraint checkboxes remain enabled across runs
         - The final resulting simulation after the optimization run is added to the main
-          list of simulations, has a new appropriate name, and has existent Dipole data
+          list of simulations, has a new appropriate name, and has existing Dipole data
         - Selected constraint values after a run are within the initial provided
           constraint bounds (this not a very good test of this because we are using very
           few optimization iterations, but whatevs)
@@ -1798,7 +1800,8 @@ def test_gui_run_optimization(backend_selection, opt_solver, dt, setup_gui):
     # Our first optimization run will use the  objective function of `dipole_corr`
     # ----------------------------------------------------------------------------------
     gui.widget_opt_obj_fun.value = "dipole_corr"
-    # Set our target data
+    # Set our target data, this emulates selecting a named simulation in the dropdown
+    # menu
     gui.opt_target_widgets["target_dipole_data"].value = file_path.stem
 
     for _ in range(0, len(gui.drive_widgets) + 1):
@@ -1889,7 +1892,7 @@ def test_gui_run_optimization(backend_selection, opt_solver, dt, setup_gui):
     ].value
 
     # Perform some basic checks, like that the optimized sim name has changed, there is
-    # existent Dipole data, etc.
+    # existing Dipole data, etc.
     new_sim_name_1 = gui.widget_simulation_name.value + "_optimized"
     dpls = gui.simulation_data[new_sim_name_1]["dpls"]
     assert isinstance(gui.simulation_data[new_sim_name_1]["net"], Network)
@@ -1919,7 +1922,7 @@ def test_gui_run_optimization(backend_selection, opt_solver, dt, setup_gui):
     ].value
 
     # Perform some basic checks, like that the optimized sim name has changed, there is
-    # existent Dipole data, etc. This also tests the auto-rename of multiple consecutive
+    # existing Dipole data, etc. This also tests the auto-rename of multiple consecutive
     # optimization runs.
     new_sim_name_2 = gui.widget_simulation_name.value + "_optimized" + "_1"
     assert new_sim_name_2 == "default_optimized_1"
@@ -1938,6 +1941,7 @@ def test_gui_run_optimization(backend_selection, opt_solver, dt, setup_gui):
     gui.opt_target_widgets["psd_target_band1_max"].value = 30.0
     gui.opt_target_widgets["psd_target_band2_checkbox"].value = True
     gui.opt_target_widgets["psd_target_band1_proportion"].value = 0.8
+    # Ensure correct automatic calculation of the band2 proportion
     assert np.isclose(gui.opt_target_widgets["psd_target_band2_proportion"].value, 0.2)
 
     # Perform the second run of optimization
@@ -1957,7 +1961,7 @@ def test_gui_run_optimization(backend_selection, opt_solver, dt, setup_gui):
     ].value
 
     # Perform some basic checks, like that the optimized sim name has changed, there is
-    # existent Dipole data, etc. This also tests the auto-rename of multiple consecutive
+    # existing Dipole data, etc. This also tests the auto-rename of multiple consecutive
     # optimization runs.
     new_sim_name_3 = gui.widget_simulation_name.value + "_optimized" + "_2"
     assert new_sim_name_3 == "default_optimized_2"

@@ -49,7 +49,7 @@ from ipywidgets.embed import embed_minimal_html
 import hnn_core
 from hnn_core import JoblibBackend, MPIBackend, simulate_dipole
 from hnn_core.cells_default import _exp_g_at_dist
-from hnn_core.dipole import _read_dipole_txt
+from hnn_core.dipole import _read_dipole_txt, average_dipoles
 from hnn_core.gui._logging import logger
 from hnn_core.gui._viz_manager import _idx2figname, _VizManager
 from hnn_core.hnn_io import dict_to_network, write_network_configuration
@@ -2324,8 +2324,11 @@ class HNNGUI:
             layout=Layout(width="378px"),
             style={"description_width": "80px"},
         )
-        # Set `_external_data_widget` to `opt_target_widgets["target_dipole_data"]` when simulation
-        # data changes
+        # Set `_external_data_widget` to `opt_target_widgets["target_dipole_data"]` when
+        # simulation data changes or upon initial GUI creation.
+        #
+        # Note: this is what first creates the `VizManager` object's
+        # `_external_data_widget` attribute!
         self.viz_manager._external_data_widget = self.opt_target_widgets[
             "target_dipole_data"
         ]
@@ -5736,7 +5739,7 @@ def run_opt_button_clicked(
         applying "target" widgets options.
     9. Afterwards, create a new `simulation_data` name (depending on existing names) and
         re-execute the final version of optimized Network. (We have to do this since the
-        Optimizer object does not (I think?) give us the final simulation output data).
+        Optimizer object does not give us the final simulation output data).
         The optimized simulation data gets saved to `<current GUI Simulation Name widget
         value>_optimized` or something similar.
     10. Save the re-executed final optimized Network and simulation data into
@@ -5790,16 +5793,13 @@ def run_opt_button_clicked(
                 # simulations yet. They likely either want to compare against a
                 # simulation result, or (more likely) forgot to load their experimental
                 # target data first.
-                #
-                # TODO: How we want to handle this, and what we want to communicate,
-                # needs some discussion and thinking.
                 logger.error(
                     textwrap.dedent("""
                     You have selected the 'default' dataset to use as the target of
                     optimization, but there is no dipole data associated with that
-                    dataset.  Please either load and select a dataset of dipole data to
-                    optimize towards, or run a simulation first if you want to optimize
-                    against that simulation.
+                    dataset. Please either load and select a dataset of dipole data to
+                    optimize towards with the "Load data" button, or run a simulation
+                    first if you want to optimize against that simulation.
                     """).replace("\n", " ")
                 )
                 simulation_status_bar.value = simulation_status_contents["failed"]
@@ -5808,8 +5808,9 @@ def run_opt_button_clicked(
                 # Extract the actual target data
                 # Like everywhere else in the GUI, we only support usage of single-trial
                 # dipole data.
-                target_dipole = simulation_data[opt_rmse_target_data_name]["dpls"][0]
-
+                target_dipole = average_dipoles(
+                    simulation_data[opt_rmse_target_data_name]["dpls"]
+                )
         # Input validation
         # ------------------------------------------------------------------------------
         # Note that this function initializes our `Network` object at
