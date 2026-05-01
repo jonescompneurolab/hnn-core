@@ -874,10 +874,10 @@ skipped. These types of failures will be marked as a failure in CI.
 ## Making changes to the default network
 
 If you ever need to make scientific or technical changes to the default network
-(i.e. the `jones_2009_model` network), you need to do three things:
+(i.e. the `neymotin_2020_model` network), you need to do three things:
 
 1. Step 1: If needed, manually make changes to `hnn_core/param/default.json`. This is
-   the base file used for the important `jones_2009_model()` function. Make sure that if
+   the base file used for the important `neymotin_2020_model()` function. Make sure that if
    you need to change certain parameters, then change them in this all-important file
    **manually**. Note that not all parameters are in this file. If your changes do not
    affect the parameters in this file, then you don't need to make any change to the
@@ -895,12 +895,12 @@ If you ever need to make scientific or technical changes to the default network
     sufficient. However, you **do** need to commit the new versions of these files. The
     two files:
 
-    A. `hnn_core/param/jones2009_base.json`: This is the base file used for the
+    A. `hnn_core/param/neymotin2020_base.json`: This is the base file used for the
        GUI. This file has been built using the code in
        `hnn_core/params.py::convert_to_json` by way of
        `dev_scripts/regenerate_base_network.py`.
 
-    B. `hnn_core/test/assets/jones2009_3x3_drives.json`: This is the base file used for
+    B. `hnn_core/test/assets/neymotin2020_3x3_drives.json`: This is the base file used for
        many tests. This file has been built using the script in
        `hnn_core/tests/regenerate_test_network.py`.
 

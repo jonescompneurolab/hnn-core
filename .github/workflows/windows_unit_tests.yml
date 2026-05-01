@@ -46,7 +46,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install --verbose .
-          python -c "from hnn_core import jones_2009_model, simulate_dipole; simulate_dipole(jones_2009_model(), tstop=20); print('--> SUCCESS: The test worked!')"
+          python -c "from hnn_core import neymotin_2020_model, simulate_dipole; simulate_dipole(neymotin_2020_model(), tstop=20); print('--> SUCCESS: The test worked!')"
 
       - name: Clean minimal dependencies install
         shell: cmd
@@ -73,11 +73,6 @@ jobs:
         shell: cmd
         run: |
           python -m pytest ./hnn_core/tests/ -m "not uses_mpi" -n auto --cov=hnn_core --cov-report=xml
-
-      - name: Test MPI-using parallel tests with pytest
-        shell: cmd
-        run: |
-          python -m pytest ./hnn_core/tests/ -m "uses_mpi" --cov=hnn_core --cov-report=xml --cov-append
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5

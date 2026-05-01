@@ -1,6 +1,6 @@
 
 <h1 align="center">
-<img src="https://raw.githubusercontent.com/jonescompneurolab/jones-website/master/images/frontpage/logos/logo-hnn-medium.png" width="300">
+<img src="https://raw.githubusercontent.com/jonescompneurolab/jones-website/master/images/frontpage/logos/logo-hnn-medium.png" alt="Logo of HNN, the Human Neocortical Neurosolver" width="300">
 </h1><br>
 
 # hnn-core

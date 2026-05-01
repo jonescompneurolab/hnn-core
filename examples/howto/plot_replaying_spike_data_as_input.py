@@ -17,7 +17,7 @@ results. Let's dive in!
 # -------------------------------------------------
 # 
 # Our journey begins with Network A, the source of neural activity. We'll use the
-# `jones_2009_model` to create a realistic neocortical network and simulate it with an
+# `neymotin_2020_model` to create a realistic neocortical network and simulate it with an
 # evoked drive to generate spike data. This step mimics how a network might produce
 # activity in a real brain region, which we'll later transmit to another network.
 # 
@@ -25,13 +25,13 @@ results. Let's dive in!
 # efficient handling.
 import numpy as np
 import matplotlib.pyplot as plt
-from hnn_core import jones_2009_model, simulate_dipole, read_spikes
+from hnn_core import neymotin_2020_model, simulate_dipole, read_spikes
 import os.path as op
 import tempfile
 
 # Create and simulate Network A
 print("Creating and simulating Network A...")
-net_A = jones_2009_model()
+net_A = neymotin_2020_model()
 net_A._params.update({'tstop': 170.0})
 
 # Add a drive to generate activity
@@ -73,7 +73,7 @@ with tempfile.TemporaryDirectory() as tmp_dir:
 # We'll also define connection properties to map Network A's pyramidal cells to Network
 # B's layers, ensuring a realistic interaction.
 print("Creating and configuring Network B...")
-net_B = jones_2009_model()
+net_B = neymotin_2020_model()
 net_B._params.update({'tstop': 225.0})
 
 # Extract spike data from first trial and filter for pyramidal cells

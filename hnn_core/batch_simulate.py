@@ -5,14 +5,16 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
-import numpy as np
 import os
+from itertools import product
+
+import numpy as np
 from joblib import Parallel, delayed, parallel_config
 
 from .network import Network
 from .externals.mne import _validate_type, _check_option
 from .dipole import simulate_dipole
-from .network_models import jones_2009_model
+from .network_models import neymotin_2020_model
 
 
 class BatchSimulate(object):
@@ -31,11 +33,11 @@ class BatchSimulate(object):
         The network model to use for simulations. Examples include the
         returned value of the following functions:
 
-        - `jones_2009_model`: A network model based on Jones et al. (2009).
+        - `neymotin_2020_model`: A network model based on Jones et al. (2009).
         - `law_2021_model`: A network model based on Law et al. (2021).
         - `calcium_model`: A network model incorporating calcium dynamics.
 
-        Default is ``jones_2009_model()``.
+        Default is ``neymotin_2020_model()``.
     tstop : float, optional
         The stop time for the simulation. Default is 170 ms.
     dt : float, optional
@@ -105,7 +107,7 @@ class BatchSimulate(object):
     def __init__(
         self,
         set_params,
-        net=jones_2009_model(),
+        net=neymotin_2020_model(),
         tstop=170,
         dt=0.025,
         n_trials=1,
@@ -376,7 +378,6 @@ class BatchSimulate(object):
         param_combinations: list
             List of parameter combinations.
         """
-        from itertools import product
 
         keys, values = zip(*param_grid.items())
         if combinations:

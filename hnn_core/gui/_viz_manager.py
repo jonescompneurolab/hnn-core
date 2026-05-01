@@ -34,8 +34,11 @@ _fig_placeholder = HTML(
     value="""
         Visualizations will become available in this window after a simulation has been
         run or data have been loaded
-    """
-).add_class("fig-placeholder")
+    """,
+    description="Visualization placeholder",
+)
+_fig_placeholder.add_class("fig-placeholder")
+_fig_placeholder.add_class("hide-label")
 
 _plot_types = [
     "current dipole",
@@ -654,7 +657,10 @@ def _plot_on_axes(
 
     existing_plots.children = (
         *existing_plots.children,
-        Label(f"{sim_name}: {plot_type}"),
+        Label(
+            f"{sim_name}: {plot_type}",
+            description=f"{sim_name}: {plot_type}",
+        ).add_class("hide-label"),
     )
     if data["use_ipympl"] is False:
         _static_rerender(widgets, fig, fig_idx)

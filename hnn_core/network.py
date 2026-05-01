@@ -430,7 +430,7 @@ class Network:
 
     Notes
     -----
-    ``net = jones_2009_model(params)`` is the recommended path for creating a
+    ``net = neymotin_2020_model(params)`` is the recommended path for creating a
     network. Instantiating the network as ``net = Network(params)`` will
     produce a network with no cell-to-cell connections. As such,
     connectivity information contained in ``params`` will be ignored.

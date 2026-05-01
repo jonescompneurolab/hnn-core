@@ -1,0 +1,7 @@
+dt:target {
+    --pst-color-target: transparent;
+}
+
+.viewcode-block:target {
+    --pst-color-target: transparent;
+}
