@@ -18,8 +18,10 @@ from matplotlib.ticker import ScalarFormatter
 from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
+from scipy.interpolate import RectBivariateSpline
+from scipy.signal import decimate, periodogram
 
-from .externals.mne import _validate_type
+from .externals.mne import tfr_array_morlet, _validate_type
 
 
 def _lighten_color(color, amount=0.5):
@@ -50,8 +52,6 @@ def _get_plot_data_trange(times, data, tmin=None, tmax=None):
 
 
 def _decimate_plot_data(decim, data, times, sfreq=None):
-    from scipy.signal import decimate
-
     if not isinstance(decim, list):
         decim = [decim]
 
@@ -302,7 +302,6 @@ def plot_dipole(
     fig : instance of plt.fig
         The matplotlib figure handle.
     """
-
     from .dipole import Dipole, average_dipoles
 
     layers = layer if isinstance(layer, list) else [layer]
@@ -680,7 +679,6 @@ def plot_spikes_raster(
     fig : instance of matplotlib Figure
         The matplotlib figure object.
     """
-
     from .dipole import Dipole, average_dipoles
 
     n_trials = len(cell_response.spike_times)
@@ -1009,8 +1007,6 @@ def plot_tfr_morlet(
     fig : instance of matplotlib Figure
         The matplotlib figure handle.
     """
-
-    from .externals.mne import tfr_array_morlet
     from .dipole import Dipole
 
     if isinstance(dpl, Dipole):
@@ -1167,9 +1163,6 @@ def plot_psd(
     fig : instance of matplotlib Figure
         The matplotlib figure handle.
     """
-
-    from scipy.signal import periodogram
-
     from .dipole import Dipole
 
     if ax is None:
@@ -1344,9 +1337,8 @@ def plot_connectivity_matrix(
     fig : instance of matplotlib Figure
         The matplotlib figure handle.
     """
-
-    from .network import Network
     from .cell import _get_gaussian_connection
+    from .network import Network
 
     _validate_type(net, Network, "net", "Network")
     _validate_type(conn_idx, int, "conn_idx", "int")
@@ -1446,9 +1438,8 @@ def plot_drive_strength(
     fig : matplotlib.figure.Figure
         The figure handle.
     """
-
-    from .network import Network
     from .cell import _get_gaussian_connection
+    from .network import Network
 
     _validate_type(net, Network, "net", "Network")
     _validate_type(show_weight, bool, "show_weight", "bool")
@@ -1651,7 +1642,6 @@ def plot_cell_connectivity(
     the connection corresponds to a drive, ex: poisson, bursty, etc.
 
     """
-
     from .network import Network
 
     _validate_type(net, Network, "net", "Network")
@@ -1810,9 +1800,6 @@ def plot_laminar_csd(
     fig : instance of matplotlib Figure
         The matplotlib figure handle.
     """
-
-    from scipy.interpolate import RectBivariateSpline
-
     if ax is None:
         _, ax = plt.subplots(1, 1, constrained_layout=True)
 

@@ -20,8 +20,9 @@ Network Local Field Potentials using LFPsim. Front Comput Neurosci 10:65.
 #          Sam Neymotin <samnemo@gmail.com>
 #          Christopher Bailey <cjb@cfin.au.dk>
 
-import numpy as np
 from copy import deepcopy
+
+import numpy as np
 from numpy.linalg import norm
 from neuron import h
 
