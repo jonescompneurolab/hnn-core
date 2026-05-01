@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**15:13.562** total execution time for 14 files **from all galleries**:
+**14:24.357** total execution time for 14 files **from all galleries**:
 
 .. container::
 
@@ -33,40 +33,40 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_workflows_plot_simulate_beta.py` (``../examples/workflows/plot_simulate_beta.py``)
-     - 03:09.515
+     - 02:57.689
      - 0.0
    * - :ref:`sphx_glr_auto_examples_workflows_plot_simulate_gamma.py` (``../examples/workflows/plot_simulate_gamma.py``)
-     - 02:07.641
+     - 01:59.482
      - 0.0
    * - :ref:`sphx_glr_auto_examples_workflows_plot_simulate_alpha.py` (``../examples/workflows/plot_simulate_alpha.py``)
-     - 01:37.179
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_howto_plot_connectivity.py` (``../examples/howto/plot_connectivity.py``)
-     - 01:35.669
+     - 01:33.852
      - 0.0
    * - :ref:`sphx_glr_auto_examples_howto_plot_hnn_animation.py` (``../examples/howto/plot_hnn_animation.py``)
-     - 01:32.391
+     - 01:32.878
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_howto_plot_connectivity.py` (``../examples/howto/plot_connectivity.py``)
+     - 01:23.544
      - 0.0
    * - :ref:`sphx_glr_auto_examples_howto_plot_replaying_spike_data_as_input.py` (``../examples/howto/plot_replaying_spike_data_as_input.py``)
-     - 01:08.210
+     - 01:05.672
      - 0.0
    * - :ref:`sphx_glr_auto_examples_workflows_plot_simulate_evoked.py` (``../examples/workflows/plot_simulate_evoked.py``)
-     - 01:00.344
+     - 00:56.971
      - 0.0
    * - :ref:`sphx_glr_auto_examples_workflows_plot_simulate_somato.py` (``../examples/workflows/plot_simulate_somato.py``)
-     - 00:47.656
+     - 00:49.937
      - 0.0
    * - :ref:`sphx_glr_auto_examples_howto_plot_record_extracellular_potentials.py` (``../examples/howto/plot_record_extracellular_potentials.py``)
-     - 00:44.471
+     - 00:40.310
      - 0.0
    * - :ref:`sphx_glr_auto_examples_howto_plot_simulate_mpi_backend.py` (``../examples/howto/plot_simulate_mpi_backend.py``)
-     - 00:43.127
+     - 00:40.255
      - 0.0
    * - :ref:`sphx_glr_auto_examples_howto_plot_firing_pattern.py` (``../examples/howto/plot_firing_pattern.py``)
-     - 00:32.471
+     - 00:29.014
      - 0.0
    * - :ref:`sphx_glr_auto_examples_howto_plot_batch_simulate.py` (``../examples/howto/plot_batch_simulate.py``)
-     - 00:14.888
+     - 00:14.753
      - 0.0
    * - :ref:`sphx_glr_auto_examples_howto_optimize_evoked.py` (``../examples/howto/optimize_evoked.py``)
      - 00:00.000

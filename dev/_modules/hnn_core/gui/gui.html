@@ -1132,7 +1132,7 @@
 <span class="s2">                &lt;div</span>
 <span class="s2">                class=&#39;sim-status-box&#39;</span>
 <span class="s2">                style=&#39;</span>
-<span class="s2">                    background:gray;</span>
+<span class="s2">                    background:var(--acs-friendly-background);</span>
 <span class="s2">                    padding-left:10px;</span>
 <span class="s2">                    color:white;</span>
 <span class="s2">                &#39;&gt;</span>
@@ -1145,7 +1145,7 @@
 <span class="s2">                style=&#39;</span>
 <span class="s2">                    background:var(--statusbar-running);</span>
 <span class="s2">                    padding-left:10px;</span>
-<span class="s2">                    color:white;</span>
+<span class="s2">                    color:black;</span>
 <span class="s2">                &#39;&gt;</span>
 <span class="s2">                    Running...</span>
 <span class="s2">                &lt;/div&gt;</span>
@@ -1156,7 +1156,7 @@
 <span class="s2">                style=&#39;</span>
 <span class="s2">                    background:var(--gentle-green);</span>
 <span class="s2">                    padding-left:10px;</span>
-<span class="s2">                    color:white;</span>
+<span class="s2">                    color:black;</span>
 <span class="s2">                &#39;&gt;</span>
 <span class="s2">                    Simulation finished</span>
 <span class="s2">                &lt;/div&gt;</span>
@@ -1167,7 +1167,7 @@
 <span class="s2">                style=&#39;</span>
 <span class="s2">                    background:var(--gentle-red);</span>
 <span class="s2">                    padding-left:10px;</span>
-<span class="s2">                    color:white;</span>
+<span class="s2">                    color:black;</span>
 <span class="s2">                &#39;&gt;</span>
 <span class="s2">                    Simulation failed</span>
 <span class="s2">                &lt;/div&gt;</span>
@@ -1312,6 +1312,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">simulation_list_widget</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span>
             <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Simulation Output to Save&quot;</span><span class="p">],</span>
             <span class="n">value</span><span class="o">=</span><span class="s2">&quot;Simulation Output to Save&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Simulation output:&quot;</span><span class="p">,</span>
             <span class="n">disabled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span>
                 <span class="n">width</span><span class="o">=</span><span class="s2">&quot;50%&quot;</span><span class="p">,</span>
@@ -1319,6 +1320,7 @@
                 <span class="n">min_width</span><span class="o">=</span><span class="s2">&quot;0&quot;</span><span class="p">,</span>  <span class="c1"># forces text to truncate</span>
             <span class="p">),</span>
         <span class="p">)</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;simulation-list-widget&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_list_widget</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;hide-label&quot;</span><span class="p">)</span>
 
         <span class="c1"># ==================================================</span>
         <span class="c1"># Network tab</span>
@@ -1454,7 +1456,7 @@
 <span class="s2">        &lt;/a&gt;</span>
 <span class="s2">        &quot;&quot;&quot;</span>
         <span class="c1"># Create widget wrapper</span>
-        <span class="k">return</span> <span class="n">HTML</span><span class="p">(</span>
+        <span class="n">html_widget</span> <span class="o">=</span> <span class="n">HTML</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">html_download_button</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">payload</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span>
                 <span class="n">filename</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;&quot;</span><span class="p">},</span>
@@ -1464,8 +1466,11 @@
                 <span class="n">color_theme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s2">&quot;theme_color&quot;</span><span class="p">],</span>
                 <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
                 <span class="n">mimetype</span><span class="o">=</span><span class="n">mimetype</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="p">),</span>
+            <span class="n">description</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="n">html_widget</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;hide-label&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">html_widget</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">add_logging_window_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">handler</span> <span class="o">=</span> <span class="n">_OutputWidgetHandler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">)</span>
@@ -1496,14 +1501,17 @@
         <span class="c1"># static parts</span>
         <span class="c1"># Running status</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_bar</span> <span class="o">=</span> <span class="n">HTML</span><span class="p">(</span>
-            <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_contents</span><span class="p">[</span><span class="s2">&quot;not_running&quot;</span><span class="p">]</span>
+            <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_contents</span><span class="p">[</span><span class="s2">&quot;not_running&quot;</span><span class="p">],</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Simulation status&quot;</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_bar</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;hide-label&quot;</span><span class="p">)</span>
 
         <span class="c1"># log window with toggle</span>
         <span class="c1"># --------------------------------------------------</span>
         <span class="c1"># toggle button</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_log_toggle_btn</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span>
             <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;chevron-down&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Toggle Log View&quot;</span><span class="p">,</span>
             <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;30px&quot;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s2">&quot;30px&quot;</span><span class="p">),</span>
             <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;Toggle Log View&quot;</span><span class="p">,</span>
         <span class="p">)</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;log-toggle-icon&quot;</span><span class="p">)</span>
@@ -1575,11 +1583,16 @@
 <span class="s2">                        height: 20px;</span>
 <span class="s2">                        display: flex;</span>
 <span class="s2">                        align-items: center;</span>
-<span class="s2">                        cursor: pointer;</span>
 <span class="s2">                    &quot;&gt;</span>
-<span class="s2">                        &lt;div style=&quot;width: 20px; height: 20px; display: flex;&quot;</span>
-<span class="s2">                            onclick=&quot;hnnToggleTheme()&quot;&gt;</span>
-<span class="s2">                            &lt;svg id=&quot;sun-svg&quot; viewBox=&quot;0 0 512 512&quot; style=&quot;</span>
+<span class="s2">                        &lt;button style=&quot;</span>
+<span class="s2">                            width: 20px; height: 20px; display: flex;</span>
+<span class="s2">                            background: none; border: none; padding: 0;</span>
+<span class="s2">                            cursor: pointer;</span>
+<span class="s2">                            &quot;</span>
+<span class="s2">                            onclick=&quot;hnnToggleTheme()&quot;</span>
+<span class="s2">                            aria-label=&quot;Toggle dark mode&quot;&gt;</span>
+<span class="s2">                            &lt;svg id=&quot;sun-svg&quot; viewBox=&quot;0 0 512 512&quot;</span>
+<span class="s2">                                aria-hidden=&quot;true&quot; style=&quot;</span>
 <span class="s2">                                fill: white;</span>
 <span class="s2">                                display: block;</span>
 <span class="s2">                                width: 100%;</span>
@@ -1587,7 +1600,8 @@
 <span class="s2">                            &quot;&gt;</span>
 <span class="s2">                                &lt;path d=&quot;</span><span class="si">{</span><span class="n">sun_icon</span><span class="si">}</span><span class="s2">&quot;&gt;&lt;/path&gt;</span>
 <span class="s2">                            &lt;/svg&gt;</span>
-<span class="s2">                            &lt;svg id=&quot;moon-svg&quot; viewBox=&quot;0 0 384 512&quot; style=&quot;</span>
+<span class="s2">                            &lt;svg id=&quot;moon-svg&quot; viewBox=&quot;0 0 384 512&quot;</span>
+<span class="s2">                                aria-hidden=&quot;true&quot; style=&quot;</span>
 <span class="s2">                                fill: white;</span>
 <span class="s2">                                display: none;</span>
 <span class="s2">                                width: 100%;</span>
@@ -1595,11 +1609,13 @@
 <span class="s2">                            &quot;&gt;</span>
 <span class="s2">                                &lt;path d=&quot;</span><span class="si">{</span><span class="n">moon_icon</span><span class="si">}</span><span class="s2">&quot;&gt;&lt;/path&gt;</span>
 <span class="s2">                            &lt;/svg&gt;</span>
-<span class="s2">                        &lt;/div&gt;</span>
+<span class="s2">                        &lt;/button&gt;</span>
 <span class="s2">                    &lt;/div&gt;</span>
 <span class="s2">                &lt;/div&gt;</span>
 <span class="s2">            &quot;&quot;&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;AES TODO&quot;</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;hide-label&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">analysis_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1806,7 +1822,12 @@
 
         <span class="n">simulation_box</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span>
             <span class="p">[</span>
-                <span class="n">HTML</span><span class="p">(</span><span class="s2">&quot;Simulation Parameters&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;sim-tab-titles&quot;</span><span class="p">),</span>
+                <span class="n">HTML</span><span class="p">(</span>
+                    <span class="s2">&quot;Simulation Parameters&quot;</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Simulation parameters heading&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;sim-tab-titles&quot;</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;hide-label&quot;</span><span class="p">),</span>
                 <span class="n">VBox</span><span class="p">(</span>
                     <span class="p">[</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">widget_simulation_name</span><span class="p">,</span>
@@ -1821,7 +1842,12 @@
                 <span class="c1"># help prevent any &quot;smushing&quot; or overlap that may appear on some</span>
                 <span class="c1"># OS/browser combinations but not others:</span>
                 <span class="n">Box</span><span class="p">()</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;dynamic-spacer&quot;</span><span class="p">),</span>
-                <span class="n">HTML</span><span class="p">(</span><span class="s2">&quot;Default Visualization Parameters&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;sim-tab-titles&quot;</span><span class="p">),</span>
+                <span class="n">HTML</span><span class="p">(</span>
+                    <span class="s2">&quot;Default Visualization Parameters&quot;</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Default visualization parameters heading&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;sim-tab-titles&quot;</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;hide-label&quot;</span><span class="p">),</span>
                 <span class="n">VBox</span><span class="p">(</span>
                     <span class="p">[</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">widget_default_smoothing</span><span class="p">,</span>
@@ -2050,6 +2076,7 @@
 <span class="s2">                src=&quot;</span><span class="si">{</span><span class="n">minimal_img_src</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="s2">                onload=&quot;</span><span class="si">{</span><span class="n">gui_scripts</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="s2">                style=&quot;display:none;&quot;</span>
+<span class="s2">                alt=&quot;&quot;</span>
 <span class="s2">            &gt;</span>
 <span class="s2">        &quot;&quot;&quot;</span>
 
@@ -2365,7 +2392,10 @@
         <span class="p">)</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;red-button&quot;</span><span class="p">)</span>
         <span class="n">delete_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_delete_single_drive</span><span class="p">)</span>
         <span class="n">drive_box</span><span class="o">.</span><span class="n">children</span> <span class="o">+=</span> <span class="p">(</span>
-            <span class="n">HTML</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&quot;&lt;p&gt; &lt;/p&gt;&quot;</span><span class="p">),</span>  <span class="c1"># Adds blank space</span>
+            <span class="n">HTML</span><span class="p">(</span>
+                <span class="n">value</span><span class="o">=</span><span class="s2">&quot;&lt;p&gt; &lt;/p&gt;&quot;</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Spacer&quot;</span><span class="p">,</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;hide-label&quot;</span><span class="p">),</span>  <span class="c1"># Adds blank space</span>
             <span class="n">delete_button</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -2611,8 +2641,10 @@
 <span class="w">                    </span><span class="mi">1</span>
 <span class="w">                    </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">global_gain_textfields</span><span class="p">[</span><span class="n">global_gain_type</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
 <span class="w">                    </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">single_gain_text_input</span><span class="o">.</span><span class="n">value</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
-<span class="w">                </span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&lt;/b&gt;&lt;/p&gt;&quot;&quot;&quot;</span>
+<span class="w">                </span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&lt;/b&gt;&lt;/p&gt;&quot;&quot;&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Total computed gain&quot;</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="n">combined_gain_indicator_output</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;hide-label&quot;</span><span class="p">)</span>
 
         <span class="c1"># Create closure to capture current widget references</span>
         <span class="k">def</span><span class="w"> </span><span class="nf">make_update_gain_indicator</span><span class="p">(</span><span class="n">gain_output</span><span class="p">,</span> <span class="n">gain_input</span><span class="p">,</span> <span class="n">gain_type</span><span class="p">):</span>
@@ -2648,8 +2680,10 @@
 <span class="w">                        </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">global_gain_textfields</span><span class="p">[</span><span class="n">global_gain_type</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
 <span class="w">                        </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">single_gain_text_input</span><span class="o">.</span><span class="n">value</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
 <span class="w">                    </span><span class="p">)</span>
-<span class="w">                </span><span class="p">)</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&lt;/b&gt;&quot;&quot;&quot;</span>
+<span class="w">                </span><span class="p">)</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&lt;/b&gt;&quot;&quot;&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Final weight&quot;</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="n">final_weight_indicator_output</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;hide-label&quot;</span><span class="p">)</span>
 
         <span class="c1"># Create closure to capture current widget references</span>
         <span class="k">def</span><span class="w"> </span><span class="nf">make_update_weight_indicator</span><span class="p">(</span>
@@ -2696,8 +2730,9 @@
             <span class="p">[</span>
                 <span class="n">HTML</span><span class="p">(</span>
                     <span class="n">value</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;&lt;p style=&#39;margin:5px;&#39;&gt;&lt;b&gt;</span><span class="si">{</span><span class="n">html_tab</span><span class="si">}{</span><span class="n">html_tab</span><span class="si">}</span>
-<span class="s2">            Receptor: </span><span class="si">{</span><span class="n">display_name</span><span class="si">}</span><span class="s2">&lt;/b&gt;&lt;/p&gt;&quot;&quot;&quot;</span>
-                <span class="p">),</span>
+<span class="s2">            Receptor: </span><span class="si">{</span><span class="n">display_name</span><span class="si">}</span><span class="s2">&lt;/b&gt;&lt;/p&gt;&quot;&quot;&quot;</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Receptor: </span><span class="si">{</span><span class="n">conn_data</span><span class="p">[</span><span class="n">receptor_name</span><span class="p">][</span><span class="s1">&#39;receptor&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;hide-label&quot;</span><span class="p">),</span>
                 <span class="n">HBox</span><span class="p">(</span>
                     <span class="p">[</span>
                         <span class="n">weight_text_input</span><span class="p">,</span>
@@ -2788,11 +2823,26 @@
         <span class="s2">&quot;delays&quot;</span><span class="p">:</span> <span class="n">delays</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="n">widgets_list</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="p">[</span><span class="n">HTML</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&quot;&lt;b&gt;AMPA weights&lt;/b&gt;&quot;</span><span class="p">)]</span>
+        <span class="p">[</span>
+            <span class="n">HTML</span><span class="p">(</span>
+                <span class="n">value</span><span class="o">=</span><span class="s2">&quot;&lt;b&gt;AMPA weights&lt;/b&gt;&quot;</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="s2">&quot;AMPA weights heading&quot;</span><span class="p">,</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;hide-label&quot;</span><span class="p">)</span>
+        <span class="p">]</span>
         <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">weights_ampa</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
-        <span class="o">+</span> <span class="p">[</span><span class="n">HTML</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&quot;&lt;b&gt;NMDA weights&lt;/b&gt;&quot;</span><span class="p">)]</span>
+        <span class="o">+</span> <span class="p">[</span>
+            <span class="n">HTML</span><span class="p">(</span>
+                <span class="n">value</span><span class="o">=</span><span class="s2">&quot;&lt;b&gt;NMDA weights&lt;/b&gt;&quot;</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="s2">&quot;NMDA weights heading&quot;</span><span class="p">,</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;hide-label&quot;</span><span class="p">)</span>
+        <span class="p">]</span>
         <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">weights_nmda</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
-        <span class="o">+</span> <span class="p">[</span><span class="n">HTML</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&quot;&lt;b&gt;Synaptic delays&lt;/b&gt;&quot;</span><span class="p">)]</span>
+        <span class="o">+</span> <span class="p">[</span>
+            <span class="n">HTML</span><span class="p">(</span>
+                <span class="n">value</span><span class="o">=</span><span class="s2">&quot;&lt;b&gt;Synaptic delays&lt;/b&gt;&quot;</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Synaptic delays heading&quot;</span><span class="p">,</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;hide-label&quot;</span><span class="p">)</span>
+        <span class="p">]</span>
         <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">delays</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">widgets_list</span><span class="p">,</span> <span class="n">widgets_dict</span>
@@ -3020,7 +3070,12 @@
     <span class="p">)</span>
     <span class="n">widgets_dict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;rate_constant&quot;</span><span class="p">:</span> <span class="n">rate_constant</span><span class="p">})</span>
     <span class="n">widgets_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
-        <span class="p">[</span><span class="n">HTML</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&quot;&lt;b&gt;Rate constants&lt;/b&gt;&quot;</span><span class="p">)]</span>
+        <span class="p">[</span>
+            <span class="n">HTML</span><span class="p">(</span>
+                <span class="n">value</span><span class="o">=</span><span class="s2">&quot;&lt;b&gt;Rate constants&lt;/b&gt;&quot;</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Rate constants heading&quot;</span><span class="p">,</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;hide-label&quot;</span><span class="p">)</span>
+        <span class="p">]</span>
         <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">widgets_dict</span><span class="p">[</span><span class="s2">&quot;rate_constant&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
     <span class="p">)</span>
 
@@ -3176,9 +3231,19 @@
 
     <span class="n">widgets_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;amplitude&quot;</span><span class="p">:</span> <span class="n">amplitudes</span><span class="p">,</span> <span class="s2">&quot;t0&quot;</span><span class="p">:</span> <span class="n">start_times</span><span class="p">,</span> <span class="s2">&quot;tstop&quot;</span><span class="p">:</span> <span class="n">stop_times</span><span class="p">}</span>
     <span class="n">widgets_list</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="p">[</span><span class="n">HTML</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&quot;&lt;b&gt;Times (ms):&lt;/b&gt;&quot;</span><span class="p">)]</span>
+        <span class="p">[</span>
+            <span class="n">HTML</span><span class="p">(</span>
+                <span class="n">value</span><span class="o">=</span><span class="s2">&quot;&lt;b&gt;Times (ms):&lt;/b&gt;&quot;</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Times heading&quot;</span><span class="p">,</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;hide-label&quot;</span><span class="p">)</span>
+        <span class="p">]</span>
         <span class="o">+</span> <span class="p">[</span><span class="n">start_times</span><span class="p">,</span> <span class="n">stop_times</span><span class="p">]</span>
-        <span class="o">+</span> <span class="p">[</span><span class="n">HTML</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&quot;&lt;b&gt;Amplitude (nA):&lt;/b&gt;&quot;</span><span class="p">)]</span>
+        <span class="o">+</span> <span class="p">[</span>
+            <span class="n">HTML</span><span class="p">(</span>
+                <span class="n">value</span><span class="o">=</span><span class="s2">&quot;&lt;b&gt;Amplitude (nA):&lt;/b&gt;&quot;</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Amplitude heading&quot;</span><span class="p">,</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;hide-label&quot;</span><span class="p">)</span>
+        <span class="p">]</span>
         <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">amplitudes</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
     <span class="p">)</span>
 
@@ -3334,7 +3399,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        &lt;div</span>
 <span class="sd">        style=&quot;</span>
-<span class="sd">            background: gray;</span>
+<span class="sd">            background: var(--acs-friendly-background);</span>
 <span class="sd">            color: white;</span>
 <span class="sd">            width: 100%;</span>
 <span class="sd">            margin-bottom: 2px;</span>
@@ -3342,8 +3407,10 @@
 <span class="sd">        &quot;&gt;</span>
 <span class="sd">        Global Synaptic Gain Modifiers</span>
 <span class="sd">        &lt;/div&gt;</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Global synaptic gain modifiers&quot;</span><span class="p">,</span>
     <span class="p">)</span>
+    <span class="n">title_box</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;hide-label&quot;</span><span class="p">)</span>
 
     <span class="n">left_box</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span>
         <span class="p">[</span>
@@ -3462,7 +3529,9 @@
 <span class="sd">        &lt;/style&gt;</span>
 <span class="sd">        &quot;&quot;&quot;</span><span class="p">,</span>
         <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">display</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">),</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Connectivity styles&quot;</span><span class="p">,</span>
     <span class="p">)</span>
+    <span class="n">connectivity_out_style</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;hide-label&quot;</span><span class="p">)</span>
 
     <span class="c1"># Display the Accordion with styling</span>
     <span class="k">with</span> <span class="n">connectivity_out</span><span class="p">:</span>
