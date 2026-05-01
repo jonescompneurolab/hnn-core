@@ -3222,27 +3222,35 @@ def _create_synaptic_widgets(
                 )
 
         syn_widgets_list = (
-            [HTML(
-                value="<b>AMPA weights</b>",
-                description="AMPA weights heading",
-            ).add_class("hide-label")]
+            [
+                HTML(
+                    value="<b>AMPA weights</b>",
+                    description="AMPA weights heading",
+                ).add_class("hide-label")
+            ]
             + list(syn_widgets_dict["weights_ampa"].values())
-            + [HTML(
-                value="<b>NMDA weights</b>",
-                description="NMDA weights heading",
-            ).add_class("hide-label")]
+            + [
+                HTML(
+                    value="<b>NMDA weights</b>",
+                    description="NMDA weights heading",
+                ).add_class("hide-label")
+            ]
             + list(syn_widgets_dict["weights_nmda"].values())
-            + [HTML(
-                value="<b>Synaptic delays</b>",
-                description="Synaptic delays heading",
-            ).add_class("hide-label")]
+            + [
+                HTML(
+                    value="<b>Synaptic delays</b>",
+                    description="Synaptic delays heading",
+                ).add_class("hide-label")
+            ]
             + list(syn_widgets_dict["delays"].values())
             + (
                 (
-                    [HTML(
-                        value="<b>Rate constants</b>",
-                        description="Rate constants heading",
-                    ).add_class("hide-label")]
+                    [
+                        HTML(
+                            value="<b>Rate constants</b>",
+                            description="Rate constants heading",
+                        ).add_class("hide-label")
+                    ]
                     + list(syn_widgets_dict["rate_constant"].values())
                 )
                 if if_poisson
@@ -4124,10 +4132,11 @@ def _create_widgets_for_tonic(
                 )
             )
         new_drive_widgets.update(syn_widgets_dict)
-        syn_widgets_list = [HTML(
-            value="<b>Amplitude (nA)</b>",
-            description="Amplitude heading"
-        ).add_class("hide-label")] + amplitudes_list
+        syn_widgets_list = [
+            HTML(
+                value="<b>Amplitude (nA)</b>", description="Amplitude heading"
+            ).add_class("hide-label")
+        ] + amplitudes_list
     elif choose_tab_drive_or_opt == "drive":
         new_drive_widgets["amplitude"] = amplitudes
         widgets_dict = {
@@ -4137,15 +4146,19 @@ def _create_widgets_for_tonic(
         }
         new_drive_widgets.update(widgets_dict)
         syn_widgets_list = (
-            [HTML(
-                value="<b>Times (ms):</b>",
-                description="Times heading",
-            ).add_class("hide-label")]
+            [
+                HTML(
+                    value="<b>Times (ms):</b>",
+                    description="Times heading",
+                ).add_class("hide-label")
+            ]
             + [t0_widget, tstop_w]
-            + [HTML(
-                value="<b>Amplitude (nA):</b>",
-                description="Amplitude heading",
-            ).add_class("hide-label")]
+            + [
+                HTML(
+                    value="<b>Amplitude (nA):</b>",
+                    description="Amplitude heading",
+                ).add_class("hide-label")
+            ]
             + list(amplitudes.values())
         )
 
