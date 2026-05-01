@@ -167,9 +167,6 @@ def _rmse_evoked(
         new_net = initial_net.copy()
         set_params(new_net, params)
 
-        # ATTN: @ntolley: Is this right? I think this is what is run during the non-CMA
-        # case, but I think there was a tiny mistake where applying the defaults to
-        # obj_fun_kwargs was forgotten (compare to BatchSimulate above)
         dpls = simulate_dipole(
             new_net,
             tstop=tstop,

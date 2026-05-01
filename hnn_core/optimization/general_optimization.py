@@ -163,8 +163,7 @@ class Optimizer:
         n_trials : int (Optional if obj_fun='dipole_rmse' or 'dipole_corr')
             Number of trials to simulate and average.
         f_bands : list of tuples (Required if obj_fun='maximize_psd')
-            Lower and higher limit for each frequency band in Hz. # ATTN @ntolley This
-            is Hz, right?
+            Lower and higher limit for each frequency band in Hz.
         relative_bandpower : list of float | float (Required if obj_fun='maximize_psd')
             Weight for each frequency band in f_bands. If a single float is provided,
             the same weight is applied to all frequency bands.
