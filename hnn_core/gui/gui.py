@@ -5813,29 +5813,47 @@ def run_opt_button_clicked(
                 )
         # Input validation
         # ------------------------------------------------------------------------------
-        # Note that this function initializes our `Network` object at
-        # `simulation_data[_sim_name]['net']`, which we will use later. If a user has
-        # previously run a simulation for this `_sim_name`, then this will *overwrite*
-        # the `Network` object at that location. The only difference, however, is that
-        # drives will not be added at this step, due to `add_drive=False`. We need this
-        # because Optimization needs to have complete control over how drives are added,
-        # since the drives need to be added in the Optimizer's `set_params` function.
+        # First, let's make a Network of the current state of the GUI, and call it
+        # something different from the current simulation name widget's value, since the
+        # user may have changed parameters since they last ran a sim:
+        simulation_data[_sim_name + "_before_optimization"] = {}
         _init_network_from_widgets(
             params,
             dt,
             tstop,
-            simulation_data[_sim_name],
+            simulation_data[_sim_name + "_before_optimization"],
             opt_drive_widgets,
             connectivity_textfields,
             cell_parameters_widgets,
             global_gain_textfields,
             add_drive=False,
         )
+        # We always want to have simulation output from the state of the GUI as it is
+        # right now, but before optimization for later comparison. If the user ran a
+        # simulation before and the network from the current GUI state is identical to
+        # the network of the prior simulation, then let's just reuse that data. If not,
+        # then let's run a new simulation.
+        if (len(simulation_data[_sim_name]["dpls"]) > 0) and (
+            simulation_data[_sim_name]["net"]
+            == simulation_data[_sim_name + "_before_optimization"]["net"]
+        ):
+            simulation_data[_sim_name + "_before_optimization"]["dpls"] = (
+                simulation_data[_sim_name]["dpls"]
+            )
+        else:
+            simulation_data[_sim_name + "_before_optimization"]["dpls"] = (
+                simulate_dipole(
+                    simulation_data[_sim_name + "_before_optimization"]["net"],
+                    tstop=tstop.value,
+                    dt=dt.value,
+                    n_trials=opt_target_widgets["n_trials"].value,
+                )
+            )
 
         # Dynamically create both the constraints and the param-applying-function
         # ------------------------------------------------------------------------------
         set_params_func, constraints = _generate_constraints_and_func(
-            simulation_data[_sim_name]["net"],
+            simulation_data[_sim_name + "_before_optimization"]["net"],
             opt_drive_widgets,
         )
         if not constraints:
@@ -5855,7 +5873,7 @@ def run_opt_button_clicked(
         # to build our Optimizer. All other arguments are simply pulled from their GUI
         # values directly.
         optim = Optimizer(
-            initial_net=simulation_data[_sim_name]["net"],
+            initial_net=simulation_data[_sim_name + "_before_optimization"]["net"],
             tstop=opt_tstop,
             constraints=constraints,
             set_params=set_params_func,
@@ -5975,6 +5993,7 @@ def run_opt_button_clicked(
                 dt=dt.value,
                 n_trials=opt_target_widgets["n_trials"].value,
             )
+
             # Finally, update the list of simulations to include our new one:
             sim_names = [
                 sim_name
