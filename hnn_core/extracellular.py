@@ -578,6 +578,9 @@ class ExtracellularArray:
         sink="b",
         colorbar=True,
         ax=None,
+        overlay_cell_morphology=False,
+        net=None,
+        morphology_color=None,
         show=True,
     ):
         """Plot laminar current source density (CSD) estimation
@@ -600,6 +603,18 @@ class ExtracellularArray:
             If the colorbar is presented.
         ax : instance of matplotlib figure | None
             The matplotlib axis.
+        overlay_cell_morphology : bool
+            If True, overlays a 2D projection of the cell morphologies on top of
+            the CSD plot. Requires passing a valid ``net`` instance.
+        net : instance of Network | None
+            The network object containing cell morphologies and positions used
+            for overlaying morphology. Must be provided if
+            ``overlay_morphology=True``. If None, no morphology will be plotted.
+        morphology_color : str | dict | None
+            Color of the overlaid cell morphologies.
+            If str: entire cell is one color
+            If dict: keys = section names, values = colors
+            If None: defaults to 'k'
         show : bool
             If True, show the plot.
 
@@ -623,6 +638,9 @@ class ExtracellularArray:
             vmax=vmax,
             interpolation=interpolation,
             sink=sink,
+            overlay_cell_morphology=overlay_cell_morphology,
+            net=net,
+            morphology_color=morphology_color,
             show=show,
         )
 
