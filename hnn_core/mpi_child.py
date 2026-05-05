@@ -13,6 +13,7 @@ from hnn_core.parallel_backends import _extract_data, _extract_data_length
 import logging
 import signal
 
+
 def _pickle_data(sim_data):
     # pickle the data and encode as base64 before sending to stderr
     pickled_str = pickle.dumps(sim_data)
@@ -39,7 +40,6 @@ def _str_to_net(input_str):
     return net
 
 
-
 class MPISimulation(object):
     """The MPISimulation class.
     Parameters
@@ -61,7 +61,7 @@ class MPISimulation(object):
         if skip_mpi_import:
             self.rank = 0
         else:
-            #from mpi4py import MPI
+            # from mpi4py import MPI
 
             self.comm = MPI.COMM_WORLD
             self.rank = self.comm.Get_rank()
@@ -69,11 +69,11 @@ class MPISimulation(object):
             log_filename = f"process_{self.rank}.log"
             logging.basicConfig(
                 filename=log_filename,
-                filemode='w',
+                filemode="w",
                 level=logging.INFO,
-                format=f'[Rank {self.rank}/{size}] %(asctime)s - %(levelname)s - %(message)s'
+                format=f"[Rank {self.rank}/{size}] %(asctime)s - %(levelname)s - %(message)s",
             )
-            self.logger = logging.getLogger(f'mpi_child.rank{self.rank}')
+            self.logger = logging.getLogger(f"mpi_child.rank{self.rank}")
 
     def __enter__(self):
         return self
@@ -81,13 +81,14 @@ class MPISimulation(object):
     def __exit__(self, type, value, traceback):
         # skip Finalize() if we didn't import MPI on __init__
         if hasattr(self, "comm"):
-            
-
             MPI.Finalize()
 
     def _handle_sigterm(self, signum, frame):
 
-        print(f"\n[CRITICAL] Caught signal {signum} (SIGTERM). Process is being killed!", file=sys.stderr)
+        print(
+            f"\n[CRITICAL] Caught signal {signum} (SIGTERM). Process is being killed!",
+            file=sys.stderr,
+        )
         sys.stderr.flush()
         sys.stdout.flush()
         sys.exit(1)
