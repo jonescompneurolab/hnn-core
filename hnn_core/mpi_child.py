@@ -154,7 +154,7 @@ class MPISimulation(object):
             # go ahead and append trial data for each rank, though
             # only rank 0 has data that should be sent back to MPIBackend
             sim_data.append(single_sim_data)
-            self.logger.info(f"Started worker process on rank")
+            self.logger.info(f"Started worker process on rank {self.rank}")
 
         # flush output buffers from all ranks (any errors or status messages)
         sys.stdout.flush()
