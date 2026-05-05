@@ -486,7 +486,7 @@ def test_cobyla_best():
     """
     max_iter = 5
     tstop = 10.0
-    net = jones_2009_model(mesh_shape=(3, 3))
+    net = neymotin_2020_model(mesh_shape=(3, 3))
 
     def set_params(net, params):
         pass
