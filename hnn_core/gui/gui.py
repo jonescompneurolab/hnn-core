@@ -5535,10 +5535,9 @@ def _create_parametrized_syn_dicts_if_exist(syn_type, drive, params):
     This function creates a dictionary of synaptic parameters for different cell types,
     checking if parametrized versions exist in the `params` dict. If a parametrized
     version exists, it uses that value; otherwise, it falls back to the drive's default
-    value. In the special case of 'amplitude', it also excludes the `L5_basket` cell
-    type if the drive location is 'distal'. This is necessary because celltype-specific
-    parameters of drives are nested inside `syn_type` dictionaries, unlike general
-    parameters.
+    value. In the special case of a 'distal' drive location, it excludes the `L5_basket`
+    cell type (except for the 'amplitude' syn_type of a tonic drive). This is necessary
+    because celltype-specific parameters.
 
     Note that `drive` should NOT contain actual Widgets, and instead must be picklable
     such as output from `_snapshot_drive_widgets`!
