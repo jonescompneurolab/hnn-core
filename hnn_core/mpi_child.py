@@ -58,6 +58,7 @@ class MPISimulation(object):
     def __init__(self, skip_mpi_import=False):
         signal.signal(signal.SIGTERM, self._handle_sigterm)
         self.skip_mpi_import = skip_mpi_import
+        self.logger = None
         if skip_mpi_import:
             self.rank = 0
         else:
