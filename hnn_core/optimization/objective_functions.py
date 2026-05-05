@@ -117,6 +117,7 @@ def _rmse_evoked(
     is_batch = _check_is_batch(predicted_params)
 
     if is_batch:
+        # The "batch" case only occurs if the solver is set to "cma"
         predicted_params = np.array(predicted_params).reshape(-1, len(initial_params))
         print(predicted_params.shape)
         params_batch = {
@@ -161,6 +162,7 @@ def _rmse_evoked(
         obj = [_rmse(dpl, obj_fun_kwargs["target"], tstop=tstop) for dpl in dpls]
 
     else:
+        # The non-"batch" case occurs if the solver is set to "cobyla" or "bayesian"
         params = update_params(initial_params, predicted_params)
 
         # simulate dpl with predicted params
@@ -180,14 +182,16 @@ def _rmse_evoked(
         dpl = average_dipoles(dpls)
         obj = _rmse(dpl, obj_fun_kwargs["target"], tstop=tstop)
 
-    obj_values.append(obj)
-    print(f"Mean Loss: {np.mean(obj):.2f}; Min Loss: {np.min(obj):.2f}")
+        # Update best params; this is a "side-effect" that changes the `best` dictionary
+        # in-place in the parent scope
+        if best is not None and obj < best["obj"]:
+            best["obj"] = obj
+            best["params"] = predicted_params.copy()
 
-    # update best params; this is a "side-effect" that changes the `best` dictionary
-    # in-place in the parent scope
-    if best is not None and obj < best["obj"]:
-        best["obj"] = obj
-        best["params"] = predicted_params.copy()
+    print(f"Mean Loss: {np.mean(obj):.2f}; Min Loss: {np.min(obj):.2f}")
+    # Update the store of objective function values via a "side-effect" in-place in the
+    # parent scope
+    obj_values.append(obj)
 
     return obj
 
@@ -259,6 +263,7 @@ def _maximize_psd(
     is_batch = _check_is_batch(predicted_params)
 
     if is_batch:
+        # The "batch" case only occurs if the solver is set to "cma"
         predicted_params = np.array(predicted_params).reshape(-1, len(initial_params))
         print(predicted_params.shape)
         params_batch = {
@@ -301,6 +306,7 @@ def _maximize_psd(
                 obj.append(_get_relative_power(dpl, obj_fun_kwargs))
 
     else:
+        # The non-"batch" case occurs if the solver is set to "cobyla" or "bayesian"
         params = update_params(initial_params, predicted_params)
 
         # simulate dpl with predicted params
@@ -316,13 +322,15 @@ def _maximize_psd(
         dpl = dpls[0]  # only one trial to analyze
         obj = _get_relative_power(dpl, obj_fun_kwargs)
 
-    obj_values.append(obj)
+        # Update best params; this is a "side-effect" that changes the `best` dictionary
+        # in-place in the parent scope
+        if best is not None and obj < best["obj"]:
+            best["obj"] = obj
+            best["params"] = predicted_params.copy()
 
-    # update best params; this is a "side-effect" that changes the `best` dictionary
-    # in-place in the parent scope
-    if best is not None and obj < best["obj"]:
-        best["obj"] = obj
-        best["params"] = predicted_params.copy()
+    # Update the store of objective function values via a "side-effect" in-place in the
+    # parent scope
+    obj_values.append(obj)
 
     return obj
 
@@ -380,6 +388,7 @@ def _anticorr_evoked(
     is_batch = _check_is_batch(predicted_params)
 
     if is_batch:
+        # The "batch" case only occurs if the solver is set to "cma"
         # params = update_params(initial_params, predicted_params)
         predicted_params = np.array(predicted_params).reshape(-1, len(initial_params))
         print(predicted_params.shape)
@@ -426,6 +435,7 @@ def _anticorr_evoked(
         obj = [_anticorr(dpl, obj_fun_kwargs["target"], tstop=tstop) for dpl in dpls]
 
     else:
+        # The non-"batch" case occurs if the solver is set to "cobyla" or "bayesian"
         params = update_params(initial_params, predicted_params)
 
         # simulate dpl with predicted params
@@ -444,13 +454,15 @@ def _anticorr_evoked(
         dpl = average_dipoles(dpls)
         obj = _anticorr(dpl, obj_fun_kwargs["target"], tstop=tstop)
 
-    print(f"Mean Loss: {np.mean(obj):.2f}; Min Loss: {np.min(obj):.2f}")
-    obj_values.append(obj)
+        # Update best params; this is a "side-effect" that changes the `best` dictionary
+        # in-place in the parent scope
+        if best is not None and obj < best["obj"]:
+            best["obj"] = obj
+            best["params"] = predicted_params.copy()
 
-    # update best params; this is a "side-effect" that changes the `best` dictionary
-    # in-place in the parent scope
-    if best is not None and obj < best["obj"]:
-        best["obj"] = obj
-        best["params"] = predicted_params.copy()
+    print(f"Mean Loss: {np.mean(obj):.2f}; Min Loss: {np.min(obj):.2f}")
+    # Update the store of objective function values via a "side-effect" in-place in the
+    # parent scope
+    obj_values.append(obj)
 
     return obj
