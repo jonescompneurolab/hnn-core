@@ -10,7 +10,7 @@ from numpy.testing import assert_allclose
 import pytest
 
 import hnn_core
-from hnn_core import read_params, jones_2009_model
+from hnn_core import read_params, neymotin_2020_model
 from hnn_core.viz import (
     plot_cells,
     plot_dipole,
@@ -38,7 +38,7 @@ def setup_net():
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, "param", "default.json")
     params = read_params(params_fname)
-    net = jones_2009_model(params, mesh_shape=(3, 3))
+    net = neymotin_2020_model(params, mesh_shape=(3, 3))
 
     return net
 
@@ -327,7 +327,7 @@ class TestCellResponsePlotters:
         hnn_core_root = op.dirname(hnn_core.__file__)
         params_fname = op.join(hnn_core_root, "param", "default.json")
         params = read_params(params_fname)
-        net = jones_2009_model(params, mesh_shape=(3, 3))
+        net = neymotin_2020_model(params, mesh_shape=(3, 3))
 
         return net
 

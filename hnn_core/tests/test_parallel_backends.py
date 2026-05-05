@@ -14,7 +14,7 @@ from numpy.testing import assert_array_equal, assert_allclose, assert_raises
 import pytest
 
 import hnn_core
-from hnn_core import MPIBackend, jones_2009_model, read_params
+from hnn_core import MPIBackend, neymotin_2020_model, read_params
 from hnn_core.dipole import simulate_dipole
 from hnn_core.parallel_backends import (
     requires_mpi4py,
@@ -42,7 +42,7 @@ def _terminate_mpibackend(event, backend):
 def test_gid_assignment():
     """Test that gids are assigned without overlap across ranks"""
 
-    net = jones_2009_model(add_drives_from_params=False)
+    net = neymotin_2020_model(add_drives_from_params=False)
     weights_ampa = {"L2_basket": 1.0, "L2_pyramidal": 2.0, "L5_pyramidal": 3.0}
     syn_delays = {"L2_basket": 0.1, "L2_pyramidal": 0.2, "L5_pyramidal": 0.3}
 
@@ -175,7 +175,9 @@ class TestParallelBackends:
         params.update(
             {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}
         )
-        net = jones_2009_model(params, add_drives_from_params=True, mesh_shape=(3, 3))
+        net = neymotin_2020_model(
+            params, add_drives_from_params=True, mesh_shape=(3, 3)
+        )
 
         with MPIBackend() as backend:
             event = Event()
@@ -209,7 +211,9 @@ class TestParallelBackends:
         params.update(
             {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}
         )
-        net = jones_2009_model(params, add_drives_from_params=True, mesh_shape=(3, 3))
+        net = neymotin_2020_model(
+            params, add_drives_from_params=True, mesh_shape=(3, 3)
+        )
 
         # Fail state: try running with more procs than cells in the network
         # (will probably oversubscribe too)
@@ -233,7 +237,7 @@ class TestParallelBackends:
         params.update(
             {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}
         )
-        net = jones_2009_model(
+        net = neymotin_2020_model(
             params, add_drives_from_params=True, mesh_shape=(n_grid_1d, n_grid_1d)
         )
 
@@ -309,7 +313,9 @@ class TestParallelBackends:
         params.update(
             {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}
         )
-        net = jones_2009_model(params, add_drives_from_params=True, mesh_shape=(3, 3))
+        net = neymotin_2020_model(
+            params, add_drives_from_params=True, mesh_shape=(3, 3)
+        )
 
         n_procs = 2
         # Test that the network runs at all
@@ -326,7 +332,9 @@ class TestParallelBackends:
 
         # Possibly needed to prevent MPIBackend failures to exit processes
         del net
-        net = jones_2009_model(params, add_drives_from_params=True, mesh_shape=(3, 3))
+        net = neymotin_2020_model(
+            params, add_drives_from_params=True, mesh_shape=(3, 3)
+        )
         with MPIBackend(
             n_procs=n_procs,
             use_hwthreading_if_found=use_hwthreading_if_found,
@@ -356,7 +364,9 @@ class TestParallelBackends:
 
         # Possibly needed to prevent MPIBackend failures to exit processes
         del net
-        net = jones_2009_model(params, add_drives_from_params=True, mesh_shape=(3, 3))
+        net = neymotin_2020_model(
+            params, add_drives_from_params=True, mesh_shape=(3, 3)
+        )
         with MPIBackend(
             n_procs=n_procs,
             use_hwthreading_if_found=use_hwthreading_if_found,

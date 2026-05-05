@@ -43,7 +43,7 @@ assets_path = Path(hnn_core_root, "tests", "assets")
 
 @pytest.fixture
 def setup_gui():
-    gui = HNNGUI(network_configuration=assets_path / "jones2009_3x3_drives.json")
+    gui = HNNGUI(network_configuration=assets_path / "neymotin2020_3x3_drives.json")
     gui.compose()
     gui.widget_dt.value = 0.5  # speed up tests
     gui.widget_tstop.value = 70  # speed up tests
@@ -169,7 +169,7 @@ def test_gui_upload_connectivity():
     assert len(gui.connectivity_widgets) == 0
 
     # simulate upload default.json
-    file1_path = Path(hnn_core_root, "param", "jones2009_base.json")
+    file1_path = Path(hnn_core_root, "param", "neymotin2020_base.json")
     file2_path = Path(assets_path, "gamma_L5weak_L2weak_hierarchical.json")
     gui._simulate_upload_connectivity(file1_path)
 
@@ -215,9 +215,9 @@ def test_gui_upload_drives():
     assert len(gui.drive_widgets) == 0
 
     # simulate upload default.json
-    file1_url = Path(hnn_core_root, "param", "jones2009_base.json")
+    file1_url = Path(hnn_core_root, "param", "neymotin2020_base.json")
     file2_url = Path(assets_path, "gamma_L5weak_L2weak_hierarchical.json")
-    file3_url = Path(assets_path, "jones2009_3x3_drives.json")
+    file3_url = Path(assets_path, "neymotin2020_3x3_drives.json")
 
     # check if parameter reloads
     gui._simulate_upload_drives(file1_url)
@@ -426,7 +426,7 @@ def test_gui_init_network(setup_gui):
     assert np.isclose(net_from_gui._layer_separation, 1307.4)
 
     # Compare Network created from API
-    config_path = assets_path / "jones2009_3x3_drives.json"
+    config_path = assets_path / "neymotin2020_3x3_drives.json"
     net_from_api = read_network_configuration(config_path)
 
     check_equal_networks(net_from_gui, net_from_api)
@@ -1123,7 +1123,7 @@ def test_gui_download_configuration(setup_gui):
     net_from_buffer = json.loads(configs)
 
     # Load configuration from file
-    source_network_config = assets_path / "jones2009_3x3_drives.json"
+    source_network_config = assets_path / "neymotin2020_3x3_drives.json"
     with open(source_network_config, "r") as file:
         net_source_config = json.load(file)
 
@@ -1670,9 +1670,9 @@ def test_diff_gui_vs_api_networks_simulations():
     # # AES: For some strange reason, the 3x3_drives network file does NOT produce
     # # identical output, even when the synaptic gains are made identical. I think that's
     # # a separate bug.
-    # net_file_path = Path(hnn_core_root / "tests" / "assets" / "jones2009_3x3_drives.json")
+    # net_file_path = Path(hnn_core_root / "tests" / "assets" / "neymotin2020_3x3_drives.json")
     # Using the full GUI base file for now.
-    net_file_path = Path(hnn_core_root / "param" / "jones2009_base.json")
+    net_file_path = Path(hnn_core_root / "param" / "neymotin2020_base.json")
 
     # Setup and run the GUI simulation
     # --------------------------------

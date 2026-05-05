@@ -21,7 +21,7 @@ placed in and around the HNN network model.
 
 import matplotlib.pyplot as plt
 
-from hnn_core import jones_2009_model, simulate_dipole
+from hnn_core import neymotin_2020_model, simulate_dipole
 from hnn_core.network_models import add_erp_drives_to_jones_model
 
 ###############################################################################
@@ -33,7 +33,7 @@ from hnn_core.network_models import add_erp_drives_to_jones_model
 # 30 um apart. To drive the network dynamics, we'll use three evoked 'ERP'
 # drives; see the event-related potential (ERP) example for details.
 
-net = jones_2009_model()
+net = neymotin_2020_model()
 add_erp_drives_to_jones_model(net)
 
 net.set_cell_positions(inplane_distance=30.)
