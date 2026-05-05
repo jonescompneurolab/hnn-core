@@ -8,9 +8,10 @@ import sys
 import pickle
 import base64
 import re
-
+from mpi4py import MPI
 from hnn_core.parallel_backends import _extract_data, _extract_data_length
-
+import logging
+import signal
 
 def _pickle_data(sim_data):
     # pickle the data and encode as base64 before sending to stderr
@@ -38,6 +39,7 @@ def _str_to_net(input_str):
     return net
 
 
+
 class MPISimulation(object):
     """The MPISimulation class.
     Parameters
@@ -54,14 +56,24 @@ class MPISimulation(object):
     """
 
     def __init__(self, skip_mpi_import=False):
+        signal.signal(signal.SIGTERM, self._handle_sigterm)
         self.skip_mpi_import = skip_mpi_import
         if skip_mpi_import:
             self.rank = 0
         else:
-            from mpi4py import MPI
+            #from mpi4py import MPI
 
             self.comm = MPI.COMM_WORLD
             self.rank = self.comm.Get_rank()
+            size = self.comm.Get_size()
+            log_filename = f"process_{self.rank}.log"
+            logging.basicConfig(
+                filename=log_filename,
+                filemode='w',
+                level=logging.INFO,
+                format=f'[Rank {self.rank}/{size}] %(asctime)s - %(levelname)s - %(message)s'
+            )
+            self.logger = logging.getLogger(f'mpi_child.rank{self.rank}')
 
     def __enter__(self):
         return self
@@ -69,9 +81,16 @@ class MPISimulation(object):
     def __exit__(self, type, value, traceback):
         # skip Finalize() if we didn't import MPI on __init__
         if hasattr(self, "comm"):
-            from mpi4py import MPI
+            
 
             MPI.Finalize()
+
+    def _handle_sigterm(self, signum, frame):
+
+        print(f"\n[CRITICAL] Caught signal {signum} (SIGTERM). Process is being killed!", file=sys.stderr)
+        sys.stderr.flush()
+        sys.stdout.flush()
+        sys.exit(1)
 
     def _read_net(self):
         """Read net broadcasted to all ranks on stdin"""
@@ -124,7 +143,7 @@ class MPISimulation(object):
 
     def run(self, net, tstop, dt, n_trials):
         """Run MPI simulation(s) and write results to stderr"""
-
+        print(f"HERE {self.rank}")
         from hnn_core.network_builder import _simulate_single_trial
 
         sim_data = list()
@@ -134,6 +153,7 @@ class MPISimulation(object):
             # go ahead and append trial data for each rank, though
             # only rank 0 has data that should be sent back to MPIBackend
             sim_data.append(single_sim_data)
+            self.logger.info(f"Started worker process on rank")
 
         # flush output buffers from all ranks (any errors or status messages)
         sys.stdout.flush()

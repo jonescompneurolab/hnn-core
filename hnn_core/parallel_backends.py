@@ -127,6 +127,7 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
     threads_started = False
 
     try:
+        print(command)
         proc = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE, *args, **kwargs)
 
         # now that the process has started, add it to the queue
@@ -992,11 +993,10 @@ class MPIBackend(object):
         )
 
         env = _get_mpi_env()
-
         self.proc, sim_data = run_subprocess(
             command=self.mpi_cmd,
             obj=[net, tstop, dt, n_trials],
-            timeout=1,
+            timeout=10,
             proc_queue=self.proc_queue,
             env=env,
             cwd=os.getcwd(),
