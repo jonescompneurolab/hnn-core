@@ -19,18 +19,13 @@ jobs:
                   bash ~/miniconda.sh -b -p ~/miniconda;
                   
           - run:
-                name: Specify MPI-related environment variables
-                command: | 
-                    export PATH=~/miniconda/bin:$PATH
-                    echo 'export LD_LIBRARY_PATH=${CONDA_PREFIX}/lib:$LD_LIBRARY_PATH' >> "$BASH_ENV"
-
-          - run:
               name: Setup Python environment including MPI
               command: |
                   export PATH=~/miniconda/bin:$PATH
                   conda update --yes --quiet conda
                   conda create -n testenv --yes pip python=3.11
                   source activate testenv
+                  echo 'export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH' >> "$BASH_ENV"
                   # necessary due to https://github.com/mpi4py/mpi4py/issues/335#issuecomment-1486366039
                   rm $CONDA_PREFIX/compiler_compat/ld
                   conda install --yes scipy numpy matplotlib "openmpi >5" -c conda-forge
