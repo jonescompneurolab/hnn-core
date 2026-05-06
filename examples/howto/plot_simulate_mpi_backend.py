@@ -18,10 +18,19 @@ without the need to install and configure MPI.
 
 ###############################################################################
 # Let us import hnn_core
-import os.path as op
-
-import hnn_core
 from hnn_core import simulate_dipole, jones_2009_model
+
+# Let us ensure we used the ``hnn_core`` install with the correct special dependencies
+# for this example.
+try:
+    from hnn_core import MPIBackend
+
+except ImportError:
+    print("For MPI to work, you must first install MPI using the instructions at: ")
+    print("https://jonescompneurolab.github.io/textbook/content/01_getting_started/installation.html ")
+    print("Then, you must install HNN-Core with its `parallel` packages via running the following command: ")
+    print("pip install \"hnn-core[parallel]\"")
+
 
 ###############################################################################
 # Following :ref:`the alpha example
@@ -45,8 +54,6 @@ net.add_bursty_drive(
 # start the simulation across the number of processors (cores) specified by
 # ``n_procs`` using MPI. The ``'mpiexec'`` launcher is used from
 # ``openmpi``, which must be installed on the system
-from hnn_core import MPIBackend
-
 with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
     dpls = simulate_dipole(net, tstop=310., n_trials=1)
 

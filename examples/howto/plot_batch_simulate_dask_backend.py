@@ -26,12 +26,20 @@ For the sample example using the built-in ``BatchSimulate`` backend, [see our ot
 
 ###############################################################################
 # Let us import ``hnn_core``.
-
 import matplotlib.pyplot as plt
 import numpy as np
 
 from hnn_core.batch_simulate import BatchSimulate
 from hnn_core import jones_2009_model
+
+# Let us ensure we used the ``hnn_core`` install with the correct special dependencies
+# for this example.
+try:
+    from dask.distributed import Client, LocalCluster
+
+except ImportError:
+    print("Dask not installed. Run the following command: ")
+    print("pip install \"hnn-core[dask]\"")
 
 # The number of cores may need modifying depending on your current machine.
 n_jobs = 3
@@ -201,16 +209,12 @@ if __name__ == "__main__":
     # To run on a remote cluster instead, replace ``LocalCluster`` with a
     # ``Client`` connected to your cluster scheduler address e.g.
     # ``Client('mycluster.university.edu:8786')``.
-    try:
-        from dask.distributed import Client, LocalCluster
-        cluster = LocalCluster(processes=True, n_workers=n_jobs, threads_per_worker=1)
-        client = Client(cluster)
-        simulation_results = batch_simulation.run(
-            param_grid, n_jobs=n_jobs, combinations=False, backend="dask"
-        )
-        print(simulation_results)
-        client.close()
-        plot_results(simulation_results)
+    cluster = LocalCluster(processes=True, n_workers=n_jobs, threads_per_worker=1)
+    client = Client(cluster)
+    simulation_results = batch_simulation.run(
+        param_grid, n_jobs=n_jobs, combinations=False, backend="dask"
+    )
+    print(simulation_results)
+    client.close()
+    plot_results(simulation_results)
 
-    except ImportError:
-        print("Dask not installed. Run: pip install \"hnn-core[dask]\"")
