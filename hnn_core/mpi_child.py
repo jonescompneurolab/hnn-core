@@ -145,7 +145,7 @@ class MPISimulation(object):
 
     def run(self, net, tstop, dt, n_trials):
         """Run MPI simulation(s) and write results to stderr"""
-        print(f"HERE {self.rank}")
+        #print(f"HERE {self.rank}")
         from hnn_core.network_builder import _simulate_single_trial
 
         sim_data = list()
