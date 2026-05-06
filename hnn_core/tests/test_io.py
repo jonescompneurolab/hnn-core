@@ -310,12 +310,12 @@ def test_order_drives(jones_2009_network):
 
 def test_read_configuration_json(jones_2009_network):
     """Read-in of a hdf5 file"""
-    net = read_network_configuration(Path(assets_path, "jones2009_3x3_drives.json"))
+    net = read_network_configuration(Path(assets_path, "neymotin2020_3x3_drives.json"))
     assert net == jones_2009_network
 
     # Read without drives
     net_no_drives = read_network_configuration(
-        Path(assets_path, "jones2009_3x3_drives.json"), read_drives=False
+        Path(assets_path, "neymotin2020_3x3_drives.json"), read_drives=False
     )
     # Check there are no external drives
     assert len(net_no_drives.external_drives) == 0
@@ -329,7 +329,7 @@ def test_read_configuration_json(jones_2009_network):
 
     # Read without external bias
     net_no_bias = read_network_configuration(
-        Path(assets_path, "jones2009_3x3_drives.json"), read_external_biases=False
+        Path(assets_path, "neymotin2020_3x3_drives.json"), read_external_biases=False
     )
     assert len(net_no_bias.external_biases) == 0
     assert len(net_no_bias.external_drives) > 0

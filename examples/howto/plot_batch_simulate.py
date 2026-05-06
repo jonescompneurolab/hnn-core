@@ -28,7 +28,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from hnn_core.batch_simulate import BatchSimulate
-from hnn_core import jones_2009_model
+from hnn_core import neymotin_2020_model
 
 # The number of cores may need modifying depending on your current machine.
 n_jobs = 4
@@ -184,7 +184,7 @@ def plot_results(simulation_results):
 
 
 # Initialize the network model and run the batch simulation.
-net = jones_2009_model(mesh_shape=(3, 3))
+net = neymotin_2020_model(mesh_shape=(3, 3))
 batch_simulation = BatchSimulate(net=net,
                                  set_params=set_params,
                                  summary_func=summary_func)

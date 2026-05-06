@@ -10,7 +10,7 @@ import pytest
 
 from hnn_core import read_params, Params, convert_to_json
 from hnn_core.hnn_io import read_network_configuration
-from hnn_core.network_models import jones_2009_model
+from hnn_core.network_models import neymotin_2020_model
 from hnn_core.params import remove_nulled_drives
 
 
@@ -22,8 +22,8 @@ def test_read_params():
     params_fname = op.join(hnn_core_root, "param", "default.json")
     params = read_params(params_fname)
     # Smoke test that network loads params
-    _ = jones_2009_model(params, add_drives_from_params=True, legacy_mode=False)
-    _ = jones_2009_model(params, add_drives_from_params=True, legacy_mode=True)
+    _ = neymotin_2020_model(params, add_drives_from_params=True, legacy_mode=False)
+    _ = neymotin_2020_model(params, add_drives_from_params=True, legacy_mode=True)
     print(params)
     print(params["L2Pyr*"])
 
@@ -93,7 +93,7 @@ def test_remove_nulled_drives(tmp_path):
     if not op.exists(params_fname):
         urlretrieve(param_url, params_fname)
 
-    net = jones_2009_model(
+    net = neymotin_2020_model(
         params=read_params(params_fname),
         add_drives_from_params=True,
         legacy_mode=True,
@@ -127,7 +127,7 @@ class TestConvertToJson:
     def test_default_network_connectivity(self, tmp_path):
         """Tests conversion with default parameters"""
 
-        net_params = jones_2009_model(
+        net_params = neymotin_2020_model(
             params=read_params(self.path_default), add_drives_from_params=True
         )
 
@@ -160,7 +160,7 @@ class TestConvertToJson:
         params_base_fname = Path(hnn_core_root, "param", "default.param")
         if not op.exists(params_base_fname):
             urlretrieve(param_url, params_base_fname)
-        net_params = jones_2009_model(
+        net_params = neymotin_2020_model(
             read_params(params_base_fname),
             add_drives_from_params=True,
             legacy_mode=True,

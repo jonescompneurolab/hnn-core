@@ -15,7 +15,7 @@ components.
 
 import matplotlib.pyplot as plt
 
-from hnn_core import (MPIBackend, jones_2009_model, simulate_dipole)
+from hnn_core import (MPIBackend, neymotin_2020_model, simulate_dipole)
 from hnn_core.viz import plot_psd
 
 # Let us ensure we used the ``hnn_core`` install with the correct special dependencies
@@ -99,7 +99,7 @@ tstop = 300
 scale_factor = 3000
 smooth_window_len = 20
 
-net = jones_2009_model()
+net = neymotin_2020_model()
 optim = Optimizer(net, tstop=tstop, constraints=constraints,
                   set_params=set_params, obj_fun='maximize_psd', max_iter=50)
 

@@ -18,7 +18,7 @@ without the need to install and configure MPI.
 
 ###############################################################################
 # Let us import hnn_core
-from hnn_core import simulate_dipole, jones_2009_model
+from hnn_core import simulate_dipole, neymotin_2020_model
 
 # Let us ensure we used the ``hnn_core`` install with the correct special dependencies
 # for this example.
@@ -40,7 +40,7 @@ except ImportError:
 # The occurrence of each burst is jittered by a random, normally distributed
 # amount (20 ms standard deviation). We repeat the burst train 10 times, each
 # time with unique randomization.
-net = jones_2009_model()
+net = neymotin_2020_model()
 
 weights_ampa = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
 net.add_bursty_drive(

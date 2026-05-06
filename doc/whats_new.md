@@ -39,6 +39,9 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ### Changelog
 
+- Enable MacOS Intel-CPU runners in CI,
+  by [Vaishnavi Baghel][] in {gh}`1287`.
+
 - Update and re-enable Codecov usage in CI,
   by [Vaishnavi Baghel][] in {gh}`1272`. This was their first PR, thanks Vaishnavi!
 

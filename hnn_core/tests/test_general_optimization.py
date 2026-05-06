@@ -5,7 +5,7 @@
 
 import pytest
 
-from hnn_core import jones_2009_model, simulate_dipole
+from hnn_core import neymotin_2020_model, simulate_dipole
 from hnn_core.optimization import Optimizer
 import numpy as np
 
@@ -20,7 +20,7 @@ def test_optimize_evoked(solver, obj_fun):
     n_trials = 1
 
     # simulate a dipole to establish ground-truth drive parameters
-    net_orig = jones_2009_model(mesh_shape=(3, 3))
+    net_orig = neymotin_2020_model(mesh_shape=(3, 3))
 
     mu_orig = 2.0
     weights_ampa = {
@@ -47,7 +47,7 @@ def test_optimize_evoked(solver, obj_fun):
     dpl_orig = simulate_dipole(net_orig, tstop=tstop, n_trials=n_trials)[0]
 
     # define set_params function and constraints
-    net_offset = jones_2009_model(mesh_shape=(3, 3))
+    net_offset = neymotin_2020_model(mesh_shape=(3, 3))
 
     def set_params(net_offset, params):
         weights_ampa = {
@@ -118,7 +118,7 @@ def test_rhythmic(solver, relative_bandpower):
     tstop = 10.0
 
     # simulate a dipole to establish ground-truth drive parameters
-    net_offset = jones_2009_model(mesh_shape=(3, 3))
+    net_offset = neymotin_2020_model(mesh_shape=(3, 3))
 
     # define set_params function and constraints
     def set_params(net_offset, params):
@@ -221,7 +221,7 @@ def test_initial_params(solver):
     n_trials = 1
 
     # simulate a dipole to establish ground-truth drive parameters
-    net_orig = jones_2009_model(mesh_shape=(3, 3))
+    net_orig = neymotin_2020_model(mesh_shape=(3, 3))
 
     mu_orig = 2.0
     sigma_orig = 1.0
@@ -249,7 +249,7 @@ def test_initial_params(solver):
     dpl_orig = simulate_dipole(net_orig, tstop=tstop, n_trials=n_trials)[0]
 
     # define set_params function and constraints
-    net_offset = jones_2009_model(mesh_shape=(3, 3))
+    net_offset = neymotin_2020_model(mesh_shape=(3, 3))
 
     def set_params(net_offset, params):
         weights_ampa = {
@@ -318,7 +318,7 @@ def test_initial_params_validation(solver, initial_params, error_type):
     """Test initial_params validation."""
 
     tstop = 10.0
-    net_offset = jones_2009_model(mesh_shape=(3, 3))
+    net_offset = neymotin_2020_model(mesh_shape=(3, 3))
 
     def set_params(net_offset, params):
         weights_ampa = {
@@ -361,7 +361,8 @@ def test_initial_params_validation(solver, initial_params, error_type):
 
 
 def test_cma_validation():
-    net = jones_2009_model(mesh_shape=(3, 3))
+    """Test validation of CMA specific parameters"""
+    net = neymotin_2020_model(mesh_shape=(3, 3))
     tstop = 10.0
     constraints = {"mu": (1, 10), "sigma": (1, 10)}
     solver = "cma"
@@ -393,3 +394,82 @@ def test_cma_validation():
         optim.fit(target=dpl_target, sigma0=[1, 2, 3])
 
     optim.fit(target=dpl_target, sigma0=[1, 2])
+
+
+def test_cma_seed():
+    """Test random seed control during CMA optimization"""
+    # Define parameters for a very short optimization run
+    max_iter = 3
+    popsize = 4
+    tstop = 10.0
+    dt = 0.5
+    n_trials = 3
+    solver = "cma"
+    obj_fun = "dipole_corr"
+
+    def set_params(net, params):
+        weights_ampa = {
+            "L2_basket": 0.5,
+            "L2_pyramidal": 0.5,
+            "L5_basket": 0.5,
+            "L5_pyramidal": 0.5,
+        }
+        synaptic_delays = {
+            "L2_basket": 0.1,
+            "L2_pyramidal": 0.1,
+            "L5_basket": 1.0,
+            "L5_pyramidal": 1.0,
+        }
+        net.add_evoked_drive(
+            "evprox",
+            mu=params["mu"],
+            sigma=params["sigma"],
+            numspikes=1,
+            location="proximal",
+            weights_ampa=weights_ampa,
+            synaptic_delays=synaptic_delays,
+        )
+
+    # Simulate a dipole to establish the target
+    net_target = neymotin_2020_model(mesh_shape=(3, 3))
+    params_target = {"mu": 2.0, "sigma": 1.0}
+
+    set_params(net_target, params_target)
+    dpl_target = simulate_dipole(net_target, tstop=tstop, dt=dt, n_trials=n_trials)[0]
+
+    # define set_params function and constraints
+    net_opt = neymotin_2020_model(mesh_shape=(3, 3))
+
+    # define constraints
+    constraints = dict()
+    constraints.update({"mu": (0, tstop), "sigma": (0.1, 10)})
+
+    opt_kwargs = {
+        "initial_net": net_opt,
+        "tstop": tstop,
+        "constraints": constraints,
+        "set_params": set_params,
+        "solver": solver,
+        "obj_fun": obj_fun,
+        "max_iter": max_iter,
+    }
+
+    optim_seed1 = Optimizer(**opt_kwargs)
+    optim_seed1_repeat = Optimizer(**opt_kwargs)
+    optim_seed2 = Optimizer(**opt_kwargs)
+
+    seed1, seed2 = 111, 999999
+    # Run two different instances of an optimizer with the same seed
+    optim_seed1.fit(target=dpl_target, seed=seed1, popsize=popsize, dt=dt)
+    optim_seed1_repeat.fit(target=dpl_target, seed=seed1, popsize=popsize, dt=dt)
+
+    # Run one more instance of an optimizer with a different seed
+    optim_seed2.fit(target=dpl_target, seed=seed2, popsize=popsize, dt=dt)
+
+    # The optimization results with the same seed should match
+    assert np.allclose(optim_seed1.obj_, optim_seed1_repeat.obj_)
+    assert np.allclose(optim_seed1.opt_params_, optim_seed1_repeat.opt_params_)
+
+    # The optimization results with different seeds should be different
+    assert not np.allclose(optim_seed1.obj_, optim_seed2.obj_)
+    assert not np.allclose(optim_seed1.opt_params_, optim_seed2.opt_params_)
