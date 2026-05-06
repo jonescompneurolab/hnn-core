@@ -2122,6 +2122,8 @@ class HNNGUI:
             return
 
         # Build drive widget objects
+        # TODO future refactor: instead of using the absolute index number of the drive,
+        # make the name use the relative number of that type of drive.
         name = (
             drive_type + str(len(self.drive_boxes))
             if not prespecified_drive_name
@@ -2171,6 +2173,8 @@ class HNNGUI:
         self.drive_boxes.append(new_drive_box)
         self.drive_widgets.append(new_drive_widgets)
 
+        # TODO future refactor: move this check and logic "up" into
+        # `update_drive_tab_accordion`
         if render:
             # Construct accordion object
             self.drive_accordion.children = self.drive_boxes
@@ -2220,6 +2224,9 @@ class HNNGUI:
                     event_seed=specs["event_seed"],
                 )
 
+            # Render when loop reaches end of drives
+            # TODO future refactor: move render block from inside
+            # `add_drive_tab_drive_widget` to here`
             should_render = idx == (len(drive_names) - 1)
             self.add_drive_tab_drive_widget(
                 drive_type=specs["type"].capitalize(),
@@ -2622,8 +2629,10 @@ class HNNGUI:
                     event_seed=specs["event_seed"],
                 )
 
+            # Render when loop reaches end of drives
+            # TODO future refactor: move render block from inside
+            # `add_drive_tab_drive_widget` to here`
             should_render = drive_idx == (len(drive_names) - 1)
-
             self.add_opt_tab_drive_widget(
                 drive_type=specs["type"].capitalize(),
                 location=specs["location"],
@@ -2783,6 +2792,8 @@ class HNNGUI:
         self.opt_drive_boxes.append(opt_drive_box)
         self.opt_drive_widgets.append(opt_drive_widget)
 
+        # TODO future refactor: move this check and logic "up" into
+        # `update_opt_tab_accordion`
         if render:
             # Construct accordion object
             self.opt_drive_accordion.children = self.opt_drive_boxes
