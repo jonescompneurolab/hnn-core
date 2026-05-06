@@ -77,7 +77,7 @@ class build_py_mod(build_py):
 if __name__ == "__main__":
     extras = {
         'opt': ['scikit-learn', 'cma'],
-        'parallel': ['joblib', 'psutil', 'dask[distributed]'],
+        'parallel': ['joblib', 'psutil'],
         'test': ['codespell', 'pytest', 'pytest-cov', 'pytest-xdist', 'ruff'],
         'docs': ['mne', 'myst-parser', 'nibabel', 'numpydoc', 'pillow',
                  'pooch<1.9.0', 'pydata-sphinx-theme', 'sphinx', 'sphinx-gallery',
@@ -85,8 +85,9 @@ if __name__ == "__main__":
         'gui': ['ipywidgets>=8.0.0', 'ipykernel', 'ipympl', 'voila'],
     }
     extras['all'] = (extras['opt'] + extras['parallel'] + extras['gui'])
+    extras['dask'] = (extras['parallel'] + ['dask[distributed]'])
     extras['dev'] = (extras['opt'] + extras['parallel'] + extras['test'] +
-                     extras['docs'] + extras['gui'])
+                     extras['docs'] + extras['gui'] + extras['dask'])
 
     setup(name=DISTNAME,
           maintainer=MAINTAINER,

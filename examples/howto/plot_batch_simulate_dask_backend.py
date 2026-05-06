@@ -1,15 +1,17 @@
 """
-====================
-07. Batch Simulation
-====================
+======================================
+08. Batch Simulation with Dask Backend
+======================================
 
-This example shows how to do batch simulations in HNN-core, allowing users to
-efficiently run multiple simulations with different parameters
-for comprehensive analysis.
+This example shows how to do batch simulations in HNN-core, using the Dask backend,
+allowing users to efficiently run multiple simulations with different parameters for
+comprehensive analysis across potentially very many cores.
+
+For the sample example using the built-in ``BatchSimulate`` backend, [see our other guide here: https://jonescompneurolab.github.io/hnn-core/stable/auto_examples/howto/plot_batch_simulate.html#sphx-glr-auto-examples-howto-plot-batch-simulate-py .
 """
 
 ###############################################################################
-# Note that batch simulation requires you to install HNN-core with Dask
+# Note that batch simulation with Dask requires you to install HNN-core with Dask
 # parallel support, which you can do by installing it with
 # ``pip install "hnn_core[dask]"``
 
@@ -18,6 +20,7 @@ for comprehensive analysis.
 #          Nick Tolley <nicholas_tolley@brown.edu>
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
+#          M Yaswanth Reddy <https://github.com/yaswanth8390>
 #
 # This project was supported by Google Summer of Code (GSoC) 2024.
 

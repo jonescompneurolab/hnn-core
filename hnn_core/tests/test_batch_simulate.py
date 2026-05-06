@@ -10,7 +10,7 @@ import numpy as np
 import os
 
 from hnn_core.batch_simulate import BatchSimulate
-from hnn_core import jones_2009_model
+from hnn_core import Network, jones_2009_model
 
 hnn_core_root = Path(__file__).parents[1]
 assets_path = Path(hnn_core_root, "tests", "assets")
@@ -336,7 +336,9 @@ def test_dask_backend(batch_simulate_instance, param_grid):
         assert len(results) == len(param_combinations)
         for result in results:
             assert "net" in result
+            assert isinstance(result["net"], Network)
             assert "dpl" in result
+            assert len(result["dpl"][0].times) > 0
             assert "param_values" in result
 
     finally:
