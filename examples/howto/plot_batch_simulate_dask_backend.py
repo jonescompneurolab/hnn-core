@@ -1,37 +1,48 @@
 """
-====================
-07. Batch Simulation
-====================
+======================================
+08. Batch Simulation with Dask Backend
+======================================
 
-This example shows how to do batch simulations in HNN-core, allowing users to
-efficiently run multiple simulations with different parameters
-for comprehensive analysis.
+This example shows how to do batch simulations in HNN-core, using the Dask backend,
+allowing users to efficiently run multiple simulations with different parameters for
+comprehensive analysis across potentially very many cores.
+
+For the sample example using the built-in ``BatchSimulate`` backend, [see our other guide here: https://jonescompneurolab.github.io/hnn-core/stable/auto_examples/howto/plot_batch_simulate.html#sphx-glr-auto-examples-howto-plot-batch-simulate-py .
 """
 
 ###############################################################################
-# Note that batch simulation requires you to install HNN-core with Joblib
+# Note that batch simulation with Dask requires you to install HNN-core with Dask
 # parallel support, which you can do by installing it with
-# ``pip install "hnn_core[parallel]"``
+# ``pip install "hnn_core[dask]"``
 
 
 # Authors: Abdul Samad Siddiqui <abdulsamadsid1@gmail.com>
 #          Nick Tolley <nicholas_tolley@brown.edu>
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
+#          M Yaswanth Reddy <https://github.com/yaswanth8390>
 #
 # This project was supported by Google Summer of Code (GSoC) 2024.
 
 ###############################################################################
 # Let us import ``hnn_core``.
-
 import matplotlib.pyplot as plt
 import numpy as np
 
 from hnn_core.batch_simulate import BatchSimulate
-from hnn_core import neymotin_2020_model
+from hnn_core import jones_2009_model
+
+# Let us ensure we used the ``hnn_core`` install with the correct special dependencies
+# for this example.
+try:
+    from dask.distributed import Client, LocalCluster
+
+except ImportError:
+    print("Dask not installed. Run the following command: ")
+    print("pip install \"hnn-core[dask]\"")
 
 # The number of cores may need modifying depending on your current machine.
-n_jobs = 4
+n_jobs = 3
 ###############################################################################
 # The `add_evoked_drive` function simulates external input to the network,
 # mimicking sensory stimulation or other external events.
@@ -78,7 +89,6 @@ def set_params(param_values, net=None):
 ###############################################################################
 # Next, we define a parameter grid for the batch simulation.
 
-
 param_grid = {
     'weight_basket': np.logspace(-4, -1, 20),
     'weight_pyr': np.logspace(-4, -1, 20)
@@ -86,7 +96,6 @@ param_grid = {
 
 ###############################################################################
 # We then define a function to calculate summary statistics.
-
 
 def summary_func(results):
     """
@@ -178,20 +187,34 @@ def plot_results(simulation_results):
     plt.xscale('log')
     plt.tight_layout()
     plt.show()
+    
+if __name__ == "__main__":
+    ###############################################################################
+    # Run the batch simulation and collect the results.
 
-###############################################################################
-# Run the batch simulation and collect the results.
+    # Initialize the network model and run the batch simulation.
+    net = jones_2009_model(mesh_shape=(3, 3))
+    batch_simulation = BatchSimulate(
+        net=net,
+        set_params=set_params,
+        summary_func=summary_func,
+    )
 
+    ###############################################################################
+    # Using Dask backend for distributed computing
+    # --------------------------------------------
+    # Dask can also be used as a backend for distributed computing.
+    # For local use, ``LocalCluster`` can be used as shown below.
+    # Note that ``threads_per_worker=1`` is required to avoid NEURON conflicts.
+    # To run on a remote cluster instead, replace ``LocalCluster`` with a
+    # ``Client`` connected to your cluster scheduler address e.g.
+    # ``Client('mycluster.university.edu:8786')``.
+    cluster = LocalCluster(processes=True, n_workers=n_jobs, threads_per_worker=1)
+    client = Client(cluster)
+    simulation_results = batch_simulation.run(
+        param_grid, n_jobs=n_jobs, combinations=False, backend="dask"
+    )
+    print(simulation_results)
+    client.close()
+    plot_results(simulation_results)
 
-# Initialize the network model and run the batch simulation.
-net = neymotin_2020_model(mesh_shape=(3, 3))
-batch_simulation = BatchSimulate(net=net,
-                                 set_params=set_params,
-                                 summary_func=summary_func)
-simulation_results = batch_simulation.run(param_grid,
-                                          n_jobs=n_jobs,
-                                          combinations=False,
-                                          backend='loky')
-
-print("Simulation results:", simulation_results)
-plot_results(simulation_results)

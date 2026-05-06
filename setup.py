@@ -99,12 +99,14 @@ if __name__ == "__main__":
         "gui": ["ipywidgets>=8.0.0", "ipykernel", "ipympl", "voila"],
     }
     extras["all"] = extras["opt"] + extras["parallel"] + extras["gui"]
+    extras['dask'] = (extras['parallel'] + ['dask[distributed]'])
     extras["dev"] = (
-        extras["opt"]
-        + extras["parallel"]
-        + extras["test"]
+        extras["dask"]
         + extras["docs"]
         + extras["gui"]
+        + extras["opt"]
+        + extras["parallel"]
+        + extras["test"]
     )
 
     setup(

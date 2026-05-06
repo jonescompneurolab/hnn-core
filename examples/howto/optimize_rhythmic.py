@@ -1,6 +1,6 @@
 """
 =========================================
-08. Optimize simulated rhythmic responses
+09. Optimize simulated rhythmic responses
 =========================================
 
 This example demonstrates how to optimize the power spectral density (PSD)
@@ -10,14 +10,22 @@ components.
 
 # Authors: Carolina Fernandez <cxf418@miami.edu>
 
-from hnn_core.viz import plot_psd
-from hnn_core.optimization import Optimizer
-import matplotlib.pyplot as plt
-
 ###############################################################################
 # Let us import hnn_core
 
+import matplotlib.pyplot as plt
+
 from hnn_core import (MPIBackend, neymotin_2020_model, simulate_dipole)
+from hnn_core.viz import plot_psd
+
+# Let us ensure we used the ``hnn_core`` install with the correct special dependencies
+# for this example.
+try:
+    from hnn_core.optimization import Optimizer
+
+except ImportError:
+    print("HNN-Core Optimization not installed. Run the following command: ")
+    print("pip install \"hnn-core[opt]\"")
 
 # The number of cores may need modifying depending on your current machine.
 n_procs = 10

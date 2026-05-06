@@ -1,6 +1,6 @@
 """
 =================================
-09. Replaying Spike Data as Input
+10. Replaying Spike Data as Input
 =================================
 
 Welcome to this hands-on tutorial on simulating communication between two neocortical
