@@ -17,7 +17,7 @@ jobs:
                   wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh;
                   chmod +x ~/miniconda.sh;
                   bash ~/miniconda.sh -b -p ~/miniconda;
-                  
+
           - run:
               name: Setup Python environment including MPI
               command: |
@@ -25,7 +25,7 @@ jobs:
                   conda update --yes --quiet conda
                   conda create -n testenv --yes pip python=3.11
                   source activate testenv
-                  echo 'export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH' >> "$BASH_ENV"
+                  export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
                   # necessary due to https://github.com/mpi4py/mpi4py/issues/335#issuecomment-1486366039
                   rm $CONDA_PREFIX/compiler_compat/ld
                   conda install --yes scipy numpy matplotlib "openmpi >5" -c conda-forge
@@ -35,12 +35,14 @@ jobs:
               name: Setup doc building stuff
               command: |
                   source ~/miniconda/bin/activate testenv
+                  export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
                   sudo apt-get install pandoc
 
           - run:
               name: Setup hnn-core
               command: |
                   source ~/miniconda/bin/activate testenv
+                  export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
                   pip install -U pip setuptools virtualenv
                   pip install '.[parallel, docs, gui]'
 
@@ -48,6 +50,7 @@ jobs:
               name: Test that MPI works in the environment
               command: |
                   source ~/miniconda/bin/activate testenv
+                  export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
                   python -c "
                   from hnn_core import jones_2009_model, MPIBackend, simulate_dipole
                   with MPIBackend():
@@ -63,6 +66,7 @@ jobs:
               name: Build the documentation
               command: |
                   source ~/miniconda/bin/activate testenv
+                  export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
                   cd doc/ && make html
 
           - persist_to_workspace:
