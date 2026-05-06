@@ -1928,7 +1928,7 @@ class HNNGUI:
             else:
                 raise ValueError
 
-            print(f"Loaded {load_type} from {param_dict['name']}")
+            logger.info(f"Loaded {load_type} from {param_dict['name']}")
         # Resets file counter to 0
         change["owner"].set_trait("value", ([]))
         return params
@@ -3085,7 +3085,7 @@ def _init_network_from_widgets(
     add_drive=True,
 ):
     """Construct network and add drives."""
-    print("init network")
+    logger.info("init network")
     single_simulation_data["net"] = dict_to_network(
         params, read_drives=False, read_external_biases=False
     )
@@ -3183,7 +3183,7 @@ def _init_network_from_widgets(
             weights_ampa = _drive_widget_to_dict(drive, "weights_ampa")
             weights_nmda = _drive_widget_to_dict(drive, "weights_nmda")
             synaptic_delays = _drive_widget_to_dict(drive, "delays")
-            print(f"drive type is {drive['type']}, location={drive['location']}")
+            logger.info(f"drive type is {drive['type']}, location={drive['location']}")
             if drive["type"] == "Poisson":
                 rate_constant = _drive_widget_to_dict(drive, "rate_constant")
 
@@ -3297,7 +3297,7 @@ def run_button_clicked(
                 global_gain_textfields,
             )
 
-            print("start simulation")
+            logger.info("start simulation")
             if backend_selection.value == "MPI":
                 # 'use_hwthreading_if_found' and 'sensible_default_cores' have
                 # already been set elsewhere, and do not need to be re-set here.
@@ -3311,7 +3311,7 @@ def run_button_clicked(
                 )
             else:
                 backend = JoblibBackend(n_jobs=n_jobs.value)
-                print(f"Using Joblib with {n_jobs.value} core(s).")
+                logger.info(f"Using Joblib with {n_jobs.value} core(s).")
             with backend:
                 simulation_status_bar.value = simulation_status_contents["running"]
                 simulation_data[_sim_name]["dpls"] = simulate_dipole(
@@ -3332,8 +3332,7 @@ def run_button_clicked(
                 simulations_list_widget.value = sim_names[0]
         except Exception:
             simulation_status_bar.value = simulation_status_contents["failed"]
-            full_error = traceback.format_exc()
-            print(f'[ERROR]{full_error}')
+            logger.error(traceback.format_exc())
             return
 
     viz_manager.reset_fig_config_tabs()
