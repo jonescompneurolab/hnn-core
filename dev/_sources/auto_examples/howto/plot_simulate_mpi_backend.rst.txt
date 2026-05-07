@@ -76,17 +76,25 @@ The occurrence of each burst is jittered by a random, normally distributed
 amount (20 ms standard deviation). We repeat the burst train 10 times, each
 time with unique randomization.
 
-.. GENERATED FROM PYTHON SOURCE LINES 34-42
+.. GENERATED FROM PYTHON SOURCE LINES 34-50
 
 .. code-block:: Python
 
     net = neymotin_2020_model()
 
-    weights_ampa = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
+    weights_ampa = {"L2_pyramidal": 5.4e-5, "L5_pyramidal": 5.4e-5}
     net.add_bursty_drive(
-        'bursty', tstart=50., burst_rate=10, burst_std=20., numspikes=2,
-        spike_isi=10, n_drive_cells=10, location='distal',
-        weights_ampa=weights_ampa, event_seed=278)
+        "bursty",
+        tstart=50.0,
+        burst_rate=10,
+        burst_std=20.0,
+        numspikes=2,
+        spike_isi=10,
+        n_drive_cells=10,
+        location="distal",
+        weights_ampa=weights_ampa,
+        event_seed=278,
+    )
 
 
 
@@ -95,7 +103,7 @@ time with unique randomization.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 43-48
+.. GENERATED FROM PYTHON SOURCE LINES 51-56
 
 Finally, to simulate we use the
 :class:`~hnn_core.parallel_backends.MPIBackend` class. This will
@@ -103,14 +111,14 @@ start the simulation across the number of processors (cores) specified by
 ``n_procs`` using MPI. The ``'mpiexec'`` launcher is used from
 ``openmpi``, which must be installed on the system
 
-.. GENERATED FROM PYTHON SOURCE LINES 48-55
+.. GENERATED FROM PYTHON SOURCE LINES 56-63
 
 .. code-block:: Python
 
     from hnn_core import MPIBackend
 
-    with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
-        dpls = simulate_dipole(net, tstop=310., n_trials=1)
+    with MPIBackend(n_procs=2, mpi_cmd="mpiexec"):
+        dpls = simulate_dipole(net, tstop=310.0, n_trials=1)
 
     trial_idx = 0
     dpls[trial_idx].plot()
@@ -129,6 +137,7 @@ start the simulation across the number of processors (cores) specified by
 
     MPI will run 1 trial(s) sequentially by distributing network neurons over 2 processes.
     numprocs=2
+    bash: /home/circleci/miniconda/envs/testenv/lib/libtinfo.so.6: no version information available (required by bash)
     Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.11/site-packages/hnn_core/mod/x86_64/libnrnmech.so
     Building the NEURON model
     Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.11/site-packages/hnn_core/mod/x86_64/libnrnmech.so
@@ -172,7 +181,7 @@ start the simulation across the number of processors (cores) specified by
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 40.255 seconds)
+   **Total running time of the script:** (0 minutes 47.225 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_simulate_mpi_backend.py:

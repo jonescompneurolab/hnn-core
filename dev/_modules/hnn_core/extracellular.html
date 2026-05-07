@@ -521,12 +521,15 @@
 <span class="c1">#          Sam Neymotin &lt;samnemo@gmail.com&gt;</span>
 <span class="c1">#          Christopher Bailey &lt;cjb@cfin.au.dk&gt;</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">norm</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">neuron</span><span class="w"> </span><span class="kn">import</span> <span class="n">h</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.externals.mne</span><span class="w"> </span><span class="kn">import</span> <span class="n">_validate_type</span><span class="p">,</span> <span class="n">_check_option</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">smooth_waveform</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.viz</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_laminar_csd</span><span class="p">,</span> <span class="n">plot_laminar_lfp</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">calculate_csd2d</span><span class="p">(</span><span class="n">lfp_data</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
@@ -984,8 +987,6 @@
 <span class="sd">        extracellular_copy : instance of ExtraCellularArray</span>
 <span class="sd">            The modified ExtraCellularArray instance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">smooth_waveform</span>
-
         <span class="k">for</span> <span class="n">n_trial</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
             <span class="k">for</span> <span class="n">n_contact</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">n_trial</span><span class="p">][</span><span class="n">n_contact</span><span class="p">]</span> <span class="o">=</span> <span class="n">smooth_waveform</span><span class="p">(</span>
@@ -1050,8 +1051,6 @@
 <span class="sd">        fig : instance of plt.fig</span>
 <span class="sd">            The matplotlib figure handle into which time series were plotted.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">.viz</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_laminar_lfp</span>
-
         <span class="k">if</span> <span class="n">trial_no</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">plot_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voltages</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">trial_no</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">slice</span><span class="p">)):</span>
@@ -1126,8 +1125,6 @@
 <span class="sd">        fig : instance of matplotlib Figure</span>
 <span class="sd">            The matplotlib figure handle.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">.viz</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_laminar_csd</span>
-
         <span class="n">lfp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voltages</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">contact_labels</span><span class="p">,</span> <span class="n">delta</span> <span class="o">=</span> <span class="n">_get_laminar_z_coords</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
 
