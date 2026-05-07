@@ -5,7 +5,7 @@
 
 import pytest
 
-from hnn_core import neymotin_2020_model, jones_2009_model, simulate_dipole
+from hnn_core import neymotin_2020_model, simulate_dipole
 from hnn_core.optimization import Optimizer
 import numpy as np
 
@@ -484,7 +484,7 @@ def test_custom_loss_fun(solver):
     n_trials = 1
 
     # simulate a dipole to establish ground-truth drive parameters
-    net_orig = jones_2009_model(mesh_shape=(3, 3))
+    net_orig = neymotin_2020_model(mesh_shape=(3, 3))
 
     mu_orig = 2.0
     weights_ampa = {
@@ -511,7 +511,7 @@ def test_custom_loss_fun(solver):
     dpl_orig = simulate_dipole(net_orig, tstop=tstop, n_trials=n_trials)[0]
 
     # define set_params function and constraints
-    net_offset = jones_2009_model(mesh_shape=(3, 3))
+    net_offset = neymotin_2020_model(mesh_shape=(3, 3))
 
     def set_params(net_offset, params):
         weights_ampa = {
