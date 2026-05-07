@@ -9,6 +9,7 @@ import re
 import shlex
 import pickle
 import base64
+import time
 from warnings import warn
 from subprocess import Popen, PIPE, TimeoutExpired
 import binascii
@@ -22,8 +23,6 @@ from .dipole import Dipole
 from .network_builder import _simulate_single_trial
 
 _BACKEND = None
-
-import time
 
 
 def _thread_handler(event, out, queue):
