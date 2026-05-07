@@ -10,7 +10,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import fmin_cobyla
 
-from .objective_functions import _rmse_evoked, _anticorr_evoked, _maximize_psd, _custom_objective_function
+from .objective_functions import (
+    _rmse_evoked,
+    _anticorr_evoked,
+    _maximize_psd,
+    _custom_objective_function,
+)
 from ..externals.mne import _validate_type
 
 

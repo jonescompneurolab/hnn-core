@@ -542,6 +542,7 @@ def test_custom_loss_fun(solver):
 
     def custom_loss(dpls, obj_fun_kwargs):
         from hnn_core.dipole import _rmse, average_dipoles
+
         dpl = average_dipoles(dpls)
         return _rmse(dpl, obj_fun_kwargs["target"], tstop=tstop)
 
@@ -558,7 +559,7 @@ def test_custom_loss_fun(solver):
     # test exception raised if missing loss_fun
     with pytest.raises(Exception, match="loss_fun must be specified"):
         optim.fit(target=dpl_orig)
-        
+
     # test exception raised if loss_fun is not callable
     with pytest.raises(Exception, match="loss_fun must be a callable"):
         optim.fit(target=dpl_orig, loss_fun="not_callable")

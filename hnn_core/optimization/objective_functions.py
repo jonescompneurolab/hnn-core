@@ -415,7 +415,7 @@ def _custom_objective_function(
     obj_fun_kwargs : dict
         Additional arguments to pass to the objective function, must contain
         'loss_fun', a callable.
-        
+
     Returns
     -------
     obj : float
@@ -428,7 +428,9 @@ def _custom_objective_function(
     new_net = initial_net.copy()
     set_params(new_net, params)
 
-    dpls = simulate_dipole(new_net, tstop=tstop, n_trials=obj_fun_kwargs.get("n_trials", 1))
+    dpls = simulate_dipole(
+        new_net, tstop=tstop, n_trials=obj_fun_kwargs.get("n_trials", 1)
+    )
 
     # smooth & scale
     if "scale_factor" in obj_fun_kwargs:
