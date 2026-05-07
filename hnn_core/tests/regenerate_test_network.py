@@ -3,7 +3,7 @@
 from pathlib import Path
 from shutil import copy
 
-from hnn_core import read_params, jones_2009_model
+from hnn_core import read_params, neymotin_2020_model
 
 hnn_core_root = Path(__file__).parents[1]
 assets_path = Path(hnn_core_root, "tests", "assets")
@@ -25,7 +25,7 @@ def jones_2009_additional_features():
     params_path = Path(hnn_core_root, "param", "default.json")
     params = read_params(params_path)
 
-    net = jones_2009_model(
+    net = neymotin_2020_model(
         params=params, add_drives_from_params=True, mesh_shape=(3, 3)
     )
 
@@ -112,7 +112,7 @@ def jones_2009_additional_features():
 
 
 if __name__ == "__main__":
-    new_test_network_path = assets_path.joinpath("jones2009_3x3_drives.json")
+    new_test_network_path = assets_path.joinpath("neymotin2020_3x3_drives.json")
 
     backup_path = Path(
         new_test_network_path.parent,

@@ -15,6 +15,7 @@ from hnn_core import (
     CellResponse,
     Network,
     calcium_model,
+    neymotin_2020_model,
     jones_2009_model,
     law_2021_model,
     read_params,
@@ -282,7 +283,7 @@ def test_network_models():
         )
 
     # Check add_default_erp()
-    net_default = jones_2009_model()
+    net_default = neymotin_2020_model()
     with pytest.raises(TypeError, match="net must be"):
         add_erp_drives_to_jones_model(net="invalid_input")
     with pytest.raises(TypeError, match="tstart must be"):
@@ -340,7 +341,7 @@ def test_network_models():
 def test_network_cell_positions():
     """ "Test manipulation of cell positions in the network object"""
 
-    net = jones_2009_model()
+    net = neymotin_2020_model()
     assert np.isclose(net._inplane_distance, 1.0)  # default
     assert np.isclose(net._layer_separation, 1307.4)  # default
 
@@ -386,7 +387,7 @@ def test_network_drives():
     with pytest.raises(TypeError, match="params must be an instance of dict"):
         Network("hello")
     params = read_params(params_fname)
-    net = jones_2009_model(params, legacy_mode=False)
+    net = neymotin_2020_model(params, legacy_mode=False)
 
     # add all drives explicitly and ensure that the expected number of drive
     # cells get instantiated for each case
@@ -732,12 +733,12 @@ def test_network_drives_legacy():
 
     # Test deprecation warning of legacy mode
     with pytest.warns(DeprecationWarning, match="Legacy mode"):
-        _ = jones_2009_model(legacy_mode=True)
+        _ = neymotin_2020_model(legacy_mode=True)
         _ = law_2021_model(legacy_mode=True)
         _ = calcium_model(legacy_mode=True)
         _ = Network(params, legacy_mode=True)
 
-    net = jones_2009_model(params, legacy_mode=True, add_drives_from_params=True)
+    net = neymotin_2020_model(params, legacy_mode=True, add_drives_from_params=True)
 
     # instantiate drive events for NetworkBuilder
     net._instantiate_drives(tstop=params["tstop"], n_trials=params["N_trials"])
@@ -1058,7 +1059,7 @@ def test_network_connectivity(base_network):
 def test_add_cell_type():
     """Test adding a new cell type."""
     params = read_params(params_fname)
-    net = jones_2009_model(params)
+    net = neymotin_2020_model(params)
     # instantiate drive events for NetworkBuilder
     net._instantiate_drives(tstop=params["tstop"], n_trials=params["N_trials"])
 
@@ -1214,7 +1215,7 @@ def test_tonic_biases():
     ):
         net.add_tonic_bias(amplitude=tonic_bias_2)
 
-    net = jones_2009_model()
+    net = neymotin_2020_model()
     net.add_tonic_bias(amplitude=tonic_bias_2, bias_name="tonic_2", t0=100)
     assert "tonic_2" in net.external_biases
     assert net.external_biases["tonic_2"]["L2_pyramidal"]["t0"] == 100
@@ -1268,7 +1269,7 @@ def test_network_mesh():
 
 @pytest.mark.parametrize(
     "network_model",
-    [jones_2009_model, law_2021_model, calcium_model],
+    [neymotin_2020_model, law_2021_model, calcium_model],
 )
 def test_network_models_mesh(network_model):
     mesh_shape = (2, 3)
@@ -1286,7 +1287,7 @@ def test_network_models_mesh(network_model):
 
 def test_set_global_synaptic_gains():
     """Test synaptic gains setter"""
-    net = jones_2009_model()
+    net = neymotin_2020_model()
     nb_base = NetworkBuilder(net)
     e_cell_names = ["L2_pyramidal", "L5_pyramidal"]
     i_cell_names = ["L2_basket", "L5_basket"]
@@ -1659,7 +1660,7 @@ def test_rename_cell_types(base_network):
 
     # Test the other main network we use for testing
     net4 = hnn_core.hnn_io.read_network_configuration(
-        op.join(hnn_core_root, "tests", "assets", "jones2009_3x3_drives.json")
+        op.join(hnn_core_root, "tests", "assets", "neymotin2020_3x3_drives.json")
     )
     net4._rename_cell_types(cell_type_rename_mapping)
     dpls4 = simulate_dipole(net4, tstop=10.0, n_trials=1)
@@ -1673,8 +1674,8 @@ def test_rename_cell_types(base_network):
 def test_spike_train_drive_formats_and_simulation():
     """Test spike train drive formats are accepted, processed correctly, and simulated."""
     # Create networks
-    net_dict = jones_2009_model()
-    net_tuple = jones_2009_model()
+    net_dict = neymotin_2020_model()
+    net_tuple = neymotin_2020_model()
 
     # File format will be tested in a temporary directory
     with tempfile.TemporaryDirectory() as tmp_dir:
@@ -1742,7 +1743,7 @@ def test_spike_train_drive_formats_and_simulation():
         )
 
         # Create network for file format testing
-        net_file = jones_2009_model()
+        net_file = neymotin_2020_model()
         net_file.add_spike_train_drive(
             name="drive_file",
             spike_data=file_format,
@@ -1792,7 +1793,7 @@ def test_spike_train_drive_formats_and_simulation():
 def test_offline_spike_replay():
     """Test a workflow of offline spike recording and replay between networks."""
     # Create first network (source)
-    net_A = jones_2009_model()
+    net_A = neymotin_2020_model()
 
     # Add drive to first network
     net_A.add_evoked_drive(
@@ -1842,7 +1843,7 @@ def test_offline_spike_replay():
     assert total_spikes >= 2, f"Not enough spikes recorded ({total_spikes})"
 
     # Create second network (target)
-    net_B = jones_2009_model()
+    net_B = neymotin_2020_model()
 
     # Feed spike data to second network
     net_B.add_spike_train_drive(
@@ -1887,7 +1888,7 @@ def test_offline_spike_replay():
 
 def test_filter_cell_types():
     """Test filtering of cell types based on cell_metadata."""
-    net = jones_2009_model()
+    net = neymotin_2020_model()
 
     # Test filtering by a single attribute: layer
     filtered_types = net.filter_cell_types(layer="5")
@@ -1910,7 +1911,7 @@ def test_filter_cell_types():
 
 def test_update_weights_metadata():
     """Test update_weights with new cell_metadata logic."""
-    net = jones_2009_model()
+    net = neymotin_2020_model()
     e_cell_names = net.filter_cell_types(electro_type="excitatory")
     i_cell_names = net.filter_cell_types(electro_type="inhibitory")
 
@@ -1931,7 +1932,7 @@ def test_update_weights_metadata():
 
 def test_get_global_synaptic_gains():
     """Test synaptic gains getter."""
-    net = jones_2009_model()
+    net = neymotin_2020_model()
     assert net.get_global_synaptic_gains() == {
         "e_e": 1.0,
         "e_i": 1.0,
@@ -1945,7 +1946,7 @@ def test_get_global_synaptic_gains():
 
 def test_add_connection_threshold_and_gain():
     """Test adding connections with custom threshold and gain parameters."""
-    net = jones_2009_model()
+    net = neymotin_2020_model()
 
     # Add connection with custom threshold
     custom_threshold = 15.0
@@ -2027,7 +2028,7 @@ def test_add_connection_threshold_and_gain():
 
 def test_get_cell_index_by_synapse_type():
     """Test _get_cell_index_by_synapse_type helper function."""
-    net = jones_2009_model()
+    net = neymotin_2020_model()
 
     e_gids, i_gids = _get_cell_index_by_synapse_type(net)
 
@@ -2049,7 +2050,7 @@ def test_get_cell_index_by_synapse_type():
 
 def test_check_global_synaptic_gains_uniformity():
     """Test _check_global_synaptic_gains_uniformity function."""
-    net = jones_2009_model()
+    net = neymotin_2020_model()
 
     # Set some global gains
     net.set_global_synaptic_gains(e_e=0.5)
@@ -2082,7 +2083,7 @@ def test_check_global_synaptic_gains_uniformity():
 def test_verbose():
     """Test that verbose flag controls print statements."""
 
-    net = jones_2009_model(mesh_shape=(3, 3))
+    net = neymotin_2020_model(mesh_shape=(3, 3))
 
     with io.StringIO() as buf, redirect_stdout(buf):
         simulate_dipole(net, dt=0.5, tstop=20.0, verbose=True)
@@ -2091,3 +2092,12 @@ def test_verbose():
     with io.StringIO() as buf, redirect_stdout(buf):
         simulate_dipole(net, dt=0.5, tstop=20.0, verbose=False)
         assert buf.getvalue() == ""
+
+
+def test_deprecated_jones_2009_model():
+    with pytest.warns(
+        DeprecationWarning, match="default model with `jones_2009_model`"
+    ):
+        net = jones_2009_model(add_drives_from_params=True, mesh_shape=(3, 3))
+
+    simulate_dipole(net, dt=0.5, tstop=20.0, verbose=True)

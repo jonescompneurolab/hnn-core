@@ -5,7 +5,7 @@
 
 import pytest
 
-from hnn_core import jones_2009_model, simulate_dipole
+from hnn_core import neymotin_2020_model, simulate_dipole
 from hnn_core.optimization import Optimizer
 import numpy as np
 
@@ -20,7 +20,7 @@ def test_optimize_evoked(solver, obj_fun):
     n_trials = 1
 
     # simulate a dipole to establish ground-truth drive parameters
-    net_orig = jones_2009_model(mesh_shape=(3, 3))
+    net_orig = neymotin_2020_model(mesh_shape=(3, 3))
 
     mu_orig = 2.0
     weights_ampa = {
@@ -47,7 +47,7 @@ def test_optimize_evoked(solver, obj_fun):
     dpl_orig = simulate_dipole(net_orig, tstop=tstop, n_trials=n_trials)[0]
 
     # define set_params function and constraints
-    net_offset = jones_2009_model(mesh_shape=(3, 3))
+    net_offset = neymotin_2020_model(mesh_shape=(3, 3))
 
     def set_params(net_offset, params):
         weights_ampa = {
@@ -118,7 +118,7 @@ def test_rhythmic(solver, relative_bandpower):
     tstop = 10.0
 
     # simulate a dipole to establish ground-truth drive parameters
-    net_offset = jones_2009_model(mesh_shape=(3, 3))
+    net_offset = neymotin_2020_model(mesh_shape=(3, 3))
 
     # define set_params function and constraints
     def set_params(net_offset, params):
@@ -221,7 +221,7 @@ def test_initial_params(solver):
     n_trials = 1
 
     # simulate a dipole to establish ground-truth drive parameters
-    net_orig = jones_2009_model(mesh_shape=(3, 3))
+    net_orig = neymotin_2020_model(mesh_shape=(3, 3))
 
     mu_orig = 2.0
     sigma_orig = 1.0
@@ -249,7 +249,7 @@ def test_initial_params(solver):
     dpl_orig = simulate_dipole(net_orig, tstop=tstop, n_trials=n_trials)[0]
 
     # define set_params function and constraints
-    net_offset = jones_2009_model(mesh_shape=(3, 3))
+    net_offset = neymotin_2020_model(mesh_shape=(3, 3))
 
     def set_params(net_offset, params):
         weights_ampa = {
@@ -318,7 +318,7 @@ def test_initial_params_validation(solver, initial_params, error_type):
     """Test initial_params validation."""
 
     tstop = 10.0
-    net_offset = jones_2009_model(mesh_shape=(3, 3))
+    net_offset = neymotin_2020_model(mesh_shape=(3, 3))
 
     def set_params(net_offset, params):
         weights_ampa = {
@@ -362,7 +362,7 @@ def test_initial_params_validation(solver, initial_params, error_type):
 
 def test_cma_validation():
     """Test validation of CMA specific parameters"""
-    net = jones_2009_model(mesh_shape=(3, 3))
+    net = neymotin_2020_model(mesh_shape=(3, 3))
     tstop = 10.0
     constraints = {"mu": (1, 10), "sigma": (1, 10)}
     solver = "cma"
@@ -431,14 +431,14 @@ def test_cma_seed():
         )
 
     # Simulate a dipole to establish the target
-    net_target = jones_2009_model(mesh_shape=(3, 3))
+    net_target = neymotin_2020_model(mesh_shape=(3, 3))
     params_target = {"mu": 2.0, "sigma": 1.0}
 
     set_params(net_target, params_target)
     dpl_target = simulate_dipole(net_target, tstop=tstop, dt=dt, n_trials=n_trials)[0]
 
     # define set_params function and constraints
-    net_opt = jones_2009_model(mesh_shape=(3, 3))
+    net_opt = neymotin_2020_model(mesh_shape=(3, 3))
 
     # define constraints
     constraints = dict()
