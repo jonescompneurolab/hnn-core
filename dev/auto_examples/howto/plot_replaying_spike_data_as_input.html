@@ -531,13 +531,13 @@ activity in a real brain region, which we’ll later transmit to another network
 efficient handling.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core</span><span class="w"> </span><span class="kn">import</span> <span class="n">neymotin_2020_model</span><span class="p">,</span> <a href="../../generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">,</span> <a href="../../generated/hnn_core.read_spikes.html#hnn_core.read_spikes" title="hnn_core.read_spikes" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">read_spikes</span></a>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core</span><span class="w"> </span><span class="kn">import</span> <a href="../../generated/hnn_core.neymotin_2020_model.html#hnn_core.neymotin_2020_model" title="hnn_core.neymotin_2020_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">neymotin_2020_model</span></a><span class="p">,</span> <a href="../../generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">,</span> <a href="../../generated/hnn_core.read_spikes.html#hnn_core.read_spikes" title="hnn_core.read_spikes" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">read_spikes</span></a>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">op</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
 <span class="c1"># Create and simulate Network A</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Creating and simulating Network A...&quot;</span><span class="p">)</span>
-<a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_A</span></a> <span class="o">=</span> <span class="n">neymotin_2020_model</span><span class="p">()</span>
+<a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_A</span></a> <span class="o">=</span> <a href="../../generated/hnn_core.neymotin_2020_model.html#hnn_core.neymotin_2020_model" title="hnn_core.neymotin_2020_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">neymotin_2020_model</span></a><span class="p">()</span>
 <a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_A</span></a><span class="o">.</span><span class="n">_params</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;tstop&#39;</span><span class="p">:</span> <span class="mf">170.0</span><span class="p">})</span>
 
 <span class="c1"># Add a drive to generate activity</span>
@@ -589,7 +589,7 @@ Trial 1: 130.0 ms...
 Trial 1: 140.0 ms...
 Trial 1: 150.0 ms...
 Trial 1: 160.0 ms...
-Writing file /tmp/tmpgwt7g9vw/spk_0.txt
+Writing file /tmp/tmpb1j_freb/spk_0.txt
 /home/circleci/project/examples/howto/plot_replaying_spike_data_as_input.py:59: DeprecationWarning: Reading cell response from txt files is deprecated and will be removed in future versions. Please load cell response along with simulated network
   cell_response = read_spikes(op.join(tmp_dir, &#39;spk_*.txt&#39;))
 Extracted 616 spikes from Network A
@@ -607,7 +607,7 @@ input.</p>
 <p>We’ll also define connection properties to map Network A’s pyramidal cells to Network
 B’s layers, ensuring a realistic interaction.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Creating and configuring Network B...&quot;</span><span class="p">)</span>
-<a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_B</span></a> <span class="o">=</span> <span class="n">neymotin_2020_model</span><span class="p">()</span>
+<a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_B</span></a> <span class="o">=</span> <a href="../../generated/hnn_core.neymotin_2020_model.html#hnn_core.neymotin_2020_model" title="hnn_core.neymotin_2020_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">neymotin_2020_model</span></a><span class="p">()</span>
 <a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_B</span></a><span class="o">.</span><span class="n">_params</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;tstop&#39;</span><span class="p">:</span> <span class="mf">225.0</span><span class="p">})</span>
 
 <span class="c1"># Extract spike data from first trial and filter for pyramidal cells</span>
@@ -747,7 +747,7 @@ distributed computing—allowing you to experiment with multiple networks or adj
 parameters like weights and delays to explore different dynamics. Try modifying the
 <em class="xref py py-obj">weights_ampa</em> or <em class="xref py py-obj">synaptic_delays</em> values in Step 2 to see how they affect the
 results!</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 9.297 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 5.751 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-howto-plot-replaying-spike-data-as-input-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/plot_replaying_spike_data_as_input.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo.svg" style="width: 150px;" />
