@@ -45,7 +45,7 @@ def expected_improvement(gp, best_f, all_x):
     return (y - best_f) * st.norm.cdf(Z) + y_std * st.norm.pdf(Z)
 
 
-def bayes_opt(func, x0, cons, acquisition, maxfun=200, debug=False, random_state=None):
+def bayes_opt(func, x0, cons, acquisition, maxfun=200, debug=False, random_state=None, eter=None):
     """The actual bayesian optimization function.
 
     Parameters
