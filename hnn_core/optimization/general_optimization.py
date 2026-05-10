@@ -10,7 +10,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import fmin_cobyla
 
-from .objective_functions import _rmse_evoked, _anticorr_evoked, _maximize_psd
+from .objective_functions import (
+    _rmse_evoked,
+    _anticorr_evoked,
+    _maximize_psd,
+    _custom_objective_function,
+)
 from ..externals.mne import _validate_type
 
 
@@ -51,7 +56,7 @@ class Optimizer:
             The optimizer, 'bayesian', 'cobyla', or 'cma'.
         obj_fun : str | func
             The objective function to be minimized. Can be 'dipole_rmse',
-            'maximize_psd', "dipole_corr", or a user-defined function. The default is
+            'maximize_psd', "dipole_corr", "custom", or a user-defined function. The default is
             'dipole_rmse'.
         max_iter : int, optional
             The max number of calls to the objective function. The default is
@@ -110,6 +115,9 @@ class Optimizer:
         elif obj_fun == "dipole_corr":
             self.obj_fun = _anticorr_evoked
             self.obj_fun_name = "dipole_corr"
+        elif obj_fun == "custom":
+            self.obj_fun = _custom_objective_function
+            self.obj_fun_name = "custom"
         else:
             self.obj_fun = obj_fun  # user-defined function
             self.obj_fun_name = None
@@ -216,6 +224,14 @@ class Optimizer:
             or "relative_bandpower" not in obj_fun_kwargs
         ):
             raise Exception("f_bands and relative_bandpower must be specified")
+
+        elif self.obj_fun_name == "custom":
+            if "loss_fun" not in obj_fun_kwargs:
+                raise Exception("loss_fun must be specified when obj_fun='custom'")
+            elif not callable(obj_fun_kwargs["loss_fun"]):
+                raise Exception("loss_fun must be a callable")
+            elif "n_trials" not in obj_fun_kwargs:
+                obj_fun_kwargs["n_trials"] = 1
 
         constraints = self._assemble_constraints(self.constraints)
 
