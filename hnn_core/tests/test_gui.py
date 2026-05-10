@@ -4,6 +4,7 @@
 import codecs
 import io
 import json
+import logging
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
@@ -1716,3 +1717,69 @@ def test_diff_gui_vs_api_networks_simulations():
         dpls_gui[0].data["agg"],
         dpls_api[0].data["agg"],
     )
+
+
+def test_traceback_logging(setup_gui, monkeypatch):
+    logger = logging.getLogger("hnn_gui")
+    gui = setup_gui
+    tstop_trials_tstep = [(10, 1, 0.25)]
+    gui.widget_backend_selection.value = "Joblib"
+    sim_count = 0
+
+    # Verify successful simulations produce no errors or tracebacks in the log:
+    logger.info("asdf info")
+    logger.warning("qwerty warning")
+    for val_tstop, val_ntrials, val_tstep in tstop_trials_tstep:
+        sim_name = f"test_{sim_count}"
+        gui.widget_simulation_name.value = sim_name
+        gui.widget_tstop.value = val_tstop
+        gui.widget_ntrials.value = val_ntrials
+        gui.widget_dt.value = val_tstep
+
+        gui.run_button.click()
+        dpls = gui.simulation_data[sim_name]["dpls"]
+        assert isinstance(gui.simulation_data[sim_name]["net"], Network)
+        assert isinstance(dpls, list)
+        assert len(dpls) > 0
+        assert all([isinstance(dpl, Dipole) for dpl in dpls])
+        sim_count += 1
+
+    logs = [msg["text"] for msg in gui._log_out.outputs]
+    compiled_log_text = "\n".join(logs)
+
+    # Test that our test log messages are included, but no errors or tracebacks are
+    # present:
+    assert "asdf info" in compiled_log_text
+    assert "qwerty warning" in compiled_log_text
+    assert "Traceback" not in compiled_log_text
+    assert "[ERROR]" not in compiled_log_text
+
+    def raise_exception(*args, **kwargs):
+        raise ValueError("Test 314159 exception")
+
+    monkeypatch.setattr("hnn_core.gui.gui.simulate_dipole", raise_exception)
+
+    for val_tstop, val_ntrials, val_tstep in tstop_trials_tstep:
+        gui.widget_simulation_name.value = f"test_{sim_count}"
+        gui.widget_tstop.value = val_tstop
+        gui.widget_ntrials.value = val_ntrials
+        gui.widget_dt.value = val_tstep
+
+        gui.run_button.click()
+        sim_count += 1
+
+    logs = [msg["text"] for msg in gui._log_out.outputs]
+    compiled_log_text = "\n".join(logs)
+
+    # Test that now, our error messages are included in the overall log:
+    assert "Test 314159 exception" in compiled_log_text
+    assert "Traceback" in compiled_log_text
+    assert "[ERROR]" in compiled_log_text
+
+    for log_index in range(len(logs)):
+        if "Test 314159 exception" in logs[log_index]:
+            err_log_index = log_index
+        elif "qwerty warning" in logs[log_index]:
+            assert err_log_index < log_index  # Error should be logged after the warning
+
+    plt.close("all")
