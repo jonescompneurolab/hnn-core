@@ -6203,10 +6203,14 @@ def run_opt_button_clicked(
             "plot",
         )
 
-        # TODO: Maybe force a file-save of the final network params automatically at the
-        # end? Since the `HNNGUI.save_config_button` is just a huge HTML element itself,
-        # I can't get it to artificially ".click()" to actually initiate a download. Is
-        # there even a way to do this?
+        # TODO future refactor: Maybe force a file-save of the final network params
+        # automatically at the end? Since the `HNNGUI.save_config_button` is just a huge
+        # HTML element itself, I can't get it to artificially ".click()" to actually
+        # initiate a download. Is there even a way to do this?
+
+        # TODO future refactor: After adding similar functionality inside Optimizer,
+        # allow for automatic saving of progress during certain points in an
+        # optimization run
 
         # Return both the optimized config and the optimizer results
         optimized_config = serialize_config(all_data, new_name)

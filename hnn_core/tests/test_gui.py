@@ -1770,6 +1770,9 @@ def test_gui_run_optimization(backend_selection, opt_solver, dt, setup_gui):
           few optimization iterations, but whatevs)
         - All of the above works after a second optimization run, including in the case
           that the objective function is different between runs
+
+    TODO: future refactor: add deterministic testing for Cobyla and, after testing
+    seeds, Bayesian and CMA
     """
     gui = setup_gui
 
