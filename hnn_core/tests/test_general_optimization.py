@@ -494,7 +494,7 @@ def test_cobyla_best():
     constraints = {"mu": (1.0, 6.0), "sigma": (1.0, 3.0)}
 
     call_log = []
-    call_counter = [0]
+    call_counter = 0
     # Non-monotonic: minimum is at index 1 (value 1.0), final is at index 4 (value 4.0)
     obj_sequence = [5.0, 1.0, 3.0, 2.0, 4.0]
 
@@ -509,9 +509,10 @@ def test_cobyla_best():
         obj_fun_kwargs,
         best=None,
     ):
-        call_idx = call_counter[0]
+        nonlocal call_counter
+        call_idx = call_counter
         obj = obj_sequence[min(call_idx, len(obj_sequence) - 1)]
-        call_counter[0] += 1
+        call_counter += 1
 
         params_copy = np.array(predicted_params).copy()
         call_log.append((obj, params_copy))
