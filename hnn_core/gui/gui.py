@@ -991,7 +991,7 @@ class HNNGUI:
             value=30.0,
             description="Dipole Smoothing:",
             min=0.0,
-            max=100.0,
+            max=1e6,
             step=1.0,
             disabled=False,
             layout=self.layout["opt_textbox"],
@@ -2023,17 +2023,17 @@ class HNNGUI:
         """
         return js_string
 
-    # below are a series of methods that are used to manipulate the GUI
+    # below are a series of methods that are used to manipulate the GUI in testing only
     def _simulate_upload_data(self, file_url):
-        uploaded_value = _prepare_upload_file(file_url)
+        uploaded_value = _simulate_prepare_upload_file(file_url)
         self.load_data_button.set_trait("value", uploaded_value)
 
     def _simulate_upload_connectivity(self, file_url):
-        uploaded_value = _prepare_upload_file(file_url)
+        uploaded_value = _simulate_prepare_upload_file(file_url)
         self.load_connectivity_button.set_trait("value", uploaded_value)
 
     def _simulate_upload_drives(self, file_url):
-        uploaded_value = _prepare_upload_file(file_url)
+        uploaded_value = _simulate_prepare_upload_file(file_url)
         self.load_drives_button.set_trait("value", uploaded_value)
 
     def _simulate_left_tab_click(self, tab_title):
@@ -2137,6 +2137,10 @@ class HNNGUI:
         )
         prespecified_drive_data.update({"seedcore": max(event_seed, 2)})
 
+        # TODO future refactor: change usage of the flag `choose_tab_drive_or_opt`
+        # instead to depend on the contents of the drive- or opt-relevant kwargs lists,
+        # as per
+        # https://github.com/jonescompneurolab/hnn-core/pull/1190#discussion_r3221594422
         choose_tab_drive_or_opt = "drive"
         new_drive_widgets, new_drive_box = _create_widgets_for_drive(
             drive_type,
@@ -2370,8 +2374,9 @@ class HNNGUI:
             "target_dipole_data"
         ]
 
-        self.opt_target_widgets["n_trials"] = IntText(
+        self.opt_target_widgets["n_trials"] = BoundedIntText(
             value=prior_target_state.get("n_trials", 1),
+            min=1,
             description="Trials:",
             disabled=False,
             layout=Layout(width="120px"),
@@ -2477,7 +2482,9 @@ class HNNGUI:
         # band2 widgets, AND the band1 proportion widget
         # ------------------------------------------------------------------------------
         def _band2_ghosting_callback(change):
-            if self.opt_target_widgets["psd_target_band2_min"].disabled:
+            if self.opt_target_widgets["psd_target_band2_checkbox"].value:
+                # If the checkbox is checked, then enable all band2 widgets and the
+                # band1 proportion widget
                 self.opt_target_widgets["psd_target_band1_proportion"].disabled = False
                 self.opt_target_widgets["psd_target_band2_min"].disabled = False
                 self.opt_target_widgets["psd_target_band2_max"].disabled = False
@@ -2851,7 +2858,7 @@ def _prepare_upload_file_from_url(file_url):
     return upload_structure
 
 
-def _prepare_upload_file(path):
+def _simulate_prepare_upload_file(path):
     """Simulates output of the FileUpload widget for testing.
 
     Unit tests for the GUI simulate user upload of files. File source can
@@ -4104,7 +4111,7 @@ def _create_widgets_for_tonic(
         tstop_w = BoundedFloatText(
             value=tstop,
             description="Stop time",
-            min=-1,
+            min=0.01,
             max=1e6,
             step=1.0,
             **simple_widget_kwargs,
@@ -5323,6 +5330,7 @@ def _create_opt_widgets_for_drive_var(
         layout=opt_tab_minmax_layout,
         style=opt_tab_minmax_style,
     )
+    # TODO future refactor: allow log-scale constraint bounds
     opt_max_widget = BoundedFloatText(
         value=(
             prior_max_pct
@@ -5331,7 +5339,7 @@ def _create_opt_widgets_for_drive_var(
         ),
         description="Max:",
         min=100,
-        max=1000,
+        max=1e6,
         step=1,
         layout=opt_tab_minmax_layout,
         style=opt_tab_minmax_style,

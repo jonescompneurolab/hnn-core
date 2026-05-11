@@ -24,7 +24,7 @@ from hnn_core.gui._viz_manager import (
 )
 from hnn_core.gui.gui import (
     _init_network_from_widgets,
-    _prepare_upload_file,
+    _simulate_prepare_upload_file,
     _update_nested_dict,
     serialize_simulation,
     serialize_config,
@@ -131,7 +131,7 @@ def test_gui_compose():
     plt.close("all")
 
 
-def test_prepare_upload_file():
+def test_simulate_prepare_upload_file():
     """Tests that input files from local or url sources import correctly"""
 
     def _import_json(content):
@@ -142,8 +142,8 @@ def test_prepare_upload_file():
     url = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/param/default.json"  # noqa
     file = Path(hnn_core_root, "param", "default.json")
 
-    content_from_url = _prepare_upload_file(url)[0]
-    content_from_local = _prepare_upload_file(file)[0]
+    content_from_url = _simulate_prepare_upload_file(url)[0]
+    content_from_local = _simulate_prepare_upload_file(file)[0]
 
     assert content_from_url["name"] == content_from_local["name"] == "default.json"
     assert content_from_url["type"] == content_from_local["type"] == "application/json"
