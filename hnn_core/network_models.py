@@ -21,7 +21,7 @@ def neymotin_2020_model(
     legacy_mode=False,
     mesh_shape=(10, 10),
 ):
-    """Instantiate the network model described in Jones et al. 2009
+    """Instantiate the network model described in Neymotin et al. 2020
 
     Parameters
     ----------
