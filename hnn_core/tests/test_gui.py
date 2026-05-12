@@ -967,8 +967,9 @@ def test_dipole_data_overlay(setup_gui):
     assert ax.legend_.texts[0]._text == "default: average"
     assert ax.legend_.texts[1]._text == "test_default"
 
-    # Check RMSE is printed
+    # Check RMSE and Corr are printed
     assert "RMSE(default, test_default):" in ax.texts[0]._text
+    assert "Corr(default, test_default):" in ax.texts[0]._text
 
     plt.close("all")
 

@@ -25,7 +25,7 @@ from ipywidgets import (
     link,
 )
 
-from hnn_core.dipole import _rmse, average_dipoles
+from hnn_core.dipole import _anticorr, _rmse, average_dipoles
 from hnn_core.gui._logging import logger
 from hnn_core.viz import plot_dipole, plot_tfr_morlet
 
@@ -623,7 +623,11 @@ def _plot_on_axes(
         else:
             dpl = dpls_processed
         rmse = _rmse(dpl, target_dpl_processed, t0, tstop)
-        annotation_text = f"RMSE({sim_name}, {target_sim_name}): {rmse:.4f}"
+        corr = 1 - _anticorr(dpl, target_dpl_processed, t0, tstop)
+        annotation_text = (
+            f"RMSE({sim_name}, {target_sim_name}): {rmse:.4f}\n"
+            f"Corr({sim_name}, {target_sim_name}): {corr:.4f}"
+        )
 
         # find subplot's annotation
         annotation = next(
@@ -645,15 +649,15 @@ def _plot_on_axes(
                 fontsize=12,
             )
 
-        rmse_logger_text = (
-            f"RMSE {rmse:.4f} ("
+        metrics_logger_text = (
+            f"RMSE {rmse:.4f} Corr {corr:.4f} ("
             f"{sim_name} smooth:{dipole_smooth.value} "
             f"scale:{dipole_scaling.value} \n"
             f"{target_sim_name} smooth:{data_smooth.value} "
             f"scale:{data_scaling.value})"
         )
 
-        logger.info(rmse_logger_text)
+        logger.info(metrics_logger_text)
 
     existing_plots.children = (
         *existing_plots.children,
