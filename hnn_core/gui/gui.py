@@ -3140,6 +3140,9 @@ def _create_synaptic_widgets(
             }
         )
     # Apply any missing default parameters if they don't already exist in the input data
+    # for "synaptic" parameters. For non-synaptic parameters, the default values are
+    # set in each of the unique `_create_widgets_for_XXX` drive functions, each of which
+    # call this `_create_synaptic_widgets`.
     if isinstance(data, dict):
         data = _update_nested_dict(default_data, data)
     else:
@@ -3330,6 +3333,15 @@ def _create_widgets_for_evoked(
         "seedcore": 14,
     }
     # Apply any missing default parameters if they don't already exist in the input data
+    # for non-cell-type-specific (aka "non-synaptic") parameters. For synaptic
+    # parameters, the default values are set in `_create_synaptic_widgets`, which is
+    # called later within this function.
+    #
+    # TODO possible future refactor: Bring up the synaptic default parameter update and
+    # usage from `_create_synaptic_widgets` into here, so that all default parameter
+    # handling for this type of drive is in one place. This would be useful in case you
+    # want to have different synaptic parameter defaults for different drives. Then
+    # repeat for Rhythmic and Poisson drive code.
     if isinstance(data, dict):
         data.update({"n_drive_cells": n_drive_cells, "cell_specific": cell_specific})
         data = _update_nested_dict(default_data, data)
@@ -3557,6 +3569,9 @@ def _create_widgets_for_poisson(
         "seedcore": 14,
     }
     # Apply any missing default parameters if they don't already exist in the input data
+    # for non-cell-type-specific (aka "non-synaptic") parameters. For synaptic
+    # parameters, the default values are set in `_create_synaptic_widgets`, which is
+    # called later within this function.
     if isinstance(data, dict):
         data.update({"n_drive_cells": n_drive_cells, "cell_specific": cell_specific})
         data = _update_nested_dict(default_data, data)
@@ -3753,6 +3768,9 @@ def _create_widgets_for_rhythmic(
         "seedcore": 14,
     }
     # Apply any missing default parameters if they don't already exist in the input data
+    # for non-cell-type-specific (aka "non-synaptic") parameters. For synaptic
+    # parameters, the default values are set in `_create_synaptic_widgets`, which is
+    # called later within this function.
     if isinstance(data, dict):
         data.update({"n_drive_cells": n_drive_cells, "cell_specific": cell_specific})
         data = _update_nested_dict(default_data, data)
@@ -6135,7 +6153,7 @@ def run_opt_button_clicked(
             logger.warning(
                 textwrap.dedent("""
                 Please note that using the CMA solver uses neither MPIBackend or
-                JoblibBackend, instead using a custom backend through BatchSimulate.  
+                JoblibBackend, instead using a custom backend through BatchSimulate.
                 """).replace("\n", " ")
             )
             if opt_obj_fun == "maximize_psd":
