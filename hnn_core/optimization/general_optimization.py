@@ -41,21 +41,22 @@ class Optimizer:
 
                 ``set_params(net, params) -> None``
 
-            where ``net`` is a Network object and ``params`` is a dictionary
-            of the parameters that will be set inside the function.
+            where ``net`` is a Network object and ``params`` is a dictionary of the
+            parameters that will be set inside the function.
         initial_params : dict, optional
-            Initial parameters for the objective function. Keys are parameter
-            names, values are initial parameters. The default is None.
-            If None, the parameters will be set to the midpoints of parameter ranges.
+            Initial parameters for the objective function. Keys are parameter names,
+            values are initial parameters. The default is None. If None, the parameters
+            will be set to the midpoints of parameter ranges.
         solver : str
             The optimizer, 'bayesian', 'cobyla', or 'cma'.
         obj_fun : str | func
             The objective function to be minimized. Can be 'dipole_rmse',
-            'maximize_psd', "dipole_corr", or a user-defined function. The default is
-            'dipole_rmse'.
+            'maximize_psd', or a user-defined function. The default is 'dipole_rmse'. If
+            a user-defined function is provided, it must have the same function
+            signature as the existing objective functions (i.e. `_rmse_evoked` and
+            `_maximize_psd` in objective_functions.py).
         max_iter : int, optional
-            The max number of calls to the objective function. The default is
-            200.
+            The max number of calls to the objective function. The default is 200.
 
         Attributes
         ----------
@@ -160,49 +161,53 @@ class Optimizer:
 
         Parameters
         ----------
-        target : instance of Dipole (Required if obj_fun='dipole_rmse')
+        target : instance of Dipole (Required if obj_fun='dipole_rmse' or 'dipole_corr')
             A dipole object with experimental data.
-        n_trials : int (Optional if obj_fun='dipole_rmse')
+        n_trials : int (Optional if obj_fun='dipole_rmse' or 'dipole_corr')
             Number of trials to simulate and average.
         f_bands : list of tuples (Required if obj_fun='maximize_psd')
-            Lower and higher limit for each frequency band.
+            Lower and higher limit for each frequency band in Hz.
         relative_bandpower : list of float | float (Required if obj_fun='maximize_psd')
             Weight for each frequency band in f_bands. If a single float is provided,
             the same weight is applied to all frequency bands.
-        sigma0 : float| array-like (Only used if solver='cma')
-            Initial standard deviation of CME-ES algorithm. If float,
-            sigma0 is scaled by bounds defined in the constraints for each parameter.
-            If array-like, The length of sigma0 must equal the length of constraints.
-            Default: 0.25
-        popsize : int (Only used if solver='cma')
-            Number of parameter samples simulated per epoch. Default: 16
         n_jobs : int (Only used if solver='cma')
             The number of jobs to start in parallel. If None, then 1 trial will be
             started without parallelism.
-        tolfun : float
+        popsize : int (Only used if solver='cma')
+            Number of parameter samples simulated per epoch. Default: 16
+        seed : int, optional (Only used if solver='cma')
+            Optional seed for random number generator of optimizer.
+        sigma0 : float | array-like (Only used if solver='cma')
+            Initial standard deviation of CME-ES algorithm. If float, sigma0 is scaled
+            by bounds defined in the constraints for each parameter. If array-like, The
+            length of sigma0 must equal the length of constraints. Default: 0.25
+        tolfun : float (Only used if solver='cma')
             Termination criteria. Stops if the range of the best objective function
             values of the last 10 + ((30 * n_parameters) / popsize) generations and all
             function values of the recent generation is below tolfun. Default 0.01.
-        dt : float
-            The integration time step of h.CVode (ms). Default: 0.025 ms
+        dt : float, default=0.025
+            The integration time step of h.CVode (in ms)
         scale_factor : float, optional
-            The dipole scale factor.
+            The dipole scale factor to use after every optimization iteration before
+            data comparison. There is no scaling applied by default, so you must pass a
+            value if you want any scaling.
         smooth_window_len : float, optional
-            The smooth window length.
-        seed : int, optional (Only used if solver='cma')
-            Optional seed for random number generator of optimizer.
-        verbose : bool
-            If True, print build steps and simulation progress to console. Default: True.
+            The smooth window length to use after every optimization iteration before
+            data comparison. There is no smoothing applied by default, so you must pass
+            a value if you want any smoothing.
+        verbose : bool, default=True
+            If True, print build steps and simulation progress to console.
 
         Notes
         -----
         When defining sigma0 for CMA-ES as a float, the sigma0 applied to each parameter
         is calculated as sigma0 * (upper_bound - lower_bound) based on the constraints.
-        It is recommended to choose a sigma0 such that the optimum is expected to lie within
-        about initial_params +- 3*sigma0. A smaller sigma0 searches closer to initial_params.
+        It is recommended to choose a sigma0 such that the optimum is expected to lie
+        within about initial_params +- 3*sigma0. A smaller sigma0 searches closer to
+        initial_params.
 
-        When defining popsize for CMA-ES, it is recommended to increase popsize relative to
-        the number of parameters being optimized (N). 4+3*log(N)
+        When defining popsize for CMA-ES, it is recommended to increase popsize relative
+        to the number of parameters being optimized (N). 4+3*log(N)
 
         """
         if self.obj_fun_name == "dipole_rmse" or self.obj_fun_name == "dipole_corr":
@@ -618,6 +623,11 @@ def _run_opt_cobyla(
     # the list is passed to `_obj_func()` and updated in place
     obj_values = list()
 
+    best = {
+        "obj": np.inf,
+        "params": None,
+    }
+
     def _obj_func(predicted_params):
         return obj_fun(
             initial_net=initial_net,
@@ -628,9 +638,10 @@ def _run_opt_cobyla(
             obj_values=obj_values,
             tstop=tstop,
             obj_fun_kwargs=obj_fun_kwargs,
+            best=best,
         )
 
-    opt_results = fmin_cobyla(
+    fmin_cobyla(
         _obj_func,
         cons=constraints,
         rhobeg=0.1,
@@ -641,7 +652,7 @@ def _run_opt_cobyla(
     )
 
     # get optimized params
-    opt_params = opt_results
+    opt_params = best["params"]
 
     # get objective values
     obj = [np.min(obj_values[:idx]) for idx in range(1, max_iter + 1)]

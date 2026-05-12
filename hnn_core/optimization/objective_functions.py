@@ -71,6 +71,7 @@ def _rmse_evoked(
     obj_values,
     tstop,
     obj_fun_kwargs,
+    best=None,
 ):
     """The objective function for evoked responses.
 
@@ -86,14 +87,27 @@ def _rmse_evoked(
         Parameters selected by the optimizer.
     update_params : func
         Function to update params.
+    obj_values : list
+        List to store objective function values.
     tstop : float
         The simulated dipole's duration.
-    target : instance of Dipole
-        A dipole object with experimental data.
-    n_trials : int
-        Number of trials to simulate and average.
-    verbose : bool
-        If True, print build steps and simulation progress to console. Default: True.
+    obj_fun_kwargs : dict
+        A kwargs-style dictionary that contains additional arguments for this particular
+        objective function and/or a particular solver. See `Optimizer.fit` for more
+        details. The key-value pairs specific to this objective function are:
+
+        target : instance of Dipole
+            Required. A dipole object with experimental data.
+        n_trials : int, default=1
+            Number of trials to simulate and average.
+
+    best : dict, optional
+        Dictionary with keys "obj" and "params" to store the best objective value and
+        corresponding parameters. Note that `best` will be updated as a "side-effect"
+        (similar to "pass-by-reference"), and is not returned by the function; this is
+        necessary because the optimization routines in `scipy.optimize` require the
+        objective functions to return a single scalar value. Only used if the solver is
+        set to "cobyla" or "cma".
 
     Returns
     -------
@@ -103,6 +117,7 @@ def _rmse_evoked(
     is_batch = _check_is_batch(predicted_params)
 
     if is_batch:
+        # The "batch" case only occurs if the solver is set to "cma"
         predicted_params = np.array(predicted_params).reshape(-1, len(initial_params))
         print(predicted_params.shape)
         params_batch = {
@@ -147,6 +162,7 @@ def _rmse_evoked(
         obj = [_rmse(dpl, obj_fun_kwargs["target"], tstop=tstop) for dpl in dpls]
 
     else:
+        # The non-"batch" case occurs if the solver is set to "cobyla" or "bayesian"
         params = update_params(initial_params, predicted_params)
 
         # simulate dpl with predicted params
@@ -154,7 +170,10 @@ def _rmse_evoked(
         set_params(new_net, params)
 
         dpls = simulate_dipole(
-            new_net, tstop=tstop, n_trials=obj_fun_kwargs["n_trials"]
+            new_net,
+            tstop=tstop,
+            dt=obj_fun_kwargs.get("dt", 0.025),
+            n_trials=obj_fun_kwargs.get("n_trials", 1),
         )
 
         # smooth & scale all dipoles
@@ -163,8 +182,17 @@ def _rmse_evoked(
         dpl = average_dipoles(dpls)
         obj = _rmse(dpl, obj_fun_kwargs["target"], tstop=tstop)
 
-    obj_values.append(obj)
+        # Update best params; this is a "side-effect" that changes the `best` dictionary
+        # in-place in the parent scope
+        if best is not None and obj < best["obj"]:
+            best["obj"] = obj
+            best["params"] = predicted_params.copy()
+
     print(f"Mean Loss: {np.mean(obj):.2f}; Min Loss: {np.min(obj):.2f}")
+    # Update the store of objective function values via a "side-effect" in-place in the
+    # parent scope
+    obj_values.append(obj)
+
     return obj
 
 
@@ -177,6 +205,7 @@ def _maximize_psd(
     obj_values,
     tstop,
     obj_fun_kwargs,
+    best=None,
 ):
     """The objective function for PSDs.
 
@@ -192,15 +221,28 @@ def _maximize_psd(
         Parameters selected by the optimizer.
     update_params : func
         Function to update params.
+    obj_values : list
+        List to store objective function values.
     tstop : float
         The simulated dipole's duration.
-    f_bands : list of tuples
-        Lower and higher limit for each frequency band.
-    relative_bandpower : list of float | float
-        Weight for each frequency band in f_bands. If a single float is provided,
-        the same weight is applied to all frequency bands.
-    verbose : bool
-        If True, print build steps and simulation progress to console. Default: True.
+    obj_fun_kwargs : dict
+        A kwargs-style dictionary that contains additional arguments for this particular
+        objective function and/or a particular solver. See `Optimizer.fit` for more
+        details. The key-value pairs specific to this objective function are:
+
+        f_bands : list of tuples
+            Required. Lower and higher limit for each frequency band in Hz.
+        relative_bandpower : list of float | float
+            Required. Weight for each frequency band in f_bands. If a single float is
+            provided, the same weight is applied to all frequency bands.
+
+    best : dict, optional
+        Dictionary with keys "obj" and "params" to store the best objective value and
+        corresponding parameters. Note that `best` will be updated as a "side-effect"
+        (similar to "pass-by-reference"), and is not returned by the function; this is
+        necessary because the optimization routines in `scipy.optimize` require the
+        objective functions to return a single scalar value. Only used if the solver is
+        set to "cobyla" or "cma".
 
     Returns
     -------
@@ -209,16 +251,17 @@ def _maximize_psd(
 
     Notes
     -----
-    The objective function minimizes the sum of the weighted (user-defined)
-    frequency band PSDs (user-defined) relative to the total PSD of the signal.
-    The objective function can be represented as -Σc[ΣPSD(i)/ΣPSD(j)] where c
-    is the weight for each frequency band, PSD(i) is the PSD for each frequency
-    band, and PSD(j) is the total PSD of the signal.
+    The objective function minimizes the sum of the weighted (user-defined) frequency
+    band PSDs (user-defined) relative to the total PSD of the signal. The objective
+    function can be represented as -Σc[ΣPSD(i)/ΣPSD(j)] where c is the weight for each
+    frequency band, PSD(i) is the PSD for each frequency band, and PSD(j) is the total
+    PSD of the signal.
     """
 
     is_batch = _check_is_batch(predicted_params)
 
     if is_batch:
+        # The "batch" case only occurs if the solver is set to "cma"
         predicted_params = np.array(predicted_params).reshape(-1, len(initial_params))
         print(predicted_params.shape)
         params_batch = {
@@ -261,18 +304,30 @@ def _maximize_psd(
                 obj.append(_get_relative_power(dpl, obj_fun_kwargs))
 
     else:
+        # The non-"batch" case occurs if the solver is set to "cobyla" or "bayesian"
         params = update_params(initial_params, predicted_params)
 
         # simulate dpl with predicted params
         new_net = initial_net.copy()
         set_params(new_net, params)
-        dpls = simulate_dipole(new_net, tstop=tstop, n_trials=1)
+        # `_maximize_psd` is currently only implemented for single-trial simulations
+        dpls = simulate_dipole(
+            new_net, tstop=tstop, dt=obj_fun_kwargs.get("dt", 0.025), n_trials=1
+        )
 
         # smooth & scale all dipoles
         _preprocess_dipole(dpls, obj_fun_kwargs)
         dpl = dpls[0]  # only one trial to analyze
         obj = _get_relative_power(dpl, obj_fun_kwargs)
 
+        # Update best params; this is a "side-effect" that changes the `best` dictionary
+        # in-place in the parent scope
+        if best is not None and obj < best["obj"]:
+            best["obj"] = obj
+            best["params"] = predicted_params.copy()
+
+    # Update the store of objective function values via a "side-effect" in-place in the
+    # parent scope
     obj_values.append(obj)
 
     return obj
@@ -287,6 +342,7 @@ def _anticorr_evoked(
     obj_values,
     tstop,
     obj_fun_kwargs,
+    best=None,
 ):
     """The objective function for evoked responses.
 
@@ -304,12 +360,23 @@ def _anticorr_evoked(
         Function to update params.
     tstop : float
         The simulated dipole's duration.
-    target : instance of Dipole
-        A dipole object with experimental data.
-    n_trials : int
-        Number of trials to simulate and average.
-    verbose : bool
-        If True, print build steps and simulation progress to console. Default: True.
+    obj_fun_kwargs : dict
+        A kwargs-style dictionary that contains additional arguments for this particular
+        objective function and/or a particular solver. See `Optimizer.fit` for more
+        details. The key-value pairs specific to this objective function are:
+
+        target : instance of Dipole
+            Required. A dipole object with experimental data.
+        n_trials : int, default=1
+            Number of trials to simulate and average.
+
+    best : dict, optional
+        Dictionary with keys "obj" and "params" to store the best objective value and
+        corresponding parameters. Note that `best` will be updated as a "side-effect"
+        (similar to "pass-by-reference"), and is not returned by the function; this is
+        necessary because the optimization routines in `scipy.optimize` require the
+        objective functions to return a single scalar value. Only used if the solver is
+        set to "cobyla" or "cma".
 
     Returns
     -------
@@ -319,6 +386,7 @@ def _anticorr_evoked(
     is_batch = _check_is_batch(predicted_params)
 
     if is_batch:
+        # The "batch" case only occurs if the solver is set to "cma"
         # params = update_params(initial_params, predicted_params)
         predicted_params = np.array(predicted_params).reshape(-1, len(initial_params))
         print(predicted_params.shape)
@@ -365,6 +433,7 @@ def _anticorr_evoked(
         obj = [_anticorr(dpl, obj_fun_kwargs["target"], tstop=tstop) for dpl in dpls]
 
     else:
+        # The non-"batch" case occurs if the solver is set to "cobyla" or "bayesian"
         params = update_params(initial_params, predicted_params)
 
         # simulate dpl with predicted params
@@ -372,7 +441,10 @@ def _anticorr_evoked(
         set_params(new_net, params)
 
         dpls = simulate_dipole(
-            new_net, tstop=tstop, n_trials=obj_fun_kwargs["n_trials"]
+            new_net,
+            tstop=tstop,
+            dt=obj_fun_kwargs.get("dt", 0.025),
+            n_trials=obj_fun_kwargs.get("n_trials", 1),
         )
 
         # smooth & scale all dipoles
@@ -380,7 +452,15 @@ def _anticorr_evoked(
         dpl = average_dipoles(dpls)
         obj = _anticorr(dpl, obj_fun_kwargs["target"], tstop=tstop)
 
+        # Update best params; this is a "side-effect" that changes the `best` dictionary
+        # in-place in the parent scope
+        if best is not None and obj < best["obj"]:
+            best["obj"] = obj
+            best["params"] = predicted_params.copy()
+
     print(f"Mean Loss: {np.mean(obj):.2f}; Min Loss: {np.min(obj):.2f}")
+    # Update the store of objective function values via a "side-effect" in-place in the
+    # parent scope
     obj_values.append(obj)
 
     return obj
