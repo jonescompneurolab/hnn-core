@@ -590,14 +590,20 @@ in the network.</p>
 <p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.gui.HNNGUI.add_drive_widget" title="hnn_core.gui.HNNGUI.add_drive_widget"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_drive_widget</span></code></a>(drive_type, location[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.gui.HNNGUI.add_drive_tab_drive_widget" title="hnn_core.gui.HNNGUI.add_drive_tab_drive_widget"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_drive_tab_drive_widget</span></code></a>(drive_type, location)</p></td>
 <td><p>Add a widget for a new drive.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.gui.HNNGUI.build_drive_tab_contents" title="hnn_core.gui.HNNGUI.build_drive_tab_contents"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_drive_tab_contents</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.gui.HNNGUI.add_opt_tab_drive_widget" title="hnn_core.gui.HNNGUI.add_opt_tab_drive_widget"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_opt_tab_drive_widget</span></code></a>(drive_type, location)</p></td>
+<td><p>Add a optimization widget for a new drive, including to the accordion.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.gui.HNNGUI.build_drive_tab_contents" title="hnn_core.gui.HNNGUI.build_drive_tab_contents"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_drive_tab_contents</span></code></a>()</p></td>
 <td><p>build the External Drives tab contents</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.gui.HNNGUI.build_network_tab_contents" title="hnn_core.gui.HNNGUI.build_network_tab_contents"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_network_tab_contents</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.gui.HNNGUI.build_network_tab_contents" title="hnn_core.gui.HNNGUI.build_network_tab_contents"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_network_tab_contents</span></code></a>()</p></td>
 <td><p>build the Network tab contents</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.gui.HNNGUI.build_opt_tab_contents" title="hnn_core.gui.HNNGUI.build_opt_tab_contents"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_opt_tab_contents</span></code></a>()</p></td>
+<td><p>Build the Optimization tab contents</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.gui.HNNGUI.build_parameters_window" title="hnn_core.gui.HNNGUI.build_parameters_window"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_parameters_window</span></code></a>()</p></td>
 <td><p>build parameters-window (to occupy AppLayout's left_sidebar)</p></td>
@@ -614,11 +620,11 @@ in the network.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.gui.HNNGUI.get_cell_parameters_dict" title="hnn_core.gui.HNNGUI.get_cell_parameters_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_cell_parameters_dict</span></code></a>()</p></td>
 <td><p>Returns the number of elements in the cell_parameters_dict dictionary.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.gui.HNNGUI.load_custom_gui_styling" title="hnn_core.gui.HNNGUI.load_custom_gui_styling"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_custom_gui_styling</span></code></a>()</p></td>
-<td><p>Load custom CSS and JS for styling the GUI</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.gui.HNNGUI.load_conn_drives_opt_widgets" title="hnn_core.gui.HNNGUI.load_conn_drives_opt_widgets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_conn_drives_opt_widgets</span></code></a>()</p></td>
+<td><p>Add connectivity, drives, and optimization ipywidgets from params.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.gui.HNNGUI.load_drive_and_connectivity" title="hnn_core.gui.HNNGUI.load_drive_and_connectivity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_drive_and_connectivity</span></code></a>()</p></td>
-<td><p>Add drive and connectivity ipywidgets from params.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.gui.HNNGUI.load_custom_gui_styling" title="hnn_core.gui.HNNGUI.load_custom_gui_styling"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_custom_gui_styling</span></code></a>()</p></td>
+<td><p>Load custom CSS and JS for styling the GUI</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.gui.HNNGUI.load_parameters" title="hnn_core.gui.HNNGUI.load_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_parameters</span></code></a>(params_fname)</p></td>
 <td><p>Read parameters from file.</p></td>
@@ -626,30 +632,45 @@ in the network.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.gui.HNNGUI.run_notebook_cells" title="hnn_core.gui.HNNGUI.run_notebook_cells"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_notebook_cells</span></code></a>()</p></td>
 <td><p>Run all but the last cells sequentially in a Jupyter notebook.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.gui.HNNGUI.update_opt_tab_accordion" title="hnn_core.gui.HNNGUI.update_opt_tab_accordion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_opt_tab_accordion</span></code></a>(params)</p></td>
+<td><p>Create/update the drives output of the optimization tab</p></td>
+</tr>
 </tbody>
 </table>
 </div>
 <div class="pst-scrollable-table-container"><table class="table">
 <tbody>
-<tr class="row-odd"><td><p><strong>add_drive_tab</strong></p></td>
+<tr class="row-odd"><td><p><strong>add_logging_window_logger</strong></p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p><strong>add_logging_window_logger</strong></p></td>
+<tr class="row-even"><td><p><strong>on_upload_params_change</strong></p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p><strong>on_upload_params_change</strong></p></td>
+<tr class="row-odd"><td><p><strong>show</strong></p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p><strong>show</strong></p></td>
+<tr class="row-even"><td><p><strong>update_drive_tab_accordion</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>update_opt_tab_solver_widgets</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>update_opt_tab_target_widgets</strong></p></td>
 <td></td>
 </tr>
 </tbody>
 </table>
 </div>
 <dl class="py method">
-<dt class="sig sig-object py" id="hnn_core.gui.HNNGUI.add_drive_widget">
-<span class="sig-name descname"><span class="pre">add_drive_widget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drive_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prespecified_drive_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prespecified_drive_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prespecified_weights_ampa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prespecified_weights_nmda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prespecified_delays</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prespecified_n_drive_cells</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prespecified_cell_specific</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">render</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand_last_drive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">14</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/gui/gui.html#HNNGUI.add_drive_widget"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.gui.HNNGUI.add_drive_widget" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="hnn_core.gui.HNNGUI.add_drive_tab_drive_widget">
+<span class="sig-name descname"><span class="pre">add_drive_tab_drive_widget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drive_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prespecified_drive_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prespecified_drive_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prespecified_weights_ampa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prespecified_weights_nmda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prespecified_delays</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prespecified_n_drive_cells</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prespecified_cell_specific</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">render</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand_last_drive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">14</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/gui/gui.html#HNNGUI.add_drive_tab_drive_widget"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.gui.HNNGUI.add_drive_tab_drive_widget" title="Link to this definition">#</a></dt>
 <dd><p>Add a widget for a new drive.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.gui.HNNGUI.add_opt_tab_drive_widget">
+<span class="sig-name descname"><span class="pre">add_opt_tab_drive_widget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drive_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prespecified_drive_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prespecified_drive_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prespecified_weights_ampa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prespecified_weights_nmda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prespecified_delays</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prespecified_n_drive_cells</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prespecified_cell_specific</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">render</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand_last_drive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drive_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_opt_widget_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/gui/gui.html#HNNGUI.add_opt_tab_drive_widget"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.gui.HNNGUI.add_opt_tab_drive_widget" title="Link to this definition">#</a></dt>
+<dd><p>Add a optimization widget for a new drive, including to the accordion.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -668,6 +689,21 @@ in the network.</p>
 <dt class="sig sig-object py" id="hnn_core.gui.HNNGUI.build_network_tab_contents">
 <span class="sig-name descname"><span class="pre">build_network_tab_contents</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/gui/gui.html#HNNGUI.build_network_tab_contents"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.gui.HNNGUI.build_network_tab_contents" title="Link to this definition">#</a></dt>
 <dd><p>build the Network tab contents</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.gui.HNNGUI.build_opt_tab_contents">
+<span class="sig-name descname"><span class="pre">build_opt_tab_contents</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/gui/gui.html#HNNGUI.build_opt_tab_contents"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.gui.HNNGUI.build_opt_tab_contents" title="Link to this definition">#</a></dt>
+<dd><p>Build the Optimization tab contents</p>
+<p>The Optimization tab is divided into 4 main sections:</p>
+<ol class="arabic simple">
+<li><p>The always-shown top-level optimization parameters</p></li>
+<li><p>The “target” parameters box (dynamic, depending on your objective function)</p></li>
+<li><p>The “solver” parameters box (dynamic, depending on if using CMA)</p></li>
+<li><p>The always-shown “Run Optimization” and “Save Optimization History” buttons</p></li>
+<li><p>The drives accordion (dynamic, depending on existing drives in the Drives
+tab)</p></li>
+</ol>
 </dd></dl>
 
 <dl class="py method">
@@ -737,15 +773,15 @@ This is for testing purposes</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="hnn_core.gui.HNNGUI.load_custom_gui_styling">
-<span class="sig-name descname"><span class="pre">load_custom_gui_styling</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/gui/gui.html#HNNGUI.load_custom_gui_styling"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.gui.HNNGUI.load_custom_gui_styling" title="Link to this definition">#</a></dt>
-<dd><p>Load custom CSS and JS for styling the GUI</p>
+<dt class="sig sig-object py" id="hnn_core.gui.HNNGUI.load_conn_drives_opt_widgets">
+<span class="sig-name descname"><span class="pre">load_conn_drives_opt_widgets</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/gui/gui.html#HNNGUI.load_conn_drives_opt_widgets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.gui.HNNGUI.load_conn_drives_opt_widgets" title="Link to this definition">#</a></dt>
+<dd><p>Add connectivity, drives, and optimization ipywidgets from params.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="hnn_core.gui.HNNGUI.load_drive_and_connectivity">
-<span class="sig-name descname"><span class="pre">load_drive_and_connectivity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/gui/gui.html#HNNGUI.load_drive_and_connectivity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.gui.HNNGUI.load_drive_and_connectivity" title="Link to this definition">#</a></dt>
-<dd><p>Add drive and connectivity ipywidgets from params.</p>
+<dt class="sig sig-object py" id="hnn_core.gui.HNNGUI.load_custom_gui_styling">
+<span class="sig-name descname"><span class="pre">load_custom_gui_styling</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/gui/gui.html#HNNGUI.load_custom_gui_styling"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.gui.HNNGUI.load_custom_gui_styling" title="Link to this definition">#</a></dt>
+<dd><p>Load custom CSS and JS for styling the GUI</p>
 </dd></dl>
 
 <dl class="py method">
@@ -767,6 +803,12 @@ selectively run twice.</p></li>
 </ol>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.gui.HNNGUI.update_opt_tab_accordion">
+<span class="sig-name descname"><span class="pre">update_opt_tab_accordion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/gui/gui.html#HNNGUI.update_opt_tab_accordion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.gui.HNNGUI.update_opt_tab_accordion" title="Link to this definition">#</a></dt>
+<dd><p>Create/update the drives output of the optimization tab</p>
 </dd></dl>
 
 </dd></dl>
@@ -821,20 +863,23 @@ selectively run twice.</p></li>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.gui.HNNGUI"><code class="docutils literal notranslate"><span class="pre">HNNGUI</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.gui.HNNGUI.add_drive_widget"><code class="docutils literal notranslate"><span class="pre">HNNGUI.add_drive_widget()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.gui.HNNGUI.add_drive_tab_drive_widget"><code class="docutils literal notranslate"><span class="pre">HNNGUI.add_drive_tab_drive_widget()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.gui.HNNGUI.add_opt_tab_drive_widget"><code class="docutils literal notranslate"><span class="pre">HNNGUI.add_opt_tab_drive_widget()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.gui.HNNGUI.analysis_config"><code class="docutils literal notranslate"><span class="pre">HNNGUI.analysis_config</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.gui.HNNGUI.build_drive_tab_contents"><code class="docutils literal notranslate"><span class="pre">HNNGUI.build_drive_tab_contents()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.gui.HNNGUI.build_network_tab_contents"><code class="docutils literal notranslate"><span class="pre">HNNGUI.build_network_tab_contents()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.gui.HNNGUI.build_opt_tab_contents"><code class="docutils literal notranslate"><span class="pre">HNNGUI.build_opt_tab_contents()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.gui.HNNGUI.build_parameters_window"><code class="docutils literal notranslate"><span class="pre">HNNGUI.build_parameters_window()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.gui.HNNGUI.build_sim_tab_contents"><code class="docutils literal notranslate"><span class="pre">HNNGUI.build_sim_tab_contents()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.gui.HNNGUI.capture"><code class="docutils literal notranslate"><span class="pre">HNNGUI.capture()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.gui.HNNGUI.compose"><code class="docutils literal notranslate"><span class="pre">HNNGUI.compose()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.gui.HNNGUI.data"><code class="docutils literal notranslate"><span class="pre">HNNGUI.data</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.gui.HNNGUI.get_cell_parameters_dict"><code class="docutils literal notranslate"><span class="pre">HNNGUI.get_cell_parameters_dict()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.gui.HNNGUI.load_conn_drives_opt_widgets"><code class="docutils literal notranslate"><span class="pre">HNNGUI.load_conn_drives_opt_widgets()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.gui.HNNGUI.load_custom_gui_styling"><code class="docutils literal notranslate"><span class="pre">HNNGUI.load_custom_gui_styling()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.gui.HNNGUI.load_drive_and_connectivity"><code class="docutils literal notranslate"><span class="pre">HNNGUI.load_drive_and_connectivity()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.gui.HNNGUI.load_parameters"><code class="docutils literal notranslate"><span class="pre">HNNGUI.load_parameters()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.gui.HNNGUI.run_notebook_cells"><code class="docutils literal notranslate"><span class="pre">HNNGUI.run_notebook_cells()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.gui.HNNGUI.update_opt_tab_accordion"><code class="docutils literal notranslate"><span class="pre">HNNGUI.update_opt_tab_accordion()</span></code></a></li>
 </ul>
 </li>
 </ul>

@@ -1176,6 +1176,123 @@
     <span class="n">set_params</span><span class="p">(</span><span class="n">net_</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">opt_params</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">net_</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_opt_history_table</span><span class="p">(</span><span class="n">opt_results</span><span class="p">,</span> <span class="n">report_timestamp</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a human-readable text table of optimization history.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    opt_results : list of dict</span>
+<span class="sd">        List of optimization results, where each dict contains the following key-value pairs:</span>
+<span class="sd">        &quot;initial_params&quot; : dict</span>
+<span class="sd">            Initial parameter values</span>
+<span class="sd">        &quot;opt_params&quot; : list</span>
+<span class="sd">            Optimized parameter values</span>
+<span class="sd">        &quot;obj_values&quot; : list</span>
+<span class="sd">            Objective function values at each iteration</span>
+<span class="sd">        &quot;solver&quot; : str</span>
+<span class="sd">            Solver name used</span>
+<span class="sd">        &quot;obj_fun&quot; : str</span>
+<span class="sd">            Objective function name</span>
+<span class="sd">        &quot;max_iter&quot; : int</span>
+<span class="sd">            Maximum iterations</span>
+<span class="sd">        &quot;target_data&quot; : str, optional</span>
+<span class="sd">            Target dataset name (for dipole_rmse)</span>
+<span class="sd">        &quot;n_trials&quot; : int, optional</span>
+<span class="sd">            Number of trials (for dipole_rmse)</span>
+<span class="sd">        &quot;psd_f_bands&quot; : list of tuple, optional</span>
+<span class="sd">            Frequency bands (for maximize_psd)</span>
+<span class="sd">        &quot;psd_relative_bandpower&quot; : list of float, optional</span>
+<span class="sd">            Relative bandpower weights (for maximize_psd)</span>
+<span class="sd">    report_timestamp : str</span>
+<span class="sd">        A timestamp which will be used to indicate the time when the report</span>
+<span class="sd">        was generated. This will represent the same time as the time used to</span>
+<span class="sd">        generate the filename for the report.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        A formatted text table documenting the initial and final values</span>
+<span class="sd">        of optimized parameters and the first/final objective function values</span>
+<span class="sd">        for each full optimization run.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">opt_results</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;No optimization runs have been completed yet.&quot;</span>
+
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;OPTIMIZATION HISTORY&quot;</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generated: </span><span class="si">{</span><span class="n">report_timestamp</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">run_idx</span><span class="p">,</span> <span class="n">opt_result</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">opt_results</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">solver</span> <span class="o">=</span> <span class="n">opt_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;solver&quot;</span><span class="p">,</span> <span class="s2">&quot;N/A&quot;</span><span class="p">)</span>
+        <span class="n">obj_fun</span> <span class="o">=</span> <span class="n">opt_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;obj_fun&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">)</span>
+        <span class="n">max_iter</span> <span class="o">=</span> <span class="n">opt_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_iter&quot;</span><span class="p">,</span> <span class="s2">&quot;N/A&quot;</span><span class="p">)</span>
+
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Run #</span><span class="si">{</span><span class="n">run_idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Solver: </span><span class="si">{</span><span class="n">solver</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Objective Function: </span><span class="si">{</span><span class="n">obj_fun</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Max Iterations: </span><span class="si">{</span><span class="n">max_iter</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Add target dataset info if using dipole_rmse</span>
+        <span class="k">if</span> <span class="n">obj_fun</span> <span class="o">==</span> <span class="s2">&quot;dipole_rmse&quot;</span> <span class="ow">and</span> <span class="s2">&quot;target_data&quot;</span> <span class="ow">in</span> <span class="n">opt_result</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Target Dataset: </span><span class="si">{</span><span class="n">opt_result</span><span class="p">[</span><span class="s1">&#39;target_data&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;n_trials&quot;</span> <span class="ow">in</span> <span class="n">opt_result</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of Trials: </span><span class="si">{</span><span class="n">opt_result</span><span class="p">[</span><span class="s1">&#39;n_trials&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Add frequency band info if using maximize_psd</span>
+        <span class="k">if</span> <span class="n">obj_fun</span> <span class="o">==</span> <span class="s2">&quot;maximize_psd&quot;</span> <span class="ow">and</span> <span class="s2">&quot;psd_f_bands&quot;</span> <span class="ow">in</span> <span class="n">opt_result</span><span class="p">:</span>
+            <span class="n">f_bands</span> <span class="o">=</span> <span class="n">opt_result</span><span class="p">[</span><span class="s2">&quot;psd_f_bands&quot;</span><span class="p">]</span>
+            <span class="n">rel_bandpower</span> <span class="o">=</span> <span class="n">opt_result</span><span class="p">[</span><span class="s2">&quot;psd_relative_bandpower&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">band</span><span class="p">,</span> <span class="n">weight</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">f_bands</span><span class="p">,</span> <span class="n">rel_bandpower</span><span class="p">),</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;  Frequency Band </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">band</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">band</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> Hz (weight: </span><span class="si">{</span><span class="n">weight</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="p">)</span>
+
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Get parameter names from initial_params dict</span>
+        <span class="n">param_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">opt_result</span><span class="p">[</span><span class="s2">&quot;initial_params&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="c1"># Create header</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;Parameter&#39;</span><span class="si">:</span><span class="s2">&lt;40</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;Initial Value&#39;</span><span class="si">:</span><span class="s2">&gt;15</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;Final Value&#39;</span><span class="si">:</span><span class="s2">&gt;15</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;Change&#39;</span><span class="si">:</span><span class="s2">&gt;15</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+
+        <span class="c1"># Add each parameter</span>
+        <span class="k">for</span> <span class="n">param_idx</span><span class="p">,</span> <span class="n">param_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">param_names</span><span class="p">):</span>
+            <span class="n">initial_val</span> <span class="o">=</span> <span class="n">opt_result</span><span class="p">[</span><span class="s2">&quot;initial_params&quot;</span><span class="p">][</span><span class="n">param_name</span><span class="p">]</span>
+            <span class="c1"># opt_params should be a list in the same order as &quot;initial_params&quot;</span>
+            <span class="n">final_val</span> <span class="o">=</span> <span class="n">opt_result</span><span class="p">[</span><span class="s2">&quot;opt_params&quot;</span><span class="p">][</span><span class="n">param_idx</span><span class="p">]</span>
+            <span class="n">change</span> <span class="o">=</span> <span class="n">final_val</span> <span class="o">-</span> <span class="n">initial_val</span>
+
+            <span class="c1"># Format the values with appropriate precision</span>
+            <span class="n">param_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">param_name</span><span class="si">:</span><span class="s2">&lt;40</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">initial_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">initial_val</span><span class="si">:</span><span class="s2">&gt;15.6f</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">final_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">final_val</span><span class="si">:</span><span class="s2">&gt;15.6f</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">change_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">change</span><span class="si">:</span><span class="s2">&gt;+15.6f</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="n">line</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">param_str</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">initial_str</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">final_str</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">change_str</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Objective Function (</span><span class="si">{</span><span class="n">obj_fun</span><span class="si">}</span><span class="s2">) Values:&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">obj_idx</span><span class="p">,</span> <span class="n">obj_out</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">opt_result</span><span class="p">[</span><span class="s2">&quot;obj_values&quot;</span><span class="p">]):</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Iteration </span><span class="si">{</span><span class="n">obj_idx</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">obj_out</span><span class="si">:</span><span class="s2">&gt;15.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">obj_diff</span> <span class="o">=</span> <span class="n">opt_result</span><span class="p">[</span><span class="s2">&quot;obj_values&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">opt_result</span><span class="p">[</span><span class="s2">&quot;obj_values&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total Change:  </span><span class="si">{</span><span class="n">obj_diff</span><span class="si">:</span><span class="s2">&gt;+15.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
 </pre></div>
 
                 </article>
