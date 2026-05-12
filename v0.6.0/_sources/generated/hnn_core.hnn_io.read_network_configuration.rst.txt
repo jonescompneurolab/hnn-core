@@ -1,0 +1,10 @@
+﻿hnn_core.hnn_io.read_network_configuration
+==========================================
+
+.. currentmodule:: hnn_core.hnn_io
+
+.. autofunction:: read_network_configuration
+
+.. _sphx_glr_backreferences_hnn_core.hnn_io.read_network_configuration:
+.. minigallery:: hnn_core.hnn_io.read_network_configuration
+   :add-heading:
