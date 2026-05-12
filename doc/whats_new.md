@@ -26,18 +26,121 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 <!-- ### Changelog -->
 
-## 0.5.1.dev0 In-progress Development Changes
+## 0.6.0 Release Notes
+
+### Important Deprecations
+
+- `jones_2009_model` has been renamed to `neymotin_2020_model` to better reflect its
+  provenance. From now on, `neymotin_2020_model` is the recommended "default" model we
+  will be documenting and using going forward. However, for backwards compatibility,
+  `jonegs_2009_model` will still be retained as a simple "wrapper function" around
+  `neymotin_2020_model`, the latter being otherwise identical to the old
+  `jones_2009_model` behavior. We recommend you update your scripts to use
+  `neymotin_2020_model`, but `jones_2009_model` will still continue to work.
+
+- IMPORTANT: For the default model `neymotin_2020_model` (renamed from
+  `jones_2009_model`, see above), in the NEXT release (i.e. 0.7.0), some parameters will
+  be slightly changed, which will cause **your simulations to produce slightly different
+  output**. Again, this is only expected in the next major release, not this one. This
+  is necessary in order to fix certain parameters (e.g. synaptic delays) which are
+  slightly different than their values in the "Original HNN" code. Using the new
+  parameters, simulation results are expected to only be *quantitatively* different, but
+  not *qualitatively* different, and these changes are not expected to change the
+  significance of simulation results.
+
+### New Features
+
+- When installing `hnn-core` through `pip`, there is now an easy way to install all
+  extra dependencies (excluding development packages): `pip install "hnn-core[all]"`.
+  This installs the necessary dependencies for the GUI, Optimization, and parallelism
+  (excluding MPI itself, which you can find how to install at our
+  [Installation
+  Guide](https://jonescompneurolab.github.io/textbook/content/01_getting_started/installation.html)
+  ).
+
+- Major visual refresh and polishing of the GUI
+  by [Dylan Daniels][] in {gh}`1243`.
+
+- [Nick Tolley][] has added Optimization support for both the "Covariance matrix adaptation
+  evolutionary strategy" (CMA-ES) solver and correlation-coefficient as an objective
+  function, in {gh}`1221` and {gh}`1286`! CMA-ES is a very powerful optimization
+  option which can simulate multiple samples in a single epoch, and may possibly become
+  the default optimization solver in the future.
+
+- The GUI now includes an Optimization tab that can run optimization against any
+  parameter in the `Network`'s drives, using any of the available built-in solvers or
+  objective functions, including the new CMA-ES solver (see above).
+  By [Austin E. Soplata][] and [Nick Tolley][] in {gh}`1190`.
+
+### Bug Fixes
+
+- Accessibility of all HNN websites (excluding auto-generated Jupyter notebook output)
+  has been fixed to prevent basic accessibility errors,
+  by [Joyce Gao][] and [Austin E. Soplata][] in several PRs including
+  {gh}`1280`,
+  {gh}`1293`,
+  https://github.com/jonescompneurolab/textbook/pull/153 , and
+  https://github.com/GitHub-at-Brown/hnn-front-website/pull/56 .
+
+- The COBYLA Optimization solver now returns the `Network` with the best-performing
+  parameters instead of simply returning the parameters of the final iteration that was
+  run,
+  by [Carolina Fernandez Pujol][], [Nick Tolley][], and [Austin E. Soplata][] in
+  {gh}`1240`.
+
+- GUI dataset dropdowns have been fixed so that they show what is displayed in the plot,
+  by [Tushar Jamdade][] in {gh}`1223`.
+
+- When loading a network using the GUI, sometimes there would arise a `KeyError` due to
+  a lack of `n_trials` value. This has been fixed
+  by [Tushar Jamdade][] in {gh}`1216`.
+
+- Read-in of Network JSON files with custom `cell_types` or `pos_dict` entries has been
+  fixed in {gh}`1195`.
+
+### Public API Changes
+
+- `jones_2009_model`, the main function to spawn the default model, has been replaced
+  with `neymotin_2020_model` (see note above in 'Important Deprecations').
+  `jones_2009_model` will still continue to work, but users should migrate to the new
+  name for the function. Done in {gh}`1290`.
+
+- `simulate_dipole` now has a `verbose` flag to control how much output is printed,
+  by [Anna Cattani][] in {gh}`1228`. This was their first PR, thanks Anna!
+
+- `Section` can now consume an `v0` argument in order to set the initial voltage of the membrane
+  potential for that section. Merged in {gh}`1185`, adapted from work by [Katharina Duecker][].
+
+- `BatchSimulate` is now properly documented via our public API, thanks to
+  [M Yaswanth Reddy][] in {gh}`1218`.
 
 ### People who contributed to this release:
 
 - [Muhammad Ahmad Amin][]
 - [Vaishnavi Baghel][]
+- [Anna Cattani][]
+- [Dylan Daniels][]
+- [Katharina Duecker][]
+- [Joyce Gao][]
 - [Tushar Jamdade][]
 - [Karthikeya Kodlai][]
 - [M Yaswanth Reddy][]
 - [Satvik Saluja][]
+- [Austin E. Soplata][]
+- [Nick Tolley][]
+- [Percival Villalva][]
 
 ### Changelog
+
+- Where possible, all remaining imports have been moved to the top of source files,
+  by [Percival Villalva][] in {gh}`1285`.
+
+- In the GUI, when comparing two datasets, both the RMSE and the correlation values are
+  now displayed on the plot instead of just the RMSE,
+  by [Nick Tolley][] and [Austin E. Soplata][] in {gh}`1298`.
+
+- Javascript and CSS files in the repository are now included in the Python packaging,
+  in {gh}`1292`.
 
 - Enable MacOS Intel-CPU runners in CI,
   by [Vaishnavi Baghel][] in {gh}`1287`.
@@ -45,18 +148,32 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 - Update and re-enable Codecov usage in CI,
   by [Vaishnavi Baghel][] in {gh}`1272`. This was their first PR, thanks Vaishnavi!
 
+- We have removed the Gitter badge on our repository's homepage (in {gh}`1270`) in order
+  to push people towards the Github Discussions page.
+
+- Test coverage of Hamming smoothing via `hnn_core.utils.smooth_waveform` has been
+  improved,
+  by [Satvik Saluja][] in {gh}`1266`.
+
+- The `issue-metrics` Github Action workflow has been removed (in {gh}`1279`) entirely
+  in favor of https://github.com/jonescompneurolab/hnn-tracking/pull/1 .
+
 - Fix testing of `mesh_shape` to include all available network models,
   by [Satvik Saluja][] in {gh}`1268`. This was their first PR, thanks Satvik!
 
-- Improve UX of GUI's "Delete all drives" button and small refactors of GUI codebase. 
+- Improve UX of GUI's "Delete all drives" button and small refactors of GUI codebase.
   By [Muhammad Ahmad Amin][] in {gh}`1245`. This was their first PR, thanks Muhammad!
 
 - In the GUI, when simulating multiple trials and plotting the spectrogram, use the
   averaged Time-Frequency-Representation of the dipoles for spectrogram calculation
   instead of only the first dipole,
-  by [M Yaswanth Reddy][] in {gh}`1223`. This was their first PR, thanks Yaswanth!
+  by [M Yaswanth Reddy][] in {gh}`1233`. This was their first PR, thanks Yaswanth!
 
-- In the GUI, add auto-renaming of new simulations. This fixes an annoying issue with
+- The repository's AI policy has been clarified in {gh}`1224`.
+
+- Issue templates are now used in the `hnn_core` repository.
+
+- In the GUI, new simulations are now auto-renamed. This fixes an annoying issue with
   the GUI where every time a user wanted to run a new simulation, they had to go back to
   the Simulation tab and manually change the simulation name. Now, whenever they run a
   new simulation without changing the name manually, the new simulation will use the old
@@ -68,9 +185,11 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
   the `hnn_core` module is imported. Whether or not the message is displayed is
   determined by the presence of a new file created in the module after first run.
   by [Karthikeya Kodlai][] in {gh}`1158`. This was their first PR, thanks Karthikeya!
-  
+
 - Add progressive minimal install and test to Github Actions,
   by [Tushar Jamdade][] in {gh}`1214`. This was their first PR, thanks Tushar!
+
+----------------------------------------------------------------------------------------
 
 ## 0.5.0 Release Notes
 
@@ -1295,3 +1414,5 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [Muhammad Ahmad Amin]: https://github.com/m-ahmad-amin
 [Satvik Saluja]: https://github.com/SatvikSaluja
 [Vaishnavi Baghel]: https://github.com/vshnvii
+[Joyce Gao]: https://github.com/xgao35
+[Percival Villalva]: https://github.com/pervillalva
