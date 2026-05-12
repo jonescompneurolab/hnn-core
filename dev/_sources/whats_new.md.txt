@@ -26,6 +26,10 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 <!-- ### Changelog -->
 
+## 0.6.1.dev0 In-progress updates
+
+### Changelog
+
 ## 0.6.0 Release Notes
 
 ### Important Deprecations
@@ -1416,3 +1420,4 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [Vaishnavi Baghel]: https://github.com/vshnvii
 [Joyce Gao]: https://github.com/xgao35
 [Percival Villalva]: https://github.com/pervillalva
+[Anna Cattani]: https://github.com/annacatt
