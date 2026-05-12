@@ -533,38 +533,41 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>target</strong><span class="classifier">instance of Dipole (Required if obj_fun=’dipole_rmse’)</span></dt><dd><p>A dipole object with experimental data.</p>
+<dt><strong>target</strong><span class="classifier">instance of Dipole (Required if obj_fun=’dipole_rmse’ or ‘dipole_corr’)</span></dt><dd><p>A dipole object with experimental data.</p>
 </dd>
-<dt><strong>n_trials</strong><span class="classifier">int (Optional if obj_fun=’dipole_rmse’)</span></dt><dd><p>Number of trials to simulate and average.</p>
+<dt><strong>n_trials</strong><span class="classifier">int (Optional if obj_fun=’dipole_rmse’ or ‘dipole_corr’)</span></dt><dd><p>Number of trials to simulate and average.</p>
 </dd>
-<dt><strong>f_bands</strong><span class="classifier">list of tuples (Required if obj_fun=’maximize_psd’)</span></dt><dd><p>Lower and higher limit for each frequency band.</p>
+<dt><strong>f_bands</strong><span class="classifier">list of tuples (Required if obj_fun=’maximize_psd’)</span></dt><dd><p>Lower and higher limit for each frequency band in Hz.</p>
 </dd>
 <dt><strong>relative_bandpower</strong><span class="classifier">list of float | float (Required if obj_fun=’maximize_psd’)</span></dt><dd><p>Weight for each frequency band in f_bands. If a single float is provided,
 the same weight is applied to all frequency bands.</p>
 </dd>
-<dt><strong>sigma0</strong><span class="classifier">float| array-like (Only used if solver=’cma’)</span></dt><dd><p>Initial standard deviation of CME-ES algorithm. If float,
-sigma0 is scaled by bounds defined in the constraints for each parameter.
-If array-like, The length of sigma0 must equal the length of constraints.
-Default: 0.25</p>
-</dd>
-<dt><strong>popsize</strong><span class="classifier">int (Only used if solver=’cma’)</span></dt><dd><p>Number of parameter samples simulated per epoch. Default: 16</p>
-</dd>
 <dt><strong>n_jobs</strong><span class="classifier">int (Only used if solver=’cma’)</span></dt><dd><p>The number of jobs to start in parallel. If None, then 1 trial will be
 started without parallelism.</p>
 </dd>
-<dt><strong>tolfun</strong><span class="classifier">float</span></dt><dd><p>Termination criteria. Stops if the range of the best objective function
-values of the last 10 + ((30 * n_parameters) / popsize) generations and all
-function values of the recent generation is below tolfun. Default 0.01.</p>
-</dd>
-<dt><strong>dt</strong><span class="classifier">float</span></dt><dd><p>The integration time step of h.CVode (ms). Default: 0.025 ms</p>
-</dd>
-<dt><strong>scale_factor</strong><span class="classifier">float, optional</span></dt><dd><p>The dipole scale factor.</p>
-</dd>
-<dt><strong>smooth_window_len</strong><span class="classifier">float, optional</span></dt><dd><p>The smooth window length.</p>
+<dt><strong>popsize</strong><span class="classifier">int (Only used if solver=’cma’)</span></dt><dd><p>Number of parameter samples simulated per epoch. Default: 16</p>
 </dd>
 <dt><strong>seed</strong><span class="classifier">int, optional (Only used if solver=’cma’)</span></dt><dd><p>Optional seed for random number generator of optimizer.</p>
 </dd>
-<dt><strong>verbose</strong><span class="classifier">bool</span></dt><dd><p>If True, print build steps and simulation progress to console. Default: True.</p>
+<dt><strong>sigma0</strong><span class="classifier">float | array-like (Only used if solver=’cma’)</span></dt><dd><p>Initial standard deviation of CME-ES algorithm. If float, sigma0 is scaled
+by bounds defined in the constraints for each parameter. If array-like, The
+length of sigma0 must equal the length of constraints. Default: 0.25</p>
+</dd>
+<dt><strong>tolfun</strong><span class="classifier">float (Only used if solver=’cma’)</span></dt><dd><p>Termination criteria. Stops if the range of the best objective function
+values of the last 10 + ((30 * n_parameters) / popsize) generations and all
+function values of the recent generation is below tolfun. Default 0.01.</p>
+</dd>
+<dt><strong>dt</strong><span class="classifier">float, default=0.025</span></dt><dd><p>The integration time step of h.CVode (in ms)</p>
+</dd>
+<dt><strong>scale_factor</strong><span class="classifier">float, optional</span></dt><dd><p>The dipole scale factor to use after every optimization iteration before
+data comparison. There is no scaling applied by default, so you must pass a
+value if you want any scaling.</p>
+</dd>
+<dt><strong>smooth_window_len</strong><span class="classifier">float, optional</span></dt><dd><p>The smooth window length to use after every optimization iteration before
+data comparison. There is no smoothing applied by default, so you must pass
+a value if you want any smoothing.</p>
+</dd>
+<dt><strong>verbose</strong><span class="classifier">bool, default=True</span></dt><dd><p>If True, print build steps and simulation progress to console.</p>
 </dd>
 </dl>
 </dd>
@@ -572,10 +575,11 @@ function values of the recent generation is below tolfun. Default 0.01.</p>
 <p class="rubric">Notes</p>
 <p>When defining sigma0 for CMA-ES as a float, the sigma0 applied to each parameter
 is calculated as sigma0 * (upper_bound - lower_bound) based on the constraints.
-It is recommended to choose a sigma0 such that the optimum is expected to lie within
-about initial_params +- 3*sigma0. A smaller sigma0 searches closer to initial_params.</p>
-<p>When defining popsize for CMA-ES, it is recommended to increase popsize relative to
-the number of parameters being optimized (N). 4+3*log(N)</p>
+It is recommended to choose a sigma0 such that the optimum is expected to lie
+within about initial_params +- 3*sigma0. A smaller sigma0 searches closer to
+initial_params.</p>
+<p>When defining popsize for CMA-ES, it is recommended to increase popsize relative
+to the number of parameters being optimized (N). 4+3*log(N)</p>
 </dd></dl>
 
 <dl class="py method">
