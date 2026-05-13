@@ -480,7 +480,10 @@ class NetworkBuilder(object):
                 for bias in self.net.external_biases:
                     if src_type in self.net.external_biases[bias]:
                         cell_type_bias = self.net.external_biases[bias][src_type]
-                        if cell_type_bias["rng"].random() < cell_type_bias["probability"]:
+                        if (
+                            cell_type_bias["rng"].random()
+                            < cell_type_bias["probability"]
+                        ):
                             cell.create_tonic_bias(
                                 amplitude=cell_type_bias["amplitude"],
                                 t_0=cell_type_bias["t0"],

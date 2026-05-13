@@ -1627,10 +1627,14 @@ class Network:
             _validate_type(probability, (float, dict), "probability")
             if isinstance(amplitude, float):
                 # single amplitude for all cell types
-                amplitude = {cell_type: float(amplitude) for cell_type in self.cell_types}
+                amplitude = {
+                    cell_type: float(amplitude) for cell_type in self.cell_types
+                }
             if isinstance(probability, float):
                 # single probability for all cell types
-                probability = {cell_type: float(probability) for cell_type in self.cell_types}
+                probability = {
+                    cell_type: float(probability) for cell_type in self.cell_types
+                }
             _validate_type(amplitude, dict, "amplitude")
             if len(amplitude) == 0 or len(probability) == 0:
                 warnings.warn(
@@ -1646,7 +1650,9 @@ class Network:
                 )
 
             seed_offset = 0
-            for (_cell_type, _amplitude), _probability in zip(amplitude.items(), probability.values()):
+            for (_cell_type, _amplitude), _probability in zip(
+                amplitude.items(), probability.values()
+            ):
                 _add_cell_type_bias(
                     network=self,
                     cell_type=_cell_type,
@@ -2440,7 +2446,7 @@ def _add_cell_type_bias(
     bias_name="tonic",
     t_0=0,
     t_stop=None,
-    probability=1.0, 
+    probability=1.0,
     bias_seed=3,
 ):
     """Add a tonic bias to a specific cell type in the network.
@@ -2491,7 +2497,9 @@ def _add_cell_type_bias(
         "section": section,
         "probability": probability,
         "bias_seed": bias_seed,
-        "rng": np.random.default_rng(bias_seed), # Define rng for each bias to maintain reproducibility
+        "rng": np.random.default_rng(
+            bias_seed
+        ),  # Define rng for each bias to maintain reproducibility
     }
 
     sections = list(network.cell_types[cell_type]["cell_object"].sections.keys())
