@@ -96,8 +96,15 @@ if __name__ == "__main__":
             "sphinx-copybutton",
             "tdqm",
         ],
-        "gui": ["ipywidgets>=8.0.0", "ipykernel", "ipympl", "voila"],
     }
+    extras["gui"] = (
+        extras["opt"]
+        + extras["parallel"]
+        + "ipywidgets>=8.0.0"
+        + "ipykernel"
+        + "ipympl"
+        + "voila"
+    )
     extras["all"] = extras["opt"] + extras["parallel"] + extras["gui"]
     extras["dev"] = (
         extras["opt"]
