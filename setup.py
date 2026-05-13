@@ -80,7 +80,6 @@ class build_py_mod(build_py):
 
 if __name__ == "__main__":
     extras = {
-        "opt": ["scikit-learn", "cma"],
         "parallel": ["joblib", "psutil"],
         "test": ["codespell", "pytest", "pytest-cov", "pytest-xdist", "ruff"],
         "docs": [
@@ -97,6 +96,7 @@ if __name__ == "__main__":
             "tdqm",
         ],
     }
+    extras["opt"] = extras["parallel"] + ["cma", "scikit-learn"]
     extras["gui"] = (
         extras["opt"]
         + extras["parallel"]

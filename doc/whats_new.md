@@ -26,9 +26,14 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 <!-- ### Changelog -->
 
-## 0.6.1.dev0 In-progress updates
+## 0.6.1 Patch Release Notes
 
-### Changelog
+This is an emergency patch release to fix several install misconfigurations (see
+{gh}`1302`). Recent changes to `Optimizer` from the new CMA optimization solver require
+the `[parallel]` extra in order to run, so `pip install "hnn-core[opt]"` now requires
+installation of the `[parallel]` extra packages too. In addition, since the GUI can now
+support optimization including CMA, its installation also requires both the `[opt]` and
+`[parallel]` extra packages as well. This has been fixed.
 
 ## 0.6.0 Release Notes
 
