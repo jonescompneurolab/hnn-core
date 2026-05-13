@@ -24,7 +24,7 @@ from .hnn_io import (
     write_network_configuration,
 )
 
-__version__ = "0.6.1.dev0"
+__version__ = "0.6.1"
 
 
 import json
