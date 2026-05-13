@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>What’s new? &#8212; hnn-core 0.6.1.dev0 documentation</title>
+    <title>What’s new? &#8212; hnn-core 0.6.1 documentation</title>
   
   
   
@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="_static/documentation_options.js?v=a40b6b46"></script>
+    <script src="_static/documentation_options.js?v=2bd037f0"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/sg-tags.js?v=d80f6fa4"></script>
@@ -54,7 +54,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.17.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.6.1';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -66,7 +66,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.6.1.dev0" />
+  <meta name="docsearch:version" content="0.6.1" />
   
     
     <script src="_static/searchtools.js"></script>
@@ -149,8 +149,8 @@
       
     
     
-    <img src="_static/hnn-medium.png" class="logo__image only-light" alt="hnn-core 0.6.1.dev0 documentation - Home"/>
-    <img src="_static/hnn-medium.png" class="logo__image only-dark pst-js-only" alt="hnn-core 0.6.1.dev0 documentation - Home"/>
+    <img src="_static/hnn-medium.png" class="logo__image only-light" alt="hnn-core 0.6.1 documentation - Home"/>
+    <img src="_static/hnn-medium.png" class="logo__image only-dark pst-js-only" alt="hnn-core 0.6.1 documentation - Home"/>
   
   
 </a></div>
@@ -513,6 +513,21 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 <!-- ### Public API Changes -->
 <!-- ### People who contributed to this release: -->
 <!-- ### Changelog -->
+<section id="patch-release-notes">
+<h2>0.6.1 Patch Release Notes<a class="headerlink" href="#patch-release-notes" title="Link to this heading">#</a></h2>
+<p>This is an emergency patch release to fix an install misconfiguration (see
+<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1302">#1302</a>).</p>
+<p>Recent changes to <code class="docutils literal notranslate"><span class="pre">Optimizer</span></code> from the new CMA optimization solver require <code class="docutils literal notranslate"><span class="pre">joblib</span></code> to
+be installed for any Optimization to be run. Since <code class="docutils literal notranslate"><span class="pre">joblib</span></code> is a required dependency of
+<code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>, installing with <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">&quot;hnn-core[opt]&quot;</span></code> is sufficient, even
+though <code class="docutils literal notranslate"><span class="pre">[opt]</span></code> installs some, but not all, of HNN-Core’s <code class="docutils literal notranslate"><span class="pre">[parallel]</span></code> install extras,
+which are <code class="docutils literal notranslate"><span class="pre">joblib</span></code> and <code class="docutils literal notranslate"><span class="pre">psutil</span></code>.</p>
+<p>Relatedly, since the GUI can now support optimization, its installation now requires
+the <code class="docutils literal notranslate"><span class="pre">[opt]</span></code> packages to be installed as well. This has been fixed.</p>
+<p>For the greater release notes that document what has been added since 0.5.0, including
+<strong>important upcoming deprecations</strong>, <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/releases/tag/v0.6.0">see our Release Notes for 0.6.0
+here</a>.</p>
+</section>
 <section id="release-notes">
 <h2>0.6.0 Release Notes<a class="headerlink" href="#release-notes" title="Link to this heading">#</a></h2>
 <section id="important-deprecations">
@@ -1698,6 +1713,7 @@ scaling, by <a class="reference external" href="https://github.com/cjayb">Christ
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#patch-release-notes">0.6.1 Patch Release Notes</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-notes">0.6.0 Release Notes</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#important-deprecations">Important Deprecations</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#new-features">New Features</a></li>
