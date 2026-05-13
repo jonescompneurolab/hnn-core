@@ -1762,6 +1762,9 @@ def plot_laminar_csd(
     vmax=None,
     sink="b",
     interpolation="spline",
+    overlay_cell_morphology=False,
+    net=None,
+    morphology_color=None,
     show=True,
 ):
     """Plot laminar current source density (CSD) estimation from LFP array.
@@ -1791,7 +1794,19 @@ def plot_laminar_csd(
     interpolation : str | None
         If 'spline', will smoothen the CSD using spline method,
         if None, no smoothing will be applied.
-
+    overlay_cell_morphology : bool
+        If True, overlay the 2D projection of the cell morphologies on
+        top of the CSD plot. Requires passing a valid ``net`` instance.
+    net : instance of Network | None
+        The network object containing cell morphologies and positions
+        used for overlaying morphology. Must be provided if
+        ``overlay_cell_morphology=True``. If None, no morphology will be
+        plotted.
+    morphology_color : str | dict | None
+        Color of the overlaid cell morphologies.
+        If str: entire cell is one color
+        If dict: keys = section names, values = colors
+        If None: defaults to 'k'
     show : bool
         If True, show the plot.
 
@@ -1842,10 +1857,84 @@ def plot_laminar_csd(
         color_axis = ax.inset_axes([1.05, 0, 0.02, 1], transform=ax.transAxes)
         plt.colorbar(im, ax=ax, cax=color_axis).set_label(r"$CSD (uV/um^{2})$")
 
+    if overlay_cell_morphology:
+        if net is None:
+            raise ValueError("overlay_cell_morphology=True requires passing `net`.")
+
+        xmin, xmax = ax.get_xlim()
+        n_cells = len(net.cell_types)
+
+        xs = np.linspace(xmin, xmax, n_cells + 2)[1:-1]
+
+        for x, cell_type in zip(xs, net.cell_types):
+            cell = net.cell_types[cell_type]["cell_object"]
+
+            # depth
+            z = net.pos_dict[cell_type][0][2]
+
+            pos = (x, 0, z)
+
+            plot_cell_morphology_2d(cell, ax, pos=pos, color=morphology_color)
+
     plt.tight_layout()
     plt_show(show)
 
     return ax.get_figure()
+
+
+def plot_cell_morphology_2d(cell, ax, pos=(0, 0, 0), color=None):
+    """Project the cell morphology onto X-Z plane.
+
+    Parameters
+    ----------
+    cell : instance of Cell
+        The cell object
+    ax : instance of matplotlib Axes
+        2D matplotlib axis
+    pos : tuple of float
+        (x, y, z) position of soma
+    color : str | dict | None
+        If str: entire cell is one color
+        If dict: keys = section names, values = colors
+        If None: defaults to 'k'
+    """
+
+    from hnn_core.externals.mne import _validate_type
+
+    # Validate color
+    _validate_type(color, (str, dict, None), "color")
+
+    if color is None:
+        section_colors = {sec: "k" for sec in cell.sections.keys()}
+    elif isinstance(color, str):
+        section_colors = {sec: color for sec in cell.sections.keys()}
+    else:  # dict
+        section_colors = color
+
+    # Validate pos
+    _validate_type(pos, tuple, "pos")
+    if len(pos) != 3:
+        raise ValueError("pos must be a tuple of 3 elements")
+
+    # Alignment soma
+    soma_pt = cell.sections["soma"].end_pts[0]
+    dx = pos[0] - soma_pt[0]
+    dz = pos[2] - soma_pt[2]
+
+    # Draw sections
+    for sec_name, section in cell.sections.items():
+        pts = section.end_pts
+
+        xs = [pt[0] + dx for pt in pts]
+        zs = [pt[2] + dz for pt in pts]
+
+        ax.plot(
+            xs,
+            zs,
+            color=section_colors[sec_name],
+            linewidth=1.5,
+            zorder=10,  # overlay on CSD
+        )
 
 
 class NetworkPlotter:
@@ -1992,7 +2081,6 @@ class NetworkPlotter:
         return times, vsec_recorded
 
     def _initialize_plots(self):
-
         # Create figure
         if self.ax is None:
             self.fig = plt.figure()
