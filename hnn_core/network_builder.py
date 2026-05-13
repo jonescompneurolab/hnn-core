@@ -460,6 +460,7 @@ class NetworkBuilder(object):
         # loop through ALL gids
         # have to loop over self._gid_list, since this is what we got
         # on this rank (MPI)
+        rngs = dict()  # rngs for each external bias for each cell type
         for gid in self._gid_list:
             src_type = self.net.gid_to_type(gid)
             gid_idx = gid - self.net.gid_ranges[src_type][0]
@@ -478,16 +479,28 @@ class NetworkBuilder(object):
                     cell.build()
                 # add tonic biases
                 for bias in self.net.external_biases:
+                    if bias not in rngs:
+                        rngs[bias] = dict()
                     if src_type in self.net.external_biases[bias]:
                         cell_type_bias = self.net.external_biases[bias][src_type]
+                        if "bias_seed" in cell_type_bias and src_type not in rngs[bias]:
+                            rngs[bias][src_type] = np.random.default_rng(
+                                cell_type_bias["bias_seed"]
+                            )
                         if (
-                            cell_type_bias["rng"].random()
-                            < cell_type_bias["probability"]
+                            "probability"
+                            not in cell_type_bias  # prob not defined, so add bias
+                            or cell_type_bias["probability"]
+                            is None  # prob not defined, so add bias
+                            or rngs[bias][src_type].random()
+                            < cell_type_bias[
+                                "probability"
+                            ]  # prob defined and rng says add bias
                         ):
                             cell.create_tonic_bias(
                                 amplitude=cell_type_bias["amplitude"],
-                                t_0=cell_type_bias["t0"],
-                                t_stop=cell_type_bias["tstop"],
+                                t0=cell_type_bias["t0"],
+                                tstop=cell_type_bias["tstop"],
                                 section=cell_type_bias["section"],
                             )
                 cell.record(record_vsec, record_isec, record_ca)

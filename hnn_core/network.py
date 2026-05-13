@@ -1624,18 +1624,13 @@ class Network:
                 bias_seed=bias_seed,
             )
         else:
+            _validate_type(amplitude, dict, "amplitude")
             _validate_type(probability, (float, dict), "probability")
-            if isinstance(amplitude, float):
-                # single amplitude for all cell types
-                amplitude = {
-                    cell_type: float(amplitude) for cell_type in self.cell_types
-                }
             if isinstance(probability, float):
                 # single probability for all cell types
                 probability = {
-                    cell_type: float(probability) for cell_type in self.cell_types
+                    cell_type: float(probability) for cell_type in amplitude.keys()
                 }
-            _validate_type(amplitude, dict, "amplitude")
             if len(amplitude) == 0 or len(probability) == 0:
                 warnings.warn(
                     "No bias have been defined, no action taken",
@@ -2497,9 +2492,6 @@ def _add_cell_type_bias(
         "section": section,
         "probability": probability,
         "bias_seed": bias_seed,
-        "rng": np.random.default_rng(
-            bias_seed
-        ),  # Define rng for each bias to maintain reproducibility
     }
 
     sections = list(network.cell_types[cell_type]["cell_object"].sections.keys())
