@@ -479,9 +479,14 @@ class NetworkBuilder(object):
                 # add tonic biases
                 for bias in self.net.external_biases:
                     if src_type in self.net.external_biases[bias]:
-                        cell.create_tonic_bias(
-                            **self.net.external_biases[bias][src_type]
-                        )
+                        cell_type_bias = self.net.external_biases[bias][src_type]
+                        if cell_type_bias["rng"].random() < cell_type_bias["probability"]:
+                            cell.create_tonic_bias(
+                                amplitude=cell_type_bias["amplitude"],
+                                t_0=cell_type_bias["t0"],
+                                t_stop=cell_type_bias["tstop"],
+                                section=cell_type_bias["section"],
+                            )
                 cell.record(record_vsec, record_isec, record_ca)
 
                 # this call could belong in init of a _Cell (with threshold)?
