@@ -100,10 +100,7 @@ if __name__ == "__main__":
     extras["gui"] = (
         extras["opt"]
         + extras["parallel"]
-        + "ipywidgets>=8.0.0"
-        + "ipykernel"
-        + "ipympl"
-        + "voila"
+        + ["ipywidgets>=8.0.0", "ipykernel", "ipympl", "voila"]
     )
     extras["all"] = extras["opt"] + extras["parallel"] + extras["gui"]
     extras["dev"] = (
