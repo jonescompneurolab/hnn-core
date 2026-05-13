@@ -78,9 +78,14 @@ class build_py_mod(build_py):
         build_py.run(self)
 
 
+# `scikit-learn` requires installation of `joblib`, so technically, running optimization
+# code does not strictly require installation of the `[parallel]` extras. However, it
+# *does* require some of the same packages that are installed in the `[parallel]`
+# extras. `joblib` will thus be installed in the `[gui]` extras case, but via the
+# `scikit-learn` dependency, not via the `[parallel]` extras.
 if __name__ == "__main__":
     extras = {
-        "opt": ["scikit-learn", "cma"],
+        "opt": ["cma", "scikit-learn"],
         "parallel": ["joblib", "psutil"],
         "test": ["codespell", "pytest", "pytest-cov", "pytest-xdist", "ruff"],
         "docs": [
@@ -96,8 +101,13 @@ if __name__ == "__main__":
             "sphinx-copybutton",
             "tdqm",
         ],
-        "gui": ["ipywidgets>=8.0.0", "ipykernel", "ipympl", "voila"],
     }
+    extras["gui"] = extras["opt"] + [
+        "ipywidgets>=8.0.0",
+        "ipykernel",
+        "ipympl",
+        "voila",
+    ]
     extras["all"] = extras["opt"] + extras["parallel"] + extras["gui"]
     extras["dev"] = (
         extras["opt"]
