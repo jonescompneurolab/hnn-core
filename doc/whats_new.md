@@ -26,6 +26,22 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 <!-- ### Changelog -->
 
+## 0.6.2.dev0 In-progress Notes
+
+### Deprecations
+
+### New Features
+
+### Upcoming Deprecations
+
+### Bug Fixes
+
+### Public API Changes
+
+### People who contributed to this release:
+
+### Changelog
+
 ## 0.6.1 Patch Release Notes
 
 This is an emergency patch release to fix an install misconfiguration (see
