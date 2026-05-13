@@ -1,0 +1,10 @@
+﻿hnn_core.neymotin_2020_model
+============================
+
+.. currentmodule:: hnn_core
+
+.. autofunction:: neymotin_2020_model
+
+.. _sphx_glr_backreferences_hnn_core.neymotin_2020_model:
+.. minigallery:: hnn_core.neymotin_2020_model
+   :add-heading:
