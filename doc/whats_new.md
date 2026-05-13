@@ -26,6 +26,40 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 <!-- ### Changelog -->
 
+## 0.6.2.dev0 In-progress Notes
+
+### Deprecations
+
+### New Features
+
+### Upcoming Deprecations
+
+### Bug Fixes
+
+### Public API Changes
+
+### People who contributed to this release:
+
+### Changelog
+
+## 0.6.1 Patch Release Notes
+
+This is an emergency patch release to fix an install misconfiguration (see
+{gh}`1302`).
+
+Recent changes to `Optimizer` from the new CMA optimization solver require `joblib` to
+be installed for any Optimization to be run. Since `joblib` is a required dependency of
+`scikit-learn`, installing with `pip install "hnn-core[opt]"` is sufficient, even
+though `[opt]` installs some, but not all, of HNN-Core's `[parallel]` install extras,
+which are `joblib` and `psutil`.
+
+Relatedly, since the GUI can now support optimization, its installation now requires
+the `[opt]` packages to be installed as well. This has been fixed.
+
+For the greater release notes that document what has been added since 0.5.0, including
+**important upcoming deprecations**, [see our Release Notes for 0.6.0
+here](https://github.com/jonescompneurolab/hnn-core/releases/tag/v0.6.0).
+
 ## 0.6.0 Release Notes
 
 ### Important Deprecations
