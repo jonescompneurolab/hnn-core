@@ -208,6 +208,7 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
             if child_terminated and data_received:
                 # both exit conditions have been met (also we know that
                 # the network has been sent)
+                print(f"process terminated after {time.time() - t_start:.2f}s")
                 break
 
             if not child_terminated and count_since_last_output > timeout_cycles:
