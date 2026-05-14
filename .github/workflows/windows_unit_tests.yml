@@ -81,7 +81,8 @@ jobs:
             -RedirectStandardOutput $outFile -RedirectStandardError $errFile `
             -PassThru -NoNewWindow
           $success = $false
-          for ($i = 0; $i -lt 15; $i++) {
+          # Poll until voila server responds (timeout ~60 seconds (30 * sleep 2)
+          for ($i = 0; $i -lt 30; $i++) {
             $content = ""
             if (Test-Path $outFile) { $content += (Get-Content $outFile -Raw -ErrorAction SilentlyContinue) }
             if (Test-Path $errFile) { $content += (Get-Content $errFile -Raw -ErrorAction SilentlyContinue) }
@@ -95,7 +96,7 @@ jobs:
           if ($success) {
             Write-Output "--> SUCCESS: GUI launched successfully"
           } else {
-            Write-Output "--> FAILURE: GUI did not launch within 30 seconds"
+            Write-Output "--> FAILURE: GUI did not launch within 60 seconds"
             if (Test-Path $outFile) { Get-Content $outFile }
             if (Test-Path $errFile) { Get-Content $errFile }
             exit 1

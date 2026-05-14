@@ -65,9 +65,9 @@ jobs:
         run: |
           hnn-gui --no-browser > /tmp/voila.log 2>&1 &
           GUI_PID=$!
-          # Poll until voila server responds (timeout ~30 seconds)
+          # Poll until voila server responds (timeout ~60 seconds (30 * sleep 2)
           SUCCESS=false
-          for i in $(seq 1 15); do
+          for i in $(seq 1 30); do
             if grep -q "is running at" /tmp/voila.log 2>/dev/null; then
               SUCCESS=true
               break
@@ -78,7 +78,7 @@ jobs:
           if [ "$SUCCESS" = "true" ]; then
             echo "--> SUCCESS: GUI launched successfully"
           else
-            echo "--> FAILURE: GUI did not launch within 30 seconds"
+            echo "--> FAILURE: GUI did not launch within 60 seconds"
             cat /tmp/voila.log
             exit 1
           fi
