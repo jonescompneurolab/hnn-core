@@ -29,28 +29,74 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install Python and Conda dependencies
+      - name: Update Python and install HNN-Core with minimal dependencies
         shell: bash -el {0}
         run: |
           python -m pip install --upgrade pip
+          pip install --verbose .
+
+      - name: Test API with minimal dependencies
+        shell: bash -el {0}
+        run: |
+          python -c "from hnn_core import neymotin_2020_model, simulate_dipole; simulate_dipole(neymotin_2020_model(), tstop=20); print('--> SUCCESS: The test worked!')"
+
+      - name: Clean minimal dependencies install
+        shell: bash -el {0}
+        run: rm -rf build
+
+      - name: Install HNN-Core with Optimization dependencies
+        shell: bash -el {0}
+        run: pip install --verbose '.[opt]'
+
+      - name: Test Optimization dependencies
+        shell: bash -el {0}
+        run: python -c "from hnn_core.optimization import Optimizer"
+
+      - name: Clean Optimization dependencies install
+        shell: bash -el {0}
+        run: rm -rf build
+
+      - name: Install HNN-Core with Optimization dependencies
+        shell: bash -el {0}
+        run: pip install --verbose '.[gui]'
+
+      - name: Test GUI dependencies
+        shell: bash -el {0}
+        run: |
+          hnn-gui --no-browser > /tmp/voila.log 2>&1 &
+          GUI_PID=$!
+          # Poll until voila server responds (timeout ~60 seconds (30 * sleep 2)
+          SUCCESS=false
+          for i in $(seq 1 30); do
+            if grep -q "is running at" /tmp/voila.log 2>/dev/null; then
+              SUCCESS=true
+              break
+            fi
+            sleep 2
+          done
+          kill $GUI_PID 2>/dev/null || true
+          if [ "$SUCCESS" = "true" ]; then
+            echo "--> SUCCESS: GUI launched successfully"
+          else
+            echo "--> FAILURE: GUI did not launch within 60 seconds"
+            cat /tmp/voila.log
+            exit 1
+          fi
+
+      - name: Clean GUI dependencies install
+        shell: bash -el {0}
+        run: |
+          rm -rf build
+
+      - name: Install MPI dependencies
+        shell: bash -el {0}
+        run: |
           if [[ "${{ matrix.os }}" == macos* ]]; then
               echo "DYLD_FALLBACK_LIBRARY_PATH=${CONDA_PREFIX}/lib:$DYLD_FALLBACK_LIBRARY_PATH" >> $GITHUB_ENV
           elif [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
               echo "LD_LIBRARY_PATH=${CONDA_PREFIX}/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
           fi
           conda install --yes --quiet -c conda-forge mpi4py "openmpi >5"
-
-      - name: Install HNN-Core with minimal dependencies and test
-        shell: bash -el {0}
-        run: |
-          pip install --verbose .
-          python -c "from hnn_core import neymotin_2020_model, simulate_dipole; simulate_dipole(neymotin_2020_model(), tstop=20); print('--> SUCCESS: The test worked!')"
-
-      - name: Clean minimal dependencies install
-        shell: bash -el {0}
-        run: |
-          pip uninstall --yes hnn_core
-          rm -rf build
 
       - name: Install HNN-Core with full dependencies
         shell: bash -el {0}
@@ -83,7 +129,7 @@ jobs:
         run: |
           python -m pytest ./hnn_core/tests/ -m "uses_mpi" --cov=hnn_core --cov-report=xml --cov-append
 
-      - name: Upload coverage to Codecov 
+      - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           files: ./coverage.xml
