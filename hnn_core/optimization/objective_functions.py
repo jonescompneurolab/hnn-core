@@ -141,6 +141,7 @@ def _rmse_evoked(
             tstop=tstop,
             overwrite=False,
             clear_cache=False,
+            bsl_cor=obj_fun_kwargs.get("bsl_cor", None),
         )
         # KDTODO!!! post-rebase: integrate `bsl_cor` usage into new obj func
         # -----------------------------------------------------------

@@ -172,7 +172,7 @@ class BatchSimulate(object):
         self.clear_cache = clear_cache
         self.summary_func = summary_func
         self._verbose = True
-        # self.bsl_cor = bsl_cor
+        self.bsl_cor = bsl_cor
         # KDTODO self.bsl_cor here and its usage in run_single_sim
 
     def run(
@@ -340,6 +340,7 @@ class BatchSimulate(object):
                 record_isec=self.record_isec,
                 postproc=self.postproc,
                 verbose=self._verbose,
+                bsl_cor=self.bsl_cor,
             )
             # KDTODO bsl_cor here
             results["dpl"] = dpl
