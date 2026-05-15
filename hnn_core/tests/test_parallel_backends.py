@@ -16,7 +16,6 @@ import pytest
 import hnn_core
 from hnn_core import (
     MPIBackend,
-    duecker_ET_model,
     neymotin_2020_model,
     read_params,
     read_spikes,

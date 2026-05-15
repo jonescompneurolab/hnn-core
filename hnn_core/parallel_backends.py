@@ -68,7 +68,8 @@ def _gather_trial_data(sim_data, net, n_trials, postproc, bsl_cor="jones"):
         N_pyr_x = net._N_pyr_x
         N_pyr_y = net._N_pyr_y
         if bsl_cor == "jones":
-            print("Applying Jones baseline correction", flush=True)
+            # KDTODO need to update this for the new `verbose` flag
+            # print("Applying Jones baseline correction", flush=True)
             dpl._baseline_renormalize(N_pyr_x, N_pyr_y)  # XXX cf. #270
 
         dpl._convert_fAm_to_nAm()  # always applied, cf. #264

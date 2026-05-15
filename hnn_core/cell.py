@@ -215,6 +215,7 @@ class Section:
         self._Ra = Ra
         self._cm = cm
         self._v0 = v0
+        self._v = v0
         if end_pts is None:
             end_pts = list()
         self._end_pts = end_pts
@@ -297,6 +298,10 @@ class Section:
     @property
     def v0(self):
         return self._v0
+
+    @property
+    def v(self):
+        return self._v
 
     @property
     def end_pts(self):
