@@ -268,6 +268,7 @@ def test_basket_voltage_init():
             expected_v0 = expected_basket_v0[sec_name]
             assert np.isclose(v0, expected_v0), (
                 f"HNN-Core Basket cell {sec_name} v0={v0}, expected {expected_v0}"
+            )
     # Build NEURON cells and sections, then initialize
     for cell in cells.values():
         cell.build()
@@ -281,6 +282,8 @@ def test_basket_voltage_init():
             expected_v = expected_basket_v0[sec_name]
             assert np.isclose(v, expected_v, atol=0.1), (
                 f"NEURON-built Basket cell {sec_name} initial voltage is {v}, expected {expected_v}"
+            )
+
 
 def test_get_syn_props_backwards_compat():
     """_get_syn_props with no type key in p_all defaults to Exp2Syn.
@@ -337,6 +340,7 @@ def test_l2pyr_voltage_init():
     for sec_name, sec in l2pyr.sections.items():
         assert np.isclose(sec.v0, expected_l2pyr_v0), (
             f"HNN-Core L2Pyr {sec_name} v0={sec.v0}, expected {expected_l2pyr_v0}"
+        )
     # Build NEURON cells and sections, then initialize
     l2pyr.build(sec_name_apical="apical_trunk")
     h.finitialize()
@@ -347,9 +351,7 @@ def test_l2pyr_voltage_init():
         v = l2pyr._nrn_sections[sec_name](0.5).v
         assert np.isclose(v, expected_l2pyr_v0, atol=0.1), (
             f"NEURON-built L2Pyr {sec_name} initial voltage is {v}, expected {expected_l2pyr_v0}"
-
-
-
+        )
 
 
 def test_get_syn_props_custom_type():
@@ -370,6 +372,7 @@ def test_get_syn_props_custom_type():
     assert "tau1" not in result[syn_type]
     assert "tau2" not in result[syn_type]
 
+
 def test_get_syn_props_NMDA_gao_mechname_params():
     """_get_syn_props with the new NMDA_gao synapse mechname works for all custom params."""
     cell_type = "L5Pyr"
@@ -389,6 +392,7 @@ def test_get_syn_props_NMDA_gao_mechname_params():
     # tau1/tau2 should NOT be present since they weren't in p_all
     assert "tau1" not in result[syn_type]
     assert "tau2" not in result[syn_type]
+
 
 def test_get_syn_props_gabab_destexhe_mechname_params():
     """_get_syn_props with the new gabab_destexhe synapse mechname works for all custom
@@ -411,6 +415,7 @@ def test_get_syn_props_gabab_destexhe_mechname_params():
     assert "tau1" in result[syn_type]
     assert "tau2" in result[syn_type]
 
+
 def test_l5pyr_voltage_init():
     """Test voltage initialization for Layer 5 Pyramidal cell type."""
     # Current section initial voltages. The original location of these values can be
@@ -426,6 +431,7 @@ def test_l5pyr_voltage_init():
         "basal_2": -72,
         "basal_3": -72,
         "apical_oblique": -72,
+    }
 
     # Initial setup
     load_custom_mechanisms()
@@ -449,6 +455,7 @@ def test_l5pyr_voltage_init():
         expected_v = expected_l5pyr_v0[sec_name]
         assert np.isclose(v, expected_v, atol=0.1), (
             f"NEURON-built L5Pyr {sec_name} initial voltage is {v}, expected {expected_v}"
+        )
 
 
 def test_get_syn_props_multiple_syn_types():
