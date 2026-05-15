@@ -401,19 +401,17 @@ def test_get_syn_props_gabab_destexhe_mechname_params():
     syn_type = "gabab_destexhe"
     p_all = {
         f"{cell_type}_{syn_type}_mechname": "gabab_destexhe",
-        f"{cell_type}_{syn_type}_e": 0.0,
-        f"{cell_type}_{syn_type}_tau1": 1.0,
-        f"{cell_type}_{syn_type}_tau2": 20,
+        f"{cell_type}_{syn_type}_g": 1.0,
     }
     result = _get_syn_props(p_all, cell_type, syn_types=[syn_type])
     result = _get_syn_props(p_all, cell_type, syn_types=[syn_type])
-    for syn_param in ["e", "tau1", "tau2", "mechname"]:
+    for syn_param in ["g", "mechname"]:
         assert (
             result[syn_type][syn_param] == p_all[f"{cell_type}_{syn_type}_{syn_param}"]
         )
-    # tau1/tau2 should be present since they are in p_all
-    assert "tau1" in result[syn_type]
-    assert "tau2" in result[syn_type]
+    # tau1/tau2 should NOT be present since they are in p_all
+    assert "tau1" not in result[syn_type]
+    assert "tau2" not in result[syn_type]
 
 
 def test_l5pyr_voltage_init():
@@ -472,9 +470,7 @@ def test_get_syn_props_multiple_syn_types():
         "L2Pyr_nmda_Beta": 5.0,
         "L2Pyr_nmda_Cdur": 1.2,
         "L2Pyr_gabab_mechname": "gabab_destexhe",
-        "L2Pyr_gabab_e": 42069.0,
-        "L2Pyr_gabab_tau1": 1.0,
-        "L2Pyr_gabab_tau2": 20.0,
+        "L2Pyr_gabab_g": 42069.0,
     }
     # Test that requesting only ampa returns with just ampa
     result1 = _get_syn_props(p_all, "L2Pyr", syn_types=["ampa"])
@@ -517,9 +513,7 @@ def test_get_syn_props_multiple_syn_types():
     assert result4["nmda"]["Beta"] == 5.0
     assert result4["nmda"]["Cdur"] == 1.2
     assert result4["nmda"]["mechname"] == "NMDA_gao"
-    assert result4["gabab"]["e"] == 42069.0
-    assert result4["gabab"]["tau1"] == 1.0
-    assert result4["gabab"]["tau2"] == 20.0
+    assert result4["gabab"]["g"] == 42069.0
     assert result4["gabab"]["mechname"] == "gabab_destexhe"
 
 

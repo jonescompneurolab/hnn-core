@@ -102,7 +102,7 @@ INDEPENDENT {t FROM 0 TO 1 WITH 1 (ms)}
 
 NEURON {
 	POINT_PROCESS gabab_destexhe
-	RANGE R, G, g, e, tau1, tau2
+	RANGE R, G, g
 	NONSPECIFIC_CURRENT i
 	GLOBAL Cmax, Cdur
 	GLOBAL K1, K2, K3, K4, KD, Erev, warn, cutoff
@@ -131,9 +131,6 @@ PARAMETER {
 	Erev	= -95	(mV)		: reversal potential (E_K)
 	warn	= 0			: too large G warning has/has not been issued
         cutoff = 1e12
-	tau1 = 1
-	tau2 = 20
-	e = -80
 }
 
 

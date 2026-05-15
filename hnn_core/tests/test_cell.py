@@ -324,7 +324,7 @@ def test_create_synapses_gabab_destexhe():
     _helper_create_cell_and_run_synapse_checks(custom_synapse_config)
 
     # syn_create with valid custom 'mechname' kwarg should create the specified synapse.
-    custom_synapse_config = dict(e=50.0, tau1=1.0, tau2=20.0, mechname="gabab_destexhe")
+    custom_synapse_config = dict(g=1.0, mechname="gabab_destexhe")
     _helper_create_cell_and_run_synapse_checks(custom_synapse_config)
 
     # syn_create with invalid parameter for custom 'mechname' should raise an error.
