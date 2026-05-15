@@ -518,10 +518,8 @@
 </dd>
 <dt><strong>sections</strong><span class="classifier">dict of Section</span></dt><dd><p>Dictionary with keys as section name.</p>
 </dd>
-<dt><strong>synapses</strong><span class="classifier">dict of dict</span></dt><dd><p>Keys are name of synaptic mechanism. Each synaptic mechanism
-has keys for parameters of the mechanism, e.g., ‘e’, ‘tau1’,
-‘tau2’.
-sections.</p>
+<dt><strong>synapses</strong><span class="classifier">dict of dict</span></dt><dd><p>Keys are name of synaptic mechanism. Each synaptic mechanism dict has keys for
+parameters of the mechanism, e.g., ‘e’, ‘tau1’, ‘tau2’.  sections.</p>
 </dd>
 <dt><strong>sect_loc</strong><span class="classifier">dict of list</span></dt><dd><p>Can have keys ‘proximal’ or ‘distal’ each containing
 names of section locations that are proximal or distal.</p>
@@ -614,8 +612,8 @@ list of nodes (children nodes) connected to the parent node.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.setup_source_netcon" title="hnn_core.Cell.setup_source_netcon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup_source_netcon</span></code></a>(threshold)</p></td>
 <td><p>Created for _PC.cell and specifies SOURCES of spikes.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.syn_create" title="hnn_core.Cell.syn_create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_create</span></code></a>(secloc, e, tau1, tau2)</p></td>
-<td><p>Create an h.Exp2Syn synapse.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.syn_create" title="hnn_core.Cell.syn_create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_create</span></code></a>(secloc, **kwargs)</p></td>
+<td><p>Create a NEURON synapse at the given section location.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.to_dict" title="hnn_core.Cell.to_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dict</span></code></a>()</p></td>
 <td><p>Converts an object of Cell class to a dictionary.</p></td>
@@ -854,24 +852,39 @@ or just the soma (‘soma’). Default: False.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Cell.syn_create">
-<span class="sig-name descname"><span class="pre">syn_create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">secloc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.syn_create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.syn_create" title="Link to this definition">#</a></dt>
-<dd><p>Create an h.Exp2Syn synapse.</p>
-<dl class="field-list simple">
+<span class="sig-name descname"><span class="pre">syn_create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">secloc</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.syn_create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.syn_create" title="Link to this definition">#</a></dt>
+<dd><p>Create a NEURON synapse at the given section location.</p>
+<p>By default (or when <code class="docutils literal notranslate"><span class="pre">mechname='Exp2Syn'</span></code>), creates an <code class="docutils literal notranslate"><span class="pre">h.Exp2Syn</span></code> two-state
+kinetic synapse. A custom NEURON synapse mechanism can be used instead by
+passing <code class="docutils literal notranslate"><span class="pre">mechname=&lt;synapse_class_name&gt;</span></code> along with any parameters that
+synapse accepts.</p>
+<dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>secloc</strong><span class="classifier">instance of nrn.Segment</span></dt><dd><p>The section location. E.g., soma(0.5).</p>
+<dd class="field-odd"><dl>
+<dt><strong>secloc</strong><span class="classifier">instance of nrn.Segment</span></dt><dd><p>The section location. E.g., <code class="docutils literal notranslate"><span class="pre">soma(0.5)</span></code>.</p>
 </dd>
-<dt><strong>e: float</strong></dt><dd><p>Reverse potential (in mV)</p>
+<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Synapse parameters. The following keys are recognised:</p>
+<dl class="simple">
+<dt>mechname<span class="classifier">str, optional</span></dt><dd><p>Name of the NEURON synapse class to instantiate (must be available in
+NEURON’s hoc interpreter). Custom synapse mechanisms must be compiled
+from a MOD file. Defaults to <code class="docutils literal notranslate"><span class="pre">'Exp2Syn'</span></code>.</p>
 </dd>
-<dt><strong>tau1: float</strong></dt><dd><p>Rise time (in ms)</p>
+<dt>e<span class="classifier">float</span></dt><dd><p>Reversal potential (mV). Required for <code class="docutils literal notranslate"><span class="pre">Exp2Syn</span></code>.</p>
 </dd>
-<dt><strong>tau2: float</strong></dt><dd><p>Decay time (in ms)</p>
+<dt>tau1<span class="classifier">float</span></dt><dd><p>Rise time constant (ms). Required for <code class="docutils literal notranslate"><span class="pre">Exp2Syn</span></code>.</p>
+</dd>
+<dt>tau2<span class="classifier">float</span></dt><dd><p>Decay time constant (ms). Required for <code class="docutils literal notranslate"><span class="pre">Exp2Syn</span></code>.</p>
+</dd>
+</dl>
+<p>For custom synapse mechanisms, pass any parameters accepted by that synapse
+as additional keyword arguments. Unknown or invalid parameter names will
+raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt><strong>syn</strong><span class="classifier">instance of h.Exp2Syn</span></dt><dd><p>A two state kinetic scheme synapse.</p>
+<dt><strong>syn</strong><span class="classifier">NEURON synapse object</span></dt><dd><p>The instantiated synapse object (e.g. <code class="docutils literal notranslate"><span class="pre">h.Exp2Syn</span></code> or a custom mechanism).</p>
 </dd>
 </dl>
 </dd>

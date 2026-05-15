@@ -818,10 +818,8 @@
 <span class="sd">    sections : dict of Section</span>
 <span class="sd">        Dictionary with keys as section name.</span>
 <span class="sd">    synapses : dict of dict</span>
-<span class="sd">        Keys are name of synaptic mechanism. Each synaptic mechanism</span>
-<span class="sd">        has keys for parameters of the mechanism, e.g., &#39;e&#39;, &#39;tau1&#39;,</span>
-<span class="sd">        &#39;tau2&#39;.</span>
-<span class="sd">        sections.</span>
+<span class="sd">        Keys are name of synaptic mechanism. Each synaptic mechanism dict has keys for</span>
+<span class="sd">        parameters of the mechanism, e.g., &#39;e&#39;, &#39;tau1&#39;, &#39;tau2&#39;.  sections.</span>
 <span class="sd">    sect_loc : dict of list</span>
 <span class="sd">        Can have keys &#39;proximal&#39; or &#39;distal&#39; each containing</span>
 <span class="sd">        names of section locations that are proximal or distal.</span>
@@ -1369,33 +1367,93 @@
 
 <div class="viewcode-block" id="Cell.syn_create">
 <a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.syn_create">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">syn_create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secloc</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">tau1</span><span class="p">,</span> <span class="n">tau2</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create an h.Exp2Syn synapse.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">syn_create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secloc</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a NEURON synapse at the given section location.</span>
+
+<span class="sd">        By default (or when ``mechname=&#39;Exp2Syn&#39;``), creates an ``h.Exp2Syn`` two-state</span>
+<span class="sd">        kinetic synapse. A custom NEURON synapse mechanism can be used instead by</span>
+<span class="sd">        passing ``mechname=&lt;synapse_class_name&gt;`` along with any parameters that</span>
+<span class="sd">        synapse accepts.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        secloc : instance of nrn.Segment</span>
-<span class="sd">            The section location. E.g., soma(0.5).</span>
-<span class="sd">        e: float</span>
-<span class="sd">            Reverse potential (in mV)</span>
-<span class="sd">        tau1: float</span>
-<span class="sd">            Rise time (in ms)</span>
-<span class="sd">        tau2: float</span>
-<span class="sd">            Decay time (in ms)</span>
+<span class="sd">            The section location. E.g., ``soma(0.5)``.</span>
+<span class="sd">        **kwargs : dict</span>
+<span class="sd">            Synapse parameters. The following keys are recognised:</span>
+
+<span class="sd">            mechname : str, optional</span>
+<span class="sd">                Name of the NEURON synapse class to instantiate (must be available in</span>
+<span class="sd">                NEURON&#39;s hoc interpreter). Custom synapse mechanisms must be compiled</span>
+<span class="sd">                from a MOD file. Defaults to ``&#39;Exp2Syn&#39;``.</span>
+<span class="sd">            e : float</span>
+<span class="sd">                Reversal potential (mV). Required for ``Exp2Syn``.</span>
+<span class="sd">            tau1 : float</span>
+<span class="sd">                Rise time constant (ms). Required for ``Exp2Syn``.</span>
+<span class="sd">            tau2 : float</span>
+<span class="sd">                Decay time constant (ms). Required for ``Exp2Syn``.</span>
+
+<span class="sd">            For custom synapse mechanisms, pass any parameters accepted by that synapse</span>
+<span class="sd">            as additional keyword arguments. Unknown or invalid parameter names will</span>
+<span class="sd">            raise a ``ValueError``.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        syn : instance of h.Exp2Syn</span>
-<span class="sd">            A two state kinetic scheme synapse.</span>
+<span class="sd">        syn : NEURON synapse object</span>
+<span class="sd">            The instantiated synapse object (e.g. ``h.Exp2Syn`` or a custom mechanism).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">secloc</span><span class="p">,</span> <span class="n">nrn</span><span class="o">.</span><span class="n">Segment</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;secloc must be instance ofnrn.Segment. Got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">secloc</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;secloc must be instance of nrn.Segment. Got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">secloc</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
-        <span class="n">syn</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Exp2Syn</span><span class="p">(</span><span class="n">secloc</span><span class="p">)</span>
-        <span class="n">syn</span><span class="o">.</span><span class="n">e</span> <span class="o">=</span> <span class="n">e</span>
-        <span class="n">syn</span><span class="o">.</span><span class="n">tau1</span> <span class="o">=</span> <span class="n">tau1</span>
-        <span class="n">syn</span><span class="o">.</span><span class="n">tau2</span> <span class="o">=</span> <span class="n">tau2</span>
+
+        <span class="c1"># Check for no &quot;mechname&quot; (including backwards compatibility), or case of mechname being</span>
+        <span class="c1"># explicitly &quot;Exp2Syn&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;mechname&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="ow">or</span> <span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;mechname&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Exp2Syn&quot;</span><span class="p">):</span>
+            <span class="n">syn</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Exp2Syn</span><span class="p">(</span><span class="n">secloc</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">param_name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;e&quot;</span><span class="p">,</span> <span class="s2">&quot;tau1&quot;</span><span class="p">,</span> <span class="s2">&quot;tau2&quot;</span><span class="p">]:</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="n">syn</span><span class="p">,</span> <span class="n">param_name</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">param_name</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;The Exp2Syn synapse in segment </span><span class="si">{</span><span class="n">secloc</span><span class="si">}</span><span class="s2"> is missing a required parameter.&quot;</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Otherwise, there is a custom synapse mechanism to be used. Create a</span>
+            <span class="c1"># synapse of that mechanism, then use all remaining kwargs to set its</span>
+            <span class="c1"># attributes.</span>
+            <span class="c1"># -------------------------------------------------------------------------</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># This tries to obtain the synapse object as if it is an attribute of</span>
+                <span class="c1"># the HOC interpreter as a whole, which all valid synapse mechanisms</span>
+                <span class="c1"># should be. In other words, if you have compiled a synapse mechanism</span>
+                <span class="c1"># called e.g. &#39;NMDA_gao&#39;, then `h.NMDA_gao` should exist.</span>
+                <span class="n">synapse_class</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;mechname&quot;</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Synapse mechanism &#39;</span><span class="si">{</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;mechname&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39; not found in NEURON&#39;s &quot;</span>
+                    <span class="s2">&quot;hoc interpreter. You probably either need to recompile your MOD &quot;</span>
+                    <span class="s2">&quot;mechanism files or you are missing a required MOD file for this &quot;</span>
+                    <span class="s2">&quot;synapse mechanism.&quot;</span>
+                <span class="p">)</span>
+            <span class="c1"># Create the synapse</span>
+            <span class="n">syn</span> <span class="o">=</span> <span class="n">synapse_class</span><span class="p">(</span><span class="n">secloc</span><span class="p">)</span>
+
+            <span class="c1"># Set attributes of this synapse from their entry in kwargs, if present</span>
+            <span class="k">for</span> <span class="n">param_name</span><span class="p">,</span> <span class="n">param_value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">syn</span><span class="p">,</span> <span class="n">param_name</span><span class="p">):</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="n">syn</span><span class="p">,</span> <span class="n">param_name</span><span class="p">,</span> <span class="n">param_value</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">param_name</span> <span class="o">==</span> <span class="s2">&quot;mechname&quot;</span><span class="p">:</span>
+                    <span class="c1"># Ignore &quot;mechname&quot; since it&#39;s only used in the control flow of</span>
+                    <span class="c1"># this function, but is never an actual attribute of the NEURON</span>
+                    <span class="c1"># Synapse object.</span>
+                    <span class="k">continue</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Synapse mechanism &#39;</span><span class="si">{</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;mechname&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39; does not have a parameter &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;named &#39;</span><span class="si">{</span><span class="n">param_name</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+                    <span class="p">)</span>
+
         <span class="k">return</span> <span class="n">syn</span></div>
 
 
