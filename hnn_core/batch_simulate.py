@@ -126,6 +126,7 @@ class BatchSimulate(object):
         postproc=False,
         clear_cache=False,
         summary_func=None,
+        bsl_cor="jones",
     ):
         _validate_type(net, Network, "net", "Network")
         _validate_type(tstop, types="numeric", item_name="tstop")
@@ -171,6 +172,8 @@ class BatchSimulate(object):
         self.clear_cache = clear_cache
         self.summary_func = summary_func
         self._verbose = True
+        # self.bsl_cor = bsl_cor
+        # KDTODO self.bsl_cor here and its usage in run_single_sim
 
     def run(
         self,
@@ -338,6 +341,7 @@ class BatchSimulate(object):
                 postproc=self.postproc,
                 verbose=self._verbose,
             )
+            # KDTODO bsl_cor here
             results["dpl"] = dpl
 
         if self.save_spiking:

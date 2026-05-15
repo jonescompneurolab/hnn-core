@@ -164,6 +164,7 @@ def _add_drives_from_params(net):
     for drive_name in sorted(drive_specs.keys()):  # order matters
         specs = drive_specs[drive_name]
         if specs["type"] == "evoked":
+            # print(specs["event_seed"], flush=True) # here it is correct
             net.add_evoked_drive(
                 drive_name,
                 mu=specs["dynamics"]["mu"],

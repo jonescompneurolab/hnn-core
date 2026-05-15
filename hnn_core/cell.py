@@ -580,8 +580,10 @@ class Cell:
         h.distance(sec=self._nrn_sections["soma"])
         for sec_name, section in sections.items():
             sec = self._nrn_sections[sec_name]
+
             for mech_name, p_mech in section.mechs.items():
                 sec.insert(mech_name)
+                setattr(sec, "v", section.v)
                 for attr, val in p_mech.items():
                     if isinstance(val, list):
                         seg_xs, seg_vals = val[0], val[1]
@@ -615,7 +617,25 @@ class Cell:
             for receptor in sections[sec_name].syns:
                 syn_key = f"{sec_name}_{receptor}"
                 seg = self._nrn_sections[sec_name](0.5)
-                self._nrn_synapses[syn_key] = self.syn_create(seg, **synapses[receptor])
+                # Quick and dirty, will be updated in bigger synapse refactor
+                if (
+                    self.name == "L5ET"
+                    and sec_name
+                    in ["apical_trunk", "apical_1", "apical_2", "apical_tuft"]
+                    and receptor == "gabaa"
+                ):
+                    update_ampa_syn = deepcopy(synapses)
+                    update_ampa_syn[receptor]["tau1"] = 1.5  # Schulz et al. 2018
+                    update_ampa_syn[receptor]["tau2"] = 20
+
+                    self._nrn_synapses[syn_key] = self.syn_create(
+                        seg, **update_ampa_syn[receptor]
+                    )
+
+                else:
+                    self._nrn_synapses[syn_key] = self.syn_create(
+                        seg, **synapses[receptor]
+                    )
 
     def _create_sections(self, sections, cell_tree):
         """Create soma and set geometry.
@@ -757,7 +777,9 @@ class Cell:
             dpp.ztan = seg_lens_z[-1]
         self.dipole = h.Vector().record(self.dpl_ref)
 
-    def create_tonic_bias(self, amplitude, t0, tstop, section="soma", loc=0.5):
+    def create_tonic_bias(
+        self, amplitude, t0, tstop, section="soma", loc=0.5, gid=None
+    ):
         """Create tonic bias at defined section.
 
         Parameters
@@ -927,7 +949,6 @@ class Cell:
                         f"Synapse mechanism '{kwargs['mechname']}' does not have a parameter "
                         f"named '{param_name}'."
                     )
-
         return syn
 
     def setup_source_netcon(self, threshold):
