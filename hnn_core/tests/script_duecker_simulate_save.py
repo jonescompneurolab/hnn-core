@@ -100,7 +100,8 @@ def rerun_and_save_duecker_model(suffix=""):
     # End of drive config
     # --------------------------------------------------------------------------------------
     with MPIBackend(mpi_cmd="mpiexec"):
-        dpls = simulate_dipole(net, tstop=170.0, bsl_cor="duecker")
+        # dpls = simulate_dipole(net, tstop=170.0, bsl_cor="duecker")
+        dpls = simulate_dipole(net, tstop=170.0, bsl_cor="jones")
 
     write_network_configuration(net, "net_d_duecker.json")
 
