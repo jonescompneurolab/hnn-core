@@ -315,10 +315,8 @@ class Cell:
     sections : dict of Section
         Dictionary with keys as section name.
     synapses : dict of dict
-        Keys are name of synaptic mechanism. Each synaptic mechanism
-        has keys for parameters of the mechanism, e.g., 'e', 'tau1',
-        'tau2'.
-        sections.
+        Keys are name of synaptic mechanism. Each synaptic mechanism dict has keys for
+        parameters of the mechanism, e.g., 'e', 'tau1', 'tau2'.  sections.
     sect_loc : dict of list
         Can have keys 'proximal' or 'distal' each containing
         names of section locations that are proximal or distal.
@@ -843,33 +841,93 @@ class Cell:
                     self.ca[sec_name] = h.Vector()
                     self.ca[sec_name].record(self._nrn_sections[sec_name](0.5)._ref_cai)
 
-    def syn_create(self, secloc, e, tau1, tau2):
-        """Create an h.Exp2Syn synapse.
+    def syn_create(self, secloc, **kwargs):
+        """Create a NEURON synapse at the given section location.
+
+        By default (or when ``mechname='Exp2Syn'``), creates an ``h.Exp2Syn`` two-state
+        kinetic synapse. A custom NEURON synapse mechanism can be used instead by
+        passing ``mechname=<synapse_class_name>`` along with any parameters that
+        synapse accepts.
 
         Parameters
         ----------
         secloc : instance of nrn.Segment
-            The section location. E.g., soma(0.5).
-        e: float
-            Reverse potential (in mV)
-        tau1: float
-            Rise time (in ms)
-        tau2: float
-            Decay time (in ms)
+            The section location. E.g., ``soma(0.5)``.
+        **kwargs : dict
+            Synapse parameters. The following keys are recognised:
+
+            mechname : str, optional
+                Name of the NEURON synapse class to instantiate (must be available in
+                NEURON's hoc interpreter). Custom synapse mechanisms must be compiled
+                from a MOD file. Defaults to ``'Exp2Syn'``.
+            e : float
+                Reversal potential (mV). Required for ``Exp2Syn``.
+            tau1 : float
+                Rise time constant (ms). Required for ``Exp2Syn``.
+            tau2 : float
+                Decay time constant (ms). Required for ``Exp2Syn``.
+
+            For custom synapse mechanisms, pass any parameters accepted by that synapse
+            as additional keyword arguments. Unknown or invalid parameter names will
+            raise a ``ValueError``.
 
         Returns
         -------
-        syn : instance of h.Exp2Syn
-            A two state kinetic scheme synapse.
+        syn : NEURON synapse object
+            The instantiated synapse object (e.g. ``h.Exp2Syn`` or a custom mechanism).
         """
         if not isinstance(secloc, nrn.Segment):
             raise TypeError(
-                f"secloc must be instance ofnrn.Segment. Got {type(secloc)}"
+                f"secloc must be instance of nrn.Segment. Got {type(secloc)}"
             )
-        syn = h.Exp2Syn(secloc)
-        syn.e = e
-        syn.tau1 = tau1
-        syn.tau2 = tau2
+
+        # Check for no "mechname" (including backwards compatibility), or case of mechname being
+        # explicitly "Exp2Syn"
+        if ("mechname" not in kwargs.keys()) or (kwargs["mechname"] == "Exp2Syn"):
+            syn = h.Exp2Syn(secloc)
+            try:
+                for param_name in ["e", "tau1", "tau2"]:
+                    setattr(syn, param_name, kwargs[param_name])
+            except KeyError:
+                raise KeyError(
+                    f"The Exp2Syn synapse in segment {secloc} is missing a required parameter."
+                )
+        else:
+            # Otherwise, there is a custom synapse mechanism to be used. Create a
+            # synapse of that mechanism, then use all remaining kwargs to set its
+            # attributes.
+            # -------------------------------------------------------------------------
+            try:
+                # This tries to obtain the synapse object as if it is an attribute of
+                # the HOC interpreter as a whole, which all valid synapse mechanisms
+                # should be. In other words, if you have compiled a synapse mechanism
+                # called e.g. 'NMDA_gao', then `h.NMDA_gao` should exist.
+                synapse_class = getattr(h, kwargs["mechname"])
+            except AttributeError:
+                raise ValueError(
+                    f"Synapse mechanism '{kwargs['mechname']}' not found in NEURON's "
+                    "hoc interpreter. You probably either need to recompile your MOD "
+                    "mechanism files or you are missing a required MOD file for this "
+                    "synapse mechanism."
+                )
+            # Create the synapse
+            syn = synapse_class(secloc)
+
+            # Set attributes of this synapse from their entry in kwargs, if present
+            for param_name, param_value in kwargs.items():
+                if hasattr(syn, param_name):
+                    setattr(syn, param_name, param_value)
+                elif param_name == "mechname":
+                    # Ignore "mechname" since it's only used in the control flow of
+                    # this function, but is never an actual attribute of the NEURON
+                    # Synapse object.
+                    continue
+                else:
+                    raise ValueError(
+                        f"Synapse mechanism '{kwargs['mechname']}' does not have a parameter "
+                        f"named '{param_name}'."
+                    )
+
         return syn
 
     def setup_source_netcon(self, threshold):
