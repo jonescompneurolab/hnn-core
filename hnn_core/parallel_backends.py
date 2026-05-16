@@ -128,7 +128,7 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
     threads_started = False
 
     try:
-        # print(command)
+        print(command)
 
         ## Timing subproces
         t_start = time.time()
@@ -294,7 +294,7 @@ def _process_child_data(data_bytes, data_len):
 
     # decode base64 byte string
     try:
-        data_pickled = base64.b64decode(data_bytes, validate=True)
+        data_pickled = base64.b64decode(data_bytes, validate=False)
     except binascii.Error:
         # This is here for future debugging purposes. Unit tests can't
         # reproduce an incorrectly padded string, but this has been an

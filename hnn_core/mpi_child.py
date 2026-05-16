@@ -132,10 +132,18 @@ class MPISimulation(object):
         # only have rank 0 write to stdout/stderr
         if self.rank > 0:
             return
-
-        sys.stderr.write("@start_of_data@")
+       
+        mem_chunk = 65536
         pickled_bytes = _pickle_data(sim_data)
-        sys.stderr.write(pickled_bytes.decode())
+
+        data = pickled_bytes.decode()
+        sys.stderr.write("@start_of_data@")
+        for i in range(0, len(data), mem_chunk):
+            sys.stderr.write(data[i:i + mem_chunk])
+            sys.stderr.write("\n")
+
+        #pickled_bytes = _pickle_data(sim_data)
+        #sys.stderr.write(pickled_bytes.decode())
 
         # the parent process is waiting for "@end_of_data:[#bytes]@" with the
         # length of data. The '@' is not found in base64 encoding, so we can
