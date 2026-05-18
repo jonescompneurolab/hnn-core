@@ -49,8 +49,33 @@ def _gather_trial_data(sim_data, net, n_trials, postproc, bsl_cor="jones"):
 
     for idx in range(n_trials):
         # cell response
-        net.cell_response._spike_times.append(sim_data[idx]["spike_times"])
-        net.cell_response._spike_gids.append(sim_data[idx]["spike_gids"])
+
+        # The below sorts our spike times as a whole, while keeping each spike's GID
+        # arranged properly. Read the below from the "inside out"
+        #
+        # Non-empty list check is needed since we want to unpack 2 values, and
+        # `zip(*[])` returns only 1
+        if sim_data[idx]["spike_times"]:
+            # 4. finally, divide the sorted pairs back into individual lists
+            spike_times_sorted, spike_gids_sorted = zip(
+                # 3. the star * on sorted means the outer zip will UNPACK the sorted zip
+                # 2. sort the zip'd object via our key (same as the default, first elem)
+                *sorted(
+                    # 1. zip together the times and their gids
+                    zip(
+                        sim_data[idx]["spike_times"],
+                        sim_data[idx]["spike_gids"],
+                    ),
+                    # The sorting key in this case is unnecessary, but makes it clear
+                    # which of the two lists we're using to sort (the first list):
+                    key=lambda t: t[0],
+                )
+            )
+        else:
+            spike_times_sorted, spike_gids_sorted = [], []
+
+        net.cell_response._spike_times.append(spike_times_sorted)
+        net.cell_response._spike_gids.append(spike_gids_sorted)
         net.cell_response.update_types(net.gid_ranges)
         net.cell_response._vsec.append(sim_data[idx]["vsec"])
         net.cell_response._isec.append(sim_data[idx]["isec"])
