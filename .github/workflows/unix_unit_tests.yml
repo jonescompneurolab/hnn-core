@@ -15,8 +15,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        #os: [ubuntu-latest, macos-latest]
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-latest]
         python-version: [3.9, 3.11, 3.13]
         include:
           - os: macos-15-intel
@@ -74,10 +73,10 @@ jobs:
         run: |
           ruff check hnn_core
 
-      # - name: Test non-MPI, embarrassingly parallel tests with pytest
-      #   shell: bash -el {0}
-      #   run: |
-      #     python -m pytest ./hnn_core/tests/ -m "not uses_mpi" -n auto --cov=hnn_core --cov-report=xml
+      - name: Test non-MPI, embarrassingly parallel tests with pytest
+        shell: bash -el {0}
+        run: |
+          python -m pytest ./hnn_core/tests/ -m "not uses_mpi" -n auto --cov=hnn_core --cov-report=xml
 
       - name: Test MPI-using parallel tests with pytest
         shell: bash -el {0}
