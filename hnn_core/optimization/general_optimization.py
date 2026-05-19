@@ -177,11 +177,13 @@ class Optimizer:
         relative_bandpower : list of float | float (Required if obj_fun='maximize_psd')
             Weight for each frequency band in f_bands. If a single float is provided,
             the same weight is applied to all frequency bands.
+        loss_fun : callable (Required if obj_fun='custom')
+            Objective loss function to be provided by user. The function must accept a
+            single ``Dipole`` object as its first argument, and `obj_fun_kwargs` as its second argument, where `obj_fun_kwargs` is the same as the kwargs passed to this ``Optimizer.fit` function.
         sigma0 : float| array-like (Only used if solver='cma')
-            Initial standard deviation of CME-ES algorithm. If float,
-            sigma0 is scaled by bounds defined in the constraints for each parameter.
-            If array-like, The length of sigma0 must equal the length of constraints.
-            Default: 0.25
+            Initial standard deviation of CME-ES algorithm. If float, sigma0 is scaled
+            by bounds defined in the constraints for each parameter. If array-like, The
+            length of sigma0 must equal the length of constraints. Default: 0.25
         popsize : int (Only used if solver='cma')
             Number of parameter samples simulated per epoch. Default: 16
         n_jobs : int (Only used if solver='cma')
@@ -200,38 +202,45 @@ class Optimizer:
         seed : int, optional (Only used if solver='cma')
             Optional seed for random number generator of optimizer.
         verbose : bool
-            If True, print build steps and simulation progress to console. Default: True.
+            If True, print build steps and simulation progress to console. Default:
+            True.
 
         Notes
         -----
         When defining sigma0 for CMA-ES as a float, the sigma0 applied to each parameter
         is calculated as sigma0 * (upper_bound - lower_bound) based on the constraints.
-        It is recommended to choose a sigma0 such that the optimum is expected to lie within
-        about initial_params +- 3*sigma0. A smaller sigma0 searches closer to initial_params.
+        It is recommended to choose a sigma0 such that the optimum is expected to lie
+        within about initial_params +- 3*sigma0. A smaller sigma0 searches closer to
+        initial_params.
 
-        When defining popsize for CMA-ES, it is recommended to increase popsize relative to
-        the number of parameters being optimized (N). 4+3*log(N)
+        When defining popsize for CMA-ES, it is recommended to increase popsize relative
+        to the number of parameters being optimized (N). 4+3*log(N)
 
         """
+        if "n_trials" not in obj_fun_kwargs:
+            obj_fun_kwargs["n_trials"] = 1
+
         if self.obj_fun_name == "dipole_rmse" or self.obj_fun_name == "dipole_corr":
             if "target" not in obj_fun_kwargs:
                 raise Exception("target must be specified")
-            elif "n_trials" not in obj_fun_kwargs:
-                obj_fun_kwargs["n_trials"] = 1
 
-        elif self.obj_fun_name == "maximize_psd" and (
-            "f_bands" not in obj_fun_kwargs
-            or "relative_bandpower" not in obj_fun_kwargs
-        ):
-            raise Exception("f_bands and relative_bandpower must be specified")
+        elif self.obj_fun_name == "maximize_psd":
+            if (
+                "f_bands" not in obj_fun_kwargs
+                or "relative_bandpower" not in obj_fun_kwargs
+            ):
+                raise Exception("f_bands and relative_bandpower must be specified")
+            elif obj_fun_kwargs["n_trials"] > 1:
+                print(
+                    "WARNING: For the `_maximize_psd` objective function, currently only 1 trial is supported. Overwriting the number of trials to be 1."
+                )
+                obj_fun_kwargs["n_trials"] = 1
 
         elif self.obj_fun_name == "custom":
             if "loss_fun" not in obj_fun_kwargs:
                 raise Exception("loss_fun must be specified when obj_fun='custom'")
             elif not callable(obj_fun_kwargs["loss_fun"]):
                 raise Exception("loss_fun must be a callable")
-            elif "n_trials" not in obj_fun_kwargs:
-                obj_fun_kwargs["n_trials"] = 1
 
         constraints = self._assemble_constraints(self.constraints)
 

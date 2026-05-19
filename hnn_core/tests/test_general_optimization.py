@@ -475,7 +475,7 @@ def test_cma_seed():
     assert not np.allclose(optim_seed1.opt_params_, optim_seed2.opt_params_)
 
 
-@pytest.mark.parametrize("solver", ["bayesian", "cobyla"])
+@pytest.mark.parametrize("solver", ["bayesian", "cma", "cobyla"])
 def test_custom_loss_fun(solver):
     """Test optimization routines with a user-defined loss function."""
 
@@ -540,10 +540,9 @@ def test_custom_loss_fun(solver):
     constraints = dict()
     constraints.update({"mu": (1, 6), "sigma": (1, 3)})
 
-    def custom_loss(dpls, obj_fun_kwargs):
-        from hnn_core.dipole import _rmse, average_dipoles
+    def custom_loss(dpl, obj_fun_kwargs):
+        from hnn_core.dipole import _rmse
 
-        dpl = average_dipoles(dpls)
         return _rmse(dpl, obj_fun_kwargs["target"], tstop=tstop)
 
     optim = Optimizer(
@@ -564,7 +563,7 @@ def test_custom_loss_fun(solver):
     with pytest.raises(Exception, match="loss_fun must be a callable"):
         optim.fit(target=dpl_orig, loss_fun="not_callable")
 
-    optim.fit(target=dpl_orig, loss_fun=custom_loss, n_trials=1)
+    optim.fit(target=dpl_orig, loss_fun=custom_loss, n_trials=2)
 
     # the optimized parameter is in the range
     for param_idx, param in enumerate(optim.opt_params_):
