@@ -522,13 +522,6 @@ class Network:
                     )
         else:
             # Default behavior - create standard network
-            """
-            wip:
-            so why not put cell name direct right?
-            1. will always need to create a cell object for using, might not satisfy the current problem solving reqs
-            2. What if more added in the future? makes the code modular aka, future proof!
-            """
-            # wip: getting it from network_models this time
             from .network_models import default_cell_metadata
 
             cell_types_default = {

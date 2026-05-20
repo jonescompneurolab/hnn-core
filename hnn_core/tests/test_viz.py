@@ -11,6 +11,8 @@ import pytest
 
 import hnn_core
 from hnn_core import read_params, neymotin_2020_model
+from hnn_core.dipole import simulate_dipole
+from hnn_core.network_models import default_cell_metadata
 from hnn_core.viz import (
     plot_cells,
     plot_dipole,
@@ -21,7 +23,6 @@ from hnn_core.viz import (
     plot_drive_strength,
     NetworkPlotter,
 )
-from hnn_core.dipole import simulate_dipole
 
 matplotlib.use("agg")
 
@@ -402,7 +403,6 @@ class TestCellResponsePlotters:
         # Default colors should come from cell metadata
         fig = net.cell_response.plot_spikes_raster(trial_idx=0, show=False)
         colors, labels = _get_line_hex_colors(fig)
-        from hnn_core.network_models import default_cell_metadata
 
         expected_cell_types = sorted(default_cell_metadata.keys())
         expected_colors = [
