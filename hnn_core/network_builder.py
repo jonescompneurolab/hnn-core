@@ -68,7 +68,8 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
     h.finitialize()
 
     def simulation_time():
-        print(f"Trial {trial_idx + 1}: {round(h.t, 2)} ms...")
+        if net._verbose:
+            print(f"Trial {trial_idx + 1}: {round(h.t, 2)} ms...")
 
     if rank == 0:
         for tt in range(0, int(h.tstop), 10):
@@ -177,7 +178,7 @@ def _is_loaded_mechanisms():
         return True
 
 
-def load_custom_mechanisms():
+def load_custom_mechanisms(net_verbose=True):
     if _is_loaded_mechanisms():
         return
 
@@ -194,7 +195,10 @@ def load_custom_mechanisms():
         raise FileNotFoundError(f"No .so or .dll file found in {mod_dir}")
 
     h.nrn_load_dll(mech_fname[0])
-    print("Loading custom mechanism files from %s" % mech_fname[0])
+
+    if net_verbose:
+        print("Loading custom mechanism files from %s" % mech_fname[0])
+
     if not _is_loaded_mechanisms():
         raise ValueError("The custom mechanisms could not be loaded")
 
@@ -348,9 +352,9 @@ class NetworkBuilder(object):
         self._rank = _get_rank()
 
         # load mechanisms needs ParallelContext for get_rank
-        load_custom_mechanisms()
+        load_custom_mechanisms(self.net._verbose)
 
-        if self._rank == 0:
+        if self._rank == 0 and self.net._verbose:
             print("Building the NEURON model")
 
         self._clear_last_network_objects()
@@ -371,8 +375,6 @@ class NetworkBuilder(object):
             record_ca=record_ca,
         )
 
-        self.state_init()
-
         # set to record spikes, somatic voltages, and extracellular potentials
         self._spike_times = h.Vector()
         self._spike_gids = h.Vector()
@@ -387,7 +389,7 @@ class NetworkBuilder(object):
         if len(self.net.rec_arrays) > 0:
             self._record_extracellular()
 
-        if self._rank == 0:
+        if self._rank == 0 and self.net._verbose:
             print("[Done]")
 
     def _gid_assign(self, rank=None, n_hosts=None):
@@ -648,37 +650,6 @@ class NetworkBuilder(object):
                 self._ca.update(ca)
 
         _PC.barrier()  # get all nodes to this place before continuing
-
-    def state_init(self):
-        """Initializes the state closer to baseline."""
-
-        for cell in self._cells:
-            seclist = h.SectionList()
-            seclist.wholetree(sec=cell._nrn_sections["soma"])
-            src_type = self.net.gid_to_type(cell.gid)
-            cell_metadata = self.net.cell_types[src_type]["cell_metadata"]
-            # initializing segment voltages from cell_metadata
-            for sect in seclist:
-                for seg in sect:
-                    if (
-                        cell_metadata.get("morpho_type") == "pyramidal"
-                        and cell_metadata.get("layer") == "2"
-                    ):
-                        seg.v = -71.46
-                    elif (
-                        cell_metadata.get("morpho_type") == "pyramidal"
-                        and cell_metadata.get("layer") == "5"
-                    ):
-                        if sect.name() == f"{_short_name(src_type)}_apical_1":
-                            seg.v = -71.32
-                        elif sect.name() == f"{_short_name(src_type)}_apical_2":
-                            seg.v = -69.08
-                        elif sect.name() == f"{_short_name(src_type)}_apical_tuft":
-                            seg.v = -67.30
-                        else:
-                            seg.v = -72.0
-                    elif cell_metadata.get("morpho_type") == "basket":
-                        seg.v = -64.9737
 
     def _clear_neuron_objects(self):
         """Clear up NEURON internal gid and reference information.

@@ -73,7 +73,7 @@ pip install -e "."
 
 4. Test that it can successfully run a simulation using the following:
 ```
-python -c "from hnn_core import jones_2009_model, simulate_dipole ; simulate_dipole(jones_2009_model(), tstop=20) ; print('--> SUCCESS: The test worked')"
+python -c "from hnn_core import neymotin_2020_model, simulate_dipole ; simulate_dipole(neymotin_2020_model(), tstop=20) ; print('--> SUCCESS: The test worked')"
 ```
 Simply testing the import with `python -c "import hnn_core"` is NOT enough! You must test an actual simulation run. If you encounter issues with your compiled MOD files, then run `make clean` to delete the existing ones, then try running a simulation again. If you continue to have issues, then halt the release and investigate!
 
@@ -85,9 +85,9 @@ pip install -e ".[dev]"
 6. Test that MPI simulations work as well, using the following command:
 ```
 python -c "
-from hnn_core import jones_2009_model, MPIBackend, simulate_dipole
+from hnn_core import neymotin_2020_model, MPIBackend, simulate_dipole
 with MPIBackend():
-    simulate_dipole(jones_2009_model(), tstop=20)
+    simulate_dipole(neymotin_2020_model(), tstop=20)
 print('--> SUCCESS: The test worked')
 "
 ```
@@ -218,13 +218,14 @@ Make sure that you check that it's the latest version that you just uploaded. If
 
 5. Similar to before, test that a basic simulation runs, such as using:
 ```
-python -c "from hnn_core import jones_2009_model, simulate_dipole ; simulate_dipole(jones_2009_model(), tstop=20)"
+python -c "from hnn_core import neymotin_2020_model, simulate_dipole ; simulate_dipole(neymotin_2020_model(), tstop=20)"
 ```
 6. You can also test the TestPyPI version in yet another environment if you want, but you should note that the command shown at the top of the [TestPyPI page](https://test.pypi.org/project/hnn-core/#history) will NOT work, due to the `-i` argument. (The reason for this is that TestPyPI does not actually provide the `setuptools` package that we need, [see here](https://stackoverflow.com/a/77948986)). If you want to install the TestPyPI version in a way that actually works, you should do the following:
 ```
 pip install --extra-index-url https://test.pypi.org/simple/ "hnn-core"
 ```
-7. Finally, manually download a copy of your new package directly from <https://pypi.org/project/hnn-core/#files>, then save it somewhere like your Downloads.
+7. Now that the release is on PyPI, you need to test that our "cloud installs" at Google CoLab work too. In the "HNN" Google Drive folder, go to "CoLab" (you can also click here if you have permissions https://drive.google.com/drive/u/1/folders/1y4qOLnVaVMufESiYpm94GDnlttpYH0NE ), go to each of the notebooks, and run them to make sure the new version works. You will probably want to add a cell with `pip show hnn-core` to make sure it's using the latest version. After you verify they work, make sure to clean them up! These are the notebooks that users see!
+8. Finally, manually download a copy of your new package directly from <https://pypi.org/project/hnn-core/#files>, then save it somewhere like your Downloads.
 
 ## 8. More Github release steps
 

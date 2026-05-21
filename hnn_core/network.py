@@ -430,7 +430,7 @@ class Network:
 
     Notes
     -----
-    ``net = jones_2009_model(params)`` is the recommended path for creating a
+    ``net = neymotin_2020_model(params)`` is the recommended path for creating a
     network. Instantiating the network as ``net = Network(params)`` will
     produce a network with no cell-to-cell connections. As such,
     connectivity information contained in ``params`` will be ignored.
@@ -457,9 +457,11 @@ class Network:
         # artificial drive cells
         self.gid_ranges = OrderedDict()
         self._n_gids = 0  # utility: keep track of last GID
+        self._verbose = True
 
         # XXX this can be removed once tests are made independent of HNN GUI
         # creates nc_dict-entries for ALL cell types
+
         self._legacy_mode = legacy_mode
         if self._legacy_mode:
             warnings.warn(
