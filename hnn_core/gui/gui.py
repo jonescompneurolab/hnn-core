@@ -5870,15 +5870,15 @@ def run_opt_button_clicked(
     with log_out:
         try:
             # Sim data setup (and related input validation)
-            # ------------------------------------------------------------------------------
+            # --------------------------------------------------------------------------
             simulation_data = all_data["simulation_data"]
 
             # clear empty trash simulations
             #
-            # AES: a "trash" simulation appears to be created (named "default") even if all
-            # a user does is load an external dipole data file. However, I do not fully
-            # understand how VizManager et al. manages the simulation data (I find it very
-            # confusing) so I am NOT touching it.
+            # AES: a "trash" simulation appears to be created (named "default") even if
+            # all a user does is load an external dipole data file. However, I do not
+            # fully understand how VizManager et al. manages the simulation data (I find
+            # it very confusing) so I am NOT touching it.
             for _name in tuple(simulation_data.keys()):
                 if len(simulation_data[_name]["dpls"]) == 0:
                     del simulation_data[_name]
@@ -5886,14 +5886,14 @@ def run_opt_button_clicked(
             _sim_name = widget_simulation_name.value
 
             # RMSE Target data extraction (and related input validation)
-            # ------------------------------------------------------------------------------
+            # --------------------------------------------------------------------------
             if opt_obj_fun in ("dipole_corr", "dipole_rmse"):
                 opt_rmse_target_data_name = opt_target_widgets[
                     "target_dipole_data"
                 ].value
                 if not opt_rmse_target_data_name:
-                    # In this case, they probably have not run any simulations or loaded any
-                    # data.
+                    # In this case, they probably have not run any simulations or loaded
+                    # any data.
                     logger.error(
                         textwrap.dedent("""
                         You have not selected a dataset to use as the target of
@@ -5906,34 +5906,34 @@ def run_opt_button_clicked(
                 elif (opt_rmse_target_data_name == "default") and (
                     not simulation_data["default"]["dpls"]
                 ):
-                    # In this case, they have selected "default", which is the default name
-                    # of the first simulation, BUT they have not actually run any
+                    # In this case, they have selected "default", which is the default
+                    # name of the first simulation, BUT they have not actually run any
                     # simulations yet. They likely either want to compare against a
-                    # simulation result, or (more likely) forgot to load their experimental
-                    # target data first.
+                    # simulation result, or (more likely) forgot to load their
+                    # experimental target data first.
                     logger.error(
                         textwrap.dedent("""
                         You have selected the 'default' dataset to use as the target of
                         optimization, but there is no dipole data associated with that
-                        dataset. Please either load and select a dataset of dipole data to
-                        optimize towards with the "Load data" button, or run a simulation
-                        first if you want to optimize against that simulation.
+                        dataset. Please either load and select a dataset of dipole data
+                        to optimize towards with the "Load data" button, or run a
+                        simulation first if you want to optimize against that
+                        simulation.
                         """).replace("\n", " ")
                     )
                     simulation_status_bar.value = simulation_status_contents["failed"]
                     return None
                 else:
-                    # Extract the actual target data
-                    # Like everywhere else in the GUI, we only support usage of single-trial
-                    # dipole data.
+                    # Extract the actual target data Like everywhere else in the GUI, we
+                    # only support usage of single-trial dipole data.
                     target_dipole = average_dipoles(
                         simulation_data[opt_rmse_target_data_name]["dpls"]
                     )
             # Input validation
-            # ------------------------------------------------------------------------------
+            # --------------------------------------------------------------------------
             # First, let's make a Network of the current state of the GUI, and call it
-            # something different from the current simulation name widget's value, since the
-            # user may have changed parameters since they last ran a sim:
+            # something different from the current simulation name widget's value, since
+            # the user may have changed parameters since they last ran a sim:
             simulation_data[_sim_name + "_before_optimization"] = {}
             _init_network_from_widgets(
                 params,
@@ -5946,11 +5946,11 @@ def run_opt_button_clicked(
                 global_gain_textfields,
                 add_drive=False,
             )
-            # We always want to have simulation output from the state of the GUI as it is
-            # right now, but before optimization for later comparison. If the user ran a
-            # simulation before and the network from the current GUI state is identical to
-            # the network of the prior simulation, then let's just reuse that data. If not,
-            # then let's run a new simulation.
+            # We always want to have simulation output from the state of the GUI as it
+            # is right now, but before optimization for later comparison. If the user
+            # ran a simulation before and the network from the current GUI state is
+            # identical to the network of the prior simulation, then let's just reuse
+            # that data. If not, then let's run a new simulation.
             if (len(simulation_data[_sim_name]["dpls"]) > 0) and (
                 simulation_data[_sim_name]["net"]
                 == simulation_data[_sim_name + "_before_optimization"]["net"]
@@ -5969,7 +5969,7 @@ def run_opt_button_clicked(
                 )
 
             # Dynamically create both the constraints and the param-applying-function
-            # ------------------------------------------------------------------------------
+            # --------------------------------------------------------------------------
             set_params_func, constraints = _generate_constraints_and_func(
                 simulation_data[_sim_name + "_before_optimization"]["net"],
                 opt_drive_widgets,
@@ -5977,19 +5977,20 @@ def run_opt_button_clicked(
             if not constraints:
                 logger.error(
                     textwrap.dedent("""
-                    You have not selected any parameters to constrain in the optimization.
-                    Please select some parameters using the checkboxes, and try again.
+                    You have not selected any parameters to constrain in the
+                    optimization. Please select some parameters using the checkboxes,
+                    and try again.
                     """).replace("\n", " ")
                 )
                 simulation_status_bar.value = simulation_status_contents["failed"]
                 return None
 
             # Instantiate our Optimizer object
-            # ------------------------------------------------------------------------------
-            # This uses our recreated `Network` object (which has NO current drives), our
-            # new dynamically-created constraints, and our similarly-created params function
-            # to build our Optimizer. All other arguments are simply pulled from their GUI
-            # values directly.
+            # --------------------------------------------------------------------------
+            # This uses our recreated `Network` object (which has NO current drives),
+            # our new dynamically-created constraints, and our similarly-created params
+            # function to build our Optimizer. All other arguments are simply pulled
+            # from their GUI values directly.
             optim = Optimizer(
                 initial_net=simulation_data[_sim_name + "_before_optimization"]["net"],
                 tstop=opt_tstop,
@@ -6000,8 +6001,9 @@ def run_opt_button_clicked(
                 max_iter=opt_max_iter,
             )
 
-            # Define the main execution function for the optimization, which is necessary
-            # due to CMA and non-CMA solvers using different approaches to parallelization:
+            # Define the main execution function for the optimization, which is
+            # necessary due to CMA and non-CMA solvers using different approaches to
+            # parallelization:
             def main_execution():
                 simulation_status_bar.value = simulation_status_contents["opt_running"]
                 logger.info("Optimization started.")
@@ -6011,14 +6013,14 @@ def run_opt_button_clicked(
                 logger.info(f"Simulation duration: {opt_tstop} ms")
 
                 # Execute optimization
-                # --------------------------------------------------------------------------
+                # ----------------------------------------------------------------------
                 try:
                     if opt_obj_fun in ("dipole_corr", "dipole_rmse"):
-                        # AES: Not including the kwarg for "verbose" since the GUI log is
-                        # already pretty "busy".
+                        # AES: Not including the kwarg for "verbose" since the GUI log
+                        # is already pretty "busy".
                         #
-                        # Note: In this case, we are adding certain solver arguments (like
-                        # for CMA) even if the solver is not set to CMA:
+                        # Note: In this case, we are adding certain solver arguments
+                        # (like for CMA) even if the solver is not set to CMA:
                         obj_fun_kwargs = dict(
                             dt=dt.value,
                             target=target_dipole,
@@ -6034,9 +6036,9 @@ def run_opt_button_clicked(
                         optim.fit(**obj_fun_kwargs)
                     elif opt_obj_fun == "maximize_psd":
                         # Note that when band2 is unchecked, the objective is simply to
-                        # maximize band1. From the GUI, when the checkbox is disabled, the
-                        # proportion of band2 will not change the optimization behavior,
-                        # even if it is nonzero.
+                        # maximize band1. From the GUI, when the checkbox is disabled,
+                        # the proportion of band2 will not change the optimization
+                        # behavior, even if it is nonzero.
                         if opt_target_widgets["psd_target_band2_checkbox"].value:
                             f_bands = [
                                 (
@@ -6063,7 +6065,8 @@ def run_opt_button_clicked(
                                 opt_target_widgets["psd_target_band1_proportion"].value,
                             ]
 
-                        # Note: `maximize_psd` does not currently support multiple trials.
+                        # Note: `maximize_psd` does not currently support multiple
+                        # trials.
                         obj_fun_kwargs = dict(
                             dt=dt.value,
                             f_bands=f_bands,
@@ -6081,16 +6084,17 @@ def run_opt_button_clicked(
                     simulation_status_bar.value = simulation_status_contents["failed"]
                     raise
 
-                # --------------------------------------------------------------------------
-                # Now, let's resimulate the final version of the optimized network for usage
-                # and display it in the GUI
+                # ----------------------------------------------------------------------
+                # Now, let's resimulate the final version of the optimized network for
+                # usage and display it in the GUI
                 #
                 # First, let's make our new simulation name.
                 if (_sim_name + "_optimized") in simulation_data.keys():
                     # Let's handle our output simulation name in the case that there are
-                    # pre-existing datasets with the names we want to use, such as if they
-                    # are executing a second round of Optimization, or their simulation name
-                    # just happens to end in "_optimized" by coincidence:
+                    # pre-existing datasets with the names we want to use, such as if
+                    # they are executing a second round of Optimization, or their
+                    # simulation name just happens to end in "_optimized" by
+                    # coincidence:
                     if (_sim_name + "_optimized" + "_1") in simulation_data.keys():
                         predecessor_sim_suffix_number = []
                         for key in simulation_data.keys():
@@ -6109,8 +6113,8 @@ def run_opt_button_clicked(
                 else:
                     new_name = _sim_name + "_optimized"
 
-                # Now let's use the final version of the optimized Network, and use it to
-                # simulate
+                # Now let's use the final version of the optimized Network, and use it
+                # to simulate
                 simulation_data[new_name]["net"] = optim.net_
                 simulation_data[new_name]["dpls"] = simulate_dipole(
                     simulation_data[new_name]["net"],
@@ -6128,7 +6132,8 @@ def run_opt_button_clicked(
                 simulations_list_widget.options = sim_names
                 simulations_list_widget.value = new_name
 
-                # Report back to the user, now that all simulations/output are completed:
+                # Report back to the user, now that all simulations/output are
+                # completed:
                 logger.info(
                     textwrap.dedent(f"""
                     Optimization finished!
@@ -6138,8 +6143,8 @@ def run_opt_button_clicked(
                     Diff: {abs(optim.obj_[-1] - optim.obj_[0])}
                     """)
                 )
-                # Check if optimization showed ANY difference in the objective function. If
-                # it did not, then we made no progress.
+                # Check if optimization showed ANY difference in the objective function.
+                # If it did not, then we made no progress.
                 if np.all(optim.obj_ >= optim.obj_[0]):
                     logger.warning(
                         textwrap.dedent("""
@@ -6159,8 +6164,8 @@ def run_opt_button_clicked(
 
             # --------------------------------------------------------------------------
             if opt_solver == "cma":
-                # Do not setup any backends, since CMA will use BatchSimulate to use its own
-                # custom Joblib backend internally.
+                # Do not setup any backends, since CMA will use BatchSimulate to use its
+                # own custom Joblib backend internally.
                 logger.warning(
                     textwrap.dedent("""
                     Please note that using the CMA solver uses neither MPIBackend or
@@ -6194,9 +6199,9 @@ def run_opt_button_clicked(
                     else:
                         new_name = main_execution()
 
-            # ------------------------------------------------------------------------------
-            # The remainder of this function is just repeating some post-run visualization
-            # steps, which are identical to those in `run_button_clicked`
+            # --------------------------------------------------------------------------
+            # The remainder of this function is just repeating some post-run
+            # visualization steps, which are identical to those in `run_button_clicked`
             viz_manager.reset_fig_config_tabs()
 
             # update default visualization params in gui based on widget
@@ -6233,9 +6238,9 @@ def run_opt_button_clicked(
             )
 
             # TODO future refactor: Maybe force a file-save of the final network params
-            # automatically at the end? Since the `HNNGUI.save_config_button` is just a huge
-            # HTML element itself, I can't get it to artificially ".click()" to actually
-            # initiate a download. Is there even a way to do this?
+            # automatically at the end? Since the `HNNGUI.save_config_button` is just a
+            # huge HTML element itself, I can't get it to artificially ".click()" to
+            # actually initiate a download. Is there even a way to do this?
 
             # TODO future refactor: After adding similar functionality inside Optimizer,
             # allow for automatic saving of progress during certain points in an
