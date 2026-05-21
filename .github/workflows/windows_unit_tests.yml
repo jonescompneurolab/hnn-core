@@ -31,6 +31,26 @@ jobs:
           activate-environment: test
           python-version: ${{ matrix.python-version }}
 
+      - name: Update pip
+        shell: cmd
+        run: |
+          python -m pip install --upgrade pip
+
+      - name: Install ruff for use before ANY other tests
+        shell: cmd
+        run: |
+          pip install --verbose ruff
+
+      - name: Check ruff formatting
+        shell: cmd
+        run: |
+          ruff format hnn_core --check
+
+      - name: Lint with ruff
+        shell: cmd
+        run: |
+          ruff check hnn_core
+
       - name: Install Neuron on Windows separately
         shell: cmd
         run: |
@@ -41,10 +61,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Update Python and install HNN-Core with minimal dependencies
+      - name: Install HNN-Core with minimal dependencies
         shell: cmd
         run: |
-          python -m pip install --upgrade pip
           pip install --verbose .
 
       - name: Test API with minimal dependencies
@@ -110,16 +129,6 @@ jobs:
         shell: cmd
         run: |
           pip install --verbose .[opt,parallel,test,gui]
-
-      - name: Check ruff formatting
-        shell: cmd
-        run: |
-          python -m ruff format hnn_core --check
-
-      - name: Lint with ruff
-        shell: cmd
-        run: |
-          python -m ruff check hnn_core
 
       - name: Test non-MPI, embarrassingly parallel tests with pytest
         shell: cmd

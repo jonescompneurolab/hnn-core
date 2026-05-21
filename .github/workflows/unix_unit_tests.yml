@@ -29,10 +29,29 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Update Python and install HNN-Core with minimal dependencies
+      - name: Update pip
         shell: bash -el {0}
         run: |
           python -m pip install --upgrade pip
+
+      - name: Install ruff for use before ANY other tests
+        shell: bash -el {0}
+        run: |
+          pip install --verbose ruff
+
+      - name: Check ruff formatting
+        shell: bash -el {0}
+        run: |
+          ruff format hnn_core --check
+
+      - name: Lint with ruff
+        shell: bash -el {0}
+        run: |
+          ruff check hnn_core
+
+      - name: Install HNN-Core with minimal dependencies
+        shell: bash -el {0}
+        run: |
           pip install --verbose .
 
       - name: Test API with minimal dependencies
@@ -108,16 +127,6 @@ jobs:
           conda info
           conda list
         shell: bash -el {0}
-
-      - name: Check ruff formatting
-        shell: bash -el {0}
-        run: |
-          ruff format hnn_core --check
-
-      - name: Lint with ruff
-        shell: bash -el {0}
-        run: |
-          ruff check hnn_core
 
       - name: Test non-MPI, embarrassingly parallel tests with pytest
         shell: bash -el {0}
