@@ -75,7 +75,7 @@ jobs:
         shell: bash -el {0}
         run: rm -rf build
 
-      - name: Install HNN-Core with Optimization dependencies
+      - name: Install HNN-Core with GUI dependencies
         shell: bash -el {0}
         run: pip install --verbose '.[gui]'
 
