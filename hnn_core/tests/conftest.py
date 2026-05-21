@@ -9,7 +9,7 @@ import pickle
 
 import os.path as op
 import hnn_core
-from hnn_core import read_params, jones_2009_model, simulate_dipole
+from hnn_core import read_params, neymotin_2020_model, simulate_dipole
 from hnn_core import MPIBackend, JoblibBackend
 
 # store history of failures per test class name and per index in parametrize
@@ -100,7 +100,7 @@ def run_hnn_core_fixture():
         else:
             mesh_shape = (10, 10)
         # Legacy mode necessary for exact dipole comparison test
-        net = jones_2009_model(
+        net = neymotin_2020_model(
             params,
             add_drives_from_params=True,
             legacy_mode=legacy_mode,

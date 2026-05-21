@@ -25,17 +25,20 @@ from ipywidgets import (
     link,
 )
 
-from hnn_core.dipole import _rmse, average_dipoles
+from hnn_core.dipole import _anticorr, _rmse, average_dipoles
 from hnn_core.gui._logging import logger
-from hnn_core.viz import plot_dipole
+from hnn_core.viz import plot_dipole, plot_tfr_morlet
 
 #
 _fig_placeholder = HTML(
     value="""
         Visualizations will become available in this window after a simulation has been
         run or data have been loaded
-    """
-).add_class("fig-placeholder")
+    """,
+    description="Visualization placeholder",
+)
+_fig_placeholder.add_class("fig-placeholder")
+_fig_placeholder.add_class("hide-label")
 
 _plot_types = [
     "current dipole",
@@ -379,7 +382,8 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
             n_cycles = freqs / 2.0
 
             try:
-                dpls_copied[0].plot_tfr_morlet(
+                plot_tfr_morlet(
+                    dpls_copied,
                     freqs,
                     n_cycles=n_cycles,
                     colormap=plot_config["spectrogram_cm"],
@@ -619,7 +623,11 @@ def _plot_on_axes(
         else:
             dpl = dpls_processed
         rmse = _rmse(dpl, target_dpl_processed, t0, tstop)
-        annotation_text = f"RMSE({sim_name}, {target_sim_name}): {rmse:.4f}"
+        corr = 1 - _anticorr(dpl, target_dpl_processed, t0, tstop)
+        annotation_text = (
+            f"RMSE({sim_name}, {target_sim_name}): {rmse:.4f}\n"
+            f"Corr({sim_name}, {target_sim_name}): {corr:.4f}"
+        )
 
         # find subplot's annotation
         annotation = next(
@@ -641,19 +649,22 @@ def _plot_on_axes(
                 fontsize=12,
             )
 
-        rmse_logger_text = (
-            f"RMSE {rmse:.4f} ("
+        metrics_logger_text = (
+            f"RMSE {rmse:.4f} Corr {corr:.4f} ("
             f"{sim_name} smooth:{dipole_smooth.value} "
             f"scale:{dipole_scaling.value} \n"
             f"{target_sim_name} smooth:{data_smooth.value} "
             f"scale:{data_scaling.value})"
         )
 
-        logger.info(rmse_logger_text)
+        logger.info(metrics_logger_text)
 
     existing_plots.children = (
         *existing_plots.children,
-        Label(f"{sim_name}: {plot_type}"),
+        Label(
+            f"{sim_name}: {plot_type}",
+            description=f"{sim_name}: {plot_type}",
+        ).add_class("hide-label"),
     )
     if data["use_ipympl"] is False:
         _static_rerender(widgets, fig, fig_idx)
@@ -1181,6 +1192,9 @@ class _VizManager:
             template_name = list(fig_templates.keys())[0]
         self._simulate_switch_fig_template(template_name)
 
+        # Update the external data widget (widget_opt_target_data)
+        self.update_external_data_widget()
+
     def build_visualization_window(self):
         """build visualization-window (to occupy AppLayout's right_sidebar)"""
         with self.axes_config_output:
@@ -1225,6 +1239,36 @@ class _VizManager:
         ).add_class("visualization-tab-contents")
 
         return visualization_tab
+
+    def update_external_data_widget(self):
+        """Enable exfiltration of simulation data by `HNNGUI` objects.
+
+        This allows external registered widgets (such as `HNNGUI.opt_target_widgets`),
+        which are "external" to `_VizManager`, to access `_VizManager`'s available
+        simulation data entries.
+
+        Note: this relies on the assumption that `HNNGUI` has externally added the
+        attribute `_external_data_widget` to `_VizManager`, which it does inside
+        `HNNGUI.update_opt_tab_target_widgets()` which is always called at the time of
+        `HNNGUI.compose()` (see here:
+        https://github.com/asoplata/hnn-core/blob/4c52a1aeed522ee1071d1acef13e29254d5447c0/hnn_core/gui/gui.py#L2329
+        ). Initializing `_VizManager` is NOT enough to create this attribute.
+        """
+        if hasattr(self, "_external_data_widget") and isinstance(
+            self._external_data_widget, Dropdown
+        ):
+            all_sim_names = list(self.data["simulations"].keys())
+            if len(all_sim_names) == 0:
+                all_sim_names = [" "]
+
+            prior_value = self._external_data_widget.value
+            # Note updating the options of the widget resets the value
+            self._external_data_widget.options = all_sim_names
+            self._external_data_widget.value = prior_value
+        else:
+            logger.warning(
+                "No external data widget found for visualization manager to update."
+            )
 
     def _layout_template_change(self, template_type):
         # check if plot set type requires loaded sim-data

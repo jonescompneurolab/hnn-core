@@ -15,13 +15,13 @@ This example demonstrates how to animate HNN simulations
 import os.path as op
 
 import hnn_core
-from hnn_core import jones_2009_model, simulate_dipole, read_params
+from hnn_core import neymotin_2020_model, simulate_dipole, read_params
 from hnn_core.network_models import add_erp_drives_to_jones_model
 
 ###############################################################################
 # We begin by instantiating the network. For this example, we will reduce the
 # number of cells in the network to speed up the simulations.
-net = jones_2009_model(mesh_shape=(3, 3))
+net = neymotin_2020_model(mesh_shape=(3, 3))
 
 # Note that we move the cells further apart to allow better visualization of
 # the network (default inplane_distance=1.0 µm).

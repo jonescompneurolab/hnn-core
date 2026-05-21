@@ -284,7 +284,7 @@ def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
         "distal": ["apical_tuft"],
     }
 
-    synapses = _get_pyr_syn_props(p_all, "L2Pyr")
+    synapses = _get_syn_props(p_all, "L2Pyr")
     return Cell(
         "L2Pyr",
         pos,
@@ -450,7 +450,7 @@ def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
         "distal": ["apical_tuft"],
     }
 
-    synapses = _get_pyr_syn_props(p_all, "L5Pyr")
+    synapses = _get_syn_props(p_all, "L5Pyr")
     return Cell(
         "L5Pyr",
         pos,
@@ -507,11 +507,18 @@ def _get_basket_soma(v_init=-64.9737):
     )
 
 
-def _get_pyr_syn_props(p_all, cell_type):
-    """Return the default synaptic parameters for a given Pyramidal cell_type.
+def _get_syn_props(p_all, cell_type, syn_types=["ampa", "nmda", "gabaa", "gabab"]):
+    """Get synaptic properties for a specific cell type.
 
-    Extracts the 'e', 'tau1', and 'tau2' parameters for all synapse types for a
-    particular cell_type.
+    When parameters in `p_all` are provided for a "syn_type" (of the set {ampa, nmda,
+    gabaa, gabab}), and no "syn_type_mechname" key is present in p_all, then this will
+    *always* return the default synapse mechanism of "Exp2Syn". In order to use a custom
+    "mechanism" (such as "NMDA_gao" or "gabab_destexhe"), the incoming parameters in
+    `p_all` should include a key of the form `f"{cell_type}_{syn_type}_mechname"` with
+    the value being the name of the custom mechanism.
+
+    This was formerly called `_get_pyr_syn_props`, but `_pyr` was dropped from name due
+    to this function's future usage by interneurons in the upcoming Duecker model.
 
     Parameters
     ----------
@@ -521,39 +528,46 @@ def _get_pyr_syn_props(p_all, cell_type):
         dictionary is expected to be constructed using functions like
         `params_default.py::get_L2Pyr_params_default`.
     cell_type : {'L2Pyr', 'L5Pyr'}
-        Cell type identifier used as prefix in parameter key lookups.
+        The "short-name" type of cell
+    syn_types : list of str, optional
+        List of synapse types to extract properties for. Default: ["ampa", "nmda",
+        "gabaa", "gabab"]
 
     Returns
     -------
-    dict
-        A dictionary where the keys are the four synapse types {'ampa', 'nmda', 'gabaa',
-        'gabab'}, and where the values are dictionaries whose keys are {'e', 'tau1',
-        'tau2'} and whose values are the parameter values of that case from default
-        parameter dictionaries such as from
-        `params_default.py::get_L2Pyr_params_default`.
+    syn_props : dict
+        Dictionary where keys are synapse types and values are dictionaries containing
+        synapse properties. At minimum includes 'mechname' (synapse mechanism name,
+        e.g., 'Exp2Syn'). For `Exp2Syn` synapses, includes 'e' (reversal potential),
+        'tau1' (rise time constant), and 'tau2' (decay time constant). Custom synapse
+        mechanisms may include additional parameters specific to that mechanism.
     """
-    return {
-        "ampa": {
-            "e": p_all["%s_ampa_e" % cell_type],
-            "tau1": p_all["%s_ampa_tau1" % cell_type],
-            "tau2": p_all["%s_ampa_tau2" % cell_type],
-        },
-        "nmda": {
-            "e": p_all["%s_nmda_e" % cell_type],
-            "tau1": p_all["%s_nmda_tau1" % cell_type],
-            "tau2": p_all["%s_nmda_tau2" % cell_type],
-        },
-        "gabaa": {
-            "e": p_all["%s_gabaa_e" % cell_type],
-            "tau1": p_all["%s_gabaa_tau1" % cell_type],
-            "tau2": p_all["%s_gabaa_tau2" % cell_type],
-        },
-        "gabab": {
-            "e": p_all["%s_gabab_e" % cell_type],
-            "tau1": p_all["%s_gabab_tau1" % cell_type],
-            "tau2": p_all["%s_gabab_tau2" % cell_type],
-        },
-    }
+    syn_props = dict()
+    for syn in syn_types:
+        # Backwards compatibility check: if syn_type key is missing or None, default to
+        # Exp2Syn
+        if (f"{cell_type}_{syn}_mechname" not in p_all.keys()) or (
+            p_all[f"{cell_type}_{syn}_mechname"] == "Exp2Syn"
+        ):
+            syn_props[syn] = {
+                key: p_all[f"{cell_type}_{syn}_{key}"] for key in ["e", "tau1", "tau2"]
+            }
+            syn_props[syn].update({"mechname": "Exp2Syn"})
+        else:
+            # We should only be here if there is a `f"{cell_type}_{syn}_mechname"` key
+            # in p_all!
+            # Get all parameter keys for this synapse mechanism
+            syn_custom_var_keys = [
+                key.split(f"{cell_type}_{syn}_")[1]
+                for key in p_all.keys()
+                if key.startswith(f"{cell_type}_{syn}_")
+            ]
+            # Build synapse properties dict from available parameters
+            # (This should include 'mechname' as well)
+            syn_props[syn] = {
+                key: p_all[f"{cell_type}_{syn}_{key}"] for key in syn_custom_var_keys
+            }
+    return syn_props
 
 
 def _get_basket_syn_props():
@@ -569,9 +583,9 @@ def _get_basket_syn_props():
         'tau1', 'tau2'} and whose values are hard-coded.
     """
     return {
-        "ampa": {"e": 0, "tau1": 0.5, "tau2": 5.0},
-        "gabaa": {"e": -80, "tau1": 0.5, "tau2": 5.0},
-        "nmda": {"e": 0, "tau1": 1.0, "tau2": 20.0},
+        "ampa": {"e": 0, "tau1": 0.5, "tau2": 5.0, "mechname": "Exp2Syn"},
+        "gabaa": {"e": -80, "tau1": 0.5, "tau2": 5.0, "mechname": "Exp2Syn"},
+        "nmda": {"e": 0, "tau1": 1.0, "tau2": 20.0, "mechname": "Exp2Syn"},
     }
 
 
