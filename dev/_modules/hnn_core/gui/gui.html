@@ -536,6 +536,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">traceback</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">IFrame</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">HTML</span><span class="p">,</span>
@@ -2834,7 +2835,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span>
 
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded </span><span class="si">{</span><span class="n">load_type</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">param_dict</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded </span><span class="si">{</span><span class="n">load_type</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">param_dict</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="c1"># Resets file counter to 0</span>
         <span class="n">change</span><span class="p">[</span><span class="s2">&quot;owner&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">set_trait</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="p">([]))</span>
         <span class="k">return</span> <span class="n">params</span>
@@ -5252,7 +5253,7 @@
     <span class="n">add_drive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Construct network and add drives.&quot;&quot;&quot;</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;init network&quot;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;init network&quot;</span><span class="p">)</span>
     <span class="n">single_simulation_data</span><span class="p">[</span><span class="s2">&quot;net&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dict_to_network</span><span class="p">(</span>
         <span class="n">params</span><span class="p">,</span> <span class="n">read_drives</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">read_external_biases</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">)</span>
@@ -5351,7 +5352,7 @@
             <span class="n">weights_ampa</span> <span class="o">=</span> <span class="n">_drive_widget_to_dict</span><span class="p">(</span><span class="n">drive</span><span class="p">,</span> <span class="s2">&quot;weights_ampa&quot;</span><span class="p">)</span>
             <span class="n">weights_nmda</span> <span class="o">=</span> <span class="n">_drive_widget_to_dict</span><span class="p">(</span><span class="n">drive</span><span class="p">,</span> <span class="s2">&quot;weights_nmda&quot;</span><span class="p">)</span>
             <span class="n">synaptic_delays</span> <span class="o">=</span> <span class="n">_drive_widget_to_dict</span><span class="p">(</span><span class="n">drive</span><span class="p">,</span> <span class="s2">&quot;delays&quot;</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;drive type is </span><span class="si">{</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, location=</span><span class="si">{</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;drive type is </span><span class="si">{</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, location=</span><span class="si">{</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Poisson&quot;</span><span class="p">:</span>
                 <span class="n">rate_constant</span> <span class="o">=</span> <span class="n">_drive_widget_to_dict</span><span class="p">(</span><span class="n">drive</span><span class="p">,</span> <span class="s2">&quot;rate_constant&quot;</span><span class="p">)</span>
 
@@ -5428,96 +5429,101 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Run the simulation and plot outputs.&quot;&quot;&quot;</span>
     <span class="n">simulation_data</span> <span class="o">=</span> <span class="n">all_data</span><span class="p">[</span><span class="s2">&quot;simulation_data&quot;</span><span class="p">]</span>
     <span class="k">with</span> <span class="n">log_out</span><span class="p">:</span>
-        <span class="c1"># clear empty trash simulations</span>
-        <span class="k">for</span> <span class="n">_name</span> <span class="ow">in</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">simulation_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">[</span><span class="n">_name</span><span class="p">][</span><span class="s2">&quot;dpls&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">del</span> <span class="n">simulation_data</span><span class="p">[</span><span class="n">_name</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># clear empty trash simulations</span>
+            <span class="k">for</span> <span class="n">_name</span> <span class="ow">in</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">simulation_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">[</span><span class="n">_name</span><span class="p">][</span><span class="s2">&quot;dpls&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">del</span> <span class="n">simulation_data</span><span class="p">[</span><span class="n">_name</span><span class="p">]</span>
 
-        <span class="n">_sim_name</span> <span class="o">=</span> <span class="n">widget_simulation_name</span><span class="o">.</span><span class="n">value</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="n">_sim_name</span> <span class="ow">in</span> <span class="n">simulation_data</span>
-            <span class="ow">and</span> <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span><span class="p">][</span><span class="s2">&quot;net&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="p">):</span>
-            <span class="n">parts</span> <span class="o">=</span> <span class="n">_sim_name</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">_sim_name</span> <span class="o">=</span> <span class="n">widget_simulation_name</span><span class="o">.</span><span class="n">value</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">_sim_name</span> <span class="ow">in</span> <span class="n">simulation_data</span>
+                <span class="ow">and</span> <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span><span class="p">][</span><span class="s2">&quot;net&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="p">):</span>
+                <span class="n">parts</span> <span class="o">=</span> <span class="n">_sim_name</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
-                <span class="n">base</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+                    <span class="n">base</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">base</span> <span class="o">=</span> <span class="n">_sim_name</span>
+                    <span class="n">idx</span> <span class="o">=</span> <span class="mi">2</span>
+
+                <span class="k">while</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">&quot;</span> <span class="ow">in</span> <span class="n">simulation_data</span><span class="p">:</span>
+                    <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="n">_sim_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">widget_simulation_name</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">_sim_name</span>
+
+            <span class="n">_init_network_from_widgets</span><span class="p">(</span>
+                <span class="n">params</span><span class="p">,</span>
+                <span class="n">dt</span><span class="p">,</span>
+                <span class="n">tstop</span><span class="p">,</span>
+                <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span><span class="p">],</span>
+                <span class="n">drive_widgets</span><span class="p">,</span>
+                <span class="n">connectivity_textfields</span><span class="p">,</span>
+                <span class="n">cell_parameters_widgets</span><span class="p">,</span>
+                <span class="n">global_gain_textfields</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;start simulation&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">backend_selection</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;MPI&quot;</span><span class="p">:</span>
+                <span class="c1"># &#39;use_hwthreading_if_found&#39; and &#39;sensible_default_cores&#39; have</span>
+                <span class="c1"># already been set elsewhere, and do not need to be re-set here.</span>
+                <span class="c1"># Hardware-threading and oversubscription will always be disabled</span>
+                <span class="c1"># to prevent edge cases in the GUI.</span>
+                <span class="n">backend</span> <span class="o">=</span> <span class="n">MPIBackend</span><span class="p">(</span>
+                    <span class="n">n_procs</span><span class="o">=</span><span class="n">n_jobs</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="n">mpi_cmd</span><span class="o">=</span><span class="n">mpi_cmd</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="n">override_hwthreading_option</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">override_oversubscribe_option</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">base</span> <span class="o">=</span> <span class="n">_sim_name</span>
-                <span class="n">idx</span> <span class="o">=</span> <span class="mi">2</span>
+                <span class="n">backend</span> <span class="o">=</span> <span class="n">JoblibBackend</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using Joblib with </span><span class="si">{</span><span class="n">n_jobs</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> core(s).&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">backend</span><span class="p">:</span>
+                <span class="n">simulation_status_bar</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">simulation_status_contents</span><span class="p">[</span><span class="s2">&quot;running&quot;</span><span class="p">]</span>
+                <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span><span class="p">][</span><span class="s2">&quot;dpls&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">simulate_dipole</span><span class="p">(</span>
+                    <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span><span class="p">][</span><span class="s2">&quot;net&quot;</span><span class="p">],</span>
+                    <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="n">n_trials</span><span class="o">=</span><span class="n">ntrials</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="p">)</span>
 
-            <span class="k">while</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">&quot;</span> <span class="ow">in</span> <span class="n">simulation_data</span><span class="p">:</span>
-                <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">simulation_status_bar</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">simulation_status_contents</span><span class="p">[</span><span class="s2">&quot;finished&quot;</span><span class="p">]</span>
+                <span class="n">sim_names</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">sim_name</span>
+                    <span class="k">for</span> <span class="n">sim_name</span> <span class="ow">in</span> <span class="n">simulation_data</span>
+                    <span class="k">if</span> <span class="n">simulation_data</span><span class="p">[</span><span class="n">sim_name</span><span class="p">][</span><span class="s2">&quot;net&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="p">]</span>
 
-            <span class="n">_sim_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="n">widget_simulation_name</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">_sim_name</span>
+                <span class="n">simulations_list_widget</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">sim_names</span>
+                <span class="n">simulations_list_widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">sim_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="n">_init_network_from_widgets</span><span class="p">(</span>
-            <span class="n">params</span><span class="p">,</span>
-            <span class="n">dt</span><span class="p">,</span>
-            <span class="n">tstop</span><span class="p">,</span>
-            <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span><span class="p">],</span>
-            <span class="n">drive_widgets</span><span class="p">,</span>
-            <span class="n">connectivity_textfields</span><span class="p">,</span>
-            <span class="n">cell_parameters_widgets</span><span class="p">,</span>
-            <span class="n">global_gain_textfields</span><span class="p">,</span>
-        <span class="p">)</span>
+            <span class="n">viz_manager</span><span class="o">.</span><span class="n">reset_fig_config_tabs</span><span class="p">()</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;start simulation&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">backend_selection</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;MPI&quot;</span><span class="p">:</span>
-            <span class="c1"># &#39;use_hwthreading_if_found&#39; and &#39;sensible_default_cores&#39; have</span>
-            <span class="c1"># already been set elsewhere, and do not need to be re-set here.</span>
-            <span class="c1"># Hardware-threading and oversubscription will always be disabled</span>
-            <span class="c1"># to prevent edge cases in the GUI.</span>
-            <span class="n">backend</span> <span class="o">=</span> <span class="n">MPIBackend</span><span class="p">(</span>
-                <span class="n">n_procs</span><span class="o">=</span><span class="n">n_jobs</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                <span class="n">mpi_cmd</span><span class="o">=</span><span class="n">mpi_cmd</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                <span class="n">override_hwthreading_option</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="n">override_oversubscribe_option</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">backend</span> <span class="o">=</span> <span class="n">JoblibBackend</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using Joblib with </span><span class="si">{</span><span class="n">n_jobs</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> core(s).&quot;</span><span class="p">)</span>
-        <span class="k">with</span> <span class="n">backend</span><span class="p">:</span>
-            <span class="n">simulation_status_bar</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">simulation_status_contents</span><span class="p">[</span><span class="s2">&quot;running&quot;</span><span class="p">]</span>
-            <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span><span class="p">][</span><span class="s2">&quot;dpls&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">simulate_dipole</span><span class="p">(</span>
-                <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span><span class="p">][</span><span class="s2">&quot;net&quot;</span><span class="p">],</span>
-                <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                <span class="n">n_trials</span><span class="o">=</span><span class="n">ntrials</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="c1"># update default visualization params in gui based on widget</span>
+            <span class="n">fig_default_params</span><span class="p">[</span><span class="s2">&quot;default_smoothing&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">widget_default_smoothing</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">fig_default_params</span><span class="p">[</span><span class="s2">&quot;default_scaling&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">widget_default_scaling</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">fig_default_params</span><span class="p">[</span><span class="s2">&quot;default_min_frequency&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">widget_min_frequency</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">fig_default_params</span><span class="p">[</span><span class="s2">&quot;default_max_frequency&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">widget_max_frequency</span><span class="o">.</span><span class="n">value</span>
 
-            <span class="n">simulation_status_bar</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">simulation_status_contents</span><span class="p">[</span><span class="s2">&quot;finished&quot;</span><span class="p">]</span>
+            <span class="c1"># change default visualization params in viz_manager to mirror gui</span>
+            <span class="k">for</span> <span class="n">widget</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">fig_default_params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">viz_manager</span><span class="o">.</span><span class="n">fig_default_params</span><span class="p">[</span><span class="n">widget</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
-            <span class="n">sim_names</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">sim_name</span>
-                <span class="k">for</span> <span class="n">sim_name</span> <span class="ow">in</span> <span class="n">simulation_data</span>
-                <span class="k">if</span> <span class="n">simulation_data</span><span class="p">[</span><span class="n">sim_name</span><span class="p">][</span><span class="s2">&quot;net&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-            <span class="p">]</span>
+            <span class="n">viz_manager</span><span class="o">.</span><span class="n">add_figure</span><span class="p">()</span>
+            <span class="n">fig_name</span> <span class="o">=</span> <span class="n">_idx2figname</span><span class="p">(</span><span class="n">viz_manager</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;fig_idx&quot;</span><span class="p">][</span><span class="s2">&quot;idx&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">ax_plots</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;ax0&quot;</span><span class="p">,</span> <span class="s2">&quot;input histogram&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;ax1&quot;</span><span class="p">,</span> <span class="s2">&quot;current dipole&quot;</span><span class="p">)]</span>
+            <span class="k">for</span> <span class="n">ax_name</span><span class="p">,</span> <span class="n">plot_type</span> <span class="ow">in</span> <span class="n">ax_plots</span><span class="p">:</span>
+                <span class="n">viz_manager</span><span class="o">.</span><span class="n">_simulate_edit_figure</span><span class="p">(</span>
+                    <span class="n">fig_name</span><span class="p">,</span> <span class="n">ax_name</span><span class="p">,</span> <span class="n">_sim_name</span><span class="p">,</span> <span class="n">plot_type</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">&quot;plot&quot;</span>
+                <span class="p">)</span>
 
-            <span class="n">simulations_list_widget</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">sim_names</span>
-            <span class="n">simulations_list_widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">sim_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
-    <span class="n">viz_manager</span><span class="o">.</span><span class="n">reset_fig_config_tabs</span><span class="p">()</span>
-
-    <span class="c1"># update default visualization params in gui based on widget</span>
-    <span class="n">fig_default_params</span><span class="p">[</span><span class="s2">&quot;default_smoothing&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">widget_default_smoothing</span><span class="o">.</span><span class="n">value</span>
-    <span class="n">fig_default_params</span><span class="p">[</span><span class="s2">&quot;default_scaling&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">widget_default_scaling</span><span class="o">.</span><span class="n">value</span>
-    <span class="n">fig_default_params</span><span class="p">[</span><span class="s2">&quot;default_min_frequency&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">widget_min_frequency</span><span class="o">.</span><span class="n">value</span>
-    <span class="n">fig_default_params</span><span class="p">[</span><span class="s2">&quot;default_max_frequency&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">widget_max_frequency</span><span class="o">.</span><span class="n">value</span>
-
-    <span class="c1"># change default visualization params in viz_manager to mirror gui</span>
-    <span class="k">for</span> <span class="n">widget</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">fig_default_params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">viz_manager</span><span class="o">.</span><span class="n">fig_default_params</span><span class="p">[</span><span class="n">widget</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
-
-    <span class="n">viz_manager</span><span class="o">.</span><span class="n">add_figure</span><span class="p">()</span>
-    <span class="n">fig_name</span> <span class="o">=</span> <span class="n">_idx2figname</span><span class="p">(</span><span class="n">viz_manager</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;fig_idx&quot;</span><span class="p">][</span><span class="s2">&quot;idx&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">ax_plots</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;ax0&quot;</span><span class="p">,</span> <span class="s2">&quot;input histogram&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;ax1&quot;</span><span class="p">,</span> <span class="s2">&quot;current dipole&quot;</span><span class="p">)]</span>
-    <span class="k">for</span> <span class="n">ax_name</span><span class="p">,</span> <span class="n">plot_type</span> <span class="ow">in</span> <span class="n">ax_plots</span><span class="p">:</span>
-        <span class="n">viz_manager</span><span class="o">.</span><span class="n">_simulate_edit_figure</span><span class="p">(</span>
-            <span class="n">fig_name</span><span class="p">,</span> <span class="n">ax_name</span><span class="p">,</span> <span class="n">_sim_name</span><span class="p">,</span> <span class="n">plot_type</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">&quot;plot&quot;</span>
-        <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">simulation_status_bar</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">simulation_status_contents</span><span class="p">[</span><span class="s2">&quot;failed&quot;</span><span class="p">]</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+            <span class="k">return</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_update_cell_params_vbox</span><span class="p">(</span>
@@ -6425,397 +6431,412 @@
 <span class="sd">    This was built based off of `run_button_clicked`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="n">log_out</span><span class="p">:</span>
-        <span class="c1"># Sim data setup (and related input validation)</span>
-        <span class="c1"># ------------------------------------------------------------------------------</span>
-        <span class="n">simulation_data</span> <span class="o">=</span> <span class="n">all_data</span><span class="p">[</span><span class="s2">&quot;simulation_data&quot;</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Sim data setup (and related input validation)</span>
+            <span class="c1"># --------------------------------------------------------------------------</span>
+            <span class="n">simulation_data</span> <span class="o">=</span> <span class="n">all_data</span><span class="p">[</span><span class="s2">&quot;simulation_data&quot;</span><span class="p">]</span>
 
-        <span class="c1"># clear empty trash simulations</span>
-        <span class="c1">#</span>
-        <span class="c1"># AES: a &quot;trash&quot; simulation appears to be created (named &quot;default&quot;) even if all</span>
-        <span class="c1"># a user does is load an external dipole data file. However, I do not fully</span>
-        <span class="c1"># understand how VizManager et al. manages the simulation data (I find it very</span>
-        <span class="c1"># confusing) so I am NOT touching it.</span>
-        <span class="k">for</span> <span class="n">_name</span> <span class="ow">in</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">simulation_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">[</span><span class="n">_name</span><span class="p">][</span><span class="s2">&quot;dpls&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">del</span> <span class="n">simulation_data</span><span class="p">[</span><span class="n">_name</span><span class="p">]</span>
+            <span class="c1"># clear empty trash simulations</span>
+            <span class="c1">#</span>
+            <span class="c1"># AES: a &quot;trash&quot; simulation appears to be created (named &quot;default&quot;) even if</span>
+            <span class="c1"># all a user does is load an external dipole data file. However, I do not</span>
+            <span class="c1"># fully understand how VizManager et al. manages the simulation data (I find</span>
+            <span class="c1"># it very confusing) so I am NOT touching it.</span>
+            <span class="k">for</span> <span class="n">_name</span> <span class="ow">in</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">simulation_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">[</span><span class="n">_name</span><span class="p">][</span><span class="s2">&quot;dpls&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">del</span> <span class="n">simulation_data</span><span class="p">[</span><span class="n">_name</span><span class="p">]</span>
 
-        <span class="n">_sim_name</span> <span class="o">=</span> <span class="n">widget_simulation_name</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">_sim_name</span> <span class="o">=</span> <span class="n">widget_simulation_name</span><span class="o">.</span><span class="n">value</span>
 
-        <span class="c1"># RMSE Target data extraction (and related input validation)</span>
-        <span class="c1"># ------------------------------------------------------------------------------</span>
-        <span class="k">if</span> <span class="n">opt_obj_fun</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;dipole_corr&quot;</span><span class="p">,</span> <span class="s2">&quot;dipole_rmse&quot;</span><span class="p">):</span>
-            <span class="n">opt_rmse_target_data_name</span> <span class="o">=</span> <span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;target_dipole_data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">opt_rmse_target_data_name</span><span class="p">:</span>
-                <span class="c1"># In this case, they probably have not run any simulations or loaded any</span>
-                <span class="c1"># data.</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-                    <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">                    You have not selected a dataset to use as the target of</span>
-<span class="s2">                    optimization. Please load and select a dataset of dipole data to</span>
-<span class="s2">                    optimize towards.</span>
-<span class="s2">                    &quot;&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
-                <span class="p">)</span>
-                <span class="n">simulation_status_bar</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">simulation_status_contents</span><span class="p">[</span><span class="s2">&quot;failed&quot;</span><span class="p">]</span>
-                <span class="k">return</span> <span class="kc">None</span>
-            <span class="k">elif</span> <span class="p">(</span><span class="n">opt_rmse_target_data_name</span> <span class="o">==</span> <span class="s2">&quot;default&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
-                <span class="ow">not</span> <span class="n">simulation_data</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">][</span><span class="s2">&quot;dpls&quot;</span><span class="p">]</span>
-            <span class="p">):</span>
-                <span class="c1"># In this case, they have selected &quot;default&quot;, which is the default name</span>
-                <span class="c1"># of the first simulation, BUT they have not actually run any</span>
-                <span class="c1"># simulations yet. They likely either want to compare against a</span>
-                <span class="c1"># simulation result, or (more likely) forgot to load their experimental</span>
-                <span class="c1"># target data first.</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-                    <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">                    You have selected the &#39;default&#39; dataset to use as the target of</span>
-<span class="s2">                    optimization, but there is no dipole data associated with that</span>
-<span class="s2">                    dataset. Please either load and select a dataset of dipole data to</span>
-<span class="s2">                    optimize towards with the &quot;Load data&quot; button, or run a simulation</span>
-<span class="s2">                    first if you want to optimize against that simulation.</span>
-<span class="s2">                    &quot;&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
-                <span class="p">)</span>
-                <span class="n">simulation_status_bar</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">simulation_status_contents</span><span class="p">[</span><span class="s2">&quot;failed&quot;</span><span class="p">]</span>
-                <span class="k">return</span> <span class="kc">None</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># Extract the actual target data</span>
-                <span class="c1"># Like everywhere else in the GUI, we only support usage of single-trial</span>
-                <span class="c1"># dipole data.</span>
-                <span class="n">target_dipole</span> <span class="o">=</span> <span class="n">average_dipoles</span><span class="p">(</span>
-                    <span class="n">simulation_data</span><span class="p">[</span><span class="n">opt_rmse_target_data_name</span><span class="p">][</span><span class="s2">&quot;dpls&quot;</span><span class="p">]</span>
-                <span class="p">)</span>
-        <span class="c1"># Input validation</span>
-        <span class="c1"># ------------------------------------------------------------------------------</span>
-        <span class="c1"># First, let&#39;s make a Network of the current state of the GUI, and call it</span>
-        <span class="c1"># something different from the current simulation name widget&#39;s value, since the</span>
-        <span class="c1"># user may have changed parameters since they last ran a sim:</span>
-        <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span> <span class="o">+</span> <span class="s2">&quot;_before_optimization&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">_init_network_from_widgets</span><span class="p">(</span>
-            <span class="n">params</span><span class="p">,</span>
-            <span class="n">dt</span><span class="p">,</span>
-            <span class="n">tstop</span><span class="p">,</span>
-            <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span> <span class="o">+</span> <span class="s2">&quot;_before_optimization&quot;</span><span class="p">],</span>
-            <span class="n">opt_drive_widgets</span><span class="p">,</span>
-            <span class="n">connectivity_textfields</span><span class="p">,</span>
-            <span class="n">cell_parameters_widgets</span><span class="p">,</span>
-            <span class="n">global_gain_textfields</span><span class="p">,</span>
-            <span class="n">add_drive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="c1"># We always want to have simulation output from the state of the GUI as it is</span>
-        <span class="c1"># right now, but before optimization for later comparison. If the user ran a</span>
-        <span class="c1"># simulation before and the network from the current GUI state is identical to</span>
-        <span class="c1"># the network of the prior simulation, then let&#39;s just reuse that data. If not,</span>
-        <span class="c1"># then let&#39;s run a new simulation.</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span><span class="p">][</span><span class="s2">&quot;dpls&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
-            <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span><span class="p">][</span><span class="s2">&quot;net&quot;</span><span class="p">]</span>
-            <span class="o">==</span> <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span> <span class="o">+</span> <span class="s2">&quot;_before_optimization&quot;</span><span class="p">][</span><span class="s2">&quot;net&quot;</span><span class="p">]</span>
-        <span class="p">):</span>
-            <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span> <span class="o">+</span> <span class="s2">&quot;_before_optimization&quot;</span><span class="p">][</span><span class="s2">&quot;dpls&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span><span class="p">][</span><span class="s2">&quot;dpls&quot;</span><span class="p">]</span>
+            <span class="c1"># RMSE Target data extraction (and related input validation)</span>
+            <span class="c1"># --------------------------------------------------------------------------</span>
+            <span class="k">if</span> <span class="n">opt_obj_fun</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;dipole_corr&quot;</span><span class="p">,</span> <span class="s2">&quot;dipole_rmse&quot;</span><span class="p">):</span>
+                <span class="n">opt_rmse_target_data_name</span> <span class="o">=</span> <span class="n">opt_target_widgets</span><span class="p">[</span>
+                    <span class="s2">&quot;target_dipole_data&quot;</span>
+                <span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">opt_rmse_target_data_name</span><span class="p">:</span>
+                    <span class="c1"># In this case, they probably have not run any simulations or loaded</span>
+                    <span class="c1"># any data.</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                        You have not selected a dataset to use as the target of</span>
+<span class="s2">                        optimization. Please load and select a dataset of dipole data to</span>
+<span class="s2">                        optimize towards.</span>
+<span class="s2">                        &quot;&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="n">simulation_status_bar</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">simulation_status_contents</span><span class="p">[</span><span class="s2">&quot;failed&quot;</span><span class="p">]</span>
+                    <span class="k">return</span> <span class="kc">None</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">opt_rmse_target_data_name</span> <span class="o">==</span> <span class="s2">&quot;default&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+                    <span class="ow">not</span> <span class="n">simulation_data</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">][</span><span class="s2">&quot;dpls&quot;</span><span class="p">]</span>
+                <span class="p">):</span>
+                    <span class="c1"># In this case, they have selected &quot;default&quot;, which is the default</span>
+                    <span class="c1"># name of the first simulation, BUT they have not actually run any</span>
+                    <span class="c1"># simulations yet. They likely either want to compare against a</span>
+                    <span class="c1"># simulation result, or (more likely) forgot to load their</span>
+                    <span class="c1"># experimental target data first.</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                        You have selected the &#39;default&#39; dataset to use as the target of</span>
+<span class="s2">                        optimization, but there is no dipole data associated with that</span>
+<span class="s2">                        dataset. Please either load and select a dataset of dipole data</span>
+<span class="s2">                        to optimize towards with the &quot;Load data&quot; button, or run a</span>
+<span class="s2">                        simulation first if you want to optimize against that</span>
+<span class="s2">                        simulation.</span>
+<span class="s2">                        &quot;&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="n">simulation_status_bar</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">simulation_status_contents</span><span class="p">[</span><span class="s2">&quot;failed&quot;</span><span class="p">]</span>
+                    <span class="k">return</span> <span class="kc">None</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Extract the actual target data Like everywhere else in the GUI, we</span>
+                    <span class="c1"># only support usage of single-trial dipole data.</span>
+                    <span class="n">target_dipole</span> <span class="o">=</span> <span class="n">average_dipoles</span><span class="p">(</span>
+                        <span class="n">simulation_data</span><span class="p">[</span><span class="n">opt_rmse_target_data_name</span><span class="p">][</span><span class="s2">&quot;dpls&quot;</span><span class="p">]</span>
+                    <span class="p">)</span>
+            <span class="c1"># Input validation</span>
+            <span class="c1"># --------------------------------------------------------------------------</span>
+            <span class="c1"># First, let&#39;s make a Network of the current state of the GUI, and call it</span>
+            <span class="c1"># something different from the current simulation name widget&#39;s value, since</span>
+            <span class="c1"># the user may have changed parameters since they last ran a sim:</span>
+            <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span> <span class="o">+</span> <span class="s2">&quot;_before_optimization&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">_init_network_from_widgets</span><span class="p">(</span>
+                <span class="n">params</span><span class="p">,</span>
+                <span class="n">dt</span><span class="p">,</span>
+                <span class="n">tstop</span><span class="p">,</span>
+                <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span> <span class="o">+</span> <span class="s2">&quot;_before_optimization&quot;</span><span class="p">],</span>
+                <span class="n">opt_drive_widgets</span><span class="p">,</span>
+                <span class="n">connectivity_textfields</span><span class="p">,</span>
+                <span class="n">cell_parameters_widgets</span><span class="p">,</span>
+                <span class="n">global_gain_textfields</span><span class="p">,</span>
+                <span class="n">add_drive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span> <span class="o">+</span> <span class="s2">&quot;_before_optimization&quot;</span><span class="p">][</span><span class="s2">&quot;dpls&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">simulate_dipole</span><span class="p">(</span>
-                    <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span> <span class="o">+</span> <span class="s2">&quot;_before_optimization&quot;</span><span class="p">][</span><span class="s2">&quot;net&quot;</span><span class="p">],</span>
+            <span class="c1"># We always want to have simulation output from the state of the GUI as it</span>
+            <span class="c1"># is right now, but before optimization for later comparison. If the user</span>
+            <span class="c1"># ran a simulation before and the network from the current GUI state is</span>
+            <span class="c1"># identical to the network of the prior simulation, then let&#39;s just reuse</span>
+            <span class="c1"># that data. If not, then let&#39;s run a new simulation.</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span><span class="p">][</span><span class="s2">&quot;dpls&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+                <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span><span class="p">][</span><span class="s2">&quot;net&quot;</span><span class="p">]</span>
+                <span class="o">==</span> <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span> <span class="o">+</span> <span class="s2">&quot;_before_optimization&quot;</span><span class="p">][</span><span class="s2">&quot;net&quot;</span><span class="p">]</span>
+            <span class="p">):</span>
+                <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span> <span class="o">+</span> <span class="s2">&quot;_before_optimization&quot;</span><span class="p">][</span><span class="s2">&quot;dpls&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span><span class="p">][</span><span class="s2">&quot;dpls&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span> <span class="o">+</span> <span class="s2">&quot;_before_optimization&quot;</span><span class="p">][</span><span class="s2">&quot;dpls&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">simulate_dipole</span><span class="p">(</span>
+                        <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span> <span class="o">+</span> <span class="s2">&quot;_before_optimization&quot;</span><span class="p">][</span><span class="s2">&quot;net&quot;</span><span class="p">],</span>
+                        <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                        <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                        <span class="n">n_trials</span><span class="o">=</span><span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;n_trials&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Dynamically create both the constraints and the param-applying-function</span>
+            <span class="c1"># --------------------------------------------------------------------------</span>
+            <span class="n">set_params_func</span><span class="p">,</span> <span class="n">constraints</span> <span class="o">=</span> <span class="n">_generate_constraints_and_func</span><span class="p">(</span>
+                <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span> <span class="o">+</span> <span class="s2">&quot;_before_optimization&quot;</span><span class="p">][</span><span class="s2">&quot;net&quot;</span><span class="p">],</span>
+                <span class="n">opt_drive_widgets</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">constraints</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                    You have not selected any parameters to constrain in the</span>
+<span class="s2">                    optimization. Please select some parameters using the checkboxes,</span>
+<span class="s2">                    and try again.</span>
+<span class="s2">                    &quot;&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">simulation_status_bar</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">simulation_status_contents</span><span class="p">[</span><span class="s2">&quot;failed&quot;</span><span class="p">]</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+            <span class="c1"># Instantiate our Optimizer object</span>
+            <span class="c1"># --------------------------------------------------------------------------</span>
+            <span class="c1"># This uses our recreated `Network` object (which has NO current drives),</span>
+            <span class="c1"># our new dynamically-created constraints, and our similarly-created params</span>
+            <span class="c1"># function to build our Optimizer. All other arguments are simply pulled</span>
+            <span class="c1"># from their GUI values directly.</span>
+            <span class="n">optim</span> <span class="o">=</span> <span class="n">Optimizer</span><span class="p">(</span>
+                <span class="n">initial_net</span><span class="o">=</span><span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span> <span class="o">+</span> <span class="s2">&quot;_before_optimization&quot;</span><span class="p">][</span><span class="s2">&quot;net&quot;</span><span class="p">],</span>
+                <span class="n">tstop</span><span class="o">=</span><span class="n">opt_tstop</span><span class="p">,</span>
+                <span class="n">constraints</span><span class="o">=</span><span class="n">constraints</span><span class="p">,</span>
+                <span class="n">set_params</span><span class="o">=</span><span class="n">set_params_func</span><span class="p">,</span>
+                <span class="n">solver</span><span class="o">=</span><span class="n">opt_solver</span><span class="p">,</span>
+                <span class="n">obj_fun</span><span class="o">=</span><span class="n">opt_obj_fun</span><span class="p">,</span>
+                <span class="n">max_iter</span><span class="o">=</span><span class="n">opt_max_iter</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Define the main execution function for the optimization, which is</span>
+            <span class="c1"># necessary due to CMA and non-CMA solvers using different approaches to</span>
+            <span class="c1"># parallelization:</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">main_execution</span><span class="p">():</span>
+                <span class="n">simulation_status_bar</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">simulation_status_contents</span><span class="p">[</span><span class="s2">&quot;opt_running&quot;</span><span class="p">]</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Optimization started.&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Solver: </span><span class="si">{</span><span class="n">opt_solver</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Objective function: </span><span class="si">{</span><span class="n">opt_obj_fun</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Max iterations: </span><span class="si">{</span><span class="n">opt_max_iter</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Simulation duration: </span><span class="si">{</span><span class="n">opt_tstop</span><span class="si">}</span><span class="s2"> ms&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Execute optimization</span>
+                <span class="c1"># ----------------------------------------------------------------------</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">opt_obj_fun</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;dipole_corr&quot;</span><span class="p">,</span> <span class="s2">&quot;dipole_rmse&quot;</span><span class="p">):</span>
+                        <span class="c1"># AES: Not including the kwarg for &quot;verbose&quot; since the GUI log</span>
+                        <span class="c1"># is already pretty &quot;busy&quot;.</span>
+                        <span class="c1">#</span>
+                        <span class="c1"># Note: In this case, we are adding certain solver arguments</span>
+                        <span class="c1"># (like for CMA) even if the solver is not set to CMA:</span>
+                        <span class="n">obj_fun_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                            <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                            <span class="n">target</span><span class="o">=</span><span class="n">target_dipole</span><span class="p">,</span>
+                            <span class="n">n_trials</span><span class="o">=</span><span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;n_trials&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                            <span class="n">smooth_window_len</span><span class="o">=</span><span class="n">opt_smoothing</span><span class="p">,</span>
+                            <span class="n">scale_factor</span><span class="o">=</span><span class="n">opt_scaling</span><span class="p">,</span>
+                            <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                            <span class="n">seed</span><span class="o">=</span><span class="n">opt_solver_widgets</span><span class="p">[</span><span class="s2">&quot;seed&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                            <span class="n">popsize</span><span class="o">=</span><span class="n">opt_solver_widgets</span><span class="p">[</span><span class="s2">&quot;popsize&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                            <span class="n">sigma0</span><span class="o">=</span><span class="n">opt_solver_widgets</span><span class="p">[</span><span class="s2">&quot;sigma0&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                            <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="p">)</span>
+                        <span class="n">optim</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="o">**</span><span class="n">obj_fun_kwargs</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">opt_obj_fun</span> <span class="o">==</span> <span class="s2">&quot;maximize_psd&quot;</span><span class="p">:</span>
+                        <span class="c1"># Note that when band2 is unchecked, the objective is simply to</span>
+                        <span class="c1"># maximize band1. From the GUI, when the checkbox is disabled,</span>
+                        <span class="c1"># the proportion of band2 will not change the optimization</span>
+                        <span class="c1"># behavior, even if it is nonzero.</span>
+                        <span class="k">if</span> <span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;psd_target_band2_checkbox&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                            <span class="n">f_bands</span> <span class="o">=</span> <span class="p">[</span>
+                                <span class="p">(</span>
+                                    <span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;psd_target_band1_min&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                                    <span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;psd_target_band1_max&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                                <span class="p">),</span>
+                                <span class="p">(</span>
+                                    <span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;psd_target_band2_min&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                                    <span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;psd_target_band2_max&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                                <span class="p">),</span>
+                            <span class="p">]</span>
+                            <span class="n">relative_bandpower</span> <span class="o">=</span> <span class="p">[</span>
+                                <span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;psd_target_band1_proportion&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                                <span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;psd_target_band2_proportion&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                            <span class="p">]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">f_bands</span> <span class="o">=</span> <span class="p">[</span>
+                                <span class="p">(</span>
+                                    <span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;psd_target_band1_min&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                                    <span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;psd_target_band1_max&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                                <span class="p">)</span>
+                            <span class="p">]</span>
+                            <span class="n">relative_bandpower</span> <span class="o">=</span> <span class="p">[</span>
+                                <span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;psd_target_band1_proportion&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                            <span class="p">]</span>
+
+                        <span class="c1"># Note: `maximize_psd` does not currently support multiple</span>
+                        <span class="c1"># trials.</span>
+                        <span class="n">obj_fun_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                            <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                            <span class="n">f_bands</span><span class="o">=</span><span class="n">f_bands</span><span class="p">,</span>
+                            <span class="n">relative_bandpower</span><span class="o">=</span><span class="n">relative_bandpower</span><span class="p">,</span>
+                            <span class="n">smooth_window_len</span><span class="o">=</span><span class="n">opt_smoothing</span><span class="p">,</span>
+                            <span class="n">scale_factor</span><span class="o">=</span><span class="n">opt_scaling</span><span class="p">,</span>
+                        <span class="p">)</span>
+                        <span class="n">optim</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="o">**</span><span class="n">obj_fun_kwargs</span><span class="p">)</span>
+
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Optimization fitting failed due to exception: &#39;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">,</span>
+                        <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">simulation_status_bar</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">simulation_status_contents</span><span class="p">[</span><span class="s2">&quot;failed&quot;</span><span class="p">]</span>
+                    <span class="k">raise</span>
+
+                <span class="c1"># ----------------------------------------------------------------------</span>
+                <span class="c1"># Now, let&#39;s resimulate the final version of the optimized network for</span>
+                <span class="c1"># usage and display it in the GUI</span>
+                <span class="c1">#</span>
+                <span class="c1"># First, let&#39;s make our new simulation name.</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">_sim_name</span> <span class="o">+</span> <span class="s2">&quot;_optimized&quot;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">simulation_data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="c1"># Let&#39;s handle our output simulation name in the case that there are</span>
+                    <span class="c1"># pre-existing datasets with the names we want to use, such as if</span>
+                    <span class="c1"># they are executing a second round of Optimization, or their</span>
+                    <span class="c1"># simulation name just happens to end in &quot;_optimized&quot; by</span>
+                    <span class="c1"># coincidence:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">_sim_name</span> <span class="o">+</span> <span class="s2">&quot;_optimized&quot;</span> <span class="o">+</span> <span class="s2">&quot;_1&quot;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">simulation_data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                        <span class="n">predecessor_sim_suffix_number</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">simulation_data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;_optimized_(\d+)$&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                                <span class="n">predecessor_sim_suffix_number</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                                    <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+                                <span class="p">)</span>
+                        <span class="n">new_name</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="n">_sim_name</span>
+                            <span class="o">+</span> <span class="s2">&quot;_optimized&quot;</span>
+                            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">predecessor_sim_suffix_number</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">new_name</span> <span class="o">=</span> <span class="n">_sim_name</span> <span class="o">+</span> <span class="s2">&quot;_optimized&quot;</span> <span class="o">+</span> <span class="s2">&quot;_1&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">new_name</span> <span class="o">=</span> <span class="n">_sim_name</span> <span class="o">+</span> <span class="s2">&quot;_optimized&quot;</span>
+
+                <span class="c1"># Now let&#39;s use the final version of the optimized Network, and use it</span>
+                <span class="c1"># to simulate</span>
+                <span class="n">simulation_data</span><span class="p">[</span><span class="n">new_name</span><span class="p">][</span><span class="s2">&quot;net&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">net_</span>
+                <span class="n">simulation_data</span><span class="p">[</span><span class="n">new_name</span><span class="p">][</span><span class="s2">&quot;dpls&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">simulate_dipole</span><span class="p">(</span>
+                    <span class="n">simulation_data</span><span class="p">[</span><span class="n">new_name</span><span class="p">][</span><span class="s2">&quot;net&quot;</span><span class="p">],</span>
                     <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
                     <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
                     <span class="n">n_trials</span><span class="o">=</span><span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;n_trials&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
                 <span class="p">)</span>
-            <span class="p">)</span>
 
-        <span class="c1"># Dynamically create both the constraints and the param-applying-function</span>
-        <span class="c1"># ------------------------------------------------------------------------------</span>
-        <span class="n">set_params_func</span><span class="p">,</span> <span class="n">constraints</span> <span class="o">=</span> <span class="n">_generate_constraints_and_func</span><span class="p">(</span>
-            <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span> <span class="o">+</span> <span class="s2">&quot;_before_optimization&quot;</span><span class="p">][</span><span class="s2">&quot;net&quot;</span><span class="p">],</span>
-            <span class="n">opt_drive_widgets</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">constraints</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-                <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">                You have not selected any parameters to constrain in the optimization.</span>
-<span class="s2">                Please select some parameters using the checkboxes, and try again.</span>
-<span class="s2">                &quot;&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
-            <span class="p">)</span>
-            <span class="n">simulation_status_bar</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">simulation_status_contents</span><span class="p">[</span><span class="s2">&quot;failed&quot;</span><span class="p">]</span>
-            <span class="k">return</span> <span class="kc">None</span>
+                <span class="c1"># Finally, update the list of simulations to include our new one:</span>
+                <span class="n">sim_names</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">sim_name</span>
+                    <span class="k">for</span> <span class="n">sim_name</span> <span class="ow">in</span> <span class="n">simulation_data</span>
+                    <span class="k">if</span> <span class="n">simulation_data</span><span class="p">[</span><span class="n">sim_name</span><span class="p">][</span><span class="s2">&quot;net&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="p">]</span>
+                <span class="n">simulations_list_widget</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">sim_names</span>
+                <span class="n">simulations_list_widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">new_name</span>
 
-        <span class="c1"># Instantiate our Optimizer object</span>
-        <span class="c1"># ------------------------------------------------------------------------------</span>
-        <span class="c1"># This uses our recreated `Network` object (which has NO current drives), our</span>
-        <span class="c1"># new dynamically-created constraints, and our similarly-created params function</span>
-        <span class="c1"># to build our Optimizer. All other arguments are simply pulled from their GUI</span>
-        <span class="c1"># values directly.</span>
-        <span class="n">optim</span> <span class="o">=</span> <span class="n">Optimizer</span><span class="p">(</span>
-            <span class="n">initial_net</span><span class="o">=</span><span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span> <span class="o">+</span> <span class="s2">&quot;_before_optimization&quot;</span><span class="p">][</span><span class="s2">&quot;net&quot;</span><span class="p">],</span>
-            <span class="n">tstop</span><span class="o">=</span><span class="n">opt_tstop</span><span class="p">,</span>
-            <span class="n">constraints</span><span class="o">=</span><span class="n">constraints</span><span class="p">,</span>
-            <span class="n">set_params</span><span class="o">=</span><span class="n">set_params_func</span><span class="p">,</span>
-            <span class="n">solver</span><span class="o">=</span><span class="n">opt_solver</span><span class="p">,</span>
-            <span class="n">obj_fun</span><span class="o">=</span><span class="n">opt_obj_fun</span><span class="p">,</span>
-            <span class="n">max_iter</span><span class="o">=</span><span class="n">opt_max_iter</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="c1"># Define the main execution function for the optimization, which is necessary</span>
-        <span class="c1"># due to CMA and non-CMA solvers using different approaches to parallelization:</span>
-        <span class="k">def</span><span class="w"> </span><span class="nf">main_execution</span><span class="p">():</span>
-            <span class="n">simulation_status_bar</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">simulation_status_contents</span><span class="p">[</span><span class="s2">&quot;opt_running&quot;</span><span class="p">]</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Optimization started.&quot;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Solver: </span><span class="si">{</span><span class="n">opt_solver</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Objective function: </span><span class="si">{</span><span class="n">opt_obj_fun</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Max iterations: </span><span class="si">{</span><span class="n">opt_max_iter</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Simulation duration: </span><span class="si">{</span><span class="n">opt_tstop</span><span class="si">}</span><span class="s2"> ms&quot;</span><span class="p">)</span>
-
-            <span class="c1"># Execute optimization</span>
-            <span class="c1"># --------------------------------------------------------------------------</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">opt_obj_fun</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;dipole_corr&quot;</span><span class="p">,</span> <span class="s2">&quot;dipole_rmse&quot;</span><span class="p">):</span>
-                    <span class="c1"># AES: Not including the kwarg for &quot;verbose&quot; since the GUI log is</span>
-                    <span class="c1"># already pretty &quot;busy&quot;.</span>
-                    <span class="c1">#</span>
-                    <span class="c1"># Note: In this case, we are adding certain solver arguments (like</span>
-                    <span class="c1"># for CMA) even if the solver is not set to CMA:</span>
-                    <span class="n">obj_fun_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-                        <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                        <span class="n">target</span><span class="o">=</span><span class="n">target_dipole</span><span class="p">,</span>
-                        <span class="n">n_trials</span><span class="o">=</span><span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;n_trials&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                        <span class="n">smooth_window_len</span><span class="o">=</span><span class="n">opt_smoothing</span><span class="p">,</span>
-                        <span class="n">scale_factor</span><span class="o">=</span><span class="n">opt_scaling</span><span class="p">,</span>
-                        <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                        <span class="n">seed</span><span class="o">=</span><span class="n">opt_solver_widgets</span><span class="p">[</span><span class="s2">&quot;seed&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                        <span class="n">popsize</span><span class="o">=</span><span class="n">opt_solver_widgets</span><span class="p">[</span><span class="s2">&quot;popsize&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                        <span class="n">sigma0</span><span class="o">=</span><span class="n">opt_solver_widgets</span><span class="p">[</span><span class="s2">&quot;sigma0&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                        <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                    <span class="p">)</span>
-                    <span class="n">optim</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="o">**</span><span class="n">obj_fun_kwargs</span><span class="p">)</span>
-                <span class="k">elif</span> <span class="n">opt_obj_fun</span> <span class="o">==</span> <span class="s2">&quot;maximize_psd&quot;</span><span class="p">:</span>
-                    <span class="c1"># Note that when band2 is unchecked, the objective is simply to</span>
-                    <span class="c1"># maximize band1. From the GUI, when the checkbox is disabled, the</span>
-                    <span class="c1"># proportion of band2 will not change the optimization behavior,</span>
-                    <span class="c1"># even if it is nonzero.</span>
-                    <span class="k">if</span> <span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;psd_target_band2_checkbox&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
-                        <span class="n">f_bands</span> <span class="o">=</span> <span class="p">[</span>
-                            <span class="p">(</span>
-                                <span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;psd_target_band1_min&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                                <span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;psd_target_band1_max&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                            <span class="p">),</span>
-                            <span class="p">(</span>
-                                <span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;psd_target_band2_min&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                                <span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;psd_target_band2_max&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                            <span class="p">),</span>
-                        <span class="p">]</span>
-                        <span class="n">relative_bandpower</span> <span class="o">=</span> <span class="p">[</span>
-                            <span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;psd_target_band1_proportion&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                            <span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;psd_target_band2_proportion&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                        <span class="p">]</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">f_bands</span> <span class="o">=</span> <span class="p">[</span>
-                            <span class="p">(</span>
-                                <span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;psd_target_band1_min&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                                <span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;psd_target_band1_max&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                            <span class="p">)</span>
-                        <span class="p">]</span>
-                        <span class="n">relative_bandpower</span> <span class="o">=</span> <span class="p">[</span>
-                            <span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;psd_target_band1_proportion&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                        <span class="p">]</span>
-
-                    <span class="c1"># Note: `maximize_psd` does not currently support multiple trials.</span>
-                    <span class="n">obj_fun_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-                        <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                        <span class="n">f_bands</span><span class="o">=</span><span class="n">f_bands</span><span class="p">,</span>
-                        <span class="n">relative_bandpower</span><span class="o">=</span><span class="n">relative_bandpower</span><span class="p">,</span>
-                        <span class="n">smooth_window_len</span><span class="o">=</span><span class="n">opt_smoothing</span><span class="p">,</span>
-                        <span class="n">scale_factor</span><span class="o">=</span><span class="n">opt_scaling</span><span class="p">,</span>
-                    <span class="p">)</span>
-                    <span class="n">optim</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="o">**</span><span class="n">obj_fun_kwargs</span><span class="p">)</span>
-
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Optimization fitting failed due to exception: &#39;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">,</span>
-                    <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="c1"># Report back to the user, now that all simulations/output are</span>
+                <span class="c1"># completed:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                    Optimization finished!</span>
+<span class="s2">                    Don&#39;t forget to &quot;Save Network&quot;!</span>
+<span class="s2">                    First objective function result: </span><span class="si">{</span><span class="n">optim</span><span class="o">.</span><span class="n">obj_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span>
+<span class="s2">                    Last objective function result: </span><span class="si">{</span><span class="n">optim</span><span class="o">.</span><span class="n">obj_</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span>
+<span class="s2">                    Diff: </span><span class="si">{</span><span class="nb">abs</span><span class="p">(</span><span class="n">optim</span><span class="o">.</span><span class="n">obj_</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">optim</span><span class="o">.</span><span class="n">obj_</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span>
+<span class="s2">                    &quot;&quot;&quot;</span><span class="p">)</span>
                 <span class="p">)</span>
-                <span class="n">simulation_status_bar</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">simulation_status_contents</span><span class="p">[</span><span class="s2">&quot;failed&quot;</span><span class="p">]</span>
-                <span class="k">raise</span>
+                <span class="c1"># Check if optimization showed ANY difference in the objective function.</span>
+                <span class="c1"># If it did not, then we made no progress.</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">optim</span><span class="o">.</span><span class="n">obj_</span> <span class="o">&gt;=</span> <span class="n">optim</span><span class="o">.</span><span class="n">obj_</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                        The objective function did not improve over the course of the</span>
+<span class="s2">                        optimization. You probably need to increase the number of max</span>
+<span class="s2">                        iterations in order to start converging.</span>
+<span class="s2">                        &quot;&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="n">simulation_status_bar</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">simulation_status_contents</span><span class="p">[</span><span class="s2">&quot;failed&quot;</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">simulation_status_bar</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">simulation_status_contents</span><span class="p">[</span><span class="s2">&quot;finished&quot;</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">opt_obj_fun</span> <span class="o">==</span> <span class="s2">&quot;maximize_psd&quot;</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">new_name</span><span class="p">,</span> <span class="n">f_bands</span><span class="p">,</span> <span class="n">relative_bandpower</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">new_name</span>
 
             <span class="c1"># --------------------------------------------------------------------------</span>
-            <span class="c1"># Now, let&#39;s resimulate the final version of the optimized network for usage</span>
-            <span class="c1"># and display it in the GUI</span>
-            <span class="c1">#</span>
-            <span class="c1"># First, let&#39;s make our new simulation name.</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">_sim_name</span> <span class="o">+</span> <span class="s2">&quot;_optimized&quot;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">simulation_data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="c1"># Let&#39;s handle our output simulation name in the case that there are</span>
-                <span class="c1"># pre-existing datasets with the names we want to use, such as if they</span>
-                <span class="c1"># are executing a second round of Optimization, or their simulation name</span>
-                <span class="c1"># just happens to end in &quot;_optimized&quot; by coincidence:</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">_sim_name</span> <span class="o">+</span> <span class="s2">&quot;_optimized&quot;</span> <span class="o">+</span> <span class="s2">&quot;_1&quot;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">simulation_data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                    <span class="n">predecessor_sim_suffix_number</span> <span class="o">=</span> <span class="p">[]</span>
-                    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">simulation_data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;_optimized_(\d+)$&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
-                            <span class="n">predecessor_sim_suffix_number</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)))</span>
-                    <span class="n">new_name</span> <span class="o">=</span> <span class="p">(</span>
-                        <span class="n">_sim_name</span>
-                        <span class="o">+</span> <span class="s2">&quot;_optimized&quot;</span>
-                        <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">predecessor_sim_suffix_number</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span>
-                    <span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">new_name</span> <span class="o">=</span> <span class="n">_sim_name</span> <span class="o">+</span> <span class="s2">&quot;_optimized&quot;</span> <span class="o">+</span> <span class="s2">&quot;_1&quot;</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">new_name</span> <span class="o">=</span> <span class="n">_sim_name</span> <span class="o">+</span> <span class="s2">&quot;_optimized&quot;</span>
-
-            <span class="c1"># Now let&#39;s use the final version of the optimized Network, and use it to</span>
-            <span class="c1"># simulate</span>
-            <span class="n">simulation_data</span><span class="p">[</span><span class="n">new_name</span><span class="p">][</span><span class="s2">&quot;net&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">net_</span>
-            <span class="n">simulation_data</span><span class="p">[</span><span class="n">new_name</span><span class="p">][</span><span class="s2">&quot;dpls&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">simulate_dipole</span><span class="p">(</span>
-                <span class="n">simulation_data</span><span class="p">[</span><span class="n">new_name</span><span class="p">][</span><span class="s2">&quot;net&quot;</span><span class="p">],</span>
-                <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                <span class="n">n_trials</span><span class="o">=</span><span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;n_trials&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-            <span class="p">)</span>
-
-            <span class="c1"># Finally, update the list of simulations to include our new one:</span>
-            <span class="n">sim_names</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">sim_name</span>
-                <span class="k">for</span> <span class="n">sim_name</span> <span class="ow">in</span> <span class="n">simulation_data</span>
-                <span class="k">if</span> <span class="n">simulation_data</span><span class="p">[</span><span class="n">sim_name</span><span class="p">][</span><span class="s2">&quot;net&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-            <span class="p">]</span>
-            <span class="n">simulations_list_widget</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">sim_names</span>
-            <span class="n">simulations_list_widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">new_name</span>
-
-            <span class="c1"># Report back to the user, now that all simulations/output are completed:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">                Optimization finished!</span>
-<span class="s2">                Don&#39;t forget to &quot;Save Network&quot;!</span>
-<span class="s2">                First objective function result: </span><span class="si">{</span><span class="n">optim</span><span class="o">.</span><span class="n">obj_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span>
-<span class="s2">                Last objective function result: </span><span class="si">{</span><span class="n">optim</span><span class="o">.</span><span class="n">obj_</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span>
-<span class="s2">                Diff: </span><span class="si">{</span><span class="nb">abs</span><span class="p">(</span><span class="n">optim</span><span class="o">.</span><span class="n">obj_</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">optim</span><span class="o">.</span><span class="n">obj_</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span>
-<span class="s2">                &quot;&quot;&quot;</span><span class="p">)</span>
-            <span class="p">)</span>
-            <span class="c1"># Check if optimization showed ANY difference in the objective function. If</span>
-            <span class="c1"># it did not, then we made no progress.</span>
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">optim</span><span class="o">.</span><span class="n">obj_</span> <span class="o">&gt;=</span> <span class="n">optim</span><span class="o">.</span><span class="n">obj_</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">opt_solver</span> <span class="o">==</span> <span class="s2">&quot;cma&quot;</span><span class="p">:</span>
+                <span class="c1"># Do not setup any backends, since CMA will use BatchSimulate to use its</span>
+                <span class="c1"># own custom Joblib backend internally.</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                     <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">                    The objective function did not improve over the course of the</span>
-<span class="s2">                    optimization. You probably need to increase the number of max</span>
-<span class="s2">                    iterations in order to start converging.</span>
+<span class="s2">                    Please note that using the CMA solver uses neither MPIBackend or</span>
+<span class="s2">                    JoblibBackend, instead using a custom backend through BatchSimulate.</span>
 <span class="s2">                    &quot;&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
                 <span class="p">)</span>
-                <span class="n">simulation_status_bar</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">simulation_status_contents</span><span class="p">[</span><span class="s2">&quot;failed&quot;</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">simulation_status_bar</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">simulation_status_contents</span><span class="p">[</span><span class="s2">&quot;finished&quot;</span><span class="p">]</span>
-
-            <span class="k">if</span> <span class="n">opt_obj_fun</span> <span class="o">==</span> <span class="s2">&quot;maximize_psd&quot;</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">new_name</span><span class="p">,</span> <span class="n">f_bands</span><span class="p">,</span> <span class="n">relative_bandpower</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">new_name</span>
-
-        <span class="c1"># --------------------------------------------------------------------------</span>
-        <span class="k">if</span> <span class="n">opt_solver</span> <span class="o">==</span> <span class="s2">&quot;cma&quot;</span><span class="p">:</span>
-            <span class="c1"># Do not setup any backends, since CMA will use BatchSimulate to use its own</span>
-            <span class="c1"># custom Joblib backend internally.</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">                Please note that using the CMA solver uses neither MPIBackend or</span>
-<span class="s2">                JoblibBackend, instead using a custom backend through BatchSimulate.</span>
-<span class="s2">                &quot;&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
-            <span class="p">)</span>
-            <span class="k">if</span> <span class="n">opt_obj_fun</span> <span class="o">==</span> <span class="s2">&quot;maximize_psd&quot;</span><span class="p">:</span>
-                <span class="n">new_name</span><span class="p">,</span> <span class="n">psd_f_bands</span><span class="p">,</span> <span class="n">psd_relative_bandpower</span> <span class="o">=</span> <span class="n">main_execution</span><span class="p">()</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">new_name</span> <span class="o">=</span> <span class="n">main_execution</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># Setup non-CMA simulation backends</span>
-            <span class="k">if</span> <span class="n">backend_selection</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;MPI&quot;</span><span class="p">:</span>
-                <span class="c1"># &#39;use_hwthreading_if_found&#39; and &#39;sensible_default_cores&#39; have</span>
-                <span class="c1"># already been set elsewhere, and do not need to be re-set here.</span>
-                <span class="c1"># Hardware-threading and oversubscription will always be disabled</span>
-                <span class="c1"># to prevent edge cases in the GUI.</span>
-                <span class="n">backend</span> <span class="o">=</span> <span class="n">MPIBackend</span><span class="p">(</span>
-                    <span class="n">n_procs</span><span class="o">=</span><span class="n">n_jobs</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                    <span class="n">mpi_cmd</span><span class="o">=</span><span class="n">mpi_cmd</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                    <span class="n">override_hwthreading_option</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                    <span class="n">override_oversubscribe_option</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">backend</span> <span class="o">=</span> <span class="n">JoblibBackend</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using Joblib with </span><span class="si">{</span><span class="n">n_jobs</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> core(s).&quot;</span><span class="p">)</span>
-
-            <span class="k">with</span> <span class="n">backend</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">opt_obj_fun</span> <span class="o">==</span> <span class="s2">&quot;maximize_psd&quot;</span><span class="p">:</span>
                     <span class="n">new_name</span><span class="p">,</span> <span class="n">psd_f_bands</span><span class="p">,</span> <span class="n">psd_relative_bandpower</span> <span class="o">=</span> <span class="n">main_execution</span><span class="p">()</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">new_name</span> <span class="o">=</span> <span class="n">main_execution</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Setup non-CMA simulation backends</span>
+                <span class="k">if</span> <span class="n">backend_selection</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;MPI&quot;</span><span class="p">:</span>
+                    <span class="c1"># &#39;use_hwthreading_if_found&#39; and &#39;sensible_default_cores&#39; have</span>
+                    <span class="c1"># already been set elsewhere, and do not need to be re-set here.</span>
+                    <span class="c1"># Hardware-threading and oversubscription will always be disabled</span>
+                    <span class="c1"># to prevent edge cases in the GUI.</span>
+                    <span class="n">backend</span> <span class="o">=</span> <span class="n">MPIBackend</span><span class="p">(</span>
+                        <span class="n">n_procs</span><span class="o">=</span><span class="n">n_jobs</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                        <span class="n">mpi_cmd</span><span class="o">=</span><span class="n">mpi_cmd</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                        <span class="n">override_hwthreading_option</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">override_oversubscribe_option</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">backend</span> <span class="o">=</span> <span class="n">JoblibBackend</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using Joblib with </span><span class="si">{</span><span class="n">n_jobs</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> core(s).&quot;</span><span class="p">)</span>
 
-        <span class="c1"># ------------------------------------------------------------------------------</span>
-        <span class="c1"># The remainder of this function is just repeating some post-run visualization</span>
-        <span class="c1"># steps, which are identical to those in `run_button_clicked`</span>
-        <span class="n">viz_manager</span><span class="o">.</span><span class="n">reset_fig_config_tabs</span><span class="p">()</span>
+                <span class="k">with</span> <span class="n">backend</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">opt_obj_fun</span> <span class="o">==</span> <span class="s2">&quot;maximize_psd&quot;</span><span class="p">:</span>
+                        <span class="n">new_name</span><span class="p">,</span> <span class="n">psd_f_bands</span><span class="p">,</span> <span class="n">psd_relative_bandpower</span> <span class="o">=</span> <span class="n">main_execution</span><span class="p">()</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">new_name</span> <span class="o">=</span> <span class="n">main_execution</span><span class="p">()</span>
 
-        <span class="c1"># update default visualization params in gui based on widget</span>
-        <span class="n">fig_default_params</span><span class="p">[</span><span class="s2">&quot;default_smoothing&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">opt_smoothing</span>
-        <span class="n">fig_default_params</span><span class="p">[</span><span class="s2">&quot;default_scaling&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">opt_scaling</span>
-        <span class="n">fig_default_params</span><span class="p">[</span><span class="s2">&quot;default_min_frequency&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">widget_min_frequency</span><span class="o">.</span><span class="n">value</span>
-        <span class="n">fig_default_params</span><span class="p">[</span><span class="s2">&quot;default_max_frequency&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">widget_max_frequency</span><span class="o">.</span><span class="n">value</span>
+            <span class="c1"># --------------------------------------------------------------------------</span>
+            <span class="c1"># The remainder of this function is just repeating some post-run</span>
+            <span class="c1"># visualization steps, which are identical to those in `run_button_clicked`</span>
+            <span class="n">viz_manager</span><span class="o">.</span><span class="n">reset_fig_config_tabs</span><span class="p">()</span>
 
-        <span class="c1"># change default visualization params in viz_manager to mirror gui</span>
-        <span class="k">for</span> <span class="n">widget</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">fig_default_params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">viz_manager</span><span class="o">.</span><span class="n">fig_default_params</span><span class="p">[</span><span class="n">widget</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="c1"># update default visualization params in gui based on widget</span>
+            <span class="n">fig_default_params</span><span class="p">[</span><span class="s2">&quot;default_smoothing&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">opt_smoothing</span>
+            <span class="n">fig_default_params</span><span class="p">[</span><span class="s2">&quot;default_scaling&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">opt_scaling</span>
+            <span class="n">fig_default_params</span><span class="p">[</span><span class="s2">&quot;default_min_frequency&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">widget_min_frequency</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">fig_default_params</span><span class="p">[</span><span class="s2">&quot;default_max_frequency&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">widget_max_frequency</span><span class="o">.</span><span class="n">value</span>
 
-        <span class="n">viz_manager</span><span class="o">.</span><span class="n">add_figure</span><span class="p">()</span>
-        <span class="n">fig_name</span> <span class="o">=</span> <span class="n">_idx2figname</span><span class="p">(</span><span class="n">viz_manager</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;fig_idx&quot;</span><span class="p">][</span><span class="s2">&quot;idx&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">viz_manager</span><span class="o">.</span><span class="n">_simulate_edit_figure</span><span class="p">(</span>
-            <span class="n">fig_name</span><span class="p">,</span>
-            <span class="s2">&quot;ax0&quot;</span><span class="p">,</span>
-            <span class="n">new_name</span><span class="p">,</span>
-            <span class="s2">&quot;input histogram&quot;</span><span class="p">,</span>
-            <span class="p">{},</span>
-            <span class="s2">&quot;plot&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">viz_manager</span><span class="o">.</span><span class="n">_simulate_edit_figure</span><span class="p">(</span>
-            <span class="n">fig_name</span><span class="p">,</span>
-            <span class="s2">&quot;ax1&quot;</span><span class="p">,</span>
-            <span class="n">new_name</span><span class="p">,</span>
-            <span class="s2">&quot;current dipole&quot;</span><span class="p">,</span>
-            <span class="p">{</span>
-                <span class="s2">&quot;data_to_compare&quot;</span><span class="p">:</span> <span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;target_dipole_data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-                <span class="k">if</span> <span class="n">opt_obj_fun</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;dipole_corr&quot;</span><span class="p">,</span> <span class="s2">&quot;dipole_rmse&quot;</span><span class="p">)</span>
-                <span class="k">else</span> <span class="kc">None</span>
-            <span class="p">},</span>
-            <span class="s2">&quot;plot&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
+            <span class="c1"># change default visualization params in viz_manager to mirror gui</span>
+            <span class="k">for</span> <span class="n">widget</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">fig_default_params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">viz_manager</span><span class="o">.</span><span class="n">fig_default_params</span><span class="p">[</span><span class="n">widget</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
-        <span class="c1"># TODO future refactor: Maybe force a file-save of the final network params</span>
-        <span class="c1"># automatically at the end? Since the `HNNGUI.save_config_button` is just a huge</span>
-        <span class="c1"># HTML element itself, I can&#39;t get it to artificially &quot;.click()&quot; to actually</span>
-        <span class="c1"># initiate a download. Is there even a way to do this?</span>
+            <span class="n">viz_manager</span><span class="o">.</span><span class="n">add_figure</span><span class="p">()</span>
+            <span class="n">fig_name</span> <span class="o">=</span> <span class="n">_idx2figname</span><span class="p">(</span><span class="n">viz_manager</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;fig_idx&quot;</span><span class="p">][</span><span class="s2">&quot;idx&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">viz_manager</span><span class="o">.</span><span class="n">_simulate_edit_figure</span><span class="p">(</span>
+                <span class="n">fig_name</span><span class="p">,</span>
+                <span class="s2">&quot;ax0&quot;</span><span class="p">,</span>
+                <span class="n">new_name</span><span class="p">,</span>
+                <span class="s2">&quot;input histogram&quot;</span><span class="p">,</span>
+                <span class="p">{},</span>
+                <span class="s2">&quot;plot&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">viz_manager</span><span class="o">.</span><span class="n">_simulate_edit_figure</span><span class="p">(</span>
+                <span class="n">fig_name</span><span class="p">,</span>
+                <span class="s2">&quot;ax1&quot;</span><span class="p">,</span>
+                <span class="n">new_name</span><span class="p">,</span>
+                <span class="s2">&quot;current dipole&quot;</span><span class="p">,</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;data_to_compare&quot;</span><span class="p">:</span> <span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;target_dipole_data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                    <span class="k">if</span> <span class="n">opt_obj_fun</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;dipole_corr&quot;</span><span class="p">,</span> <span class="s2">&quot;dipole_rmse&quot;</span><span class="p">)</span>
+                    <span class="k">else</span> <span class="kc">None</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;plot&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
 
-        <span class="c1"># TODO future refactor: After adding similar functionality inside Optimizer,</span>
-        <span class="c1"># allow for automatic saving of progress during certain points in an</span>
-        <span class="c1"># optimization run</span>
+            <span class="c1"># TODO future refactor: Maybe force a file-save of the final network params</span>
+            <span class="c1"># automatically at the end? Since the `HNNGUI.save_config_button` is just a</span>
+            <span class="c1"># huge HTML element itself, I can&#39;t get it to artificially &quot;.click()&quot; to</span>
+            <span class="c1"># actually initiate a download. Is there even a way to do this?</span>
 
-        <span class="c1"># Return both the optimized config and the optimizer results</span>
-        <span class="n">optimized_config</span> <span class="o">=</span> <span class="n">serialize_config</span><span class="p">(</span><span class="n">all_data</span><span class="p">,</span> <span class="n">new_name</span><span class="p">)</span>
-        <span class="n">opt_result</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;initial_params&quot;</span><span class="p">:</span> <span class="n">optim</span><span class="o">.</span><span class="n">initial_params</span><span class="p">,</span>
-            <span class="s2">&quot;opt_params&quot;</span><span class="p">:</span> <span class="n">optim</span><span class="o">.</span><span class="n">opt_params_</span><span class="p">,</span>
-            <span class="s2">&quot;obj_values&quot;</span><span class="p">:</span> <span class="n">optim</span><span class="o">.</span><span class="n">obj_</span><span class="p">,</span>
-            <span class="s2">&quot;obj_fun&quot;</span><span class="p">:</span> <span class="n">opt_obj_fun</span><span class="p">,</span>
-            <span class="s2">&quot;solver&quot;</span><span class="p">:</span> <span class="n">opt_solver</span><span class="p">,</span>
-            <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">),</span>
-            <span class="s2">&quot;max_iter&quot;</span><span class="p">:</span> <span class="n">opt_max_iter</span><span class="p">,</span>
-        <span class="p">}</span>
+            <span class="c1"># TODO future refactor: After adding similar functionality inside Optimizer,</span>
+            <span class="c1"># allow for automatic saving of progress during certain points in an</span>
+            <span class="c1"># optimization run</span>
 
-        <span class="c1"># Add target dataset name if using dipole_corr or dipole_rmse</span>
-        <span class="k">if</span> <span class="n">opt_obj_fun</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;dipole_corr&quot;</span><span class="p">,</span> <span class="s2">&quot;dipole_rmse&quot;</span><span class="p">):</span>
-            <span class="n">opt_result</span><span class="p">[</span><span class="s2">&quot;target_dipole_data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">opt_target_widgets</span><span class="p">[</span>
-                <span class="s2">&quot;target_dipole_data&quot;</span>
-            <span class="p">]</span><span class="o">.</span><span class="n">value</span>
-            <span class="n">opt_result</span><span class="p">[</span><span class="s2">&quot;n_trials&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;n_trials&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-        <span class="c1"># Add frequency band parameters if using maximize_psd</span>
-        <span class="k">elif</span> <span class="n">opt_obj_fun</span> <span class="o">==</span> <span class="s2">&quot;maximize_psd&quot;</span><span class="p">:</span>
-            <span class="n">opt_result</span><span class="p">[</span><span class="s2">&quot;psd_f_bands&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">psd_f_bands</span>
-            <span class="n">opt_result</span><span class="p">[</span><span class="s2">&quot;psd_relative_bandpower&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">psd_relative_bandpower</span>
-        <span class="k">return</span> <span class="n">optimized_config</span><span class="p">,</span> <span class="n">opt_result</span>
+            <span class="c1"># Return both the optimized config and the optimizer results</span>
+            <span class="n">optimized_config</span> <span class="o">=</span> <span class="n">serialize_config</span><span class="p">(</span><span class="n">all_data</span><span class="p">,</span> <span class="n">new_name</span><span class="p">)</span>
+            <span class="n">opt_result</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;initial_params&quot;</span><span class="p">:</span> <span class="n">optim</span><span class="o">.</span><span class="n">initial_params</span><span class="p">,</span>
+                <span class="s2">&quot;opt_params&quot;</span><span class="p">:</span> <span class="n">optim</span><span class="o">.</span><span class="n">opt_params_</span><span class="p">,</span>
+                <span class="s2">&quot;obj_values&quot;</span><span class="p">:</span> <span class="n">optim</span><span class="o">.</span><span class="n">obj_</span><span class="p">,</span>
+                <span class="s2">&quot;obj_fun&quot;</span><span class="p">:</span> <span class="n">opt_obj_fun</span><span class="p">,</span>
+                <span class="s2">&quot;solver&quot;</span><span class="p">:</span> <span class="n">opt_solver</span><span class="p">,</span>
+                <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;max_iter&quot;</span><span class="p">:</span> <span class="n">opt_max_iter</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="c1"># Add target dataset name if using dipole_corr or dipole_rmse</span>
+            <span class="k">if</span> <span class="n">opt_obj_fun</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;dipole_corr&quot;</span><span class="p">,</span> <span class="s2">&quot;dipole_rmse&quot;</span><span class="p">):</span>
+                <span class="n">opt_result</span><span class="p">[</span><span class="s2">&quot;target_dipole_data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">opt_target_widgets</span><span class="p">[</span>
+                    <span class="s2">&quot;target_dipole_data&quot;</span>
+                <span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                <span class="n">opt_result</span><span class="p">[</span><span class="s2">&quot;n_trials&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">opt_target_widgets</span><span class="p">[</span><span class="s2">&quot;n_trials&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="c1"># Add frequency band parameters if using maximize_psd</span>
+            <span class="k">elif</span> <span class="n">opt_obj_fun</span> <span class="o">==</span> <span class="s2">&quot;maximize_psd&quot;</span><span class="p">:</span>
+                <span class="n">opt_result</span><span class="p">[</span><span class="s2">&quot;psd_f_bands&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">psd_f_bands</span>
+                <span class="n">opt_result</span><span class="p">[</span><span class="s2">&quot;psd_relative_bandpower&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">psd_relative_bandpower</span>
+            <span class="k">return</span> <span class="n">optimized_config</span><span class="p">,</span> <span class="n">opt_result</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">simulation_status_bar</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">simulation_status_contents</span><span class="p">[</span><span class="s2">&quot;failed&quot;</span><span class="p">]</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+            <span class="k">return</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">launch</span><span class="p">():</span>
