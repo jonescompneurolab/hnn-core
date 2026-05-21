@@ -19,6 +19,7 @@ def _get_target_properties(
     location,
     cell_types,
     probability=1.0,
+    weights_gabab=None,
 ):
     """Retrieve drive properties associated with each target cell type
 
@@ -31,15 +32,23 @@ def _get_target_properties(
         weights_ampa = dict()
     if weights_nmda is None:
         weights_nmda = dict()
+    if weights_gabab is None:
+        weights_gabab = dict()
 
     weights_by_type = {
         cell_type: dict()
-        for cell_type in (set(weights_ampa.keys()) | set(weights_nmda.keys()))
+        for cell_type in (
+            set(weights_ampa.keys())
+            | set(weights_nmda.keys())
+            | set(weights_gabab.keys())
+        )
     }
     for cell_type in weights_ampa:
         weights_by_type[cell_type].update({"ampa": weights_ampa[cell_type]})
     for cell_type in weights_nmda:
         weights_by_type[cell_type].update({"nmda": weights_nmda[cell_type]})
+    for cell_type in weights_gabab:
+        weights_by_type[cell_type].update({"gabab": weights_gabab[cell_type]})
 
     target_populations = set(weights_by_type)
     if not target_populations:
@@ -79,7 +88,7 @@ def _get_target_properties(
         raise ValueError(
             "synaptic_delays is either a common float or needs "
             "to be specified as a dict for each of the cell "
-            "types defined in weights_ampa and weights_nmda "
+            "types defined in weights_ampa, weights_nmda, and weights_gabab "
             f"({target_populations})"
         )
 
@@ -94,7 +103,7 @@ def _get_target_properties(
         raise ValueError(
             "probability is either a common float or needs "
             "to be specified as a dict for each of the cell "
-            "types defined in weights_ampa and weights_nmda "
+            "types defined in weights_ampa, weights_nmda, and weights_gabab "
             f"({target_populations})"
         )
 
@@ -313,7 +322,7 @@ def _drive_cell_event_times(
     )
 
     # check drive name validity, allowing substring matches
-    valid_drives = ["evoked", "poisson", "gaussian", "bursty", "spike_train"]
+    valid_drives = ["evoked", "poisson", "gaussian", "bursty", "spike_train", "ngfc"]
     # NB check if drive_type has a valid substring, not vice versa
     matches = [f for f in valid_drives if f in drive_type]
     if len(matches) == 0:
@@ -336,7 +345,7 @@ def _drive_cell_event_times(
                 lamtha=rate_constant,
                 prng=prng,
             )
-    elif drive_type == "evoked" or drive_type == "gaussian":
+    elif drive_type in ("evoked", "gaussian", "ngfc"):
         event_times = _create_gauss(
             mu=dynamics["mu"],
             sigma=dynamics["sigma"],

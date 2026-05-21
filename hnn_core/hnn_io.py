@@ -305,6 +305,20 @@ def _read_external_drive(net, drive_data, read_output):
             event_seed=drive_data["event_seed"],
             conn_seed=drive_data["conn_seed"],
         )
+    elif drive_data["type"] == "ngfc":
+        net.add_ngfc_drive(
+            name=drive_data["name"],
+            mu=drive_data["dynamics"]["mu"],
+            sigma=drive_data["dynamics"]["sigma"],
+            numspikes=drive_data["dynamics"]["numspikes"],
+            weights_gabab=drive_data["weights_gabab"],
+            n_drive_cells=_set_from_cell_specific(drive_data),
+            cell_specific=drive_data["cell_specific"],
+            synaptic_delays=drive_data["synaptic_delays"],
+            probability=drive_data["probability"],
+            event_seed=drive_data["event_seed"],
+            conn_seed=drive_data["conn_seed"],
+        )
 
     net.external_drives[drive_data["name"]]["events"] = drive_data["events"]
     if not read_output:
