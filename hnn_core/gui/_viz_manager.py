@@ -1093,8 +1093,22 @@ class _VizManager:
         plt.close("all")
         self.viz_layout = viz_layout
         self.fig_default_params = fig_default_params
+
+        # The choice of backend here controls whether our plots elsewhere in this file
+        # use `_static_rerender` or `_dynamic_rerender`, and we prefer the latter.
+        #
+        # This `use` call attempts to force use of the `ipympl` backend, which should be
+        # safe to do because:
+        # 1. `ipympl` is always installed with the GUI dependencies
+        # 2. We are only forcing this for the GUI itself (via `_VizManager`), not for a
+        #    user's general plotting
+        matplotlib.use("ipympl")
+        # However, just in case, we will still support fallback backends like Tushar
+        # added here:
         backend = matplotlib.get_backend().lower()
-        self.use_ipympl = any(name in backend for name in ("ipympl", "nbagg", "widget"))
+        self.use_ipympl = any(
+            name in backend for name in ("ipympl", "nbagg", "widget", "agg")
+        )
 
         self.axes_config_output = Output()
         self.figs_output = Output()
