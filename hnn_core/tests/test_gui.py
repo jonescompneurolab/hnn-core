@@ -2092,10 +2092,44 @@ def test_traceback_logging(setup_gui, monkeypatch):
     assert "Traceback" in compiled_log_text
     assert "[ERROR]" in compiled_log_text
 
+    # Test that our new simulate error was logged AFTER the prior warning from the
+    # beginning of the test
     for log_index in range(len(logs)):
         if "Test 314159 exception" in logs[log_index]:
             err_log_index = log_index
         elif "qwerty warning" in logs[log_index]:
-            assert err_log_index < log_index  # Error should be logged after the warning
+            assert err_log_index < log_index
+
+    def raise_exception_opt(*args, **kwargs):
+        raise ValueError("Test 87654321 exception")
+
+    monkeypatch.setattr("hnn_core.gui.gui.simulate_dipole", raise_exception_opt)
+
+    for val_tstop, val_ntrials, val_tstep in tstop_trials_tstep:
+        gui.widget_simulation_name.value = f"test_{sim_count}"
+        gui.widget_tstop.value = val_tstop
+        gui.widget_ntrials.value = val_ntrials
+        gui.widget_dt.value = val_tstep
+
+        # opt-specific values that need to be set for the run
+        gui.widget_opt_obj_fun.value = "maximize_psd"
+        gui.opt_drive_widgets[0]["mu_opt_checkbox"].value = True
+
+        gui.run_opt_button.click()
+        sim_count += 1
+
+    logs = [msg["text"] for msg in gui._log_out.outputs]
+    compiled_log_text = "\n".join(logs)
+
+    # Test that now, our new error message is included in the overall log:
+    assert "Test 87654321 exception" in compiled_log_text
+
+    # Test that our new opt simulate error was logged AFTER the simulate error from
+    # before
+    for log_index in range(len(logs)):
+        if "Test 87654321 exception" in logs[log_index]:
+            err_log_index = log_index
+        elif "Test 314159 exception" in logs[log_index]:
+            assert err_log_index < log_index
 
     plt.close("all")
