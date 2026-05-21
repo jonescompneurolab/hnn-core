@@ -31,6 +31,26 @@ jobs:
           activate-environment: test
           python-version: ${{ matrix.python-version }}
 
+      - name: Update pip
+        shell: cmd
+        run: |
+          python -m pip install --upgrade pip
+
+      - name: Install ruff for use before ANY other tests
+        shell: cmd
+        run: |
+          pip install --verbose ruff
+
+      - name: Check ruff formatting
+        shell: cmd
+        run: |
+          ruff format hnn_core --check
+
+      - name: Lint with ruff
+        shell: cmd
+        run: |
+          ruff check hnn_core
+
       - name: Install Neuron on Windows separately
         shell: cmd
         run: |
@@ -41,33 +61,74 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install HNN-Core with minimal dependencies and test
+      - name: Install HNN-Core with minimal dependencies
         shell: cmd
         run: |
-          python -m pip install --upgrade pip
           pip install --verbose .
+
+      - name: Test API with minimal dependencies
+        shell: cmd
+        run: |
           python -c "from hnn_core import neymotin_2020_model, simulate_dipole; simulate_dipole(neymotin_2020_model(), tstop=20); print('--> SUCCESS: The test worked!')"
 
       - name: Clean minimal dependencies install
         shell: cmd
+        run: rmdir /s /q build
+
+      - name: Install HNN-Core with Optimization dependencies
+        shell: cmd
+        run: pip install --verbose .[opt]
+
+      - name: Test Optimization dependencies
+        shell: cmd
+        run: python -c "from hnn_core.optimization import Optimizer"
+
+      - name: Clean Optimization dependencies install
+        shell: cmd
+        run: rmdir /s /q build
+
+      - name: Install HNN-Core with GUI dependencies
+        shell: cmd
+        run: pip install --verbose .[gui]
+
+      - name: Test GUI dependencies
+        shell: powershell
         run: |
-          pip uninstall --yes hnn_core
-          rmdir /s /q build
+          $outFile = "$env:TEMP\voila_out.log"
+          $errFile = "$env:TEMP\voila_err.log"
+          $proc = Start-Process -FilePath "hnn-gui" -ArgumentList "--no-browser" `
+            -RedirectStandardOutput $outFile -RedirectStandardError $errFile `
+            -PassThru -NoNewWindow
+          $success = $false
+          # Poll until voila server responds (timeout ~60 seconds (30 * sleep 2)
+          for ($i = 0; $i -lt 30; $i++) {
+            $content = ""
+            if (Test-Path $outFile) { $content += (Get-Content $outFile -Raw -ErrorAction SilentlyContinue) }
+            if (Test-Path $errFile) { $content += (Get-Content $errFile -Raw -ErrorAction SilentlyContinue) }
+            if ($content -match "is running at") {
+              $success = $true
+              break
+            }
+            Start-Sleep -Seconds 2
+          }
+          Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
+          if ($success) {
+            Write-Output "--> SUCCESS: GUI launched successfully"
+          } else {
+            Write-Output "--> FAILURE: GUI did not launch within 60 seconds"
+            if (Test-Path $outFile) { Get-Content $outFile }
+            if (Test-Path $errFile) { Get-Content $errFile }
+            exit 1
+          }
+
+      - name: Clean GUI dependencies install
+        shell: cmd
+        run: rmdir /s /q build
 
       - name: Install HNN-Core with full dependencies
         shell: cmd
         run: |
           pip install --verbose .[opt,parallel,test,gui]
-
-      - name: Check ruff formatting
-        shell: cmd
-        run: |
-          python -m ruff format hnn_core --check
-
-      - name: Lint with ruff
-        shell: cmd
-        run: |
-          python -m ruff check hnn_core
 
       - name: Test non-MPI, embarrassingly parallel tests with pytest
         shell: cmd
