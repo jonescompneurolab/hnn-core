@@ -40,7 +40,13 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ### People who contributed to this release:
 
+- [Shivansh Bhageria][]
+
 ### Changelog
+
+- Improve y-axis labels and ticks of LFP and CSD plotting,
+  by [Shivansh Bhageria][] in {gh}`1191`. This was their first PR, thanks Shivansh!
+
 
 ## 0.6.1 Patch Release Notes
 
@@ -1451,3 +1457,4 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [Joyce Gao]: https://github.com/xgao35
 [Percival Villalva]: https://github.com/pervillalva
 [Anna Cattani]: https://github.com/annacatt
+[Shivansh Bhageria]: https://github.com/Shivansh1205
