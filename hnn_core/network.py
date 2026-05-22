@@ -909,6 +909,8 @@ class Network:
         sigma,
         numspikes,
         weights_gabab=None,
+        weights_gabaa=None,
+        synapse_type="gabab",
         n_drive_cells="n_cells",
         cell_specific=True,
         space_constant=3.0,
@@ -917,12 +919,12 @@ class Network:
         event_seed=2,
         conn_seed=3,
     ):
-        """Add an 'ngfc' external drive targeting apical GABAB receptors.
+        """Add an 'ngfc' external drive targeting apical inhibitory receptors.
 
-        Models input from neurogliaform cells (NGFCs), activating only GABAB
-        receptors on the ``apical_tuft`` section of pyramidal cells. Spike
-        times are drawn from a Gaussian distribution, identical to the evoked
-        drive mechanism.
+        Models input from neurogliaform cells (NGFCs), activating GABAB and/or
+        GABAA receptors on the ``apical_tuft`` section of pyramidal cells.
+        Spike times are drawn from a Gaussian distribution, identical to the
+        evoked drive mechanism.
 
         Parameters
         ----------
@@ -936,9 +938,19 @@ class Network:
             Number of spikes per drive cell per trial.
         weights_gabab : dict or None
             Synaptic weights (in uS) of GABAB receptors on each targeted cell
-            type (dict keys). Only ``'L2_pyramidal'`` and ``'L5_pyramidal'``
-            are valid targets, as they are the only cell types with an
-            ``apical_tuft`` section.
+            type (dict keys). Only pyramidal cell types with an
+            ``apical_tuft`` section are valid targets. Ignored when
+            ``synapse_type='gabaa'``.
+        weights_gabaa : dict or None
+            Synaptic weights (in uS) of GABAA receptors on each targeted cell
+            type (dict keys). Only pyramidal cell types with an
+            ``apical_tuft`` section are valid targets. Ignored when
+            ``synapse_type='gabab'``.
+        synapse_type : str
+            Which inhibitory synapse(s) to activate on ``apical_tuft``.
+            Must be one of ``'gabab'`` (default), ``'gabaa'``, or ``'both'``.
+            ``'gabab'`` uses only ``weights_gabab``; ``'gabaa'`` uses only
+            ``weights_gabaa``; ``'both'`` uses both weight dicts.
         n_drive_cells : int | 'n_cells'
             The number of drive cells that each contribute an independently
             sampled synaptic spike. If ``'n_cells'`` (default) and
@@ -970,15 +982,26 @@ class Network:
 
         Notes
         -----
-        The location is fixed to ``'apical_tuft'`` and the receptor is fixed
-        to ``'gabab'``. Only ``L2_pyramidal`` and ``L5_pyramidal`` cells have
-        this section and receptor combination.
+        The location is fixed to ``'apical_tuft'``. The active receptor(s)
+        are controlled by ``synapse_type``: ``'gabab'`` only, ``'gabaa'``
+        only, or ``'both'``. Only pyramidal cell types that have an
+        ``apical_tuft`` section are valid targets.
 
         Random seeding behavior across trials is the same as for
         :meth:`~hnn_core.Network.add_evoked_drive`.
         """
+        valid_synapse_types = ("gabab", "gabaa", "both")
+        if synapse_type not in valid_synapse_types:
+            raise ValueError(
+                f"synapse_type must be one of {valid_synapse_types}; "
+                f"got '{synapse_type}'"
+            )
         if not self._legacy_mode:
             _check_drive_parameter_values("ngfc", sigma=sigma, numspikes=numspikes)
+
+        active_gabab = weights_gabab if synapse_type in ("gabab", "both") else None
+        active_gabaa = weights_gabaa if synapse_type in ("gabaa", "both") else None
+
         drive = _NetworkDrive()
         drive["type"] = "ngfc"
         drive["location"] = "apical_tuft"
@@ -990,6 +1013,8 @@ class Network:
         drive["weights_ampa"] = None
         drive["weights_nmda"] = None
         drive["weights_gabab"] = weights_gabab
+        drive["weights_gabaa"] = weights_gabaa
+        drive["synapse_type"] = synapse_type
         drive["synaptic_delays"] = synaptic_delays
         drive["probability"] = probability
 
@@ -1004,7 +1029,8 @@ class Network:
             n_drive_cells=n_drive_cells,
             cell_specific=cell_specific,
             probability=probability,
-            weights_gabab=weights_gabab,
+            weights_gabab=active_gabab,
+            weights_gabaa=active_gabaa,
         )
 
     def add_poisson_drive(
@@ -1436,6 +1462,7 @@ class Network:
         cell_specific,
         probability,
         weights_gabab=None,
+        weights_gabaa=None,
     ):
         """Attach a drive to network based on connectivity information
 
@@ -1507,6 +1534,7 @@ class Network:
                 self.cell_types,
                 probability=probability,
                 weights_gabab=weights_gabab,
+                weights_gabaa=weights_gabaa,
             )
         )
 

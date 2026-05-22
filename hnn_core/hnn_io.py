@@ -312,6 +312,8 @@ def _read_external_drive(net, drive_data, read_output):
             sigma=drive_data["dynamics"]["sigma"],
             numspikes=drive_data["dynamics"]["numspikes"],
             weights_gabab=drive_data["weights_gabab"],
+            weights_gabaa=drive_data.get("weights_gabaa", None),
+            synapse_type=drive_data.get("synapse_type", "gabab"),
             n_drive_cells=_set_from_cell_specific(drive_data),
             cell_specific=drive_data["cell_specific"],
             synaptic_delays=drive_data["synaptic_delays"],

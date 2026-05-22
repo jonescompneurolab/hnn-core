@@ -20,6 +20,7 @@ def _get_target_properties(
     cell_types,
     probability=1.0,
     weights_gabab=None,
+    weights_gabaa=None,
 ):
     """Retrieve drive properties associated with each target cell type
 
@@ -34,6 +35,8 @@ def _get_target_properties(
         weights_nmda = dict()
     if weights_gabab is None:
         weights_gabab = dict()
+    if weights_gabaa is None:
+        weights_gabaa = dict()
 
     weights_by_type = {
         cell_type: dict()
@@ -41,6 +44,7 @@ def _get_target_properties(
             set(weights_ampa.keys())
             | set(weights_nmda.keys())
             | set(weights_gabab.keys())
+            | set(weights_gabaa.keys())
         )
     }
     for cell_type in weights_ampa:
@@ -49,6 +53,8 @@ def _get_target_properties(
         weights_by_type[cell_type].update({"nmda": weights_nmda[cell_type]})
     for cell_type in weights_gabab:
         weights_by_type[cell_type].update({"gabab": weights_gabab[cell_type]})
+    for cell_type in weights_gabaa:
+        weights_by_type[cell_type].update({"gabaa": weights_gabaa[cell_type]})
 
     target_populations = set(weights_by_type)
     if not target_populations:
@@ -88,7 +94,7 @@ def _get_target_properties(
         raise ValueError(
             "synaptic_delays is either a common float or needs "
             "to be specified as a dict for each of the cell "
-            "types defined in weights_ampa, weights_nmda, and weights_gabab "
+            "types defined in weights_ampa, weights_nmda, weights_gabab, and weights_gabaa "
             f"({target_populations})"
         )
 
@@ -103,7 +109,7 @@ def _get_target_properties(
         raise ValueError(
             "probability is either a common float or needs "
             "to be specified as a dict for each of the cell "
-            "types defined in weights_ampa, weights_nmda, and weights_gabab "
+            "types defined in weights_ampa, weights_nmda, weights_gabab, and weights_gabaa "
             f"({target_populations})"
         )
 
