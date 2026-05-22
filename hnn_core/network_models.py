@@ -122,7 +122,7 @@ def neymotin_2020_model(
     """
     hnn_core_root = Path(hnn_core.__file__).parent
     if params is None:
-        params = hnn_core_root/ "param"/ "default.json"
+        params = hnn_core_root / "param" / "default.json"
     if isinstance(params, (str, Path)):
         params = read_params(params)
 
@@ -491,7 +491,7 @@ def calcium_model(
            Brain Topography, 35, 19–35 (2022).
     """
     hnn_core_root = Path(hnn_core.__file__).parent
-    params_fname = hnn_core_root/ "param"/ "default.json"
+    params_fname = hnn_core_root / "param" / "default.json"
     if params is None:
         params = read_params(params_fname)
 

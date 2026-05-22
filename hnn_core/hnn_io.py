@@ -452,9 +452,9 @@ def write_network_configuration(net, output, overwrite=True):
 
     net_data = net.to_dict(write_output=False)
     net_data_converted = _convert_np_array_to_list(net_data)
-    
+
     if isinstance(output, (str, Path)):
-        output=Path(output)
+        output = Path(output)
         if overwrite is False and output.exists():
             raise FileExistsError(
                 f"File already exists at path {output}. Rename "

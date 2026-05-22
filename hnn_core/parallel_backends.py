@@ -528,10 +528,7 @@ def _get_procs_running(proc_name):
     for p in process_iter(attrs=["name", "exe", "cmdline"]):
         if (
             proc_name == p.info["name"]
-            or (
-                p.info["exe"] is not None
-                and Path(p.info["exe"]).name == proc_name
-            )
+            or (p.info["exe"] is not None and Path(p.info["exe"]).name == proc_name)
             or (p.info["cmdline"] and p.info["cmdline"][0] == proc_name)
         ):
             process_list.append(p)

@@ -85,7 +85,6 @@ def read_params(params_fname, file_contents=None):
         Params containing parameter values from file
     """
 
-    
     ext = Path(params_fname).suffix
 
     if ext not in [".json", ".param"]:

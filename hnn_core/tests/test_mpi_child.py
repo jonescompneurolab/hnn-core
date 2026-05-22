@@ -88,7 +88,7 @@ def test_str_to_net():
     hnn_core_root = Path(hnn_core.__file__).parent
 
     # prepare network
-    params_fname = hnn_core_root/ "param"/ "default.json"
+    params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
     net = neymotin_2020_model(params, add_drives_from_params=True)
 
@@ -125,7 +125,7 @@ def test_child_run():
     hnn_core_root = Path(hnn_core.__file__).parent
 
     # prepare params
-    params_fname = hnn_core_root/ "param"/ "default.json"
+    params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
     params_reduced = params.copy()
     params_reduced.update({"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20})

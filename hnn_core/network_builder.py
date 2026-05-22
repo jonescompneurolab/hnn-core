@@ -187,7 +187,7 @@ def load_custom_mechanisms(net_verbose=True):
     for root, dirnames, filenames in os.walk(mod_dir):
         for filename in filenames:
             if filename.endswith((".so", ".dll")):
-                mech_fname.append(Path(root) / filename)
+                mech_fname.append(str(Path(root) / filename))
                 break
 
     if len(mech_fname) == 0:

@@ -37,7 +37,7 @@ def cleanup_matplotlib():
 @pytest.fixture
 def setup_net():
     hnn_core_root = Path(hnn_core.__file__).parent
-    params_fname = hnn_core_root/ "param"/ "default.json"
+    params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
     net = neymotin_2020_model(params, mesh_shape=(3, 3))
 
@@ -326,7 +326,7 @@ class TestCellResponsePlotters:
     def class_setup_net(self):
         """Creates a base network for tests within this class"""
         hnn_core_root = Path(hnn_core.__file__).parent
-        params_fname = hnn_core_root/ "param"/ "default.json"
+        params_fname = hnn_core_root / "param" / "default.json"
         params = read_params(params_fname)
         net = neymotin_2020_model(params, mesh_shape=(3, 3))
 

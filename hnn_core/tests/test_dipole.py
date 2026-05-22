@@ -21,7 +21,7 @@ matplotlib.use("agg")
 def test_dipole(tmp_path, run_hnn_core_fixture):
     """Test dipole object."""
     hnn_core_root = Path(hnn_core.__file__).parent
-    params_fname = hnn_core_root/ "param" / "default.json"
+    params_fname = hnn_core_root / "param" / "default.json"
     dpl_out_fname = tmp_path / "dpl1.txt"
     dpl_out_hdf5_fname = tmp_path / "dpl.hdf5"
     params = read_params(params_fname)
@@ -187,7 +187,7 @@ def test_dipole(tmp_path, run_hnn_core_fixture):
 def test_dipole_simulation():
     """Test data produced from simulate_dipole() call."""
     hnn_core_root = Path(hnn_core.__file__).parent
-    params_fname = hnn_core_root/ "param"/ "default.json"
+    params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
     params.update(
         {"dipole_smooth_win": 5, "t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20}
@@ -328,7 +328,7 @@ def test_rmse():
     )
 
     hnn_core_root = Path(hnn_core.__file__).resolve().parent
-    params_fname = hnn_core_root/ "param"/ "default.json"
+    params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
 
     expected_rmse = 0.1

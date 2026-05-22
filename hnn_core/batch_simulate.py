@@ -486,7 +486,7 @@ class BatchSimulate(object):
             List of dictionaries containing all loaded simulation results.
         """
         all_results = []
-        save_folder=Path(self.save_folder)
+        save_folder = Path(self.save_folder)
         for file_path in save_folder.glob("sim_run_*.npz"):
             results = self.load_results(file_path)
             all_results.append(results)

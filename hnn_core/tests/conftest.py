@@ -85,7 +85,7 @@ def run_hnn_core_fixture():
         hnn_core_root = Path(hnn_core.__file__).parent
 
         # default params
-        params_fname = hnn_core_root/ "param"/ "default.json"
+        params_fname = hnn_core_root / "param" / "default.json"
         params = read_params(params_fname)
 
         tstop = 170.0
