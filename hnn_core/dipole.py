@@ -3,7 +3,7 @@
 # Authors: Mainak Jas <mjas@mgh.harvard.edu>
 #          Sam Neymotin <samnemo@gmail.com>
 
-import os
+from pathlib import Path
 import warnings
 from copy import deepcopy
 from io import StringIO
@@ -215,10 +215,10 @@ def read_dipole(fname):
         The instance of Dipole class
     """
 
-    fname = str(fname)
-    if not os.path.exists(fname):
-        raise FileNotFoundError("File not found at path %s." % (fname,))
-    file_extension = os.path.splitext(fname)[-1]
+    fname = Path(fname)
+    if not fname.exists():
+        raise FileNotFoundError(f"File not found at path {fname}.")
+    file_extension = fname.suffix
     if file_extension == ".txt":
         return _read_dipole_txt(fname)
     elif file_extension == ".hdf5":
@@ -226,7 +226,7 @@ def read_dipole(fname):
     else:
         raise NameError(
             "File extension should be either txt or hdf5, but the "
-            "given extension is %s" % (file_extension,)
+            f"given extension is {file_extension}."
         )
 
 
@@ -854,13 +854,13 @@ class Dipole(object):
         if isinstance(fname, StringIO):
             return self._write_txt(fname)
 
-        fname = str(fname)
-        if overwrite is False and os.path.exists(fname):
+        fname = Path(fname)
+        if overwrite is False and fname.exists():
             raise FileExistsError(
                 "File already exists at path %s. Rename "
                 "the file or set overwrite=True." % (fname,)
             )
-        file_extension = os.path.splitext(fname)[-1]
+        file_extension = fname.suffix
         if file_extension == ".txt":
             self._write_txt(fname)
         elif file_extension == ".hdf5":
@@ -868,5 +868,5 @@ class Dipole(object):
         else:
             raise NameError(
                 "File extension should be either txt or hdf5, but "
-                "the given extension is %s." % (file_extension,)
+                f"the given extension is {file_extension}."
             )

@@ -5,7 +5,6 @@
 
 import json
 import fnmatch
-import os.path as op
 from pathlib import Path
 from copy import deepcopy
 
@@ -86,8 +85,8 @@ def read_params(params_fname, file_contents=None):
         Params containing parameter values from file
     """
 
-    split_fname = op.splitext(params_fname)
-    ext = split_fname[1]
+    
+    ext = Path(params_fname).suffix
 
     if ext not in [".json", ".param"]:
         raise ValueError(
@@ -103,7 +102,7 @@ def read_params(params_fname, file_contents=None):
 
     if len(params_dict) == 0:
         raise ValueError(
-            "Failed to read parameters from file: %s" % op.normpath(params_fname)
+            "Failed to read parameters from file: %s" % Path(params_fname).resolve()
         )
 
     params = Params(params_dict)

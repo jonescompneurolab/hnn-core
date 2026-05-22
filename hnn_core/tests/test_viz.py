@@ -1,4 +1,4 @@
-import os.path as op
+from pathlib import Path
 
 import matplotlib
 from matplotlib import backend_bases
@@ -36,8 +36,8 @@ def cleanup_matplotlib():
 
 @pytest.fixture
 def setup_net():
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, "param", "default.json")
+    hnn_core_root = Path(hnn_core.__file__).parent
+    params_fname = hnn_core_root/ "param"/ "default.json"
     params = read_params(params_fname)
     net = neymotin_2020_model(params, mesh_shape=(3, 3))
 
@@ -325,8 +325,8 @@ class TestCellResponsePlotters:
     @pytest.fixture(scope="class")
     def class_setup_net(self):
         """Creates a base network for tests within this class"""
-        hnn_core_root = op.dirname(hnn_core.__file__)
-        params_fname = op.join(hnn_core_root, "param", "default.json")
+        hnn_core_root = Path(hnn_core.__file__).parent
+        params_fname = hnn_core_root/ "param"/ "default.json"
         params = read_params(params_fname)
         net = neymotin_2020_model(params, mesh_shape=(3, 3))
 

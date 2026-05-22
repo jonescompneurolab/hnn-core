@@ -5,9 +5,8 @@
 #          Blake Caldwell <blake_caldwell@brown.edu>
 
 import os
-import os.path as op
 from copy import deepcopy
-
+from pathlib import Path
 import numpy as np
 from neuron import h
 
@@ -184,11 +183,11 @@ def load_custom_mechanisms(net_verbose=True):
 
     # recursively find the .so / .dll library
     mech_fname = list()
-    mod_dir = op.join(op.dirname(__file__), "mod")
+    mod_dir = Path(__file__).parent / "mod"
     for root, dirnames, filenames in os.walk(mod_dir):
         for filename in filenames:
             if filename.endswith((".so", ".dll")):
-                mech_fname.append(os.path.join(root, filename))
+                mech_fname.append(Path(root) / filename)
                 break
 
     if len(mech_fname) == 0:

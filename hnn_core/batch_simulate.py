@@ -5,9 +5,8 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
-import os
 from itertools import product
-
+from pathlib import Path
 import numpy as np
 from joblib import Parallel, delayed, parallel_config
 
@@ -406,9 +405,8 @@ class BatchSimulate(object):
         _validate_type(start_idx, types="int", item_name="start_idx")
         _validate_type(end_idx, types="int", item_name="end_idx")
 
-        if not os.path.exists(self.save_folder):
-            os.makedirs(self.save_folder)
-
+        save_folder = Path(self.save_folder)
+        save_folder.mkdir(parents=True, exist_ok=True)
         save_data = {"param_values": [result["param_values"] for result in results]}
 
         attributes_to_save = [
@@ -431,8 +429,9 @@ class BatchSimulate(object):
         }
         save_data["metadata"] = metadata
 
-        file_name = os.path.join(self.save_folder, f"sim_run_{start_idx}-{end_idx}.npz")
-        if os.path.exists(file_name) and not self.overwrite:
+        save_folder = Path(self.save_folder)
+        file_name = save_folder / f"sim_run_{start_idx}-{end_idx}.npz"
+        if file_name.exists() and not self.overwrite:
             raise FileExistsError(
                 f"File {file_name} already exists and overwrite is set to False."
             )
@@ -487,9 +486,8 @@ class BatchSimulate(object):
             List of dictionaries containing all loaded simulation results.
         """
         all_results = []
-        for file_name in os.listdir(self.save_folder):
-            if file_name.startswith("sim_run_") and file_name.endswith(".npz"):
-                file_path = os.path.join(self.save_folder, file_name)
-                results = self.load_results(file_path)
-                all_results.append(results)
+        save_folder=Path(self.save_folder)
+        for file_path in save_folder.glob("sim_run_*.npz"):
+            results = self.load_results(file_path)
+            all_results.append(results)
         return all_results
