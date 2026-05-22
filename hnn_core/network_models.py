@@ -774,6 +774,16 @@ def duecker_ET_model(
     receptor = "ampa"
     net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
+    # NGFC drive: models slow apical-tuft GABAB inhibition from neurogliaform cells
+    net.add_ngfc_drive(
+        "ngfc",
+        mu=135.0,
+        sigma=4.0,
+        numspikes=1,
+        weights_gabab={"L2_pyramidal": 0.001, "L5ET": 0.001},
+        synaptic_delays={"L2_pyramidal": 0.1, "L5ET": 0.1},
+    )
+
     return net
 
 
