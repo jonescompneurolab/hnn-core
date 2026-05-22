@@ -11,7 +11,7 @@ import pytest
 
 import hnn_core
 from hnn_core import read_params, read_dipole, average_dipoles
-from hnn_core import Network, jones_2009_model
+from hnn_core import Network, neymotin_2020_model
 from hnn_core.viz import plot_dipole
 from hnn_core.dipole import Dipole, simulate_dipole, _rmse
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
@@ -193,7 +193,7 @@ def test_dipole_simulation():
     params.update(
         {"dipole_smooth_win": 5, "t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20}
     )
-    net = jones_2009_model(params, add_drives_from_params=True, mesh_shape=(3, 3))
+    net = neymotin_2020_model(params, add_drives_from_params=True, mesh_shape=(3, 3))
     with pytest.raises(ValueError, match="Invalid number of simulations: 0"):
         simulate_dipole(net, tstop=25.0, n_trials=0)
     with pytest.raises(ValueError, match="Invalid value for the"):
@@ -344,3 +344,31 @@ def test_rmse():
     avg_rmse = _rmse(test_dpl, exp_dpl, tstop=params["tstop"])
 
     assert_allclose(avg_rmse, expected_rmse)
+
+
+def test_dipole_simulation_with_renamed_cells():
+    """Test dipole simulation works with renamed pyramidal cells."""
+    net = neymotin_2020_model()
+
+    # renaming the pyramidal cells (their cell_metadata should remeain the same)
+    rename_mapping = {"L2_pyramidal": "My_L2_Pyr", "L5_pyramidal": "My_L5_Pyr"}
+    net._rename_cell_types(rename_mapping)
+
+    # adding a drive using the new names to generate activity
+    net.add_evoked_drive(
+        "evd1",
+        mu=20,
+        sigma=5,
+        numspikes=1,
+        location="distal",
+        weights_ampa={"My_L2_Pyr": 0.1, "My_L5_Pyr": 0.1},
+    )
+
+    # Simulate the dipole. This will fail if the backend can't find
+    #    the pyramidal cells by their cell_metadata.
+    dpls = simulate_dipole(net, tstop=40.0, n_trials=1)
+
+    # 5. Assert that a valid Dipole object was returned
+    assert isinstance(dpls[0], Dipole)
+    assert len(dpls[0].times) > 0
+    assert np.any(dpls[0].data["agg"] != 0)  # Check that dipole is not all zeros

@@ -68,7 +68,8 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
     h.finitialize()
 
     def simulation_time():
-        print(f"Trial {trial_idx + 1}: {round(h.t, 2)} ms...")
+        if net._verbose:
+            print(f"Trial {trial_idx + 1}: {round(h.t, 2)} ms...")
 
     if rank == 0:
         for tt in range(0, int(h.tstop), 10):
@@ -109,12 +110,33 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
             if ca is not None:
                 ca_py[gid][sec_name] = ca.to_python()
 
-    dpl_data = np.c_[
-        neuron_net._nrn_dipoles["L2_pyramidal"].as_numpy()
-        + neuron_net._nrn_dipoles["L5_pyramidal"].as_numpy(),
-        neuron_net._nrn_dipoles["L2_pyramidal"].as_numpy(),
-        neuron_net._nrn_dipoles["L5_pyramidal"].as_numpy(),
+    dipole_cell_types = [
+        name
+        for name, data in neuron_net.net.cell_types.items()
+        if data["cell_metadata"].get("measure_dipole", False)
     ]
+
+    dpl_data = None
+
+    # Process each cell type that contributes to the dipole
+    for cell_type_name in dipole_cell_types:
+        if cell_type_name in neuron_net._nrn_dipoles:
+            cell_dipole = neuron_net._nrn_dipoles[cell_type_name].as_numpy()
+
+            if dpl_data is None:
+                dpl_data = np.zeros((len(cell_dipole), len(dipole_cell_types) + 1))
+
+            cell_idx = dipole_cell_types.index(cell_type_name)
+
+            # Add to total dipole
+            dpl_data[:, 0] += cell_dipole
+
+            # Store individual cell type dipole
+            dpl_data[:, cell_idx + 1] = cell_dipole
+
+    # If no dipole data was collected, create empty array
+    if dpl_data is None:
+        dpl_data = np.array([])
 
     rec_arr_py = dict()
     rec_times_py = dict()
@@ -141,6 +163,8 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
 def _is_loaded_mechanisms():
     # copied from:
     # https://www.neuron.yale.edu/neuron/static/py_doc/modelspec/programmatic/mechtype.html
+    # For newer version of the same documentation, see
+    # https://nrn.readthedocs.io/en/8.2.7/hoc/modelspec/programmatic/mechtype.html
     mt = h.MechanismType(0)
     mname = h.ref("")
     mnames = list()
@@ -154,7 +178,7 @@ def _is_loaded_mechanisms():
         return True
 
 
-def load_custom_mechanisms():
+def load_custom_mechanisms(net_verbose=True):
     if _is_loaded_mechanisms():
         return
 
@@ -171,7 +195,10 @@ def load_custom_mechanisms():
         raise FileNotFoundError(f"No .so or .dll file found in {mod_dir}")
 
     h.nrn_load_dll(mech_fname[0])
-    print("Loading custom mechanism files from %s" % mech_fname[0])
+
+    if net_verbose:
+        print("Loading custom mechanism files from %s" % mech_fname[0])
+
     if not _is_loaded_mechanisms():
         raise ValueError("The custom mechanisms could not be loaded")
 
@@ -325,15 +352,16 @@ class NetworkBuilder(object):
         self._rank = _get_rank()
 
         # load mechanisms needs ParallelContext for get_rank
-        load_custom_mechanisms()
+        load_custom_mechanisms(self.net._verbose)
 
-        if self._rank == 0:
+        if self._rank == 0 and self.net._verbose:
             print("Building the NEURON model")
 
         self._clear_last_network_objects()
 
-        self._nrn_dipoles["L5_pyramidal"] = h.Vector()
-        self._nrn_dipoles["L2_pyramidal"] = h.Vector()
+        for cell_type, cell_data in self.net.cell_types.items():
+            if cell_data["cell_metadata"].get("measure_dipole", False):
+                self._nrn_dipoles[cell_type] = h.Vector()
 
         self._gid_assign()
 
@@ -346,8 +374,6 @@ class NetworkBuilder(object):
             record_isec=record_isec,
             record_ca=record_ca,
         )
-
-        self.state_init()
 
         # set to record spikes, somatic voltages, and extracellular potentials
         self._spike_times = h.Vector()
@@ -363,7 +389,7 @@ class NetworkBuilder(object):
         if len(self.net.rec_arrays) > 0:
             self._record_extracellular()
 
-        if self._rank == 0:
+        if self._rank == 0 and self.net._verbose:
             print("[Done]")
 
     def _gid_assign(self, rank=None, n_hosts=None):
@@ -439,12 +465,14 @@ class NetworkBuilder(object):
             gid_idx = gid - self.net.gid_ranges[src_type][0]
             if src_type in self.net.cell_types:
                 # copy cell object from template cell type in Network
-                cell = self.net.cell_types[src_type].copy()
+                cell = self.net.cell_types[src_type]["cell_object"].copy()
                 cell.gid = gid
                 cell.pos = self.net.pos_dict[src_type][gid_idx]
 
                 # instantiate NEURON object
-                if src_type in ("L2_pyramidal", "L5_pyramidal"):
+                # using meta data style
+                src_type_metadata = self.net.cell_types[src_type]["cell_metadata"]
+                if src_type_metadata.get("measure_dipole", False):
                     cell.build(sec_name_apical="apical_trunk")
                 else:
                     cell.build()
@@ -585,7 +613,8 @@ class NetworkBuilder(object):
                         f"Got n_samples={n_samples}, {cell.name}."
                         f"dipole.size()={cell.dipole.size()}."
                     )
-                nrn_dpl = self._nrn_dipoles[_long_name(cell.name)]
+                cell_type = self.net.gid_to_type(cell.gid)
+                nrn_dpl = self._nrn_dipoles[cell_type]
                 nrn_dpl.add(cell.dipole)
 
             self._vsec[cell.gid] = cell.vsec
@@ -621,30 +650,6 @@ class NetworkBuilder(object):
                 self._ca.update(ca)
 
         _PC.barrier()  # get all nodes to this place before continuing
-
-    def state_init(self):
-        """Initializes the state closer to baseline."""
-
-        for cell in self._cells:
-            seclist = h.SectionList()
-            seclist.wholetree(sec=cell._nrn_sections["soma"])
-            for sect in seclist:
-                for seg in sect:
-                    if cell.name == "L2Pyr":
-                        seg.v = -71.46
-                    elif cell.name == "L5Pyr":
-                        if sect.name() == "L5Pyr_apical_1":
-                            seg.v = -71.32
-                        elif sect.name() == "L5Pyr_apical_2":
-                            seg.v = -69.08
-                        elif sect.name() == "L5Pyr_apical_tuft":
-                            seg.v = -67.30
-                        else:
-                            seg.v = -72.0
-                    elif cell.name == "L2Basket":
-                        seg.v = -64.9737
-                    elif cell.name == "L5Basket":
-                        seg.v = -64.9737
 
     def _clear_neuron_objects(self):
         """Clear up NEURON internal gid and reference information.

@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 import hnn_core
-from hnn_core import read_params, jones_2009_model, simulate_dipole
+from hnn_core import read_params, neymotin_2020_model, simulate_dipole
 from hnn_core.optimization.optimize_evoked import (
     _consolidate_chunks,
     _split_by_evinput,
@@ -107,7 +107,9 @@ def test_optimize_evoked():
             "sigma_t_evdist_1": 2.0,
         }
     )
-    net_orig = jones_2009_model(params, add_drives_from_params=True, mesh_shape=(3, 3))
+    net_orig = neymotin_2020_model(
+        params, add_drives_from_params=True, mesh_shape=(3, 3)
+    )
     del net_orig.external_drives["evprox2"]
     dpl_orig = simulate_dipole(net_orig, tstop=tstop, n_trials=n_trials)[0]
 
@@ -121,7 +123,7 @@ def test_optimize_evoked():
             "sigma_t_evdist_1": 2.0,
         }
     )
-    net_offset = jones_2009_model(
+    net_offset = neymotin_2020_model(
         params, add_drives_from_params=True, mesh_shape=(3, 3)
     )
     del net_offset.external_drives["evprox2"]

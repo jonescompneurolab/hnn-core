@@ -4,9 +4,9 @@ import numpy as np
 
 import matplotlib
 
-from hnn_core.network_builder import load_custom_mechanisms
-from hnn_core.cell import _ArtificialCell, Cell, Section
 from hnn_core import pyramidal
+from hnn_core.cell import _ArtificialCell, Cell, Section
+from hnn_core.network_builder import load_custom_mechanisms
 
 matplotlib.use("agg")
 
@@ -42,7 +42,7 @@ def test_cell():
 
     # test that ExpSyn always takes nrn.Segment, not float
     with pytest.raises(TypeError, match="secloc must be instance of"):
-        cell.syn_create(0.5, e=0.0, tau1=0.5, tau2=5.0)
+        cell.syn_create(0.5, e=0.0, tau1=0.5, tau2=5.0, type="Exp2Syn")
 
     pickle.dumps(cell)  # check cell object is picklable until built
 
@@ -94,7 +94,7 @@ def test_cell():
     assert cell.sections[sec_name].Ra == new_Ra
 
     # Testing update end pts using template cell
-    cell1 = pyramidal(cell_name="L5Pyr")
+    cell1 = pyramidal(cell_name="L5_pyramidal")
 
     # Test other not NotImplemented for Cell Class
     assert (cell1 == "cell") is False
@@ -135,7 +135,7 @@ def test_cell():
     # Checking equality till 5 decimal places
     np.testing.assert_almost_equal(end_pts_original, end_pts_new, 5)
 
-    # Testing distance function using template cell (L5pyr)
+    # Testing distance function using template cell (L5_pyramidal)
     sec_dist = dict()
     sec_dist["soma"] = 19.5
     sec_dist["apical_trunk"] = 90
@@ -182,3 +182,152 @@ def test_artificial_cell():
         match="gid must be an integer",
     ):
         cell = _ArtificialCell(event_times, threshold, gid="one")
+
+
+def _helper_create_cell_and_run_synapse_checks(input_synapse_config):
+    """Helper function to create Cell with input synapse config.
+
+    This is used for tests that use `Cell.build` to test both
+    `Cell._create_synapses` and `Cell.syn_create`.
+    """
+    load_custom_mechanisms()
+    name = "asdf"
+    pos = (0.0, 0.0, 0.0)
+
+    sections = {
+        "soma": Section(
+            L=39, diam=20, cm=0.85, Ra=200.0, end_pts=[[0, 0, 0], [0, 39.0, 0]]
+        )
+    }
+    # Set the name of every future synapse we will test to be "ampa"
+    sections["soma"].syns = ["ampa"]
+
+    sect_loc = {"proximal": "soma"}
+    cell_tree = {("soma", 0): [("soma", 1)]}
+
+    # Create our unique synapse config for this test:
+    synapses = {"ampa": input_synapse_config}
+
+    # Create the HNN-Core Cell object with this custom synapse config:
+    cell = Cell(name, pos, sections, synapses, sect_loc, cell_tree)
+    # Checking that we have no NEURON synapses present before building the cell
+    assert not cell._nrn_synapses
+    # Build cell into NEURON
+    cell.build()
+
+    # Grab the new NEURON synapse object (which also checks that it exists)
+    syn = cell._nrn_synapses["soma_ampa"]
+    # NEURON HocObjects use hname() to identify mechname (e.g. "Exp2Syn[0]")
+    if "mechname" in input_synapse_config.keys():
+        assert syn.hname().startswith(input_synapse_config["mechname"])
+    else:
+        assert syn.hname().startswith("Exp2Syn")
+
+    # Remove 'mechname' from the custom synapse config since it's not an actual
+    # parameter of the NEURON synapse object
+    if "mechname" in input_synapse_config.keys():
+        input_synapse_config.pop("mechname")
+    # Check that all custom synapse parameters are present and set correctly on the
+    # NEURON synapse object
+    for param_name, expected_value in input_synapse_config.items():
+        if hasattr(syn, param_name):
+            actual_value = getattr(syn, param_name)
+            assert actual_value == expected_value, (
+                f"Expected {param_name}={expected_value}, got {actual_value}"
+            )
+
+
+def test_create_synapses_builtin():
+    """Test builtin (Exp2Syn, ExpSyn) synapse creation with various configurations
+
+    This uses `Cell.build` to test both `Cell._create_synapses` and `Cell.syn_create`.
+    """
+
+    # Begin actual tests using the above helper function
+    # ----------------------------------------------------------------------------------
+    # syn_create without 'mechname' kwarg should create an Exp2Syn (backwards compat).
+    custom_synapse_config = dict(e=0, tau1=0.5, tau2=5.0)
+    _helper_create_cell_and_run_synapse_checks(custom_synapse_config)
+
+    # syn_create with no 'mechname' kwarg but missing a required parameter should raise
+    # error. This is because the default 'mechname' is 'Exp2Syn', which requires the
+    # parameters 'e', 'tau1', and 'tau2'.
+    custom_synapse_config = dict(tau1=1.0, tau2=20.0)
+    with pytest.raises(KeyError, match="missing a required parameter"):
+        _helper_create_cell_and_run_synapse_checks(custom_synapse_config)
+
+    # syn_create with 'Exp2Syn' 'mechname' should create an Exp2Syn.
+    custom_synapse_config = dict(e=-80.0, tau1=1.0, tau2=20.0, mechname="Exp2Syn")
+    _helper_create_cell_and_run_synapse_checks(custom_synapse_config)
+
+    # syn_create with 'Exp2Syn' 'mechname' missing a required parameter should raise
+    # error.
+    custom_synapse_config = dict(tau1=1.0, tau2=20.0, mechname="Exp2Syn")
+    with pytest.raises(KeyError, match="missing a required parameter"):
+        _helper_create_cell_and_run_synapse_checks(custom_synapse_config)
+
+    # syn_create with invalid 'mechname' kwarg should raise an error.
+    custom_synapse_config = dict(mechname="NonExistentSynapseXYZ", e=0.0)
+    with pytest.raises(ValueError, match="not found in NEURON's hoc interpreter"):
+        _helper_create_cell_and_run_synapse_checks(custom_synapse_config)
+
+    # syn_create with valid custom 'mechname' kwarg should create the specified synapse.
+    # NOTE: This uses `ExpSyn` as an example of a "custom" synapse mechname, and it
+    # looks similar to `Exp2Syn` but it's NOT! This is a different, built-in NEURON
+    # synapse mechname.
+    custom_synapse_config = dict(e=50.0, tau=1.0, mechname="ExpSyn")
+    _helper_create_cell_and_run_synapse_checks(custom_synapse_config)
+
+    # syn_create with invalid parameter for custom 'mechname' should raise an error.
+    # NOTE: This usese `ExpSyn` as an example of a "custom" synapse mechname, and it
+    # looks similar to `Exp2Syn` but it's NOT! This is a different, built-in NEURON
+    # synapse mechname.
+    custom_synapse_config = dict(
+        tau1=1.0, tau2=20.0, mechname="ExpSyn", unknown_param=9
+    )
+    with pytest.raises(ValueError, match="does not have a parameter named"):
+        _helper_create_cell_and_run_synapse_checks(custom_synapse_config)
+
+
+def test_create_synapses_NMDA_gao():
+    """Test custom `NMDA_gao` synapse creation with various configurations
+
+    This requires the following synapse mechanisms to be present and compiled by `nrnivmodl`:
+    - hnn_core/mod/NMDA_gao.mod
+
+    This uses `Cell.build` to test both `Cell._create_synapses` and `Cell.syn_create`.
+    """
+    # Test syn_create with new synapse mechname 'NMDA_gao'.
+    custom_synapse_config = dict(mechname="NMDA_gao")
+    _helper_create_cell_and_run_synapse_checks(custom_synapse_config)
+
+    # syn_create with valid custom 'mechname' kwarg should create the specified synapse.
+    custom_synapse_config = dict(e=50.0, Beta=0.02, Cdur=1.5, mechname="NMDA_gao")
+    _helper_create_cell_and_run_synapse_checks(custom_synapse_config)
+
+    # syn_create with invalid parameter for custom 'mechname' should raise an error.
+    custom_synapse_config = dict(tau=1.0, mechname="NMDA_gao")
+    with pytest.raises(ValueError, match="does not have a parameter named"):
+        _helper_create_cell_and_run_synapse_checks(custom_synapse_config)
+
+
+def test_create_synapses_gabab_destexhe():
+    """Test custom `gabab_destexhe` synapse creation with various configurations
+
+    This requires the following synapse mechanisms to be present and compiled by `nrnivmodl`:
+    - hnn_core/mod/gabab_destexhe.mod
+
+    This uses `Cell.build` to test both `Cell._create_synapses` and `Cell.syn_create`.
+    """
+    # Test syn_create with new synapse mechname 'gabab_destexhe'.
+    custom_synapse_config = dict(mechname="gabab_destexhe")
+    _helper_create_cell_and_run_synapse_checks(custom_synapse_config)
+
+    # syn_create with valid custom 'mechname' kwarg should create the specified synapse.
+    custom_synapse_config = dict(g=1.0, mechname="gabab_destexhe")
+    _helper_create_cell_and_run_synapse_checks(custom_synapse_config)
+
+    # syn_create with invalid parameter for custom 'mechname' should raise an error.
+    custom_synapse_config = dict(Beta=1.0, mechname="gabab_destexhe")
+    with pytest.raises(ValueError, match="does not have a parameter named"):
+        _helper_create_cell_and_run_synapse_checks(custom_synapse_config)

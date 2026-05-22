@@ -11,10 +11,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from IPython.display import display
 from ipywidgets import (
-    Box,
+    HTML,
+    BoundedFloatText,
     Button,
     Dropdown,
-    BoundedFloatText,
     FloatText,
     HBox,
     Label,
@@ -25,11 +25,20 @@ from ipywidgets import (
     link,
 )
 
-from hnn_core.dipole import average_dipoles, _rmse
+from hnn_core.dipole import _anticorr, _rmse, average_dipoles
 from hnn_core.gui._logging import logger
-from hnn_core.viz import plot_dipole
+from hnn_core.viz import plot_dipole, plot_tfr_morlet
 
-_fig_placeholder = "Run simulation to add figures here."
+#
+_fig_placeholder = HTML(
+    value="""
+        Visualizations will become available in this window after a simulation has been
+        run or data have been loaded
+    """,
+    description="Visualization placeholder",
+)
+_fig_placeholder.add_class("fig-placeholder")
+_fig_placeholder.add_class("hide-label")
 
 _plot_types = [
     "current dipole",
@@ -460,7 +469,8 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
             n_cycles = freqs / 2.0
 
             try:
-                dpls_copied[0].plot_tfr_morlet(
+                plot_tfr_morlet(
+                    dpls_copied,
                     freqs,
                     n_cycles=n_cycles,
                     colormap=plot_config["spectrogram_cm"],
@@ -527,7 +537,11 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
                 io_buf.seek(0)
                 img_arr = np.reshape(
                     np.frombuffer(io_buf.getvalue(), dtype=np.uint8),
-                    newshape=(int(_fig.bbox.bounds[3]), int(_fig.bbox.bounds[2]), -1),
+                    (
+                        int(_fig.bbox.bounds[3]),
+                        int(_fig.bbox.bounds[2]),
+                        -1,
+                    ),
                 )
                 io_buf.close()
                 _ = ax.imshow(img_arr)
@@ -730,7 +744,11 @@ def _plot_on_axes(
         else:
             dpl = dpls_processed
         rmse = _rmse(dpl, target_dpl_processed, t0, tstop)
-        annotation_text = f"RMSE({sim_name}, {target_sim_name}): {rmse:.4f}"
+        corr = 1 - _anticorr(dpl, target_dpl_processed, t0, tstop)
+        annotation_text = (
+            f"RMSE({sim_name}, {target_sim_name}): {rmse:.4f}\n"
+            f"Corr({sim_name}, {target_sim_name}): {corr:.4f}"
+        )
 
         # find subplot's annotation
         annotation = next(
@@ -752,19 +770,22 @@ def _plot_on_axes(
                 fontsize=12,
             )
 
-        rmse_logger_text = (
-            f"RMSE {rmse:.4f} ("
+        metrics_logger_text = (
+            f"RMSE {rmse:.4f} Corr {corr:.4f} ("
             f"{sim_name} smooth:{dipole_smooth.value} "
             f"scale:{dipole_scaling.value} \n"
             f"{target_sim_name} smooth:{data_smooth.value} "
             f"scale:{data_scaling.value})"
         )
 
-        logger.info(rmse_logger_text)
+        logger.info(metrics_logger_text)
 
     existing_plots.children = (
         *existing_plots.children,
-        Label(f"{sim_name}: {plot_type}"),
+        Label(
+            f"{sim_name}: {plot_type}",
+            description=f"{sim_name}: {plot_type}",
+        ).add_class("hide-label"),
     )
     if data["use_ipympl"] is False:
         _static_rerender(widgets, fig, fig_idx)
@@ -1000,7 +1021,7 @@ def _get_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax):
         style=analysis_style,
     )
 
-    existing_plots = VBox([])
+    existing_plots = VBox([]).add_class("existing-plots")
 
     plot_button = Button(description="Add plot")
     clear_button = Button(description="Clear axis")
@@ -1193,7 +1214,7 @@ def _close_figure(b, widgets, data, fig_idx):
             if n_tabs == 0:
                 widgets["figs_output"].clear_output()
                 with widgets["figs_output"]:
-                    display(Label(_fig_placeholder))
+                    display(_fig_placeholder)
 
 
 def _add_axes_controls(widgets, data, fig_default_params, fig, axd):
@@ -1232,7 +1253,7 @@ def _add_axes_controls(widgets, data, fig_default_params, fig, axd):
         button_style="danger",
         icon="close",
         layout=Layout(width="98%"),
-    )
+    ).add_class("red-button")
     close_fig_button.on_click(
         partial(_close_figure, widgets=widgets, data=data, fig_idx=fig_idx)
     )
@@ -1270,8 +1291,15 @@ def _add_figure(
     """
 
     fig_idx = data["fig_idx"]["idx"]
-    viz_output_layout = data["visualization_output"]
-    fig_outputs = Output()
+
+    viz_window_width = int(data["visualization_window"].width[:-2])
+    viz_window_height = int(data["visualization_window"].height[:-2])
+    viz_out_width_prct = int(data["viz_out_figsize"].width[:-1])
+    viz_out_height_prct = int(data["viz_out_figsize"].height[:-1])
+    viz_out_width = int(viz_window_width * viz_out_width_prct / 100)
+    viz_out_height = int(viz_window_height * viz_out_height_prct / 100)
+
+    fig_outputs = Output().add_class("visualization-output")
     n_tabs = len(widgets["figs_tabs"].children)
 
     if n_tabs == 0:
@@ -1286,8 +1314,8 @@ def _add_figure(
 
     with fig_outputs:
         figsize = (
-            scale * ((int(viz_output_layout.width[:-2]) - 10) / dpi),
-            scale * ((int(viz_output_layout.height[:-2]) - 10) / dpi),
+            scale * (viz_out_width / dpi),
+            scale * (viz_out_height / dpi),
         )
         mosaic = template_type["mosaic"]
         kwargs = template_type["kwargs"]
@@ -1391,7 +1419,7 @@ class _VizManager:
 
         # widgets
         self.axes_config_tabs = Tab()
-        self.figs_tabs = Tab()
+        self.figs_tabs = Tab().add_class("fig-tabs")
         self.axes_config_tabs.selected_index = None
         self.figs_tabs.selected_index = None
         self.figs_config_tab_link = link(
@@ -1402,11 +1430,11 @@ class _VizManager:
         template_names = list(data_templates.keys())
         template_names.extend(list(fig_templates.keys()))
         self.templates_dropdown = Dropdown(
-            description="Layout template:",
+            description="Figure Template:",
             options=template_names,
             value=template_names[0],
-            style={"description_width": "initial"},
-            layout=Layout(width="98%"),
+            style={"description_width": "28%"},
+            layout=Layout(width="70%"),
         )
         self.templates_dropdown.observe(self._layout_template_change, "value")
 
@@ -1415,15 +1443,15 @@ class _VizManager:
             button_style="primary",
             style={"button_color": self.viz_layout["theme_color"]},
             layout=self.viz_layout["btn"],
-        )
+        ).add_class("make-fig-btn")
         self.make_fig_button.on_click(self.add_figure)
 
         self.datasets_dropdown = Dropdown(
-            description="Dataset:",
+            description="Simulation:",
             options=[],
             value=None,
-            style={"description_width": "initial"},
-            layout=Layout(width="98%"),
+            style={"description_width": "28%"},
+            layout=Layout(width="70%"),
         )
 
         # data
@@ -1449,7 +1477,8 @@ class _VizManager:
             "use_ipympl": self.use_ipympl,
             "simulations": self.gui_data["simulation_data"],
             "fig_idx": self.fig_idx,
-            "visualization_output": self.viz_layout["visualization_output"],
+            "visualization_window": self.viz_layout["visualization_window"],
+            "viz_out_figsize": self.viz_layout["visualization_output_figsize"],
             "figs": self.figs,
         }
 
@@ -1468,44 +1497,63 @@ class _VizManager:
             for ax_control in controls.children:
                 # Update the options for the simulation data selection dropdown
                 simulation_data_selection = ax_control.children[1]
+                # Note that we need to save the previous value prior to resetting the
+                # options, because resetting the options also resets the value.
+                prev_sim = simulation_data_selection.value
                 simulation_data_selection.options = simulation_names
+                if prev_sim in simulation_names:
+                    simulation_data_selection.value = prev_sim
 
                 # Update the options for the data to compare dropdown
                 simulation_to_compare = ax_control.children[4]
-                simulation_to_compare.options = simulation_names
+                # Again, note that we need to save the previous value prior to resetting
+                # the options, because resetting the options also resets the value.
+                prev_target = simulation_to_compare.value
+                simulation_to_compare.options = list(simulation_names) + ["None"]
+                simulation_to_compare.value = (
+                    prev_target if prev_target in simulation_names else "None"
+                )
 
         # recover the default layout
         if template_name is None:
             template_name = list(fig_templates.keys())[0]
         self._simulate_switch_fig_template(template_name)
 
-    def compose(self):
-        """Compose widgets.
-        
-        Returns
-        -------
+        # Update the external data widget (widget_opt_target_data)
+        self.update_external_data_widget()
 
-        config_panel : ipywidgets.VBox
-            A VBox widget containing the configuration panel for the figures.
-        fig_output_container : ipywidgets.VBox
-            A VBox widget containing the output container for the figures.
-        """
+    def build_visualization_window(self):
+        """build visualization-window (to occupy AppLayout's right_sidebar)"""
         with self.axes_config_output:
             display(self.axes_config_tabs)
         with self.figs_output:
-            display(Label(_fig_placeholder))
+            display(_fig_placeholder)
 
-        fig_output_container = VBox(
-            [self.figs_output], layout=self.viz_layout["visualization_window"]
+        visualization_window = VBox(
+            [self.figs_output],
+            layout=self.viz_layout["visualization_window"],
+        )
+        return visualization_window
+
+    def build_viz_tab_contents(self):
+        """Compose Visualization tab and widgets"""
+
+        config_sub_panel = HBox(
+            [
+                self.templates_dropdown,
+                self.make_fig_button,
+            ],
+            layout=Layout(
+                width="100%",
+            ),
         )
 
-        config_panel = VBox(
+        visualization_tab = VBox(
             [
-                Box(
+                VBox(
                     [
-                        self.templates_dropdown,
+                        config_sub_panel,
                         self.datasets_dropdown,
-                        self.make_fig_button,
                     ],
                     layout=Layout(
                         display="flex",
@@ -1513,11 +1561,41 @@ class _VizManager:
                         align_items="stretch",
                     ),
                 ),
-                Label("Figure config:"),
                 self.axes_config_output,
             ]
-        )
-        return config_panel, fig_output_container
+        ).add_class("visualization-tab-contents")
+
+        return visualization_tab
+
+    def update_external_data_widget(self):
+        """Enable exfiltration of simulation data by `HNNGUI` objects.
+
+        This allows external registered widgets (such as `HNNGUI.opt_target_widgets`),
+        which are "external" to `_VizManager`, to access `_VizManager`'s available
+        simulation data entries.
+
+        Note: this relies on the assumption that `HNNGUI` has externally added the
+        attribute `_external_data_widget` to `_VizManager`, which it does inside
+        `HNNGUI.update_opt_tab_target_widgets()` which is always called at the time of
+        `HNNGUI.compose()` (see here:
+        https://github.com/asoplata/hnn-core/blob/4c52a1aeed522ee1071d1acef13e29254d5447c0/hnn_core/gui/gui.py#L2329
+        ). Initializing `_VizManager` is NOT enough to create this attribute.
+        """
+        if hasattr(self, "_external_data_widget") and isinstance(
+            self._external_data_widget, Dropdown
+        ):
+            all_sim_names = list(self.data["simulations"].keys())
+            if len(all_sim_names) == 0:
+                all_sim_names = [" "]
+
+            prior_value = self._external_data_widget.value
+            # Note updating the options of the widget resets the value
+            self._external_data_widget.options = all_sim_names
+            self._external_data_widget.value = prior_value
+        else:
+            logger.warning(
+                "No external data widget found for visualization manager to update."
+            )
 
     def _layout_template_change(self, template_type):
         """
@@ -1534,7 +1612,7 @@ class _VizManager:
         """
         # check if plot set type requires loaded sim-data
         if _check_template_type_is_data_dependant(template_type.new):
-            # Add only simualated data
+            # Add only simulated data
             sim_names = [
                 simulations
                 for simulations, sim_name in self.data["simulations"].items()
@@ -1549,7 +1627,8 @@ class _VizManager:
             # show list of simulated to gui dropdown
             self.datasets_dropdown.layout.visibility = "visible"
         else:
-            # hide sim-data dropdown
+            # hide sim-data dropdown if not using a pre-programmed Figure Template (this
+            # currently only applies to the "[Blank] Xrow x Ycol" Figure Templates)
             self.datasets_dropdown.layout.visibility = "hidden"
 
     @unlink_relink(attribute="figs_config_tab_link")

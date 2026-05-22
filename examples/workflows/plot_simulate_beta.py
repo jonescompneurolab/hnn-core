@@ -14,7 +14,7 @@ of the beta event, and the incoming sensory information.
 
 # Authors: Nick Tolley <nicholas_tolley@brown.edu>
 
-from hnn_core import simulate_dipole, law_2021_model, jones_2009_model
+from hnn_core import simulate_dipole, law_2021_model, neymotin_2020_model
 from hnn_core.viz import plot_dipole
 
 ###############################################################################
@@ -30,20 +30,20 @@ net = law_2021_model()
 # L5 pyramidal cells specifically.
 # We can inspect these properties with the ``net.cell_types`` attribute which
 # contains information on the biophysics and geometry of each cell.
-net_jones = jones_2009_model()
+net_jones = neymotin_2020_model()
 
-jones_rise = net_jones.cell_types['L5_pyramidal'].synapses['gabab']['tau1']
-law_rise = net.cell_types['L5_pyramidal'].synapses['gabab']['tau1']
+jones_rise = net_jones.cell_types['L5_pyramidal']['cell_object'].synapses['gabab']['tau1']
+law_rise = net.cell_types['L5_pyramidal']['cell_object'].synapses['gabab']['tau1']
 print(f'GABAb Rise (ms): {jones_rise} -> {law_rise}')
 
-jones_fall = net_jones.cell_types['L5_pyramidal'].synapses['gabab']['tau2']
-law_fall = net.cell_types['L5_pyramidal'].synapses['gabab']['tau2']
+jones_fall = net_jones.cell_types['L5_pyramidal']['cell_object'].synapses['gabab']['tau2']
+law_fall = net.cell_types['L5_pyramidal']['cell_object'].synapses['gabab']['tau2']
 print(f'GABAb Fall (ms): {jones_fall} -> {law_fall}\n')
 
 print('Apical Dendrite Channels:')
-print(net.cell_types['L5_pyramidal'].sections['apical_1'].mechs.keys())
+print(net.cell_types['L5_pyramidal']['cell_object'].sections['apical_1'].mechs.keys())
 print("\nBasal Dendrite Channels ('ca' missing):")
-print(net.cell_types['L5_pyramidal'].sections['basal_1'].mechs.keys())
+print(net.cell_types['L5_pyramidal']['cell_object'].sections['basal_1'].mechs.keys())
 
 ###############################################################################
 # A major change to the Jones 2009 model is the addition of a

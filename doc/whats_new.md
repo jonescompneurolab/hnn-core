@@ -5,7 +5,7 @@ orphan: true
 (whats_new)=
 # What's new?
 
-<!-- Protip: the Github PRs webpage can NOT give you the true order of *when* PRs were
+<!-- Protip: the Github PRs webpage does NOT give you the true order of *when* PRs were
 merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 <!-- template below for new release notes: -->
@@ -20,11 +20,400 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 <!-- ### Bug Fixes -->
 
-<!-- ### API Changes -->
+<!-- ### Public API Changes -->
 
-<!-- ### People who contributed to this release (in alphabetical order of family name): -->
+<!-- ### People who contributed to this release: -->
 
 <!-- ### Changelog -->
+
+## 0.6.2.dev0 In-progress Notes
+
+### Deprecations
+
+### New Features
+
+### Upcoming Deprecations
+
+### Bug Fixes
+
+### Public API Changes
+
+### People who contributed to this release:
+
+- [Shivansh Bhageria][]
+
+### Changelog
+
+- Improve y-axis labels and ticks of LFP and CSD plotting,
+  by [Shivansh Bhageria][] in {gh}`1191`. This was their first PR, thanks Shivansh!
+
+
+## 0.6.1 Patch Release Notes
+
+This is an emergency patch release to fix an install misconfiguration (see
+{gh}`1302`).
+
+Recent changes to `Optimizer` from the new CMA optimization solver require `joblib` to
+be installed for any Optimization to be run. Since `joblib` is a required dependency of
+`scikit-learn`, installing with `pip install "hnn-core[opt]"` is sufficient, even
+though `[opt]` installs some, but not all, of HNN-Core's `[parallel]` install extras,
+which are `joblib` and `psutil`.
+
+Relatedly, since the GUI can now support optimization, its installation now requires
+the `[opt]` packages to be installed as well. This has been fixed.
+
+For the greater release notes that document what has been added since 0.5.0, including
+**important upcoming deprecations**, [see our Release Notes for 0.6.0
+here](https://github.com/jonescompneurolab/hnn-core/releases/tag/v0.6.0).
+
+## 0.6.0 Release Notes
+
+### Important Deprecations
+
+- `jones_2009_model` has been renamed to `neymotin_2020_model` to better reflect its
+  provenance. From now on, `neymotin_2020_model` is the recommended "default" model we
+  will be documenting and using going forward. However, for backwards compatibility,
+  `jonegs_2009_model` will still be retained as a simple "wrapper function" around
+  `neymotin_2020_model`, the latter being otherwise identical to the old
+  `jones_2009_model` behavior. We recommend you update your scripts to use
+  `neymotin_2020_model`, but `jones_2009_model` will still continue to work.
+
+- IMPORTANT: For the default model `neymotin_2020_model` (renamed from
+  `jones_2009_model`, see above), in the NEXT release (i.e. 0.7.0), some parameters will
+  be slightly changed, which will cause **your simulations to produce slightly different
+  output**. Again, this is only expected in the next major release, not this one. This
+  is necessary in order to fix certain parameters (e.g. synaptic delays) which are
+  slightly different than their values in the "Original HNN" code. Using the new
+  parameters, simulation results are expected to only be *quantitatively* different, but
+  not *qualitatively* different, and these changes are not expected to change the
+  significance of simulation results.
+
+### New Features
+
+- When installing `hnn-core` through `pip`, there is now an easy way to install all
+  extra dependencies (excluding development packages): `pip install "hnn-core[all]"`.
+  This installs the necessary dependencies for the GUI, Optimization, and parallelism
+  (excluding MPI itself, which you can find how to install at our
+  [Installation
+  Guide](https://jonescompneurolab.github.io/textbook/content/01_getting_started/installation.html)
+  ).
+
+- Major visual refresh and polishing of the GUI
+  by [Dylan Daniels][] in {gh}`1243`.
+
+- [Nick Tolley][] has added Optimization support for both the "Covariance matrix adaptation
+  evolutionary strategy" (CMA-ES) solver and correlation-coefficient as an objective
+  function, in {gh}`1221` and {gh}`1286`! CMA-ES is a very powerful optimization
+  option which can simulate multiple samples in a single epoch, and may possibly become
+  the default optimization solver in the future.
+
+- The GUI now includes an Optimization tab that can run optimization against any
+  parameter in the `Network`'s drives, using any of the available built-in solvers or
+  objective functions, including the new CMA-ES solver (see above).
+  By [Austin E. Soplata][] and [Nick Tolley][] in {gh}`1190`.
+
+### Bug Fixes
+
+- Accessibility of all HNN websites (excluding auto-generated Jupyter notebook output)
+  has been fixed to prevent basic accessibility errors,
+  by [Joyce Gao][] and [Austin E. Soplata][] in several PRs including
+  {gh}`1280`,
+  {gh}`1293`,
+  https://github.com/jonescompneurolab/textbook/pull/153 , and
+  https://github.com/GitHub-at-Brown/hnn-front-website/pull/56 .
+
+- The COBYLA Optimization solver now returns the `Network` with the best-performing
+  parameters instead of simply returning the parameters of the final iteration that was
+  run,
+  by [Carolina Fernandez Pujol][], [Nick Tolley][], and [Austin E. Soplata][] in
+  {gh}`1240`.
+
+- GUI dataset dropdowns have been fixed so that they show what is displayed in the plot,
+  by [Tushar Jamdade][] in {gh}`1223`.
+
+- When loading a network using the GUI, sometimes there would arise a `KeyError` due to
+  a lack of `n_trials` value. This has been fixed
+  by [Tushar Jamdade][] in {gh}`1216`.
+
+- Read-in of Network JSON files with custom `cell_types` or `pos_dict` entries has been
+  fixed in {gh}`1195`.
+
+### Public API Changes
+
+- `jones_2009_model`, the main function to spawn the default model, has been replaced
+  with `neymotin_2020_model` (see note above in 'Important Deprecations').
+  `jones_2009_model` will still continue to work, but users should migrate to the new
+  name for the function. Done in {gh}`1290`.
+
+- `simulate_dipole` now has a `verbose` flag to control how much output is printed,
+  by [Anna Cattani][] in {gh}`1228`. This was their first PR, thanks Anna!
+
+- `Section` can now consume an `v0` argument in order to set the initial voltage of the membrane
+  potential for that section. Merged in {gh}`1185`, adapted from work by [Katharina Duecker][].
+
+- `BatchSimulate` is now properly documented via our public API, thanks to
+  [M Yaswanth Reddy][] in {gh}`1218`.
+
+### People who contributed to this release:
+
+- [Muhammad Ahmad Amin][]
+- [Vaishnavi Baghel][]
+- [Anna Cattani][]
+- [Dylan Daniels][]
+- [Katharina Duecker][]
+- [Joyce Gao][]
+- [Tushar Jamdade][]
+- [Karthikeya Kodlai][]
+- [M Yaswanth Reddy][]
+- [Satvik Saluja][]
+- [Austin E. Soplata][]
+- [Nick Tolley][]
+- [Percival Villalva][]
+
+### Changelog
+
+- Where possible, all remaining imports have been moved to the top of source files,
+  by [Percival Villalva][] in {gh}`1285`.
+
+- In the GUI, when comparing two datasets, both the RMSE and the correlation values are
+  now displayed on the plot instead of just the RMSE,
+  by [Nick Tolley][] and [Austin E. Soplata][] in {gh}`1298`.
+
+- Javascript and CSS files in the repository are now included in the Python packaging,
+  in {gh}`1292`.
+
+- Enable MacOS Intel-CPU runners in CI,
+  by [Vaishnavi Baghel][] in {gh}`1287`.
+
+- Update and re-enable Codecov usage in CI,
+  by [Vaishnavi Baghel][] in {gh}`1272`. This was their first PR, thanks Vaishnavi!
+
+- We have removed the Gitter badge on our repository's homepage (in {gh}`1270`) in order
+  to push people towards the Github Discussions page.
+
+- Test coverage of Hamming smoothing via `hnn_core.utils.smooth_waveform` has been
+  improved,
+  by [Satvik Saluja][] in {gh}`1266`.
+
+- The `issue-metrics` Github Action workflow has been removed (in {gh}`1279`) entirely
+  in favor of https://github.com/jonescompneurolab/hnn-tracking/pull/1 .
+
+- Fix testing of `mesh_shape` to include all available network models,
+  by [Satvik Saluja][] in {gh}`1268`. This was their first PR, thanks Satvik!
+
+- Improve UX of GUI's "Delete all drives" button and small refactors of GUI codebase.
+  By [Muhammad Ahmad Amin][] in {gh}`1245`. This was their first PR, thanks Muhammad!
+
+- In the GUI, when simulating multiple trials and plotting the spectrogram, use the
+  averaged Time-Frequency-Representation of the dipoles for spectrogram calculation
+  instead of only the first dipole,
+  by [M Yaswanth Reddy][] in {gh}`1233`. This was their first PR, thanks Yaswanth!
+
+- The repository's AI policy has been clarified in {gh}`1224`.
+
+- Issue templates are now used in the `hnn_core` repository.
+
+- In the GUI, new simulations are now auto-renamed. This fixes an annoying issue with
+  the GUI where every time a user wanted to run a new simulation, they had to go back to
+  the Simulation tab and manually change the simulation name. Now, whenever they run a
+  new simulation without changing the name manually, the new simulation will use the old
+  name, but with a reasonable number appended.
+  By [Tushar Jamdade][] in {gh}`1213`.
+
+- Add support for printing a welcome message that asks the user to fill out the HNN
+  survey, which is printed to the standard output after (and only after) the first time
+  the `hnn_core` module is imported. Whether or not the message is displayed is
+  determined by the presence of a new file created in the module after first run.
+  by [Karthikeya Kodlai][] in {gh}`1158`. This was their first PR, thanks Karthikeya!
+
+- Add progressive minimal install and test to Github Actions,
+  by [Tushar Jamdade][] in {gh}`1214`. This was their first PR, thanks Tushar!
+
+----------------------------------------------------------------------------------------
+
+## 0.5.0 Release Notes
+
+### New Features
+
+- You can now provide custom spike trains as inputs into your simulation; see the
+  description of {func}`~hnn_core.Network.add_spike_train_drive` below in the Public API
+  Changes section.
+
+### Deprecations
+
+- Similar to [NEURON][], we have dropped support for Python 3.8. We have also added support for Python 3.13.
+
+### Bug Fixes
+
+- Synaptic `gain` and `threshold` values are now loaded correctly when reading in a
+  `Network` JSON file, instead of being overridden with default values,
+  by [George Dang][] and [Austin E. Soplata][] in {gh}`918`.
+
+### Public API Changes
+
+- Synaptic gains can now be set and retrieved for different "global" connection types
+  (excitatory-to-excitatory, excitatory-to-inhibitory, inhibitory-to-excitatory, and
+  inhibitory-to-inhibitory) using {meth}`~hnn_core.Network.set_global_synaptic_gains`
+  (formerly called `Network.update_weights`) and
+  {meth}`~hnn_core.Network.get_global_synaptic_gains`. The GUI now includes widgets for
+  modifying synaptic gains in the Connectivity interface, both on a "global" level and
+  on an individual level. The additive combination of global and individual gains is
+  also always shown in the GUI. **Importantly**, all of the synaptic gain getters and
+  setters across both the GUI and API do **not** change or reflect the gains of
+  drives. They only change or reflect non-drive connections.
+
+- {meth}`~hnn_core.Network.add_connection` now accepts optional `threshold` and `gain`
+  arguments for setting connection-specific firing thresholds and synaptic gain values.
+
+- {class}`~hnn_core.optimization.Optimizer` now accepts user-defined initial weights in
+  the form of optional argument `initial_params` and allows the user to set the number
+  of trials by passing `n_trials` to {func}`~hnn_core.optimization.Optimizer.fit`,
+  by [Carolina Fernandez Pujol][] in {gh}`1057`.
+
+- The `cell_types` attribute and initializer argument of {class}`~hnn_core.Network` has
+  significantly changed. Previously, `Network.cell_types` was a dictionary where keys
+  were cell-type names and values were {class}`~hnn_core.Cell` instances of that
+  cell-type to be used as templates for building the Network. Now, the structure of
+  dictionary is different: `Network.cell_types` is a dictionary where keys are cell-type
+  names and values are child-dictionaries. The child-dictionaries of each cell-type have
+  the following keys: `cell_object` and `cell_metadata`. The value of
+  `Network.cell_types[<cell_type>]["cell_object"]` is the {class}`~hnn_core.Cell` instance
+  for that cell-type, similar to before. The value of
+  `Network.cell_types[<cell_type>]["cell_metadata"]` is a new dictionary containing
+  several key-values pairs that describe different aspects of the cell type, described
+  below:
+    - `morpho_type` : either `basket` or `pyramidal`
+    - `electro_type` : either `inhibitory` or `excitatory`
+    - `layer` : either `2` or `5`
+    - `measure_dipole` : either True or False
+    - `reference`: optional
+
+  You can find a working version of `Network.cell_types` for the default Jones 2009
+  model here as an example:
+  <https://github.com/jonescompneurolab/hnn-core/blob/4659d0a2aff5f65c94794376abc669f6473fe808/hnn_core/network_models.py#L78>
+  . The author for this was [Chetan Kandpal][] in {gh}`1099`. Others who helped with
+  design were [Dylan Daniels][], [Katharina Duecker][], [Austin E. Soplata][], and [Nick
+  Tolley][].
+
+
+- The newer Network object and file input/output module, {mod}`~hnn_core.hnn_io`, is now
+  published as part of the Public API. The recommended way to write a
+  {class}`~hnn_core.Network` object is
+  {func}`~hnn_core.hnn_io.write_network_configuration`, and the recommended way to read
+  the same is {func}`~hnn_core.hnn_io.read_network_configuration`.
+  By [Austin E. Soplata][] in {gh}`1108`.
+
+- {class}`~hnn_core.Network` now has support for calculating a "layer dictionary"
+  `layer_dict` attribute whose layers can be mapped as desired to an object's
+  `cell_types` attribute. This mapping can then be used to make a more flexible position
+  dictionary `pos_dict` attribute of the object. This also adds support for optional
+  `pos_dict` and `cell_types` arguments to the {class}`~hnn_core.Network`
+  constructor. This also begins the process of moving some model-specific celltype-usage
+  from `network.py` to `network_models.py`.
+  By [Chetan Kandpal][] in {gh}`1095`.
+
+- {class}`~hnn_core.Network` now has a new type of available "external drive", the
+  "spike train" drive, which you can add using
+  {func}`~hnn_core.Network.add_spike_train_drive`. This new drive can take in spike data
+  in various formats (see its docstring), including spikes generated by previous HNN
+  simulations, and then "replay" the spike trains as inputs into the current
+  simulation. This offers a large degree of control over both the data of the spike
+  trains and how you want to connect them to your simulation. There is a [new example
+  script
+  here](https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/plot_replaying_spike_data_as_input.html#sphx-glr-auto-examples-howto-plot-replaying-spike-data-as-input-py)
+  which illustrates its use.
+  By [Maira Usman][] in {gh}`1064`.
+
+### People who contributed to this release:
+
+- [George Dang][]
+- [Dylan Daniels][]
+- [Katharina Duecker][]
+- [Chetan Kandpal][]
+- [Carolina Fernandez Pujol][]
+- [Austin E. Soplata][]
+- [Nick Tolley][]
+- [Maira Usman][]
+
+### Changelog
+
+- Add methods {meth}`~hnn_core.Network.set_global_synaptic_gains` and
+  {meth}`~hnn_core.Network.get_global_synaptic_gains` to modify and retrieve synaptic
+  gains for different cell type connections in the network. Add GUI support for
+  modifying synaptic gains with interactive widgets in the connectivity interface, for
+  both individual connections and "global" connections (for example,
+  "excitatory-to-excitatory"). Add `gain` and `threshold` parameters to
+  {meth}`~hnn_core.Network.add_connection` to allow connection-specific control of
+  synaptic gains and firing thresholds. There is also now a warning displayed when a
+  user loads a `Network` JSON file that has inconsistent synaptic gains, since both
+  {meth}`~hnn_core.Network.set_global_synaptic_gains` and
+  {meth}`~hnn_core.Network.get_global_synaptic_gains` assume that gains are uniformly
+  equal within each "global" connection type.
+  By [George Dang][] and [Austin E. Soplata][] in {gh}`918`.
+
+- Enhance the optimization workflow for more reliable parameter fitting. This includes
+  adding support for user-defined initial weights. For optimal results, we now recommend
+  setting `initial_params` to hand-tuned values since they often provide a good starting
+  fit. The default objective function
+  ({func}`~hnn_core.optimization.objective_functions._rmse_evoked`) now averages results
+  over 3 dipoles rather than simulating a single dipole, with the option to control this
+  behavior by setting the `n_trials` parameter in
+  {func}`~hnn_core.optimization.Optimizer.fit`. To capture the model's average behavior,
+  it is recommended to set `n_trials` > 1, as using `n_trials=1` may identify parameters
+  that work well for one simulation run but perform poorly on average. The optimization
+  example (`examples/howto/optimize_evoked.py`) has also been enhanced with improved
+  markdown and updated contents to better illustrate best practices.
+  By [Carolina Fernandez Pujol][] in {gh}`1057`.
+
+- Tiny bugfix for the {gh}`1099` to enable backwards-compatibility,
+  by [Austin E. Soplata][] in {gh}`1119`.
+
+- Major upgrade to celltype metadata and `cell_types` in {class}`~hnn_core.Network`, see
+  the description above in Public API Changes for details,
+  By [Chetan Kandpal][] in {gh}`1099`.
+
+- Added {mod}`~hnn_core.hnn_io` to the Public API
+  by [Austin E. Soplata][] in {gh}`1108`.
+
+- Some time allowances for "MPI Timeout" errors were doubled. The infamous "MPI Timeout
+  Error" should occur less frequently now, though this is only a temporary, incomplete
+  solution to {gh}`774`.
+  By [Austin E. Soplata][] in {gh}`1102`.
+
+- Reduction of old "short name vs long name" usage (Chetan Chunk 1.5),
+  By [Chetan Kandpal][] in {gh}`1103`.
+
+- Add support for {class}`~hnn_core.Network` to calculate a more flexible "layer
+  dictionary" that can be used to construct your {class}`~hnn_core.Network`'s
+  `pos_dict`, and add its use in our existing `network_models.py`. This is the first in
+  a series of code changes meant to allow for more flexible cell types to be used.
+  By [Chetan Kandpal][] in {gh}`1095`.
+
+- Introduce new "spike_train" drive to {class}`~hnn_core.Network`
+  by [Maira Usman][] in {gh}`1064`.
+
+- Various development-process and documentation changes
+  by [Austin E. Soplata][] in {gh}`1081`, {gh}`1086`, {gh}`1090`, {gh}`1083`,
+  {gh}`1069`, {gh}`1107`, {gh}`1100`, {gh}`1114`, and {gh}`1126`.
+
+- Drop Python 3.8 support, add Python 3.13 support
+  by [Austin E. Soplata][] in {gh}`1070`.
+
+## 0.4.3 Patch Notes
+
+This is an emergency patch release to fix a dependency issue.
+
+### Bug Fixes
+
+- NEURON version support is restricted to versions 7.7 through 8.2.7 (including those
+  versions). Going forward, the maximum NEURON version supported will be set explicitly
+  in our install configuration, so that new, incompatible versions of NEURON are not
+  used before testing.
+  by [Austin E. Soplata][] in {gh}`1153`.
+
+### People who contributed to this release:
+
+- [Austin E. Soplata][]
 
 ## 0.4.2 Patch Notes
 
@@ -1053,8 +1442,19 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [Carolina Fernandez Pujol]: https://github.com/carolinafernandezp
 [Austin E. Soplata]: https://github.com/asoplata
 [Dikshant Jha]: https://github.com/dikshant182004
-[Dan Toms]: https://github.com/pynmash
+[Dan Toms]: https://github.com/dantoms
 [Shehroz Kashif]: https://github.com/Shehrozkashif
 [Mohamed W. ElSayed]: https://github.com/wagdy88
 [Maira Usman]: https://github.com/Myrausman
 [Chetan Kandpal]: https://github.com/Chetank99
+[NEURON]: https://nrn.readthedocs.io
+[Karthikeya Kodlai]: https://github.com/sketch123456
+[Tushar Jamdade]: https://github.com/Tusharjamdade
+[M Yaswanth Reddy]: https://github.com/Yaswanth8390
+[Muhammad Ahmad Amin]: https://github.com/m-ahmad-amin
+[Satvik Saluja]: https://github.com/SatvikSaluja
+[Vaishnavi Baghel]: https://github.com/vshnvii
+[Joyce Gao]: https://github.com/xgao35
+[Percival Villalva]: https://github.com/pervillalva
+[Anna Cattani]: https://github.com/annacatt
+[Shivansh Bhageria]: https://github.com/Shivansh1205

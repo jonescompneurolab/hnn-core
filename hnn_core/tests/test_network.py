@@ -1,17 +1,35 @@
 # Authors: Mainak Jas <mainakjas@gmail.com>
 
-from hnn_core.dipole import simulate_dipole
+from contextlib import redirect_stdout
+import io
 import os.path as op
+import tempfile
+
 import numpy as np
 from numpy.testing import assert_allclose
 import pytest
+import matplotlib.pyplot as plt
 
 import hnn_core
-from hnn_core import read_params, CellResponse, Network
-from hnn_core import jones_2009_model, law_2021_model, calcium_model
-from hnn_core.network_models import add_erp_drives_to_jones_model
+from hnn_core import (
+    CellResponse,
+    Network,
+    calcium_model,
+    neymotin_2020_model,
+    jones_2009_model,
+    law_2021_model,
+    read_params,
+    simulate_dipole,
+)
+from hnn_core.cells_default import pyramidal
+from hnn_core.network import (
+    _check_global_synaptic_gains_uniformity,
+    _create_cell_coords,
+    _get_cell_index_by_synapse_type,
+    pick_connection,
+)
 from hnn_core.network_builder import NetworkBuilder
-from hnn_core.network import pick_connection
+from hnn_core.network_models import add_erp_drives_to_jones_model
 from hnn_core.viz import plot_dipole
 
 hnn_core_root = op.dirname(hnn_core.__file__)
@@ -91,6 +109,160 @@ def base_network():
     return net, params
 
 
+def test_create_cell_coords():
+    layer_dict = _create_cell_coords(
+        n_pyr_x=3, n_pyr_y=3, z_coord=1307.4, inplane_distance=1.0
+    )
+    assert set(layer_dict.keys()) == {
+        "L5_bottom",
+        "L2_bottom",
+        "L5_mid",
+        "L2_mid",
+        "origin",
+    }
+    assert len(layer_dict["L2_bottom"]) == 9
+    assert len(layer_dict["L5_bottom"]) == 9
+
+
+@pytest.mark.parametrize("mesh_shape", [(2, 2), (2, 3)])
+def test_custom_network_coords(mesh_shape):
+    params = read_params(params_fname)
+
+    # network with custom cell types and positions (an irregular one)
+    custom_cell_types = {
+        "L2_pyramidal": {
+            "cell_object": pyramidal(cell_name="L2_pyramidal"),
+            "cell_metadata": {
+                "morpho_type": "pyramidal",
+                "electro_type": "excitatory",
+                "layer": "2",
+                "measure_dipole": True,
+                "reference": "https://doi.org/10.7554/eLife.51214",
+            },
+        },
+        "L5_pyramidal": {
+            "cell_object": pyramidal(cell_name="L5_pyramidal"),
+            "cell_metadata": {
+                "morpho_type": "pyramidal",
+                "electro_type": "excitatory",
+                "layer": "5",
+                "measure_dipole": True,
+                "reference": "https://doi.org/10.7554/eLife.51214",
+            },
+        },
+    }
+    custom_layer_dict = _create_cell_coords(
+        n_pyr_x=mesh_shape[0],
+        n_pyr_y=mesh_shape[1],
+        z_coord=1307.4,
+        inplane_distance=1.0,
+    )
+    custom_pos_dict = {
+        "L2_pyramidal": custom_layer_dict["L2_bottom"],
+        "L5_pyramidal": custom_layer_dict["L5_bottom"],
+        "origin": custom_layer_dict["origin"],
+    }
+    custom_net = Network(params, pos_dict=custom_pos_dict, cell_types=custom_cell_types)
+    assert "L2_pyramidal" in custom_net.cell_types
+    assert "L5_pyramidal" in custom_net.cell_types
+    total_mesh_size = mesh_shape[0] * mesh_shape[1]
+    assert len(custom_net.pos_dict["L2_pyramidal"]) == total_mesh_size
+    assert custom_net.gid_ranges["L2_pyramidal"] == range(0, total_mesh_size)
+    assert custom_net.gid_ranges["L5_pyramidal"] == range(
+        total_mesh_size, 2 * total_mesh_size
+    )
+
+    # ALL types of drives to test interactions
+    spike_data = {
+        "drive_cell_1": [10.0, 20.0, 30.0],
+        "drive_cell_2": [15.0, 25.0, 35.0],
+    }
+    weights_ampa = {"L2_pyramidal": 0.5, "L5_pyramidal": 0.5}
+    custom_net.add_spike_train_drive(
+        "test_drive",
+        spike_data=spike_data,
+        location="proximal",
+        weights_ampa=weights_ampa,
+        synaptic_delays=0.1,
+        conn_seed=42,
+    )
+
+    # evoked drives
+    custom_net.add_evoked_drive(
+        "test_evprox",
+        mu=40.0,
+        sigma=5.0,
+        numspikes=1,
+        location="proximal",
+        weights_ampa={"L2_pyramidal": 0.01, "L5_pyramidal": 0.01},
+        synaptic_delays=0.1,
+        event_seed=43,
+    )
+
+    custom_net.add_evoked_drive(
+        "test_evdist",
+        mu=60.0,
+        sigma=5.0,
+        numspikes=1,
+        location="distal",
+        weights_nmda={"L2_pyramidal": 0.01, "L5_pyramidal": 0.01},
+        synaptic_delays=0.1,
+        event_seed=44,
+    )
+
+    # poisson drive
+    custom_net.add_poisson_drive(
+        "test_poisson",
+        tstart=0,
+        tstop=40.0,
+        rate_constant=10.0,
+        location="proximal",
+        weights_ampa={"L2_pyramidal": 0.001, "L5_pyramidal": 0.001},
+        synaptic_delays=0.1,
+        event_seed=45,
+    )
+
+    # bursty drive
+    custom_net.add_bursty_drive(
+        "test_bursty",
+        tstart=0,
+        tstop=40.0,
+        location="proximal",
+        burst_rate=1.0,
+        burst_std=10.0,
+        numspikes=2,
+        spike_isi=10.0,
+        weights_ampa={"L2_pyramidal": 0.001, "L5_pyramidal": 0.001},
+        synaptic_delays=0.1,
+        event_seed=46,
+    )
+
+    # drive properties and connectivity for custom
+    assert "test_drive" in custom_net.external_drives
+    drive = custom_net.external_drives["test_drive"]
+    assert drive["type"] == "spike_train"
+    assert drive["n_drive_cells"] == 2
+
+    # checking if all new drives were added
+    for drive_name in ["test_evprox", "test_evdist", "test_poisson", "test_bursty"]:
+        assert drive_name in custom_net.external_drives
+
+    # Pick_connection check in custom_net
+    conn_indices = pick_connection(net=custom_net, src_gids="test_drive")
+    assert len(conn_indices) > 0
+
+    # checking drives and check events
+    custom_net._instantiate_drives(tstop=40.0)
+    assert len(custom_net.external_drives["test_drive"]["events"]) > 0
+    assert len(custom_net.external_drives["test_drive"]["events"][0]) == 2
+
+    # seeing if custom network can run simulations
+    dipole_custom = simulate_dipole(custom_net, tstop=50.0, dt=0.5, n_trials=1)
+    assert dipole_custom is not None
+    assert len(dipole_custom[0].times) > 0
+    assert np.all(np.isfinite(dipole_custom[0].data["agg"]))
+
+
 def test_network_models():
     """ "Test instantiations of the network object"""
     # Make sure critical biophysics for Law model are updated
@@ -101,16 +273,24 @@ def test_network_models():
     )
 
     for cell_name in ["L5_pyramidal", "L2_pyramidal"]:
-        assert net_law.cell_types[cell_name].synapses["gabab"]["tau1"] == 45.0
-        assert net_law.cell_types[cell_name].synapses["gabab"]["tau2"] == 200.0
+        assert (
+            net_law.cell_types[cell_name]["cell_object"].synapses["gabab"]["tau1"]
+            == 45.0
+        )
+        assert (
+            net_law.cell_types[cell_name]["cell_object"].synapses["gabab"]["tau2"]
+            == 200.0
+        )
 
     # Check add_default_erp()
-    net_default = jones_2009_model()
+    net_default = neymotin_2020_model()
     with pytest.raises(TypeError, match="net must be"):
         add_erp_drives_to_jones_model(net="invalid_input")
     with pytest.raises(TypeError, match="tstart must be"):
         add_erp_drives_to_jones_model(net=net_default, tstart="invalid_input")
     n_conn = len(net_default.connectivity)
+    for cell_name in ["L5_pyramidal", "L2_pyramidal"]:
+        assert len(net_default.pos_dict[cell_name]) == 100
     add_erp_drives_to_jones_model(net_default)
     for drive_name in ["evdist1", "evprox1", "evprox2"]:
         assert drive_name in net_default.external_drives.keys()
@@ -161,7 +341,7 @@ def test_network_models():
 def test_network_cell_positions():
     """ "Test manipulation of cell positions in the network object"""
 
-    net = jones_2009_model()
+    net = neymotin_2020_model()
     assert np.isclose(net._inplane_distance, 1.0)  # default
     assert np.isclose(net._layer_separation, 1307.4)  # default
 
@@ -207,7 +387,7 @@ def test_network_drives():
     with pytest.raises(TypeError, match="params must be an instance of dict"):
         Network("hello")
     params = read_params(params_fname)
-    net = jones_2009_model(params, legacy_mode=False)
+    net = neymotin_2020_model(params, legacy_mode=False)
 
     # add all drives explicitly and ensure that the expected number of drive
     # cells get instantiated for each case
@@ -553,12 +733,12 @@ def test_network_drives_legacy():
 
     # Test deprecation warning of legacy mode
     with pytest.warns(DeprecationWarning, match="Legacy mode"):
-        _ = jones_2009_model(legacy_mode=True)
+        _ = neymotin_2020_model(legacy_mode=True)
         _ = law_2021_model(legacy_mode=True)
         _ = calcium_model(legacy_mode=True)
         _ = Network(params, legacy_mode=True)
 
-    net = jones_2009_model(params, legacy_mode=True, add_drives_from_params=True)
+    net = neymotin_2020_model(params, legacy_mode=True, add_drives_from_params=True)
 
     # instantiate drive events for NetworkBuilder
     net._instantiate_drives(tstop=params["tstop"], n_trials=params["N_trials"])
@@ -879,7 +1059,7 @@ def test_network_connectivity(base_network):
 def test_add_cell_type():
     """Test adding a new cell type."""
     params = read_params(params_fname)
-    net = jones_2009_model(params)
+    net = neymotin_2020_model(params)
     # instantiate drive events for NetworkBuilder
     net._instantiate_drives(tstop=params["tstop"], n_trials=params["N_trials"])
 
@@ -890,7 +1070,7 @@ def test_add_cell_type():
     new_cell = net.cell_types["L2_basket"].copy()
     net._add_cell_type("new_type", pos=pos, cell_template=new_cell)
     assert "new_type" in net.cell_types.keys()
-    net.cell_types["new_type"].synapses["gabaa"]["tau1"] = tau1
+    net.cell_types["new_type"]["cell_object"].synapses["gabaa"]["tau1"] = tau1
 
     n_new_type = len(net.gid_ranges["new_type"])
     assert n_new_type == len(pos)
@@ -1035,7 +1215,7 @@ def test_tonic_biases():
     ):
         net.add_tonic_bias(amplitude=tonic_bias_2)
 
-    net = jones_2009_model()
+    net = neymotin_2020_model()
     net.add_tonic_bias(amplitude=tonic_bias_2, bias_name="tonic_2", t0=100)
     assert "tonic_2" in net.external_biases
     assert net.external_biases["tonic_2"]["L2_pyramidal"]["t0"] == 100
@@ -1067,12 +1247,15 @@ def test_network_mesh():
     assert net._N_pyr_x == mesh_shape[0]
     assert net._N_pyr_y == mesh_shape[1]
     assert net.gid_ranges["L2_basket"] == range(0, 3)
+    assert len(net.pos_dict["L2_pyramidal"]) == (mesh_shape[0] * mesh_shape[1])
+    del net
 
     # Test default mesh_shape loaded
     net = Network(params)
     assert net._N_pyr_x == 10
     assert net._N_pyr_y == 10
     assert net.gid_ranges["L2_basket"] == range(0, 35)
+    del net
 
     with pytest.raises(ValueError, match="mesh_shape must be"):
         net = Network(params, mesh_shape=(-2, 3))
@@ -1081,17 +1264,30 @@ def test_network_mesh():
         net = Network(params, mesh_shape=(2.0, 3))
 
     with pytest.raises(TypeError, match="mesh_shape must be"):
-        net = Network(params, mesh_shape="abc")
-
-    # Smoke test for all models
-    _ = jones_2009_model(mesh_shape=mesh_shape)
-    _ = calcium_model(mesh_shape=mesh_shape)
-    _ = law_2021_model(mesh_shape=mesh_shape)
+        net = Network(params, mesh_shape="abc")  # noqa: F841
 
 
-def test_synaptic_gains():
-    """Test synaptic gains update"""
-    net = jones_2009_model()
+@pytest.mark.parametrize(
+    "network_model",
+    [neymotin_2020_model, law_2021_model, calcium_model],
+)
+def test_network_models_mesh(network_model):
+    mesh_shape = (2, 3)
+    net = network_model(mesh_shape=mesh_shape)
+    dp = simulate_dipole(net, tstop=20.0)
+    assert dp is not None
+    assert len(dp[0].times) > 0
+    assert np.all(np.isfinite(dp[0].data["agg"]))
+    assert net._N_pyr_x == mesh_shape[0]
+    assert net._N_pyr_y == mesh_shape[1]
+    assert len(net.pos_dict["L2_pyramidal"]) == mesh_shape[0] * mesh_shape[1]
+    assert len(net.pos_dict["L5_pyramidal"]) == mesh_shape[0] * mesh_shape[1]
+    del net, dp
+
+
+def test_set_global_synaptic_gains():
+    """Test synaptic gains setter"""
+    net = neymotin_2020_model()
     nb_base = NetworkBuilder(net)
     e_cell_names = ["L2_pyramidal", "L5_pyramidal"]
     i_cell_names = ["L2_basket", "L5_basket"]
@@ -1100,16 +1296,16 @@ def test_synaptic_gains():
     arg_names = ["e_e", "e_i", "i_e", "i_i"]
     for arg in arg_names:
         with pytest.raises(TypeError, match="must be an instance of int or"):
-            net.update_weights(**{arg: "abc"})
+            net.set_global_synaptic_gains(**{arg: "abc"})
 
         with pytest.raises(ValueError, match="must be non-negative"):
-            net.update_weights(**{arg: -1})
+            net.set_global_synaptic_gains(**{arg: -1})
 
     with pytest.raises(TypeError, match="must be an instance of bool"):
-        net.update_weights(copy="True")
+        net.set_global_synaptic_gains(copy="True")
 
     # Single argument check with copy
-    net_updated = net.update_weights(e_e=2.0, copy=True)
+    net_updated = net.set_global_synaptic_gains(e_e=2.0, copy=True)
     for conn in net_updated.connectivity:
         if conn["src_type"] in e_cell_names and conn["target_type"] in e_cell_names:
             assert conn["nc_dict"]["gain"] == 2.0
@@ -1120,7 +1316,7 @@ def test_synaptic_gains():
         assert conn["nc_dict"]["gain"] == 1.0
 
     # Single argument with inplace change
-    net.update_weights(i_e=0.5, copy=False)
+    net.set_global_synaptic_gains(i_e=0.5, copy=False)
     for conn in net.connectivity:
         if conn["src_type"] in i_cell_names and conn["target_type"] in e_cell_names:
             assert conn["nc_dict"]["gain"] == 0.5
@@ -1128,7 +1324,7 @@ def test_synaptic_gains():
             assert conn["nc_dict"]["gain"] == 1.0
 
     # Two argument check
-    net.update_weights(i_e=0.5, i_i=0.25, copy=False)
+    net.set_global_synaptic_gains(i_e=0.5, i_i=0.25, copy=False)
     for conn in net.connectivity:
         if conn["src_type"] in i_cell_names and conn["target_type"] in e_cell_names:
             assert conn["nc_dict"]["gain"] == 0.5
@@ -1157,6 +1353,11 @@ def test_synaptic_gains():
         _get_weight(nb_updated, "L2Pyr_L5Basket_ampa")
         / _get_weight(nb_base, "L2Pyr_L5Basket_ampa")
     ) == 1
+
+    # Verify network can be simulated with very heterogeneous gains
+    net.connectivity[1]["nc_dict"]["gain"] = 0.37
+    dpls = simulate_dipole(net, tstop=10.0, n_trials=1)
+    assert len(dpls[0].times) > 0
 
 
 class TestPickConnection:
@@ -1459,7 +1660,7 @@ def test_rename_cell_types(base_network):
 
     # Test the other main network we use for testing
     net4 = hnn_core.hnn_io.read_network_configuration(
-        op.join(hnn_core_root, "tests", "assets", "jones2009_3x3_drives.json")
+        op.join(hnn_core_root, "tests", "assets", "neymotin2020_3x3_drives.json")
     )
     net4._rename_cell_types(cell_type_rename_mapping)
     dpls4 = simulate_dipole(net4, tstop=10.0, n_trials=1)
@@ -1468,3 +1669,435 @@ def test_rename_cell_types(base_network):
         show=False, cell_types=list(cell_type_rename_mapping.values())
     )
     net4.cell_response.plot_spikes_hist(show=False)
+
+
+def test_spike_train_drive_formats_and_simulation():
+    """Test spike train drive formats are accepted, processed correctly, and simulated."""
+    # Create networks
+    net_dict = neymotin_2020_model()
+    net_tuple = neymotin_2020_model()
+
+    # File format will be tested in a temporary directory
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        # Create dictionary format (Format 1)
+        dict_format = {
+            "L2_pyramidal": [10.0, 20.0, 30.0],
+            "L5_pyramidal": [15.0, 25.0, 35.0],
+        }
+
+        # Create tuple format (Format 2)
+        tuple_format = [
+            (10.0, 0),
+            (15.0, 1),
+            (20.0, 0),
+            (25.0, 1),
+            (30.0, 0),
+            (35.0, 1),
+        ]
+
+        # Create test spike files for file format (Format 3)
+        # Create a CellResponse object with test data
+        cell_types = ["L2_pyramidal", "L5_pyramidal"]
+        spike_times = [[10.0, 15.0, 20.0, 25.0, 30.0, 35.0]]
+        spike_gids = [[1, 2, 1, 2, 1, 2]]
+        spike_types = [
+            [
+                cell_types[0],
+                cell_types[1],
+                cell_types[0],
+                cell_types[1],
+                cell_types[0],
+                cell_types[1],
+            ]
+        ]
+
+        cell_response = CellResponse(
+            spike_times=spike_times,
+            spike_gids=spike_gids,
+            spike_types=spike_types,
+            cell_type_names=cell_types,
+        )
+
+        # Write spike data to file
+        spike_file_pattern = op.join(tmp_dir, "spk_%d.txt")
+        cell_response.write(spike_file_pattern)
+        file_format = op.join(tmp_dir, "spk_*.txt")
+
+        # Add drives to networks with different formats
+        net_dict.add_spike_train_drive(
+            name="drive_dict",
+            spike_data=dict_format,
+            location="distal",
+            weights_ampa={"L5_pyramidal": 0.1, "L2_pyramidal": 0.05},
+            synaptic_delays=1.0,
+            conn_seed=42,
+        )
+
+        net_tuple.add_spike_train_drive(
+            name="drive_tuple",
+            spike_data=tuple_format,
+            location="distal",
+            weights_ampa={"L5_pyramidal": 0.1, "L2_pyramidal": 0.05},
+            synaptic_delays=1.0,
+            conn_seed=42,
+        )
+
+        # Create network for file format testing
+        net_file = neymotin_2020_model()
+        net_file.add_spike_train_drive(
+            name="drive_file",
+            spike_data=file_format,
+            location="distal",
+            weights_ampa={"L5_pyramidal": 0.1, "L2_pyramidal": 0.05},
+            synaptic_delays=1.0,
+            conn_seed=42,
+        )
+
+        # Check all drives were created with correct structure
+        for net, drive_name, format_name in [
+            (net_dict, "drive_dict", "dictionary"),
+            (net_tuple, "drive_tuple", "tuple list"),
+            (net_file, "drive_file", "file path"),
+        ]:
+            # Check drive exists
+            assert drive_name in net.external_drives
+
+            # Check drive properties
+            drive = net.external_drives[drive_name]
+            assert drive["type"] == "spike_train"
+            assert drive["n_drive_cells"] == 2
+
+            # Check standardized data structure
+            assert "times" in drive["dynamics"]
+            assert "gids" in drive["dynamics"]
+            assert len(drive["dynamics"]["times"]) == 6
+
+            # Simulate networks
+            dpls = simulate_dipole(net, tstop=50.0, n_trials=1)
+
+            # Verify simulations completed successfully
+            assert len(dpls[0].times) > 0
+
+            # Verify spikes were generated
+            assert len(net.cell_response.spike_times[0]) > 0
+
+            # Create plots to verify simulation worked correctly
+            fig, axes = plt.subplots(2, 1, figsize=(8, 6), constrained_layout=True)
+            dpls[0].plot(ax=axes[0], show=False)
+            axes[0].set_title(f"Dipole with {format_name} format spike drive")
+            net.cell_response.plot_spikes_raster(ax=axes[1], show=False)
+            axes[1].set_title(f"Spike raster with {format_name} format spike drive")
+            plt.close(fig)
+
+
+def test_offline_spike_replay():
+    """Test a workflow of offline spike recording and replay between networks."""
+    # Create first network (source)
+    net_A = neymotin_2020_model()
+
+    # Add drive to first network
+    net_A.add_evoked_drive(
+        name="evdist1",
+        mu=50.0,
+        sigma=2.0,
+        numspikes=1,
+        location="distal",
+        weights_ampa={"L5_pyramidal": 0.2, "L2_pyramidal": 0.1},
+        weights_nmda=None,
+        conn_seed=42,
+    )
+
+    # Simulate first network
+    dpls_A = simulate_dipole(net_A, tstop=100.0, n_trials=1)
+
+    # Extract spike data from first network
+    spike_data = {}
+    if net_A.cell_response and net_A.cell_response.spike_times:
+        trial_idx = 0
+        spike_times = net_A.cell_response.spike_times[trial_idx]
+        spike_gids = net_A.cell_response.spike_gids[trial_idx]
+        spike_types = net_A.cell_response.spike_types[trial_idx]
+
+        # Filter for pyramidal cells (since we're using these in net_B)
+        pyr_mask = np.array(
+            [t in ["L2_pyramidal", "L5_pyramidal"] for t in spike_types]
+        )
+        filtered_times = np.array(spike_times)[pyr_mask]
+        filtered_gids = np.array(spike_gids)[pyr_mask]
+        filtered_types = np.array(spike_types)[pyr_mask]
+
+        for i in range(len(filtered_times)):
+            gid = filtered_gids[i]
+            cell_type = filtered_types[i]
+            time = filtered_times[i]
+            src_id = f"NetA_{cell_type}_GID{gid}"
+
+            if src_id not in spike_data:
+                spike_data[src_id] = []
+
+            spike_data[src_id].append(time)
+
+    # Verify we have spikes to replay
+    assert len(spike_data) >= 1, "No spikes recorded from source network"
+    total_spikes = sum(len(spikes) for spikes in spike_data.values())
+    assert total_spikes >= 2, f"Not enough spikes recorded ({total_spikes})"
+
+    # Create second network (target)
+    net_B = neymotin_2020_model()
+
+    # Feed spike data to second network
+    net_B.add_spike_train_drive(
+        name="drive_from_NetA",
+        spike_data=spike_data,
+        location="distal",
+        weights_ampa={"L5_pyramidal": 0.1, "L2_pyramidal": 0.05},
+        synaptic_delays=1.0,
+        conn_seed=42,
+    )
+
+    # Simulate second network
+    dpls_B = simulate_dipole(net_B, tstop=150.0, n_trials=1)
+
+    # Verify both simulations completed successfully
+    assert len(dpls_A[0].times) > 0
+    assert len(dpls_B[0].times) > 0
+
+    # Verify both networks generated spikes
+    assert len(net_A.cell_response.spike_times[0]) > 0
+    assert len(net_B.cell_response.spike_times[0]) > 0
+
+    # Create plots to verify correct simulation
+    fig, axes = plt.subplots(4, 1, figsize=(10, 12), constrained_layout=True)
+
+    # Source network visualization
+    dpls_A[0].plot(ax=axes[0], show=False)
+    axes[0].set_title("Source Network: Dipole")
+
+    net_A.cell_response.plot_spikes_raster(ax=axes[1], show=False)
+    axes[1].set_title("Source Network: Spike Raster")
+
+    # Target network visualization
+    dpls_B[0].plot(ax=axes[2], show=False)
+    axes[2].set_title("Target Network: Dipole")
+
+    net_B.cell_response.plot_spikes_raster(ax=axes[3], show=False)
+    axes[3].set_title("Target Network: Spike Raster")
+
+    plt.close(fig)
+
+
+def test_filter_cell_types():
+    """Test filtering of cell types based on cell_metadata."""
+    net = neymotin_2020_model()
+
+    # Test filtering by a single attribute: layer
+    filtered_types = net.filter_cell_types(layer="5")
+    assert sorted(filtered_types) == ["L5_basket", "L5_pyramidal"]
+
+    # Test filtering by multiple attributes: layer and electro_type
+    filtered_types = net.filter_cell_types(layer="2", electro_type="excitatory")
+    assert filtered_types == ["L2_pyramidal"]
+
+    # Test a filter that should return an empty list
+    filtered_types = net.filter_cell_types(
+        layer="5", electro_type="inhibitory", measure_dipole=True
+    )
+    assert filtered_types == []
+
+    # Test filtering with a non-existent cell_metadata key
+    filtered_types = net.filter_cell_types(non_existent_key="some_value")
+    assert filtered_types == []
+
+
+def test_update_weights_metadata():
+    """Test update_weights with new cell_metadata logic."""
+    net = neymotin_2020_model()
+    e_cell_names = net.filter_cell_types(electro_type="excitatory")
+    i_cell_names = net.filter_cell_types(electro_type="inhibitory")
+
+    # Test updating excitatory to inhibitory connections
+    net.set_global_synaptic_gains(e_i=2.0)
+
+    for conn in net.connectivity:
+        is_e_to_i = (
+            conn["src_type"] in e_cell_names and conn["target_type"] in i_cell_names
+        )
+        if is_e_to_i:
+            # Assert that the gain was updated only for E->I connections
+            assert conn["nc_dict"]["gain"] == 2.0
+        else:
+            # Assert that all other gains remain unchanged
+            assert conn["nc_dict"]["gain"] == 1.0
+
+
+def test_get_global_synaptic_gains():
+    """Test synaptic gains getter."""
+    net = neymotin_2020_model()
+    assert net.get_global_synaptic_gains() == {
+        "e_e": 1.0,
+        "e_i": 1.0,
+        "i_e": 1.0,
+        "i_i": 1.0,
+    }
+    new_gains = {"e_e": 0.5, "e_i": 1.5, "i_e": 0.75, "i_i": 1.0}
+    net.set_global_synaptic_gains(**new_gains)
+    assert net.get_global_synaptic_gains() == new_gains
+
+
+def test_add_connection_threshold_and_gain():
+    """Test adding connections with custom threshold and gain parameters."""
+    net = neymotin_2020_model()
+
+    # Add connection with custom threshold
+    custom_threshold = 15.0
+    net.add_connection(
+        src_gids="L2_pyramidal",
+        target_gids="L2_basket",
+        loc="soma",
+        receptor="ampa",
+        weight=1e-3,
+        delay=1.0,
+        lamtha=3.0,
+        threshold=custom_threshold,
+    )
+
+    # Check that the threshold was set correctly
+    conn_idx = pick_connection(
+        net, src_gids="L2_pyramidal", target_gids="L2_basket", receptor="ampa"
+    )[-1]
+    assert net.connectivity[conn_idx]["nc_dict"]["threshold"] == custom_threshold
+
+    # Add connection with custom gain
+    custom_gain = 2.5
+    net.add_connection(
+        src_gids="L5_pyramidal",
+        target_gids="L5_basket",
+        loc="soma",
+        receptor="ampa",
+        weight=1e-3,
+        delay=1.0,
+        lamtha=3.0,
+        gain=custom_gain,
+    )
+
+    # Check that the gain was set correctly
+    conn_idx = pick_connection(
+        net, src_gids="L5_pyramidal", target_gids="L5_basket", receptor="ampa"
+    )[-1]
+    assert net.connectivity[conn_idx]["nc_dict"]["gain"] == custom_gain
+
+    # Add connection with both custom threshold and gain
+    net.add_connection(
+        src_gids="L2_basket",
+        target_gids="L2_pyramidal",
+        loc="soma",
+        receptor="gabaa",
+        weight=1e-3,
+        delay=1.0,
+        lamtha=3.0,
+        threshold=custom_threshold,
+        gain=custom_gain,
+    )
+
+    # Check that both were set correctly
+    conn_idx = pick_connection(
+        net, src_gids="L2_basket", target_gids="L2_pyramidal", receptor="gabaa"
+    )[-1]
+    assert net.connectivity[conn_idx]["nc_dict"]["threshold"] == custom_threshold
+    assert net.connectivity[conn_idx]["nc_dict"]["gain"] == custom_gain
+
+    # Test that default threshold is inherited from network when threshold=None
+    net.add_connection(
+        src_gids="L5_basket",
+        target_gids="L5_pyramidal",
+        loc="soma",
+        receptor="gabaa",
+        weight=1e-3,
+        delay=1.0,
+        lamtha=3.0,
+        threshold=None,  # Should use net.threshold
+        gain=1.5,
+    )
+
+    conn_idx = pick_connection(
+        net, src_gids="L5_basket", target_gids="L5_pyramidal", receptor="gabaa"
+    )[-1]
+    assert net.connectivity[conn_idx]["nc_dict"]["threshold"] == net.threshold
+    assert net.connectivity[conn_idx]["nc_dict"]["gain"] == 1.5
+
+
+def test_get_cell_index_by_synapse_type():
+    """Test _get_cell_index_by_synapse_type helper function."""
+    net = neymotin_2020_model()
+
+    e_gids, i_gids = _get_cell_index_by_synapse_type(net)
+
+    # Check that excitatory cells are correctly identified
+    expected_e_gids = list(net.gid_ranges["L2_pyramidal"]) + list(
+        net.gid_ranges["L5_pyramidal"]
+    )
+    assert sorted(e_gids) == sorted(expected_e_gids)
+
+    # Check that inhibitory cells are correctly identified
+    expected_i_gids = list(net.gid_ranges["L2_basket"]) + list(
+        net.gid_ranges["L5_basket"]
+    )
+    assert sorted(i_gids) == sorted(expected_i_gids)
+
+    # Ensure no overlap between excitatory and inhibitory
+    assert len(set(e_gids).intersection(set(i_gids))) == 0
+
+
+def test_check_global_synaptic_gains_uniformity():
+    """Test _check_global_synaptic_gains_uniformity function."""
+    net = neymotin_2020_model()
+
+    # Set some global gains
+    net.set_global_synaptic_gains(e_e=0.5)
+
+    # With uniform gains (default), should return True (no warning)
+    result = _check_global_synaptic_gains_uniformity(net)
+    assert result is True
+
+    # Make gains non-uniform by setting different gains for different connections
+    # Get two e_e connections
+    l2p_l2p_conns = pick_connection(
+        net, src_gids="L2_pyramidal", target_gids="L2_pyramidal"
+    )
+
+    # Set different gains for these connections
+    net.connectivity[l2p_l2p_conns[0]]["nc_dict"]["gain"] = 1.0
+    net.connectivity[l2p_l2p_conns[1]]["nc_dict"]["gain"] = 2.0
+
+    # Capture stdout to check for warning message
+    with io.StringIO() as buf, redirect_stdout(buf):
+        result = _check_global_synaptic_gains_uniformity(net)
+        stdout = buf.getvalue()
+
+    # With NON-uniform gains, check should return False
+    assert result is False
+    assert "WARNING" in stdout
+    assert "custom synaptic gain values" in stdout
+
+
+def test_verbose():
+    """Test that verbose flag controls print statements."""
+
+    net = neymotin_2020_model(mesh_shape=(3, 3))
+
+    with io.StringIO() as buf, redirect_stdout(buf):
+        simulate_dipole(net, dt=0.5, tstop=20.0, verbose=True)
+        assert "Trial 1" in buf.getvalue()
+
+    with io.StringIO() as buf, redirect_stdout(buf):
+        simulate_dipole(net, dt=0.5, tstop=20.0, verbose=False)
+        assert buf.getvalue() == ""
+
+
+def test_deprecated_jones_2009_model():
+    with pytest.warns(
+        DeprecationWarning, match="default model with `jones_2009_model`"
+    ):
+        net = jones_2009_model(add_drives_from_params=True, mesh_shape=(3, 3))
+
+    simulate_dipole(net, dt=0.5, tstop=20.0, verbose=True)

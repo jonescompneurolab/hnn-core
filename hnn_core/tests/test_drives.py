@@ -15,7 +15,7 @@ from hnn_core.drives import (
     _create_bursty_input,
 )
 from hnn_core.network import pick_connection
-from hnn_core.network_models import jones_2009_model
+from hnn_core.network_models import neymotin_2020_model
 from hnn_core import simulate_dipole
 
 hnn_core_root = op.dirname(hnn_core.__file__)
@@ -26,7 +26,7 @@ def setup_net():
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, "param", "default.json")
     params = read_params(params_fname)
-    net = jones_2009_model(params, mesh_shape=(3, 3))
+    net = neymotin_2020_model(params, mesh_shape=(3, 3))
 
     return net
 
@@ -686,7 +686,7 @@ def test_drive_random_state():
         "L5_pyramidal": 1.0,
     }
 
-    net = jones_2009_model()
+    net = neymotin_2020_model()
     for drive_name in ["evprox1", "evprox2"]:
         net.add_evoked_drive(
             drive_name,
