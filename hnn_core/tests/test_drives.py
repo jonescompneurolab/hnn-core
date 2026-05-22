@@ -16,6 +16,7 @@ from hnn_core.drives import (
 )
 from hnn_core.network import pick_connection
 from hnn_core.network_models import neymotin_2020_model
+from hnn_core.network_models import jones_2009_model
 from hnn_core import simulate_dipole
 
 hnn_core_root = op.dirname(hnn_core.__file__)
@@ -737,3 +738,222 @@ def test_add_poisson_drive(setup_net, rate_constant, cell_specific, n_drive_cell
     )
 
     simulate_dipole(net, tstop=5)
+
+
+def test_add_ngfc_drive():
+    """Test add_ngfc_drive connectivity, properties, and parameter validation."""
+    net = jones_2009_model(mesh_shape=(3, 3))
+
+    weights_gabab = {"L2_pyramidal": 0.001, "L5_pyramidal": 0.002}
+    syn_delays = {"L2_pyramidal": 0.1, "L5_pyramidal": 0.5}
+
+    net.add_ngfc_drive(
+        "ngfc1",
+        mu=50.0,
+        sigma=2.5,
+        numspikes=1,
+        weights_gabab=weights_gabab,
+        synaptic_delays=syn_delays,
+    )
+
+    drive = net.external_drives["ngfc1"]
+
+    # Drive metadata
+    assert drive["type"] == "ngfc"
+    assert drive["location"] == "apical_tuft"
+    assert drive["dynamics"] == {"mu": 50.0, "sigma": 2.5, "numspikes": 1}
+    assert drive["weights_gabab"] == weights_gabab
+    assert drive["weights_ampa"] is None
+    assert drive["weights_nmda"] is None
+    assert set(drive["target_types"]) == {"L2_pyramidal", "L5_pyramidal"}
+
+    # With cell_specific=True (default) and mesh (3,3): 9 L2_pyr + 9 L5_pyr = 18
+    assert drive["n_drive_cells"] == 18
+    assert drive["cell_specific"] is True
+
+    # All connections must target apical_tuft with gabab receptor only
+    conn_idxs = pick_connection(net, src_gids="ngfc1")
+    assert len(conn_idxs) > 0
+    for conn_idx in conn_idxs:
+        conn = net.connectivity[conn_idx]
+        assert conn["loc"] == "apical_tuft"
+        assert conn["receptor"] == "gabab"
+
+    # Connection weights match weights_gabab per cell type
+    for cell_type, expected_weight in weights_gabab.items():
+        idxs = pick_connection(net, src_gids="ngfc1", target_gids=cell_type)
+        assert len(idxs) == 1
+        assert net.connectivity[idxs[0]]["nc_dict"]["A_weight"] == expected_weight
+        assert net.connectivity[idxs[0]]["nc_dict"]["A_delay"] == syn_delays[cell_type]
+
+    # Basket cells have no apical_tuft, so targeting them must fail
+    with pytest.raises(ValueError):
+        net.add_ngfc_drive(
+            "ngfc_bad_target",
+            mu=50.0,
+            sigma=2.5,
+            numspikes=1,
+            weights_gabab={"L2_basket": 0.001},
+            synaptic_delays=0.1,
+        )
+
+    # Duplicate name must raise
+    with pytest.raises(ValueError, match="Drive ngfc1 already defined"):
+        net.add_ngfc_drive(
+            "ngfc1",
+            mu=50.0,
+            sigma=2.5,
+            numspikes=1,
+            weights_gabab=weights_gabab,
+            synaptic_delays=syn_delays,
+        )
+
+    # Parameter validation mirrors evoked drive
+    with pytest.raises(ValueError, match="Standard deviation cannot be negative"):
+        net.add_ngfc_drive(
+            "ngfc_neg_sigma",
+            mu=50.0,
+            sigma=-1.0,
+            numspikes=1,
+            weights_gabab=weights_gabab,
+            synaptic_delays=syn_delays,
+        )
+
+    with pytest.raises(ValueError, match="Number of spikes must be greater than zero"):
+        net.add_ngfc_drive(
+            "ngfc_zero_spikes",
+            mu=50.0,
+            sigma=2.5,
+            numspikes=0,
+            weights_gabab=weights_gabab,
+            synaptic_delays=syn_delays,
+        )
+
+    # No weights at all must raise
+    with pytest.raises(
+        ValueError,
+        match="No target cell types have been given a synaptic weight",
+    ):
+        net.add_ngfc_drive(
+            "ngfc_no_weights",
+            mu=50.0,
+            sigma=2.5,
+            numspikes=1,
+            synaptic_delays=0.1,
+        )
+
+
+def test_ngfc_drive_cell_specific_and_probability():
+    """Test ngfc drive with non-cell-specific connectivity and probability."""
+    net = jones_2009_model(mesh_shape=(3, 3))
+
+    weights_gabab = {"L2_pyramidal": 0.003, "L5_pyramidal": 0.005}
+    n_drive_cells = 5
+    probability = 0.5
+
+    net.add_ngfc_drive(
+        "ngfc_prob",
+        mu=60.0,
+        sigma=3.0,
+        numspikes=1,
+        weights_gabab=weights_gabab,
+        n_drive_cells=n_drive_cells,
+        cell_specific=False,
+        probability=probability,
+        synaptic_delays=0.1,
+    )
+
+    drive = net.external_drives["ngfc_prob"]
+    assert drive["n_drive_cells"] == n_drive_cells
+    assert drive["cell_specific"] is False
+
+    # Each target cell type should have ~50% connections
+    for cell_type in weights_gabab:
+        idxs = pick_connection(net, src_gids="ngfc_prob", target_gids=cell_type)
+        assert len(idxs) == 1
+        conn = net.connectivity[idxs[0]]
+        num_connections = sum(len(v) for v in conn["gid_pairs"].values())
+        expected = round(len(net.gid_ranges[cell_type]) * n_drive_cells * probability)
+        assert num_connections == expected
+
+
+def test_ngfc_drive_event_times():
+    """Test that ngfc drives generate Gaussian spike times like evoked drives."""
+    dynamics = {"mu": 50.0, "sigma": 3.0, "numspikes": 2}
+    tstop = 200.0
+    prng, _ = _get_prng(seed=0, gid=0)
+
+    times_ngfc = _drive_cell_event_times(
+        drive_type="ngfc",
+        dynamics=dynamics,
+        tstop=tstop,
+        event_seed=0,
+    )
+    times_evoked = _drive_cell_event_times(
+        drive_type="evoked",
+        dynamics=dynamics,
+        tstop=tstop,
+        event_seed=0,
+    )
+
+    # Both should produce spike times; same seed → same output
+    assert len(times_ngfc) > 0
+    assert times_ngfc == times_evoked
+
+    # Spike times should cluster near mu
+    times_ngfc_many = [
+        _drive_cell_event_times(
+            drive_type="ngfc",
+            dynamics=dynamics,
+            tstop=tstop,
+            drive_cell_gid=gid,
+            event_seed=42,
+        )
+        for gid in range(50)
+    ]
+    all_times = [t for cell_times in times_ngfc_many for t in cell_times]
+    assert abs(np.mean(all_times) - dynamics["mu"]) < 2.0
+
+
+def test_ngfc_drive_io(tmp_path):
+    """Test that an ngfc drive survives a JSON serialization round-trip."""
+    from hnn_core import read_network_configuration
+
+    net = jones_2009_model(mesh_shape=(3, 3))
+    weights_gabab = {"L2_pyramidal": 0.001, "L5_pyramidal": 0.002}
+    net.add_ngfc_drive(
+        "ngfc1",
+        mu=50.0,
+        sigma=2.5,
+        numspikes=1,
+        weights_gabab=weights_gabab,
+        synaptic_delays={"L2_pyramidal": 0.1, "L5_pyramidal": 0.5},
+        event_seed=7,
+        conn_seed=8,
+    )
+
+    config_path = tmp_path / "net_ngfc.json"
+    net.write_configuration(config_path)
+    net_loaded = read_network_configuration(config_path)
+
+    # Drive-specific parameters are faithfully restored
+    drive_orig = net.external_drives["ngfc1"]
+    drive_load = net_loaded.external_drives["ngfc1"]
+    assert drive_load["type"] == "ngfc"
+    assert drive_load["location"] == "apical_tuft"
+    assert drive_load["dynamics"] == drive_orig["dynamics"]
+    assert drive_load["weights_gabab"] == drive_orig["weights_gabab"]
+    assert drive_load["weights_ampa"] is None
+    assert drive_load["weights_nmda"] is None
+    assert drive_load["event_seed"] == drive_orig["event_seed"]
+    assert drive_load["conn_seed"] == drive_orig["conn_seed"]
+
+    # Connections are faithfully restored with correct loc and receptor
+    orig_idxs = pick_connection(net, src_gids="ngfc1")
+    load_idxs = pick_connection(net_loaded, src_gids="ngfc1")
+    assert len(orig_idxs) == len(load_idxs)
+    for oi, li in zip(orig_idxs, load_idxs):
+        assert net.connectivity[oi]["loc"] == net_loaded.connectivity[li]["loc"]
+        assert (
+            net.connectivity[oi]["receptor"] == net_loaded.connectivity[li]["receptor"]
+        )
