@@ -173,7 +173,6 @@ class BatchSimulate(object):
         self.summary_func = summary_func
         self._verbose = True
         self.bsl_cor = bsl_cor
-        # KDTODO self.bsl_cor here and its usage in run_single_sim
 
     def run(
         self,
@@ -342,7 +341,6 @@ class BatchSimulate(object):
                 verbose=self._verbose,
                 bsl_cor=self.bsl_cor,
             )
-            # KDTODO bsl_cor here
             results["dpl"] = dpl
 
         if self.save_spiking:

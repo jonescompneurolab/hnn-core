@@ -143,20 +143,6 @@ def _rmse_evoked(
             clear_cache=False,
             bsl_cor=obj_fun_kwargs.get("bsl_cor", None),
         )
-        # KDTODO!!! post-rebase: integrate `bsl_cor` usage into new obj func
-        # -----------------------------------------------------------
-        # if "bsl_cor" in obj_fun_kwargs:
-        #     dpls = simulate_dipole(
-        #         new_net,
-        #         tstop=tstop,
-        #         n_trials=obj_fun_kwargs["n_trials"],
-        #         bsl_cor=obj_fun_kwargs["bsl_cor"],
-        #     )
-        # else:
-        #     dpls = simulate_dipole(
-        #         new_net, tstop=tstop, n_trials=obj_fun_kwargs["n_trials"]
-        #     )
-        # -----------------------------------------------------------
 
         res = batch_simulation.run(
             params_batch,
@@ -189,6 +175,7 @@ def _rmse_evoked(
             tstop=tstop,
             dt=obj_fun_kwargs.get("dt", 0.025),
             n_trials=obj_fun_kwargs.get("n_trials", 1),
+            bsl_cor=obj_fun_kwargs.get("bsl_cor", None),
         )
 
         # smooth & scale all dipoles
@@ -300,6 +287,7 @@ def _maximize_psd(
             tstop=tstop,
             overwrite=False,
             clear_cache=False,
+            bsl_cor=obj_fun_kwargs.get("bsl_cor", None),
         )
 
         res = batch_simulation.run(
@@ -327,7 +315,11 @@ def _maximize_psd(
         set_params(new_net, params)
         # `_maximize_psd` is currently only implemented for single-trial simulations
         dpls = simulate_dipole(
-            new_net, tstop=tstop, dt=obj_fun_kwargs.get("dt", 0.025), n_trials=1
+            new_net,
+            tstop=tstop,
+            dt=obj_fun_kwargs.get("dt", 0.025),
+            n_trials=1,
+            bsl_cor=obj_fun_kwargs.get("bsl_cor", None),
         )
 
         # smooth & scale all dipoles
@@ -426,6 +418,7 @@ def _anticorr_evoked(
             tstop=tstop,
             overwrite=False,
             clear_cache=False,
+            bsl_cor=obj_fun_kwargs.get("bsl_cor", None),
         )
 
         res = batch_simulation.run(
@@ -460,6 +453,7 @@ def _anticorr_evoked(
             tstop=tstop,
             dt=obj_fun_kwargs.get("dt", 0.025),
             n_trials=obj_fun_kwargs.get("n_trials", 1),
+            bsl_cor=obj_fun_kwargs.get("bsl_cor", None),
         )
 
         # smooth & scale all dipoles
