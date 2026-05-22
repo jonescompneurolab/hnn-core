@@ -379,6 +379,7 @@ class Network:
             - "measure_dipole" : either True or False
             - "reference": optional
 
+
     Attributes
     ----------
     cell_types : dict of dict of (Cell | dict)
