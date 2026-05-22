@@ -1,4 +1,4 @@
-name: Unit tests
+name: Unix Unit Tests
 
 on:
   push:
