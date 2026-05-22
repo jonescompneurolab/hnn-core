@@ -745,6 +745,7 @@ def test_add_ngfc_drive():
     net = jones_2009_model(mesh_shape=(3, 3))
 
     weights_gabab = {"L2_pyramidal": 0.001, "L5_pyramidal": 0.002}
+    weights_gabaa = {"L2_pyramidal": 0.0015, "L5_pyramidal": 0.0025}
     syn_delays = {"L2_pyramidal": 0.1, "L5_pyramidal": 0.5}
 
     net.add_ngfc_drive(
@@ -753,6 +754,8 @@ def test_add_ngfc_drive():
         sigma=2.5,
         numspikes=1,
         weights_gabab=weights_gabab,
+        weights_gabaa=weights_gabaa,
+        synapse_type="both",
         synaptic_delays=syn_delays,
     )
 
@@ -763,6 +766,8 @@ def test_add_ngfc_drive():
     assert drive["location"] == "apical_tuft"
     assert drive["dynamics"] == {"mu": 50.0, "sigma": 2.5, "numspikes": 1}
     assert drive["weights_gabab"] == weights_gabab
+    assert drive["weights_gabaa"] == weights_gabaa
+    assert drive["synapse_type"] == "both"
     assert drive["weights_ampa"] is None
     assert drive["weights_nmda"] is None
     assert set(drive["target_types"]) == {"L2_pyramidal", "L5_pyramidal"}
@@ -771,20 +776,40 @@ def test_add_ngfc_drive():
     assert drive["n_drive_cells"] == 18
     assert drive["cell_specific"] is True
 
-    # All connections must target apical_tuft with gabab receptor only
+    # All connections must target apical_tuft with gabaa or gabab receptor
     conn_idxs = pick_connection(net, src_gids="ngfc1")
     assert len(conn_idxs) > 0
     for conn_idx in conn_idxs:
         conn = net.connectivity[conn_idx]
         assert conn["loc"] == "apical_tuft"
-        assert conn["receptor"] == "gabab"
+        assert conn["receptor"] in ("gabaa", "gabab")
 
-    # Connection weights match weights_gabab per cell type
-    for cell_type, expected_weight in weights_gabab.items():
-        idxs = pick_connection(net, src_gids="ngfc1", target_gids=cell_type)
-        assert len(idxs) == 1
-        assert net.connectivity[idxs[0]]["nc_dict"]["A_weight"] == expected_weight
-        assert net.connectivity[idxs[0]]["nc_dict"]["A_delay"] == syn_delays[cell_type]
+    # Connection weights match per cell type for each receptor
+    for cell_type in weights_gabab:
+        idxs_b = pick_connection(
+            net, src_gids="ngfc1", target_gids=cell_type, receptor="gabab"
+        )
+        assert len(idxs_b) == 1
+        assert (
+            net.connectivity[idxs_b[0]]["nc_dict"]["A_weight"]
+            == weights_gabab[cell_type]
+        )
+        assert (
+            net.connectivity[idxs_b[0]]["nc_dict"]["A_delay"] == syn_delays[cell_type]
+        )
+
+    for cell_type in weights_gabaa:
+        idxs_a = pick_connection(
+            net, src_gids="ngfc1", target_gids=cell_type, receptor="gabaa"
+        )
+        assert len(idxs_a) == 1
+        assert (
+            net.connectivity[idxs_a[0]]["nc_dict"]["A_weight"]
+            == weights_gabaa[cell_type]
+        )
+        assert (
+            net.connectivity[idxs_a[0]]["nc_dict"]["A_delay"] == syn_delays[cell_type]
+        )
 
     # Basket cells have no apical_tuft, so targeting them must fail
     with pytest.raises(ValueError):
