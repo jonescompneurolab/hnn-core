@@ -123,7 +123,7 @@ def neymotin_2020_model(
     hnn_core_root = Path(hnn_core.__file__).parent
     if params is None:
         params = hnn_core_root/ "param"/ "default.json"
-    if isinstance(params, str):
+    if isinstance(params, (str, Path)):
         params = read_params(params)
 
     # Define cell types for Jones 2009 model
