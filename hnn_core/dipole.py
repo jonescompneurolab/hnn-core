@@ -143,7 +143,7 @@ def simulate_dipole(
 
     net._verbose = verbose
 
-    dpls = _BACKEND.simulate(net, tstop, dt, n_trials, postproc)
+    dpls = _BACKEND.simulate(net, tstop, dt, n_trials, postproc, bsl_cor)
 
     return dpls
 
