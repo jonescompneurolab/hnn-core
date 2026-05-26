@@ -8,18 +8,11 @@ import sys
 import pickle
 import base64
 import re
-from mpi4py import MPI
 from hnn_core.parallel_backends import _extract_data, _extract_data_length
 import logging
-import signal
 
-
-def _pickle_data(sim_data):
-    # pickle the data and encode as base64 before sending to stderr
-    pickled_str = pickle.dumps(sim_data)
-    pickled_bytes = base64.b64encode(pickled_str)
-
-    return pickled_bytes
+import os
+import tempfile
 
 
 def _str_to_net(input_str):
@@ -53,28 +46,31 @@ class MPISimulation(object):
         The handle used for communicating among MPI processes
     rank : int
         The rank for each processor part of the MPI communicator
+    verbose_subprocess: boolean
+        If True, prints progress messages and status updates to log file.
     """
 
-    def __init__(self, skip_mpi_import=False):
-        signal.signal(signal.SIGTERM, self._handle_sigterm)
+    def __init__(self, skip_mpi_import=False, verbose_subprocess=False):
         self.skip_mpi_import = skip_mpi_import
         self.logger = None
         if skip_mpi_import:
             self.rank = 0
         else:
-            # from mpi4py import MPI
+            from mpi4py import MPI
 
             self.comm = MPI.COMM_WORLD
             self.rank = self.comm.Get_rank()
             size = self.comm.Get_size()
-            log_filename = f"process_{self.rank}.log"
-            logging.basicConfig(
-                filename=log_filename,
-                filemode="w",
-                level=logging.INFO,
-                format=f"[Rank {self.rank}/{size}] %(asctime)s - %(levelname)s - %(message)s",
-            )
-            self.logger = logging.getLogger(f"mpi_child.rank{self.rank}")
+
+            if verbose_subprocess:
+                log_filename = f"process_{self.rank}.log"
+                logging.basicConfig(
+                    filename=log_filename,
+                    filemode="w",
+                    level=logging.INFO,
+                    format=f"[Rank {self.rank}/{size}] %(asctime)s - %(levelname)s - %(message)s",
+                )
+                self.logger = logging.getLogger(f"mpi_child.rank{self.rank}")
 
     def __enter__(self):
         return self
@@ -82,17 +78,9 @@ class MPISimulation(object):
     def __exit__(self, type, value, traceback):
         # skip Finalize() if we didn't import MPI on __init__
         if hasattr(self, "comm"):
+            from mpi4py import MPI
+
             MPI.Finalize()
-
-    def _handle_sigterm(self, signum, frame):
-
-        print(
-            f"\n[CRITICAL] Caught signal {signum} (SIGTERM). Process is being killed!",
-            file=sys.stderr,
-        )
-        sys.stderr.flush()
-        sys.stdout.flush()
-        sys.exit(1)
 
     def _read_net(self):
         """Read net broadcasted to all ranks on stdin"""
@@ -113,9 +101,16 @@ class MPISimulation(object):
             net = None
 
         net = self.comm.bcast(net, root=0)
+        if self.logger:
+            self.logger.info(f"Net has been loaded on rank {self.rank}")
         return net
 
     def _wait_for_exit_signal(self):
+        """Wait for the parent to acknowledge data receipt before exiting.
+
+        Rank 0 blocks on stdin until it receives "@data_received@", sent by
+        the parent after it has read the result file path from stderr."""
+
         # read from stdin
         if self.rank == 0:
             input_str = ""
@@ -127,41 +122,72 @@ class MPISimulation(object):
                     break
 
     def _write_data_stderr(self, sim_data):
-        """write base64 encoded data to stderr"""
+        """Pickle sim_data to a temp file and signal the parent via stderr.
+
+        Rank 0 writes the file path and byte count as "@data_file:PATH:SIZE@\n";
+        all other ranks return immediately."""
 
         # only have rank 0 write to stdout/stderr
         if self.rank > 0:
+            if self.logger:
+                self.logger.info("Child process beginning to wait for exit signal")
             return
 
-        sys.stderr.write("@start_of_data@")
-        pickled_bytes = _pickle_data(sim_data)
-        sys.stderr.write(pickled_bytes.decode())
+        if self.logger:
+            self.logger.info(
+                "Rank 0 beginning to write data to temp file and signal parent process"
+            )
+        # rankm 0 writes data to temp file
+        pickled_bytes = pickle.dumps(sim_data)
+        fd, tmp_path = tempfile.mkstemp(prefix="hnn_mpi_data_", suffix=".pkl")
+        if self.logger:
+            self.logger.info(f"Rank 0 begins writing data to temp file {tmp_path}")
+        try:
+            with os.fdopen(fd, "wb") as f:
+                f.write(pickled_bytes)
+        except Exception:
+            # This exception was necessary in HPC environments to make the runtime error more verbose
+            os.unlink(tmp_path)
+            raise
 
-        # the parent process is waiting for "@end_of_data:[#bytes]@" with the
-        # length of data. The '@' is not found in base64 encoding, so we can
-        # be certain it is the border of the signal
-        sys.stderr.write("@end_of_data:%d@\n" % len(pickled_bytes))
+        # Signal the parent process the file path  @data_file:/path/to/file:SIZE@
+        # solves pipe buffering problems
+        # TODO make sure that this string is under 64kb right?
+        sys.stderr.write("@data_file:%s:%d@\n" % (tmp_path, len(pickled_bytes)))
         sys.stderr.flush()  # flush to ensure signal is not buffered
+        if self.logger:
+            self.logger.info(f"Rank 0 finished writing data to temp file {tmp_path}")
 
     def run(self, net, tstop, dt, n_trials):
         """Run MPI simulation(s) and write results to stderr"""
-        # print(f"HERE {self.rank}")
+
         from hnn_core.network_builder import _simulate_single_trial
 
         sim_data = list()
         for trial_idx in range(n_trials):
+            if self.logger:
+                self.logger.info(
+                    f"Beginning simulation of trial {trial_idx} on rank {self.rank}"
+                )
             single_sim_data = _simulate_single_trial(net, tstop, dt, trial_idx)
 
             # go ahead and append trial data for each rank, though
             # only rank 0 has data that should be sent back to MPIBackend
             sim_data.append(single_sim_data)
+
             if self.logger:
-                self.logger.info(f"Started worker process on rank {self.rank}")
+                # AES: Is this always successful?
+                self.logger.info(
+                    f"Successfully finished simulation of trial {trial_idx} on rank {self.rank}"
+                )
 
         # flush output buffers from all ranks (any errors or status messages)
         sys.stdout.flush()
         sys.stderr.flush()
-
+        if self.logger:
+            self.logger.info(
+                f"Successfully finished all simulations on rank {self.rank}"
+            )
         return sim_data
 
 
@@ -171,9 +197,10 @@ if __name__ == "__main__":
     import traceback
 
     rc = 0
+    verbose_subprocess = "--verbose-subprocess" in sys.argv
 
     try:
-        with MPISimulation() as mpi_sim:
+        with MPISimulation(verbose_subprocess=verbose_subprocess) as mpi_sim:
             # XXX: _read_net -> _read_obj, fix later
             net, tstop, dt, n_trials = mpi_sim._read_net()
             sim_data = mpi_sim.run(net, tstop, dt, n_trials)

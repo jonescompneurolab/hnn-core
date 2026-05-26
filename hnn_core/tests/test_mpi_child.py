@@ -7,7 +7,7 @@ import pytest
 
 import hnn_core
 from hnn_core import read_params, Network, neymotin_2020_model
-from hnn_core.mpi_child import MPISimulation, _str_to_net, _pickle_data
+from hnn_core.mpi_child import MPISimulation, _str_to_net
 from hnn_core.parallel_backends import (
     _gather_trial_data,
     _process_child_data,
@@ -16,6 +16,11 @@ from hnn_core.parallel_backends import (
     _extract_data,
     _extract_data_length,
 )
+
+import pickle
+import base64
+import tempfile
+import os
 
 
 def test_get_data_from_child_err():
@@ -85,7 +90,7 @@ def test_str_to_net():
     params = read_params(params_fname)
     net = neymotin_2020_model(params, add_drives_from_params=True)
 
-    pickled_net = _pickle_data(net)
+    pickled_net = base64.b64encode(pickle.dumps(net))
 
     input_str = (
         "@start_of_net@"
@@ -139,16 +144,15 @@ def test_child_run():
         with io.StringIO() as buf_err, redirect_stderr(buf_err):
             mpi_sim._write_data_stderr(sim_data)
             stderr_str = buf_err.getvalue()
-        assert "@start_of_data@" in stderr_str
-        assert "@end_of_data:" in stderr_str
+        assert "@data_file:" in stderr_str
 
         # write data to queue
         err_q = Queue()
         err_q.put(stderr_str)
 
         # use _read_stderr to get data_len (but not the data this time)
-        data_len, data = _get_data_from_child_err(err_q)
-        sim_data = _process_child_data(data, data_len)
+        data_len, data_path = _get_data_from_child_err(err_q)
+        sim_data = _process_child_data(data_path, data_len)
         n_trials = 1
         postproc = False
         dpls = _gather_trial_data(sim_data, net_reduced, n_trials, postproc)
@@ -157,20 +161,24 @@ def test_child_run():
 
 def test_empty_data():
     """Test that an empty string raises RuntimeError"""
-    data_bytes = b""
-    with pytest.raises(RuntimeError, match="MPI simulation didn't return any data"):
-        _process_child_data(data_bytes, len(data_bytes))
+    data_path = None
+    with pytest.raises(
+        RuntimeError, match="MPI simulation didn't produce a result file"
+    ):
+        _process_child_data(data_path, 0)
 
 
 def test_data_len_mismatch():
     """Test that padded data can be unpickled with warning for length"""
 
-    pickled_bytes = _pickle_data({})
+    pickled_bytes = pickle.dumps({})
+    fd, temp_file_path = tempfile.mkstemp(suffix=".pkl")
+    with os.fdopen(fd, "wb") as f:
+        f.write(pickled_bytes)
 
     expected_len = len(pickled_bytes) + 1
-
     with pytest.warns(UserWarning) as record:
-        _process_child_data(pickled_bytes, expected_len)
+        _process_child_data(temp_file_path, expected_len)
 
     expected_string = (
         "Length of received data unexpected. "
