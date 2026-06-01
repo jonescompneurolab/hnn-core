@@ -953,17 +953,15 @@ def pyramidal_l5ET(cell_name, pos=(0, 0, 0), gid=None):
     section_names = list(end_pts.keys())
 
     # initialize section voltage
-    v_init = {
-        "soma": np.float64(-71),
-        "basal_1": np.float64(-71),
-        "basal_2": np.float64(-71),
-        "basal_3": np.float64(-71),
-        "apical_oblique": np.float64(-71),
-        "apical_trunk": np.float64(-71),
-        "apical_1": np.float64(-71),
-        "apical_2": np.float64(-66.1144274029203),
-        "apical_tuft": np.float64(-59.84726333175576),
-    }
+    v_init = {'soma': -70.62820902070445,
+                'basal_1': -70.68833400623593,
+                'basal_2': -70.77775514983897,
+                'basal_3': -70.77775514983897,
+                'apical_oblique': -70.59471467725159,
+                'apical_trunk': -70.5815879670308,
+                'apical_1': -69.62883464685193,
+                'apical_2': -65.7496819357426,
+                'apical_tuft': -61.28751781712565}
 
     sections_apcl = _get_dends(
         p_all,
