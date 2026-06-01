@@ -4384,7 +4384,7 @@ def add_network_connectivity_tab(
     ### Global synaptic gains
     # ---------------------------------------------------------------
     global_gain_out.clear_output()
-    gain_types = ("e_e", "e_i", "i_e", "i_i")
+    gui_global_gain_types = ("e_e", "e_i", "i_e", "i_i")
 
     # Do "smart" loading of the synaptic gains, where custom global gains are
     # "extracted" from the network and displayed in the "global gains" parts of the GUI,
@@ -4395,11 +4395,11 @@ def add_network_connectivity_tab(
     if _check_global_synaptic_gains_uniformity(net):
         # If the check passes, then we can faithfully rely on the getter function to get
         # the global gain of each class, including the non-default ones.
-        gain_values = net.get_global_synaptic_gains()
-        if not np.allclose(1.0, list(gain_values.values())):
+        gui_global_gain_values = net.get_global_synaptic_gains()
+        if not np.allclose(1.0, list(gui_global_gain_values.values())):
             # If any of the global gain classes use a non-default value, then reset it
             # in the Network to the default, since we're ONLY going to keep the "state"
-            # of that global gain value in the GUI via `gain_values` (until the GUI
+            # of that global gain value in the GUI via `gui_global_gain_values` (until the GUI
             # later creates a new Network).
             #
             # Apparently can't just pass a dictionary...
@@ -4416,14 +4416,14 @@ def add_network_connectivity_tab(
         # default rather than show non-default values which are not correct (since they
         # don't hold to the uniformity assumption). The individual, single gains that
         # are displayed later in the accordion should be accurate and up-to-date.
-        gain_values = {type: 1.0 for type in gain_types}
+        gui_global_gain_values = {type: 1.0 for type in gui_global_gain_types}
 
     # Same as _get_connectivity_widgets
     style = {"description_width": "100px"}
 
-    for gain_type in gain_types:
+    for gain_type in gui_global_gain_types:
         gain_widget = BoundedFloatText(
-            value=gain_values[gain_type],
+            value=gui_global_gain_values[gain_type],
             description=f"{global_gain_type_display_dict[gain_type]}",
             min=0,
             max=1e6,
