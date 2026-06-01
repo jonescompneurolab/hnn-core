@@ -136,8 +136,8 @@ start the simulation across the number of processors (cores) specified by
  .. code-block:: none
 
     MPI will run 1 trial(s) sequentially by distributing network neurons over 2 processes.
-    numprocs=2
     bash: /home/circleci/miniconda/envs/testenv/lib/libtinfo.so.6: no version information available (required by bash)
+    numprocs=2
     Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.11/site-packages/hnn_core/mod/x86_64/libnrnmech.so
     Building the NEURON model
     Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.11/site-packages/hnn_core/mod/x86_64/libnrnmech.so
@@ -181,7 +181,7 @@ start the simulation across the number of processors (cores) specified by
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 44.567 seconds)
+   **Total running time of the script:** (0 minutes 46.178 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_simulate_mpi_backend.py:
