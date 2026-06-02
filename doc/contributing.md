@@ -848,7 +848,7 @@ is outlined below.
     The child rank 0 writes simulation results to a temp file and sends only
     the file path + byte count over stderr to avoid pipe buffer deadlocks
     with large payloads.
-4.  `MPIBackend` will verify the existance and access to the temp the file, length of data it receives, printing a
+4.  `MPIBackend` will verify the existence and access to the temp the file, length of data it receives, printing a
     `UserWarning` if the data length received doesn't match the length part of the
     marking.
 6.  Acknowledge and exit: once the file signal is received, sends
