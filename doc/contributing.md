@@ -839,27 +839,22 @@ is outlined below.
     `MPISimulation` processes' `stdin` is used. The ready-to-use
     {class}`~hnn_core.Network` object is base64 encoded and pickled before being written
     to the child processes' `stdin` by way of a Queue in a non-blocking way. See how it
-    is [used in MNE-Python][].  The data is marked by start and end signals that are
-    used to extract the pickled net object. After being unpickled, the parallel
-    simulation begins.
-2.  Output from the simulation (either to `stdout` or `stderr`) is communicated back to
-    `MPIBackend`, where it will be printed to the console. Typical output at this point
-    would be simulation progress messages as well as any MPI warnings/errors during the
-    simulation.
-3.  Once the simulation has completed, the rank 0 of the child process sends back the
-    simulation data by base64 encoding and pickling the data object. It also adds
-    markings for the start and end of the encoded data, including the expected length of
-    data (in bytes) in the end of data marking. Finally rank 0 writes the whole string
-    with markings and encoded data to `stderr`.
-4.  `MPIBackend` will look for these markings to know that data is being sent (and will
-    not print this). It will verify the length of data it receives, printing a
+    is [used in MNE-Python][].
+2.  Send the network: on the first iteration, it serializes and writes the
+    network object to the child's stdin via `_write_net()`. The child's
+    rank 0 reads it, deserializes it, and broadcasts it to all MPI ranks.
+3.  Wait for results: after sending, polls the child's `stdout`
+    for NEURON progress output and `stderr` for the `"@data_file:PATH:SIZE@"` signal.
+    The child rank 0 writes simulation results to a temp file and sends only
+    the file path + byte count over stderr to avoid pipe buffer deadlocks
+    with large payloads.
+4.  `MPIBackend` will verify the existance and access to the temp the file, length of data it receives, printing a
     `UserWarning` if the data length received doesn't match the length part of the
     marking.
-5.  To signal that the child process should terminate, `MPIBackend` sends a signal to
-    the child proccesses' `stdin`. After sending the simulation data, rank 0 waits for
-    this completion signal before continuing and letting all ranks of the MPI process
-    exit successfully.
-6.  At this point, `MPIBackend.simulate()` decodes and unpickles the data, populates the
+6.  Acknowledge and exit: once the file signal is received, sends
+    `"@data_received@"` to the child's stdin so the child can exit cleanly,
+    then waits for the subprocess to terminate.
+7.  At this point, `MPIBackend.simulate()` loads the simulation data from the temp file into a
     network's CellResponse object, and returns the simulation dipoles to the caller.
 
 It is important that `flush()` is used whenever data is written to stdin or stderr to
