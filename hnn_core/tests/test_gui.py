@@ -6,6 +6,7 @@ import io
 import json
 import logging
 import os
+import sys
 import tempfile
 import time
 from pathlib import Path
@@ -28,6 +29,7 @@ from hnn_core.gui._viz_manager import (
     unlink_relink,
 )
 from hnn_core.gui.gui import (
+    _GUI_PrintToLogger,
     _init_network_from_widgets,
     _simulate_prepare_upload_file,
     _update_nested_dict,
@@ -225,11 +227,8 @@ def test_gui_upload_connectivity():
 
 def test_gui_smart_gains_upload_connectivity(setup_gui):
     """Test if gui 'smartly' handles upload of Network with non-default global gains."""
-    logger = logging.getLogger("hnn_gui")
-
-    # gui = HNNGUI()
-    # _ = gui.compose()
     gui = setup_gui
+    sys.stdout = _GUI_PrintToLogger()
 
     global_gain_test_value_1 = 1.2
     global_gain_test_value_2 = 0.9
