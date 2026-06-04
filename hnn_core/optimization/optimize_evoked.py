@@ -17,7 +17,21 @@ from ..network import pick_connection
 
 
 def _get_range(val, multiplier):
-    """Get range of values to sweep over."""
+    """Get range of values to sweep over.
+    
+    Parameters
+    ----------
+
+    val : float
+        The initial value.
+    multiplier : float
+        The percentage to sweep over.
+
+    Returns
+    -------
+    ranges : dict
+        Dictionary with keys 'initial', 'minval', and 'maxval'.    
+    """
     range_min = max(0, val - val * multiplier / 100.0)
     range_max = val + val * multiplier / 100.0
     ranges = {"initial": val, "minval": range_min, "maxval": range_max}
@@ -125,12 +139,21 @@ def _split_by_evinput(
 def _generate_weights(evinput_params, tstop, dt, decay_multiplier):
     """Calculation of weight function for wRMSE calculation
 
+    Parameters
+    ----------
+    tstop : float
+        The simulation stop time (ms).
+    dt : float
+        The integration time step (ms) of h.CVode during simulation.
+    decay_multiplier : float
+        The decay multiplier for the weight function.
+
     Returns
     -------
     evinput_params : dict
         Adds the keys 'weights', 'opt_start', 'opt_end'
         to evinput_params[input_name] and removes 'mean'
-        and 'sigma' which were needed to compute 'weights'.
+        and 'sigma' which were needed to compute 'weights'.    
     """
     num_step = ceil(tstop / dt) + 1
     times = np.linspace(0, tstop, num_step)
@@ -192,8 +215,9 @@ def _create_last_chunk(input_chunks):
     Returns
     -------
     chunk: dict
-        Dictionary of with parameters for combined
-        chunk (final step)
+        Combined chunk dictionary with parameters from all
+        chunks in input_chunks. Contains keys 'inputs',
+        'ranges', 'opt_start', and 'opt_end'.
     """
     chunk = {"inputs": [], "ranges": {}, "opt_start": 0.0, "opt_end": 0.0}
 
@@ -398,6 +422,25 @@ def _optrun(
 
 
 def _run_optimization(maxiter, param_ranges, optrun):
+    """
+    Run optimization using the COBYLA method.
+
+    Parameters
+    ----------
+    maxiter : int
+        The maximum number of iterations to run the optimization.
+    param_ranges : dict
+        Dictionary with keys as parameter names and values as dictionaries
+        containing 'initial', 'minval', and 'maxval' keys.
+    optrun : callable
+        The function to run the optimization. It should accept a list of
+        parameters and return the objective function value.
+    
+    Returns
+    -------
+    result : ndarray
+        The optimized parameters found by the COBYLA method.
+    """
     cons = list()
     x0 = list()
     for idx, param_name in enumerate(param_ranges):
@@ -417,7 +460,25 @@ def _run_optimization(maxiter, param_ranges, optrun):
 
 
 def _get_drive_params(net, drive_names):
-    """Get evoked drive parameters from a Network instance."""
+    """Get evoked drive parameters from a Network instance.
+    
+    Parameters
+    ----------
+    net : Network instance
+        An instance of the Network object with attached evoked drives.
+    drive_names : list of str, shape (n_drives, )
+        Names corresponding to n Network drives.
+
+    Returns
+    -------
+    drive_dynamics : list of dict, shape (n_drives, )
+        Dynamics parameters for each drive specified in drive_names.
+    drive_syn_weights : list of dict, shape (n_drives, )
+        Synaptic weight parameters for each drive specified in drive_names.
+    drive_static_params : dict
+        Dictionary with keys corresponding to each drive name in drive_names
+        and values as dicts with static parameters for each drive.    
+    """
 
     drive_dynamics = list()
     drive_syn_weights = list()

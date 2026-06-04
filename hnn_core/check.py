@@ -7,7 +7,32 @@ from .externals.mne import _validate_type, _check_option
 
 
 def _check_gids(gids, gid_ranges, valid_cells, arg_name, same_type=True):
-    """Format different gid specifications into list of gids"""
+    """Format different gid specifications into list of gids
+    
+    Parameters
+    ----------
+
+    gids : int, list, range, str, optional
+        The gids to check, can be a single gid or a list of gids.
+
+    gid_ranges : dict
+        Dict containing the gid ranges for each cell type.
+
+    valid_cells : list of str
+        List of valid cell type strings.
+
+    arg_name : str
+        The name of the argument to be checked.
+
+    same_type : bool, optional
+        If True, all gids must be of the same cell type. The default is True.
+
+    Returns
+    -------
+
+    gids : list of int
+        List of gids.
+    """
     _validate_type(
         gids, (int, list, range, str, None), arg_name, "int list, range, str, or None"
     )
@@ -37,14 +62,45 @@ def _check_gids(gids, gid_ranges, valid_cells, arg_name, same_type=True):
 
 
 def _gid_to_type(gid, gid_ranges):
-    """Reverse lookup of gid to type."""
+    """Reverse lookup of gid to type.
+    
+    Parameters
+    ----------
+    gid : int
+        The gid to check.
+    gid_ranges : dict
+        Dict containing the gid ranges for each cell type.
+    
+    Returns
+    -------
+    gidtype : str, None
+        The cell type of the gid, or None if not found.
+    
+    """
     for gidtype, gids in gid_ranges.items():
         if gid in gids:
             return gidtype
 
 
 def _string_input_to_list(input_str, valid_str, arg_name):
-    """Convert input strings to list"""
+    """Convert input strings to list
+    
+    Parameters
+    ----------
+    input_str : str, list of str, optional
+        The input string(s) to check.
+    
+    valid_str : list of str
+        List of valid strings.
+
+    arg_name : str
+        The name of the argument to be checked.
+
+    Returns
+    -------
+    input_str : list of str
+        The input strings as a list.
+    """
     if input_str is None:
         input_str = list()
     elif isinstance(input_str, str):

@@ -149,6 +149,15 @@ class Optimizer:
         self.opt_params_ = None
 
     def __repr__(self):
+        """
+        Print summary info about the object.
+
+        Returns
+        -------
+        str
+            Summary info about the object. Is of the form: "{name}\nsolver={solver}\nfit={is_fit}>"
+
+        """
         is_fit = False
         if self.net_ is not None:
             is_fit = True

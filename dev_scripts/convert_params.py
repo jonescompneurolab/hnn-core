@@ -60,12 +60,14 @@ def convert_param_files_from_repo(owner, repo, repo_path, local_path):
         github account
     repo : str
         repository name
-    path : str
-        path to directory
-
+    repo_path : str
+        path to directory in repository
+    local_path : str
+        local path to save converted files
+        
     Returns
     -------
-    None
+    None    
     """
     # Download param files
     temp_dir = download_folder_contents(owner, repo, repo_path)

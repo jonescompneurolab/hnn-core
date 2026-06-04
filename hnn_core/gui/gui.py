@@ -189,10 +189,32 @@ global_gain_type_lookup_dict = {
 
 class _OutputWidgetHandler(logging.Handler):
     def __init__(self, output_widget, *args, **kwargs):
+        """
+        Custom logging handler to redirect log messages to an IPython output widget.
+
+        Parameters
+        ----------
+        output_widget : ipywidgets.Output
+            The output widget where log messages will be displayed.
+        *args : tuple
+            Species arbitrary number of positional arguments to pass to the parent class.
+        **kwargs : dict
+            Species arbitrary number of keyword arguments to pass to the parent class.
+        """
         super(_OutputWidgetHandler, self).__init__(*args, **kwargs)
         self.out = output_widget
 
     def emit(self, record):
+        """
+        Formats the log record and appends it to the output widget. Creates an output dict and
+        appends it to the output widget's outputs.
+
+
+        Parameters
+        ----------
+        record : logging.LogRecord
+            The log record to be formatted and displayed in the output widget.
+        """
         formatted_record = self.format(record)
         # Further format the message for GUI presentation
         try:
@@ -209,10 +231,26 @@ class _OutputWidgetHandler(logging.Handler):
 
 
 class _GUI_PrintToLogger:
-    """Class to redirect print messages to the logger in the GUI"""
+    """
+    Class to redirect print messages to the logger in the GUI.
+    """
 
     # when print is used, call the write method instead
     def write(self, message):
+        """
+        Redirect print messages to the logger.
+
+        Parameters
+        ----------
+        message : str
+            The message to be logged. If the message is empty or contains only whitespace,
+            it will not be logged.
+
+        Notes
+        -----
+        This method is called whenever print is used in the GUI. It checks if the message 
+        is empty or contains only whitespace before logging it.
+        """
         # avoid logging empty/new lines
         if message.strip():
             # send the message to the logger
@@ -220,6 +258,9 @@ class _GUI_PrintToLogger:
 
     # The flush method is required for compatibility with print
     def flush(self):
+        """
+        Flush method for compatibility with print function to ensure real time compatibility.
+        """
         pass
 
 
@@ -1059,14 +1100,27 @@ class HNNGUI:
     def get_cell_parameters_dict(self):
         """Returns the number of elements in the
         cell_parameters_dict dictionary.
-        This is for testing purposes"""
+        This is for testing purposes."""
         return cell_parameters_dict
 
-    def _init_html_download_button(
-        self,
-        title,
-        mimetype,
-    ):
+    def _init_html_download_button(self, title, mimetype):
+        """
+        Initializes an HTML download button with a base64 encoded payload.
+        
+        Parameters
+        ----------
+
+        title : str
+            The title of the download button.
+        mimetype : str
+            The MIME type of the file to be downloaded.
+
+        Returns
+        -------
+        HTML
+            An HTML widget wrapper containing the download button.
+        """
+
         b64 = base64.b64encode("".encode())
         payload = b64.decode()
         # Initialliting HTML code for download button
@@ -1099,6 +1153,7 @@ class HNNGUI:
         return html_widget
 
     def add_logging_window_logger(self):
+        """Add a logger to the logging window."""
         handler = _OutputWidgetHandler(self._log_out)
         handler.setFormatter(
             logging.Formatter("%(asctime)s  - [%(levelname)s] %(message)s")
@@ -1248,7 +1303,10 @@ class HNNGUI:
 
     @property
     def analysis_config(self):
-        """Provides everything viz window needs except for the data."""
+        """Provides everything viz window needs except for the data.
+        
+        Returns a dictionary containing the visualization style and widgets.
+        """
         return {
             "viz_style": self.layout["visualization_output_figsize"],
             # widgets
@@ -1275,6 +1333,14 @@ class HNNGUI:
         """Link callbacks to UI components."""
 
         def _handle_backend_change(backend_type):
+            """Handle backend change.
+            
+            Parameters
+            ----------
+            backend_type : str
+                The new backend type selected by the user.
+
+            """
             return handle_backend_change(
                 backend_type.new,
                 self._backend_config_out,
@@ -1283,6 +1349,15 @@ class HNNGUI:
             )
 
         def _add_drive_button_clicked(b):
+            """Handle the click event of the add drive button.
+            
+            Parameters
+            ----------
+            b : Button
+                The button that was clicked.
+            This function adds a new drive widget to the GUI based on the
+            selected drive type and location.
+            """
             location = self.widget_location_selection.value.lower()
             output = self.add_drive_tab_drive_widget(
                 self.widget_drive_type_selection.value,
@@ -1297,6 +1372,17 @@ class HNNGUI:
             return output
 
         def _delete_drives_clicked(b):
+            """Handle the click event of the delete drives button.
+            
+            Parameters
+            ----------
+
+            b : Button
+                The button that was clicked.
+
+            This function clears all existing drive widgets and their
+            corresponding boxes from the GUI.
+            """
             self._drives_out.clear_output()
             self._opt_drives_out.clear_output()
             # black magic: the following does not work
@@ -1311,22 +1397,67 @@ class HNNGUI:
                 self.opt_drive_boxes.pop()
 
         def _on_upload_connectivity(change):
+
+            """Handle the upload of connectivity parameters.
+            
+            Parameters
+            ----------
+
+            change : dict
+                The traitlets change dictionary passed in from the upload file widget. Contains
+                information about the newly uploaded file, including its name and content.
+
+            This function reads the uploaded connectivity parameters and
+            updates the connectivity widgets accordingly. It also updates the
+            simulation data with the new parameters.
+            """
             new_params = self.on_upload_params_change(
                 change, self.layout["drive_textbox"], load_type="connectivity"
             )
             self.params = new_params
 
         def _on_upload_drives(change):
+            """
+            Handle the upload of drive parameters.
+
+            Parameters
+            ----------
+            change : dict
+                The traitlets change dictionary triggered by the file upload widget.
+
+            This function reads the uploaded drive parameters and updates the
+            drive widgets accordingly. It also updates the simulation data with
+            the new parameters.
+            """
             _ = self.on_upload_params_change(
                 change, self.layout["drive_textbox"], load_type="drives"
             )
 
         def _on_upload_data(change):
+            """Handle the upload of external drive data. Updates widget after
+            new data is uploaded via 'on_upload_data_change' function.
+
+            Parameters
+            ----------
+            change : dict
+                The traitlets change dict triggered by the file upload widget.            
+
+            """
             return on_upload_data_change(
                 change, self.data, self.viz_manager, self._log_out
             )
 
         def _run_button_clicked(b):
+            """Handle the click event of the run button.
+
+            Parameters
+            ----------
+            b : Button
+                The button that was clicked.
+
+            This function initiates the simulation run process via the 'run_button_clicked'
+            function, passing in all necessary parameters and widgets.
+            """
             return run_button_clicked(
                 self.widget_simulation_name,
                 self._log_out,
@@ -1400,6 +1531,20 @@ class HNNGUI:
             return
 
         def _simulation_list_change(value):
+            """Handle the change event of the simulation list widget. It updates the HTML 
+            download buttons so the user can save these files locally.
+            
+            Parameters
+            ----------
+
+            value : dict
+                Traitlets change dictionary containing updated information. Contains 
+                the new simulation selection (in `value.new`).
+
+            This function updates the save simulation and save configuration buttons
+            with the appropriate payloads and filenames based on the selected simulation.
+                        
+            """
             # Simulation Data
             _simulation_data, file_extension = _serialize_simulation(
                 self._log_out, self.data, self.simulation_list_widget
@@ -1448,11 +1593,33 @@ class HNNGUI:
             )
 
         def _driver_type_change(value):
+            """Handle the change event of the drive type selection widget. Widget remains 
+            disabled if the selected drive type is "Tonic", otherwise False.
+
+            Parameters
+            ----------
+            value : dict
+                Traitlets change dictionary containing updated information. Contains 
+                the new drive type selection (in `value.new`).
+            
+            """
+
             self.widget_location_selection.disabled = (
                 True if value.new == "Tonic" else False
             )
 
         def _cell_type_radio_change(value):
+            """Handle the change event of the cell type radio buttons. Updates the cell parameters
+            output box with the appropriate parameters based on the selected cell type and layer.
+            
+            Parameters
+            ----------
+
+            value : dict
+                Traitlets change dictionary containing updated information. Contains
+                the new cell type selection (in `value.new`).
+            """
+
             _update_cell_params_vbox(
                 self._cell_params_out,
                 self.cell_parameters_widgets,
@@ -1461,6 +1628,16 @@ class HNNGUI:
             )
 
         def _cell_layer_radio_change(value):
+            """Handle the change event of the cell layer radio buttons. Updates the cell parameters
+            output box with the appropriate parameters based on the selected cell type and layer.
+
+            Parameters
+            ----------
+            value : dict
+                Traitlets change dictionary containing updated information. Contains
+                the new cell layer selection (in `value.new`).
+            """
+
             _update_cell_params_vbox(
                 self._cell_params_out,
                 self.cell_parameters_widgets,
@@ -1516,6 +1693,15 @@ class HNNGUI:
         )
 
     def _delete_single_drive(self, b):
+        """Delete a single drive from the drive list. Updates the accordion
+        titles and children accordingly and rerenders it. 
+
+        Parameters
+        ----------
+        b : Button
+            The button that was clicked to trigger the deletion.
+
+        """
         index = self.drive_accordion.selected_index
 
         # Remove selected drive from drive lists
@@ -1926,6 +2112,7 @@ class HNNGUI:
             return self.app_layout
 
     def show(self):
+        """Display the GUI."""
         display(self.app_layout)
 
     def capture(self, width=None, height=None, extra_margin=100, render=True):
@@ -1933,14 +2120,14 @@ class HNNGUI:
 
         Parameters
         ----------
-        width : int | None
-            The width of iframe window use to show the snapshot.
-        height : int | None
-            The height of iframe window use to show the snapshot.
-        extra_margin: int
-            Extra margin in pixel for the GUI.
-        render : bool
-            Will return an IFrame object if False
+        width : int | None, optional
+            The width of iframe window use to show the snapshot. By default, None.
+        height : int | None, optional
+            The height of iframe window use to show the snapshot. By default, None.
+        extra_margin: int, default = 100
+            Extra margin in pixel for the GUI. By default, 100.
+        render : bool, default = True
+            Will return an IFrame object if False. By default, True.
 
         Returns
         -------
@@ -1969,6 +2156,13 @@ class HNNGUI:
             2. init the HNNGUI in a single cell.
             3. Hit 'run all' button to run the whole notebook and it will
                selectively run twice.
+
+        Returns
+        -------
+
+        js_string : str
+            A JavaScript string that can be run in a Jupyter notebook to
+            execute all cells sequentially.
         """
         js_string = """
         function sleep(ms) {
@@ -2030,14 +2224,41 @@ class HNNGUI:
         self.load_data_button.set_trait("value", uploaded_value)
 
     def _simulate_upload_connectivity(self, file_url):
+        """Simulate uploading connectivity data by setting the value of the load_connectivity_button.
+
+        Parameters
+        ----------
+        file_url : str
+            The URL of the file to upload.
+        """
         uploaded_value = _simulate_prepare_upload_file(file_url)
+
         self.load_connectivity_button.set_trait("value", uploaded_value)
 
     def _simulate_upload_drives(self, file_url):
+        """Simulate uploading drive data by setting the value of the load_drives_button.
+
+        Parameters
+        ----------
+        file_url : str
+            The URL of the file to upload.
+        """
         uploaded_value = _simulate_prepare_upload_file(file_url)
         self.load_drives_button.set_trait("value", uploaded_value)
 
     def _simulate_left_tab_click(self, tab_title):
+        """Simulate clicking on a left tab by setting the selected_index of the left_tab.
+
+        Parameters
+        ----------
+        tab_title : str
+            The title of the tab to click.
+
+        Raises
+        ------
+        ValueError
+            If the tab title does not exist.
+        """
         # Get left tab group object
         left_tab = self.app_layout.left_sidebar.children[0].children[0]
         # Check that the title is in the tab group
@@ -2050,6 +2271,7 @@ class HNNGUI:
     def _simulate_make_figure(
         self,
     ):
+        """A shortcut clicking the make figure button in the Visualization tab."""
         self._simulate_left_tab_click("Visualization")
         self.viz_manager.make_fig_button.click()
 
@@ -2071,6 +2293,15 @@ class HNNGUI:
         action(*args, **kwargs)
 
     def _simulate_delete_single_drive(self, idx=0):
+        """Simulate deleting a single drive by clicking its delete button.
+
+        Parameters
+        ----------
+
+        idx : int, default = 0
+            The index of the drive to delete. By default, 0.
+
+        """
         self.drive_accordion.selected_index = idx
         self.drive_boxes[idx].children[-1].click()
 
@@ -2114,7 +2345,55 @@ class HNNGUI:
         expand_last_drive=True,
         event_seed=14,
     ):
-        """Add a widget for a new drive."""
+        """Add a widget for a new drive.
+        
+        Parameters
+        ----------
+
+        drive_type : str
+            The type of drive to add. Options are "Evoked", "Poisson", "Rhythmic", and "Tonic".
+
+        location : str | None
+            Widget that specifies the location of network drives. Could be proximal
+            or distal. If the drive type is "Tonic", this parameter is ignored.
+
+        prespecified_drive_name : str, optional
+            The name of the drive to add. If None, a default name will be
+            generated.
+
+        prespecified_drive_data : dict, optional
+            The data for the drive to add. If None, default data will be used.
+
+        prespecified_weights_ampa : list, optional
+            The AMPA weights for the drive to add. If None, default weights
+            will be used.
+
+        prespecified_weights_nmda : list, optional
+            The NMDA weights for the drive to add. If None, default weights
+            will be used.
+
+        prespecified_delays : list, optional
+            The synaptic delays for the drive to add. If None, default delays
+            will be used.
+
+        prespecified_n_drive_cells : int, optional
+            The number of drive cells for the drive to add. If None, default
+            number will be used.
+
+        prespecified_cell_specific : list, optional
+            The cell specificity for the drive to add. If None, default
+            specificity will be used.
+
+        render : bool, optional
+            Whether to render the drive accordion after adding the new drive.
+
+        expand_last_drive : bool, optional
+            Whether to expand the last added drive in the accordion.
+
+        event_seed : int, default = 14
+            The seed for the drive events. By default, 14.
+
+        """
 
         # Check only adds 1 tonic input widget
         if drive_type == "Tonic" and not _check_if_tonic_bias_exists(
@@ -2243,6 +2522,30 @@ class HNNGUI:
             )
 
     def on_upload_params_change(self, change, layout, load_type):
+        """Handle the upload of parameters from a file.
+
+        This function is triggered when the user uploads a file containing
+        simulation parameters. It reads the file, extracts the parameters,
+        and updates the GUI accordingly.
+        
+        Parameters
+        ----------
+        change : dict
+            Traitlets change dictionary containing updated information. Contains
+            the new file upload data in `change["new"]`.
+        layout : dict
+            Dictionary containing layout information for the GUI.  
+        load_type : str
+            The type of parameters being loaded. Options are "connectivity"
+            and "drives".
+            
+        Returns
+        -------
+        params : dict
+            The JSON parameters loaded from the file.
+        
+        """
+
         if len(change["owner"].value) == 0:
             return
         param_dict = change["new"][0]
@@ -2821,6 +3124,24 @@ class HNNGUI:
 
 
 def _prepare_upload_file_from_local(path):
+    """
+    Prepare file upload structure from a local file path.
+
+    This function reads a file from the local filesystem and prepares
+    it for upload by creating a memoryview of its contents and
+    extracting metadata.
+
+    Parameters
+    ----------
+
+    path : str
+        The local file path to read.
+
+    Returns
+    -------
+    upload_structure : list of dict
+        A list with each dict containing the file metadata and content for upload.
+    """
     path = Path(path)
     with open(path, "rb") as file:
         content = memoryview(file.read())
@@ -2840,6 +3161,23 @@ def _prepare_upload_file_from_local(path):
 
 
 def _prepare_upload_file_from_url(file_url):
+    """
+    Prepare file upload structure from a URL.
+
+    This function downloads a file from a URL and prepares it for upload
+    by creating a memoryview of its contents and extracting metadata.
+
+    Parameters
+    ----------
+    file_url : str
+        The URL of the file to download.
+
+    Returns
+    -------
+    upload_structure : list of dict
+        A list with each dict containing the file metadata and content for upload.
+    """
+
     file_name = file_url.split("/")[-1]
     data = urllib.request.urlopen(file_url)
     content = bytearray()
@@ -2866,6 +3204,18 @@ def _simulate_prepare_upload_file(path):
     either be local or from a URL. This function returns the data structure
     of the ipywidget FileUpload widget, a list of dictionaries with file
     attributes.
+
+    Parameters
+    ----------
+
+    path : str
+        The local file path to read or URL of the file to download.
+
+    Returns
+    -------
+
+    upload_structure : list of dict
+        A list with each dict containing the file metadata and content for upload.
     """
     try:
         uploaded_value = _prepare_upload_file_from_local(path)
@@ -2894,8 +3244,10 @@ def _update_nested_dict(original, new, skip_none=True):
         dictionary by when True. If False None values will be passed to the
         updated dictionary.
 
-    Returns dict
+    Returns 
     -------
+    updated : dict
+        The updated dictionary with new values merged in.
 
     """
     updated = original.copy()
@@ -3284,6 +3636,18 @@ def _create_synaptic_widgets(
 
 
 def _cell_spec_change(change, widget):
+    """Disable or enable the widget based on a change.
+
+    Parameters
+    ----------
+
+    change : dict
+        Traitlets change dictionary containing updated information. 
+
+    widget : ipywidget
+        The widget to disable or enable.
+
+    """
     if change["new"]:
         widget.disabled = True
     else:
@@ -4346,7 +4710,35 @@ def add_connectivity_tab(
     global_gain_textfields,
     layout,
 ):
-    """Add all possible connectivity boxes to connectivity tab."""
+    """
+    Add all possible connectivity boxes to connectivity tab.
+    
+    Parameters
+    ----------
+
+    params : dict
+        Dictionary containing the network parameters.
+    connectivity_out : ipywidget.Output
+        Output widget to display the connectivity tab.
+    connectivity_textfields : list
+        List to store the connectivity text fields.
+    cell_params_out : ipywidget.Output
+        Output widget to display the cell parameters tab.
+    cell_pameters_vboxes : dict
+        Dictionary to store the cell parameters VBoxes.
+    cell_layer_radio_button : ipywidget.RadioButtons
+        Radio button widget to select the cell layer.
+    cell_type_radio_button : ipywidget.RadioButtons
+        Radio button widget to select the cell type.
+    layout : dict
+        Layout options for widgets.
+    
+    Returns
+    -------
+    
+    net : Network
+        The constructed network object.
+    """
     net = dict_to_network(params)
 
     # build network connectivity tab
@@ -4613,6 +5005,33 @@ def get_cell_param_default_value(cell_type_key, param_dict):
 
 
 def on_upload_data_change(change, data, viz_manager, log_out):
+    """
+    Handle changes in the upload widget when a user uploads new simulation data.
+
+    This function is triggered automatically whenever the file upload widget
+    changes value (i.e., when the user uploads a file). It parses the uploaded
+    file metadata, decodes its content, and stores the data inside the global
+    `data` dictionary under the `simulation_data` key. If the file is new, it
+    is processed and immediately visualized by creating a dipole plot in the GUI.
+    If the file has already been loaded before, the function logs an error and
+    does not reload it.
+
+    Parameters
+    ----------
+    change : dict
+        Traitlets change dictionary describing the change in the file upload widget. Contains
+        information about the newly uploaded file, including its name and content.
+    data : dict
+        Global data dictionary where simulation data is stored. The uploaded
+        dipole data is added to the `simulation_data` key.
+    viz_manager : object
+        Visualization manager instance controlling GUI figures. Used to reset
+        figure configuration, create a new figure panel, and call
+        `_simulate_edit_figure` to display the uploaded dipole data.
+    log_out : ipywidgets.Output
+        Widget used to display log messages. Errors and status messages
+        are written here using the `logger`.
+    """
     if len(change["owner"].value) == 0:
         return
     # Parsing file information from the 'change' object passed in from
