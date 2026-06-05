@@ -21,6 +21,7 @@ import pickle
 import base64
 import tempfile
 import os
+from unittest.mock import patch
 
 
 def test_get_data_from_child_err():
@@ -187,3 +188,26 @@ def test_data_len_mismatch():
 
     assert len(record) == 1
     assert record[0].message.args[0] == expected_string
+
+
+def test_file_not_found():
+    """_process_child_data raises RuntimeError and warns when file is missing"""
+    with pytest.warns(UserWarning, match="Result file not found"):
+        with pytest.raises(RuntimeError, match="MPI result file missing"):
+            _process_child_data("/nonexistent/path/hnn_mpi_data.pkl", 42)
+
+
+def test_permission_error():
+    """_process_child_data raises RuntimeError and warns on PermissionError"""
+    fd, tmp_path = tempfile.mkstemp(prefix="hnn_mpi_test_", suffix=".pkl")
+    os.close(fd)
+    try:
+        with patch("builtins.open", side_effect=PermissionError("denied")):
+            with pytest.warns(UserWarning, match="Permission denied"):
+                with pytest.raises(RuntimeError, match="MPI result file unreadable"):
+                    _process_child_data(tmp_path, 42)
+    finally:
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass

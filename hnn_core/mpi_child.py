@@ -121,6 +121,34 @@ class MPISimulation(object):
                 if "@data_received@" in input_str:
                     break
 
+    def _write_data_tempfile(self, sim_data):
+        """Pickle sim_data to a temp file and return file path
+        and byte count."""
+
+        pickled_bytes = pickle.dumps(sim_data)
+        fd, tmp_path = tempfile.mkstemp(prefix="hnn_mpi_data_", suffix=".pkl")
+        if self.logger:
+            self.logger.info(f"Rank 0 begins writing data to temp file {tmp_path}")
+        try:
+            with os.fdopen(fd, "wb") as f:
+                f.write(pickled_bytes)
+        except Exception:
+            # This exception was necessary in HPC environments to make the runtime error more verbose
+            os.unlink(tmp_path)
+            raise
+
+        return tmp_path, len(pickled_bytes)
+
+    def _signal_data_file_stderr(self, tmp_path, pickled_size):
+        """Signal parent process with temp file path
+        and byte count on stderr."""
+
+        # Signal the parent process the file path @data_file:/path/to/file:SIZE@
+        # solves pipe buffering problems
+        # TODO make sure that this string is under 64kb right?
+        sys.stderr.write("@data_file:%s:%d@\n" % (tmp_path, pickled_size))
+        sys.stderr.flush()  # flush to ensure signal is not buffered
+
     def _write_data_stderr(self, sim_data):
         """Pickle sim_data to a temp file and signal the parent via stderr.
 
@@ -137,24 +165,8 @@ class MPISimulation(object):
             self.logger.info(
                 "Rank 0 beginning to write data to temp file and signal parent process"
             )
-        # rankm 0 writes data to temp file
-        pickled_bytes = pickle.dumps(sim_data)
-        fd, tmp_path = tempfile.mkstemp(prefix="hnn_mpi_data_", suffix=".pkl")
-        if self.logger:
-            self.logger.info(f"Rank 0 begins writing data to temp file {tmp_path}")
-        try:
-            with os.fdopen(fd, "wb") as f:
-                f.write(pickled_bytes)
-        except Exception:
-            # This exception was necessary in HPC environments to make the runtime error more verbose
-            os.unlink(tmp_path)
-            raise
-
-        # Signal the parent process the file path  @data_file:/path/to/file:SIZE@
-        # solves pipe buffering problems
-        # TODO make sure that this string is under 64kb right?
-        sys.stderr.write("@data_file:%s:%d@\n" % (tmp_path, len(pickled_bytes)))
-        sys.stderr.flush()  # flush to ensure signal is not buffered
+        tmp_path, pickled_size = self._write_data_tempfile(sim_data)
+        self._signal_data_file_stderr(tmp_path, pickled_size)
         if self.logger:
             self.logger.info(f"Rank 0 finished writing data to temp file {tmp_path}")
 

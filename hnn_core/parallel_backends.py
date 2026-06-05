@@ -158,6 +158,9 @@ def run_subprocess(
         data_received = False
         sent_network = False
         count_since_last_output = 0
+        ## Keep track of the process is still running
+        stay_alive_interval = 60.0
+        last_alive_t = time.time()
 
         ## Wait for NEURON starts and sends first response
         first_output_received = False
@@ -237,16 +240,20 @@ def run_subprocess(
                     # assume it was successful and move on to waiting for
                     # data in the next loop iteration.
 
-            if child_terminated and data_received:
-                # both exit conditions have been met (also we know that
-                # the network has been sent)
-                if verbose:
-                    print(f"process terminated after {time.time() - t_start:.2f}s")
-                break
-
             if not child_terminated and count_since_last_output > timeout_cycles:
                 if sent_network:
                     # nrniv child is computing silently ,dont timeout
+                    # Print feedback to user the process is still running
+                    t_now = time.time()
+                    if t_now - last_alive_t >= stay_alive_interval:
+                        elapsed_time = t_now - t_start
+                        print(
+                            "MPI simulation is still running. This may take several minutes."
+                            f"({elapsed_time:.1f}s elapsed)"
+                            "You may cancel if there is no response for a long time.",
+                            flush=True,
+                        )
+                        last_alive_t = t_now
                     count_since_last_output = 0
                 else:
                     warn(
@@ -255,6 +262,14 @@ def run_subprocess(
                     )
                     kill_proc_name("nrniv")
                     break
+
+            if child_terminated and data_received:
+                # both exit conditions have been met (also we know that
+                # the network has been sent)
+                if verbose:
+                    print(f"process terminated after {time.time() - t_start:.2f}s")
+                break
+
     except KeyboardInterrupt:
         warn("Received KeyboardInterrupt. Stopping simulation process...")
 
