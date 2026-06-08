@@ -777,7 +777,7 @@ class Cell:
         self.dipole = h.Vector().record(self.dpl_ref)
 
     def create_tonic_bias(
-        self, amplitude, t0, tstop, section="soma", loc=0.5, gid=None
+        self, amplitude, t0, tstop, section="soma", loc=0.5
     ):
         """Create tonic bias at defined section.
 
