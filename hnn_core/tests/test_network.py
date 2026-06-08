@@ -1238,11 +1238,18 @@ def test_tonic_biases():
     net = neymotin_2020_model()
     net.clear_connectivity()
     target_gid = 35
-    cell_type = 'L2_pyramidal'
+    cell_type = "L2_pyramidal"
 
     # Correct type
     assert target_gid in net.gid_ranges[cell_type]
-    net.add_tonic_bias(cell_type=cell_type, gid=target_gid, bias_name="tonic_soma", amplitude=3, t0=10, tstop=15)
+    net.add_tonic_bias(
+        cell_type=cell_type,
+        gid=target_gid,
+        bias_name="tonic_soma",
+        amplitude=3,
+        t0=10,
+        tstop=15,
+    )
 
     # stored correctly
     assert target_gid == net.external_biases["tonic_soma"][cell_type]["gid"]
@@ -1259,23 +1266,36 @@ def test_tonic_biases():
         del net
         net = neymotin_2020_model()
         net.clear_connectivity()
-        net.add_tonic_bias(cell_type=cell_type, bias_name="tonic_soma", amplitude=3, t0=10, tstop=15)
+        net.add_tonic_bias(
+            cell_type=cell_type, bias_name="tonic_soma", amplitude=3, t0=10, tstop=15
+        )
         dpl = simulate_dipole(net, tstop=20)
-        assert (np.unique(np.array(net.cell_response.spike_gids)) == net.gid_ranges[cell_type]).all()
+        assert (
+            np.unique(np.array(net.cell_response.spike_gids))
+            == net.gid_ranges[cell_type]
+        ).all()
 
     del net, dpl
 
     # Assert value error when GID is not in cell type range
-    import pytest
     net = neymotin_2020_model()
-    cell_type='L2_pyramidal'
+    cell_type = "L2_pyramidal"
     target_gids = 20
-    net.add_tonic_bias(cell_type=cell_type, gid=target_gids, bias_name="tonic_soma", amplitude=3, t0=10, tstop=15)
-    with pytest.raises(ValueError, match="GID 20 was given a 'L2_pyramidal' bias but is of type 'L2_basket'. Define a separate bias per cell type."):
+    net.add_tonic_bias(
+        cell_type=cell_type,
+        gid=target_gids,
+        bias_name="tonic_soma",
+        amplitude=3,
+        t0=10,
+        tstop=15,
+    )
+    with pytest.raises(
+        ValueError,
+        match="GID 20 was given a 'L2_pyramidal' bias but is of type 'L2_basket'. Define a separate bias per cell type.",
+    ):
         dpl = simulate_dipole(net, tstop=20)
 
     del net, dpl
-    
 
 
 def test_network_mesh():

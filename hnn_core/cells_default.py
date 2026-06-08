@@ -868,7 +868,6 @@ def pyramidal_ca(cell_name, pos, override_params=None, gid=None):
 
 
 def pyramidal_humanL5ET(cell_name, pos=(0, 0, 0), gid=None):
-
     """Create a Cell object of a human L5Pyr pyramidal neuron (developed for duecker_ET_model).
 
     Parameters
@@ -910,10 +909,16 @@ def pyramidal_humanL5ET(cell_name, pos=(0, 0, 0), gid=None):
 
     # basal dendrites
     gbar_NaTs2_t = partial(
-        _linear_g_at_dist, gsoma=p_all["L5Pyr_basal_gbar_NaTs2_t_hay2011"], gdend=0, xkink=255
+        _linear_g_at_dist,
+        gsoma=p_all["L5Pyr_basal_gbar_NaTs2_t_hay2011"],
+        gdend=0,
+        xkink=255,
     )
     gbar_SKv3_1 = partial(
-        _linear_g_at_dist, gsoma=0, gdend=p_all["L5Pyr_basal_gbar_SKv3_1_hay2011"], xkink=255
+        _linear_g_at_dist,
+        gsoma=0,
+        gdend=p_all["L5Pyr_basal_gbar_SKv3_1_hay2011"],
+        xkink=255,
     )
 
     override_params = dict()
@@ -1001,7 +1006,10 @@ def pyramidal_humanL5ET(cell_name, pos=(0, 0, 0), gid=None):
         "Im_hay2011": ["gbar_Im_hay2011"],
         "K_Pst_hay2011": ["gbar_K_Pst_hay2011"],
         "K_Tst_hay2011": ["gbar_K_Tst_hay2011"],
-        "CaDynamics_E2_hay2011": ["decay_CaDynamics_E2_hay2011", "gamma_CaDynamics_E2_hay2011"],
+        "CaDynamics_E2_hay2011": [
+            "decay_CaDynamics_E2_hay2011",
+            "gamma_CaDynamics_E2_hay2011",
+        ],
     }
 
     p_mech_soma = _get_mechanisms(p_all, "L5Pyr", ["soma"], mechanisms)
@@ -1019,7 +1027,10 @@ def pyramidal_humanL5ET(cell_name, pos=(0, 0, 0), gid=None):
         "Im_hay2011": ["gbar_Im_hay2011"],
         "K_Pst_hay2011": ["gbar_K_Pst_hay2011"],
         "K_Tst_hay2011": ["gbar_K_Tst_hay2011"],
-        "CaDynamics_E2_hay2011": ["decay_CaDynamics_E2_hay2011", "gamma_CaDynamics_E2_hay2011"],
+        "CaDynamics_E2_hay2011": [
+            "decay_CaDynamics_E2_hay2011",
+            "gamma_CaDynamics_E2_hay2011",
+        ],
     }
 
     p_mech_apical = _get_mechanisms(p_all, "L5Pyr", section_names, mechanisms)
@@ -1030,7 +1041,10 @@ def pyramidal_humanL5ET(cell_name, pos=(0, 0, 0), gid=None):
         "SKv3_1_hay2011": ["gbar_SKv3_1_hay2011"],
         "pas": ["g_pas", "e_pas"],
         "Ih_hay2011": ["gbar_Ih_hay2011"],
-        "CaDynamics_E2_hay2011": ["decay_CaDynamics_E2_hay2011", "gamma_CaDynamics_E2_hay2011"],
+        "CaDynamics_E2_hay2011": [
+            "decay_CaDynamics_E2_hay2011",
+            "gamma_CaDynamics_E2_hay2011",
+        ],
     }
 
     section_names = ["basal_1", "basal_2", "basal_3", "apical_oblique"]
@@ -1054,7 +1068,7 @@ def pyramidal_humanL5ET(cell_name, pos=(0, 0, 0), gid=None):
 
         if sec_name == "soma":
             section.syns = ["gabaa", "gabab"]
-        elif sec_name=="apical_2":
+        elif sec_name == "apical_2":
             section.syns = ["ampa", "nmda", "gabaa_slow", "gabab"]
         else:
             section.syns = ["ampa", "nmda", "gabaa", "gabab"]
@@ -1084,7 +1098,6 @@ def pyramidal_humanL5ET(cell_name, pos=(0, 0, 0), gid=None):
 
 
 def pyramidal_humanL23(cell_name, pos=(0, 0, 0), gid=None):
-
     """Create a Cell object of a human L52/3 pyramidal neuron (developed for duecker_ET_model).
 
     Parameters
@@ -1193,7 +1206,10 @@ def pyramidal_humanL23(cell_name, pos=(0, 0, 0), gid=None):
         "pas": ["g_pas", "e_pas"],
         "Ih_hay2011": ["gbar_Ih_hay2011"],
         "Im_hay2011": ["gbar_Im_hay2011"],
-        "CaDynamics_E2_hay2011": ["decay_CaDynamics_E2_hay2011", "gamma_CaDynamics_E2_hay2011"],
+        "CaDynamics_E2_hay2011": [
+            "decay_CaDynamics_E2_hay2011",
+            "gamma_CaDynamics_E2_hay2011",
+        ],
     }
 
     p_mech_soma = _get_mechanisms(p_all, "L2Pyr", ["soma"], mechanisms)
@@ -1208,7 +1224,10 @@ def pyramidal_humanL23(cell_name, pos=(0, 0, 0), gid=None):
         "pas": ["g_pas", "e_pas"],
         "Ih_hay2011": ["gbar_Ih_hay2011"],
         "Im_hay2011": ["gbar_Im_hay2011"],
-        "CaDynamics_E2_hay2011": ["decay_CaDynamics_E2_hay2011", "gamma_CaDynamics_E2_hay2011"],
+        "CaDynamics_E2_hay2011": [
+            "decay_CaDynamics_E2_hay2011",
+            "gamma_CaDynamics_E2_hay2011",
+        ],
     }
 
     section_names = ["apical_trunk", "apical_1", "apical_tuft"]
@@ -1220,7 +1239,10 @@ def pyramidal_humanL23(cell_name, pos=(0, 0, 0), gid=None):
         "SKv3_1_hay2011": ["gbar_SKv3_1_hay2011"],
         "pas": ["g_pas", "e_pas"],
         "Ih_hay2011": ["gbar_Ih_hay2011"],
-        "CaDynamics_E2_hay2011": ["decay_CaDynamics_E2_hay2011", "gamma_CaDynamics_E2_hay2011"],
+        "CaDynamics_E2_hay2011": [
+            "decay_CaDynamics_E2_hay2011",
+            "gamma_CaDynamics_E2_hay2011",
+        ],
     }
 
     section_names = ["basal_1", "basal_2", "basal_3", "apical_oblique"]
@@ -1271,9 +1293,8 @@ def pyramidal_humanL23(cell_name, pos=(0, 0, 0), gid=None):
 
 
 def human_gen_interneuron(cell_name, pos=(0, 0, 0), layer=2, gid=None):
-
     """Create a Cell object of a "human generic interneuron" tuned to dynamics of aspiny human cells.
-    Stands in for both PV+ and SOM+ cells in duecker_ET_model. 
+    Stands in for both PV+ and SOM+ cells in duecker_ET_model.
 
     Parameters
     ----------
@@ -1306,7 +1327,10 @@ def human_gen_interneuron(cell_name, pos=(0, 0, 0), layer=2, gid=None):
         "kd_golomb2007": ["gbar_kd_golomb2007"],
         "Ih_hay2011": ["gbar_Ih_hay2011"],
         "pas": ["g_pas", "e_pas"],
-        "CaDynamics_E2_hay2011": ["decay_CaDynamics_E2_hay2011", "gamma_CaDynamics_E2_hay2011"],
+        "CaDynamics_E2_hay2011": [
+            "decay_CaDynamics_E2_hay2011",
+            "gamma_CaDynamics_E2_hay2011",
+        ],
     }
 
     sections["soma"].mechs = dict()

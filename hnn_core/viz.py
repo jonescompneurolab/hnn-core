@@ -724,7 +724,7 @@ def plot_spikes_raster(
             : len(cell_types)
         ]
         cell_colors = {cell: color for cell, color in zip(cell_types, default_colors)}
-    elif colors: 
+    elif colors:
         if isinstance(colors, list):
             if len(colors) != len(cell_types):
                 raise ValueError(
@@ -743,7 +743,9 @@ def plot_spikes_raster(
                 )
             cell_colors.update(colors)
     elif cell_types_metadata is not None:
-        cell_colors = {cell: meta["color"] for cell, meta in cell_types_metadata.items()}
+        cell_colors = {
+            cell: meta["color"] for cell, meta in cell_types_metadata.items()
+        }
 
     # validate show_legend argument
     _validate_type(show_legend, bool, "show_legend", "bool")
@@ -940,21 +942,22 @@ def plot_cells(net, ax=None, show=True, colors=None, markers=None):
         x = [pos[0] for pos in net.pos_dict[cell_type]]
         y = [pos[1] for pos in net.pos_dict[cell_type]]
         z = [pos[2] for pos in net.pos_dict[cell_type]]
-        
+
         if colors:
             color = colors.get(cell_type, color_cycle[c % len(color_cycle)])
         else:
             color = net.cell_types[cell_type]["cell_metadata"].get(
-                    "color", color_cycle[c % len(color_cycle)])
-            
-        morpho_type = net.cell_types[cell_type]["cell_metadata"].get(
-                "morpho_type", None
+                "color", color_cycle[c % len(color_cycle)]
             )
+
+        morpho_type = net.cell_types[cell_type]["cell_metadata"].get(
+            "morpho_type", None
+        )
         if morpho_type:
             alt_marker = morpho_marker_map[morpho_type]
         else:
-            alt_marker ="o"
-        
+            alt_marker = "o"
+
         if markers:
             marker = markers.get(cell_type, alt_marker)
         else:
@@ -2032,7 +2035,6 @@ class NetworkPlotter:
         return times, vsec_recorded
 
     def _initialize_plots(self):
-
         # Create figure
         if self.ax is None:
             self.fig = plt.figure()

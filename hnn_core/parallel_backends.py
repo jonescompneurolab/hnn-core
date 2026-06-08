@@ -42,9 +42,8 @@ def _gather_trial_data(sim_data, net, n_trials, postproc, bsl_cor="jones"):
 
     # create CellResponse object with metadata
     cell_types_metadata = {
-    name: entry["cell_metadata"]
-    for name, entry in net.cell_types.items()
-}
+        name: entry["cell_metadata"] for name, entry in net.cell_types.items()
+    }
     cell_response = CellResponse(
         cell_types_metadata=cell_types_metadata, times=sim_data[0]["times"]
     )

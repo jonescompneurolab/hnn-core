@@ -632,9 +632,7 @@ class Cell:
                 #     )
 
                 # else:
-                self._nrn_synapses[syn_key] = self.syn_create(
-                    seg, **synapses[receptor]
-                )
+                self._nrn_synapses[syn_key] = self.syn_create(seg, **synapses[receptor])
 
     def _create_sections(self, sections, cell_tree):
         """Create soma and set geometry.

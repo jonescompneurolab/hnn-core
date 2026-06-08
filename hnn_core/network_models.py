@@ -93,7 +93,7 @@ def neymotin_2020_model(
                 "measure_dipole": False,
                 "reference": "https://doi.org/10.7554/eLife.51214",
                 "color": "m",
-                "marker": "x"
+                "marker": "x",
             },
         },
         "L2_pyramidal": {
@@ -106,7 +106,7 @@ def neymotin_2020_model(
                 "measure_dipole": True,
                 "reference": "https://doi.org/10.7554/eLife.51214",
                 "color": "c",
-                "marker": "^"
+                "marker": "^",
             },
         },
         "L5_basket": {
@@ -119,7 +119,7 @@ def neymotin_2020_model(
                 "measure_dipole": False,
                 "reference": "https://doi.org/10.7554/eLife.51214",
                 "color": "r",
-                "marker": "x"
+                "marker": "x",
             },
         },
         "L5_pyramidal": {
@@ -132,7 +132,7 @@ def neymotin_2020_model(
                 "measure_dipole": True,
                 "reference": "https://doi.org/10.7554/eLife.51214",
                 "color": "b",
-                "marker": "^"
+                "marker": "^",
             },
         },
     }
@@ -523,7 +523,7 @@ def duecker_ET_model(
                 "measure_dipole": False,
                 "reference": "",
                 "color": "#daa69c",
-                "marker": "o"
+                "marker": "o",
             },
         },
         "L2_pyramidal": {
@@ -536,7 +536,7 @@ def duecker_ET_model(
                 "measure_dipole": True,
                 "reference": "",
                 "color": "#a41e4f",
-                "marker": "^"
+                "marker": "^",
             },
         },
         "L5_basket": {
@@ -549,7 +549,7 @@ def duecker_ET_model(
                 "measure_dipole": False,
                 "reference": "",
                 "color": "#77a1bb",
-                "marker": "o"
+                "marker": "o",
             },
         },
         "L5_pyramidal": {
@@ -562,7 +562,7 @@ def duecker_ET_model(
                 "measure_dipole": True,
                 "reference": "",
                 "color": "#5c73b7",
-                "marker": "^"
+                "marker": "^",
             },
         },
     }
