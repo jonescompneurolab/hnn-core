@@ -494,7 +494,7 @@ def get_Int_params():
         "Int_gamma_CaDynamics_E2": 0.0005096,
         # Synapses
         "Int_ampa_e": 0.0,
-        # Destexhe et al., 1998: interneuron rise and decay twice as fast!
+        # Interneuron rise and decay twice as fast as pyramidal! (Destexhe, Alain, Zachary F. Mainen, and Terrence J. Sejnowski. "Kinetic models of synaptic transmission." Methods in neuronal modeling 2 (1998): 1-25.)
         "Int_ampa_tau1": 0.35,
         "Int_ampa_tau2": 2.5,
         "Int_ampa_mechname": "Exp2Syn",
