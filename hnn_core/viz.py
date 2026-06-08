@@ -940,7 +940,13 @@ def plot_cells(net, ax=None, show=True, colors=None, markers=None):
         x = [pos[0] for pos in net.pos_dict[cell_type]]
         y = [pos[1] for pos in net.pos_dict[cell_type]]
         z = [pos[2] for pos in net.pos_dict[cell_type]]
-        color = colors.get(cell_type, color_cycle[c % len(color_cycle)])
+        
+        if colors:
+            color = colors.get(cell_type, color_cycle[c % len(color_cycle)])
+        else:
+            color = net.cell_types[cell_type]["cell_metadata"].get(
+                    "color", color_cycle[c % len(color_cycle)])
+            
         morpho_type = net.cell_types[cell_type]["cell_metadata"].get(
                 "morpho_type", None
             )
@@ -949,7 +955,10 @@ def plot_cells(net, ax=None, show=True, colors=None, markers=None):
         else:
             alt_marker ="o"
         
-        marker = markers.get(cell_type, alt_marker)
+        if markers:
+            marker = markers.get(cell_type, alt_marker)
+        else:
+            marker = alt_marker
 
         ax.scatter(x, y, z, c=color, s=50, marker=marker, label=cell_type)
 
