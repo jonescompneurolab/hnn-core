@@ -1232,6 +1232,51 @@ def test_tonic_biases():
     ):
         net.add_tonic_bias(amplitude={"L2_pyramidal": 0.5}, section="apical_4")
 
+    # Updated tonic bias tests for GID definitions
+
+    # Target gid defined and stored correctly
+    net = neymotin_2020_model()
+    net.clear_connectivity()
+    target_gid = 35
+    cell_type = 'L2_pyramidal'
+
+    # Correct type
+    assert target_gid in net.gid_ranges[cell_type]
+    net.add_tonic_bias(cell_type=cell_type, gid=target_gid, bias_name="tonic_soma", amplitude=3, t0=10, tstop=15)
+
+    # stored correctly
+    assert target_gid == net.external_biases["tonic_soma"][cell_type]["gid"]
+    dpl = simulate_dipole(net, tstop=20)
+    # the only neuron that fires when connectivity is cleared
+    assert np.unique(np.array(net.cell_response.spike_gids)) == target_gid
+    del net, dpl
+
+    # If no target gid given, bias applied to all cells of cell_type (backwards compatibility)
+    # For this test, remove all connections and ensure that the cells of that particular type spike
+
+    net = neymotin_2020_model()
+    for cell_type in net.cell_types.keys():
+        del net
+        net = neymotin_2020_model()
+        net.clear_connectivity()
+        net.add_tonic_bias(cell_type=cell_type, bias_name="tonic_soma", amplitude=3, t0=10, tstop=15)
+        dpl = simulate_dipole(net, tstop=20)
+        assert (np.unique(np.array(net.cell_response.spike_gids)) == net.gid_ranges[cell_type]).all()
+
+    del net, dpl
+
+    # Assert value error when GID is not in cell type range
+    import pytest
+    net = neymotin_2020_model()
+    cell_type='L2_pyramidal'
+    target_gids = 20
+    net.add_tonic_bias(cell_type=cell_type, gid=target_gids, bias_name="tonic_soma", amplitude=3, t0=10, tstop=15)
+    with pytest.raises(ValueError, match="GID 20 was given a 'L2_pyramidal' bias but is of type 'L2_basket'. Define a separate bias per cell type."):
+        dpl = simulate_dipole(net, tstop=20)
+
+    del net, dpl
+    
+
 
 def test_network_mesh():
     """Test mesh for defining cell positions biases."""

@@ -480,26 +480,42 @@ class NetworkBuilder(object):
                     cell.build()
                 # add tonic biases
                 for bias in self.net.external_biases:
-                    if src_type in self.net.external_biases[bias]:
-                        # if no specific GID specified for this bias, apply to all cells of the type
-                        if self.net.external_biases[bias][src_type]["gid"] is None:
-                            cell.create_tonic_bias(
-                                **self.net.external_biases[bias][src_type]
+                    if src_type not in self.net.external_biases[bias]:
+                        continue
+
+                    bias_params = self.net.external_biases[bias][src_type]
+                    target_gids = bias_params["gid"]
+
+                    # make sure that GID for this bias is the right one
+                    # (None means "all cells of this type", so there's nothing to validate.)
+                    if target_gids is None:
+                        gids_to_check = []
+                    elif isinstance(target_gids, list):
+                        gids_to_check = target_gids
+                    else:
+                        gids_to_check = [target_gids]
+
+                    for tgid in gids_to_check:
+                        if tgid not in self.net.gid_ranges[src_type]:
+                            actual_type = self.net.gid_to_type(tgid)
+                            raise ValueError(
+                                f"GID {tgid} was given a '{src_type}' bias but is of type "
+                                f"'{actual_type}'. Define a separate bias per cell type."
                             )
-                        # if specific GIDs specified, check if this cell's GID is in the list and apply bias if so
-                        elif (
-                            type(self.net.external_biases[bias][src_type]["gid"])
-                            is list
-                        ):
-                            if gid in self.net.external_biases[bias][src_type]["gid"]:
-                                cell.create_tonic_bias(
-                                    **self.net.external_biases[bias][src_type]
-                                )
-                        # if specific GID specified as int, apply bias if this cell's GID matches
-                        elif gid == self.net.external_biases[bias][src_type]["gid"]:
-                            cell.create_tonic_bias(
-                                **self.net.external_biases[bias][src_type]
-                            )
+
+                    # Which cells does this bias target?
+                    #   None -> all cells of this type
+                    #   list -> cells whose gid is in the list
+                    #   int  -> the single cell whose gid matches
+                    if target_gids is None:
+                        apply_bias = True
+                    elif isinstance(target_gids, list):
+                        apply_bias = gid in target_gids
+                    else:
+                        apply_bias = gid == target_gids
+
+                    if apply_bias:
+                        cell.create_tonic_bias(**bias_params)
 
                         # KD: need to come up with a test to make sure that there is an error if users define gids that are not in cell type range.
                 cell.record(record_vsec, record_isec, record_ca)
