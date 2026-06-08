@@ -712,19 +712,19 @@ def plot_spikes_raster(
                 f"Must be of set {allowed_types}. "
                 f"Got {cell_types}"
             )
-    else:
-        # Use all cell types and warn user that they should select cell types
-        cell_types = cell_response._cell_type_names
 
-    # Set default colors
-    default_colors = plt.rcParams["axes.prop_cycle"].by_key()["color"][
-        : len(cell_types)
-    ]
-    cell_colors = {cell: color for cell, color in zip(cell_types, default_colors)}
-
+    cell_types_metadata = getattr(cell_response, "_cell_types_metadata", None)
     # validate colors argument
     _validate_type(colors, (list, dict, None), "color", "list of str, or dict")
-    if colors:
+
+    # Set default colors
+
+    if colors is None and cell_types_metadata is None:
+        default_colors = plt.rcParams["axes.prop_cycle"].by_key()["color"][
+            : len(cell_types)
+        ]
+        cell_colors = {cell: color for cell, color in zip(cell_types, default_colors)}
+    elif colors: 
         if isinstance(colors, list):
             if len(colors) != len(cell_types):
                 raise ValueError(
@@ -733,7 +733,6 @@ def plot_spikes_raster(
                     f"for {len(cell_types)} cell types."
                 )
             cell_colors = {cell: color for cell, color in zip(cell_types, colors)}
-
         if isinstance(colors, dict):
             # Check valid cell types
             if not set(colors.keys()).issubset(set(unique_spike_types)):
@@ -743,6 +742,8 @@ def plot_spikes_raster(
                     f"Got {colors.keys()}"
                 )
             cell_colors.update(colors)
+    elif cell_types_metadata is not None:
+        cell_colors = {cell: meta["color"] for cell, meta in cell_types_metadata.items()}
 
     # validate show_legend argument
     _validate_type(show_legend, bool, "show_legend", "bool")
@@ -932,37 +933,24 @@ def plot_cells(net, ax=None, show=True, colors=None, markers=None):
             f"Expected 'ax' to be an instance of Axes3D, but got {type(ax).__name__}"
         )
 
-    if colors is None:
-        color_cycle = plt.rcParams["axes.prop_cycle"].by_key()["color"]
-        colors = {
-            cell_type: color_cycle[i % len(color_cycle)]
-            for i, cell_type in enumerate(net.cell_types)
-        }
+    morpho_marker_map = {"pyramidal": "^", "basket": "x", "interneuron": "o"}
+    color_cycle = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 
-    if markers is None:
-        morpho_marker_map = {"pyramidal": "^", "basket": "x", "interneuron": "o"}
-        all_markers = ["^", "x", "o", "s", "D", "P", "*", "v", "<", ">"]
-        used_markers = set(morpho_marker_map.values())
-        markers = {}
-        for cell_type in net.cell_types:
-            morpho_type = net.cell_types[cell_type]["cell_metadata"].get(
-                "morpho_type", ""
-            )
-            if morpho_type in morpho_marker_map:
-                markers[cell_type] = morpho_marker_map[morpho_type]
-            else:
-                for m in all_markers:
-                    if m not in used_markers:
-                        markers[cell_type] = m
-                        used_markers.add(m)
-                        break
-
-    for cell_type in net.cell_types:
+    for c, cell_type in enumerate(net.cell_types):
         x = [pos[0] for pos in net.pos_dict[cell_type]]
         y = [pos[1] for pos in net.pos_dict[cell_type]]
         z = [pos[2] for pos in net.pos_dict[cell_type]]
-        color = colors.get(cell_type, "k")
-        marker = markers.get(cell_type, "o")
+        color = colors.get(cell_type, color_cycle[c % len(color_cycle)])
+        morpho_type = net.cell_types[cell_type]["cell_metadata"].get(
+                "morpho_type", None
+            )
+        if morpho_type:
+            alt_marker = morpho_marker_map[morpho_type]
+        else:
+            alt_marker ="o"
+        
+        marker = markers.get(cell_type, alt_marker)
+
         ax.scatter(x, y, z, c=color, s=50, marker=marker, label=cell_type)
 
     if net.rec_arrays:

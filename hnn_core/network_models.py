@@ -92,6 +92,8 @@ def neymotin_2020_model(
                 "zdist_origin": 0.8,  # distance to origin in percent of layer_separation
                 "measure_dipole": False,
                 "reference": "https://doi.org/10.7554/eLife.51214",
+                "color": "m",
+                "marker": "x"
             },
         },
         "L2_pyramidal": {
@@ -103,6 +105,8 @@ def neymotin_2020_model(
                 "zdist_origin": 1,
                 "measure_dipole": True,
                 "reference": "https://doi.org/10.7554/eLife.51214",
+                "color": "c",
+                "marker": "^"
             },
         },
         "L5_basket": {
@@ -114,6 +118,8 @@ def neymotin_2020_model(
                 "zdist_origin": 0.2,
                 "measure_dipole": False,
                 "reference": "https://doi.org/10.7554/eLife.51214",
+                "color": "r",
+                "marker": "x"
             },
         },
         "L5_pyramidal": {
@@ -125,6 +131,8 @@ def neymotin_2020_model(
                 "zdist_origin": 0,
                 "measure_dipole": True,
                 "reference": "https://doi.org/10.7554/eLife.51214",
+                "color": "b",
+                "marker": "^"
             },
         },
     }
@@ -514,6 +522,8 @@ def duecker_ET_model(
                 "zdist_origin": 0.8,
                 "measure_dipole": False,
                 "reference": "",
+                "color": "#daa69c",
+                "marker": "o"
             },
         },
         "L2_pyramidal": {
@@ -525,6 +535,8 @@ def duecker_ET_model(
                 "zdist_origin": 1,
                 "measure_dipole": True,
                 "reference": "",
+                "color": "#a41e4f",
+                "marker": "^"
             },
         },
         "L5_basket": {
@@ -536,6 +548,8 @@ def duecker_ET_model(
                 "zdist_origin": 0.2,
                 "measure_dipole": False,
                 "reference": "",
+                "color": "#77a1bb",
+                "marker": "o"
             },
         },
         "L5_pyramidal": {
@@ -547,6 +561,8 @@ def duecker_ET_model(
                 "zdist_origin": 0,
                 "measure_dipole": True,
                 "reference": "",
+                "color": "#5c73b7",
+                "marker": "^"
             },
         },
     }

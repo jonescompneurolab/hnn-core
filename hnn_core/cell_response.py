@@ -84,7 +84,7 @@ class CellResponse(object):
 
     def __init__(
         self,
-        cell_type_names,
+        cell_types_metadata,
         spike_times=None,
         spike_gids=None,
         spike_types=None,
@@ -129,7 +129,7 @@ class CellResponse(object):
             if not isinstance(times, (list, np.ndarray)):
                 raise TypeError("'times' is an np.ndarray of simulation times")
         self._times = np.array(times)
-        self._cell_type_names = cell_type_names
+        self._cell_types_metadata = cell_types_metadata
 
     def __repr__(self):
         class_name = self.__class__.__name__
