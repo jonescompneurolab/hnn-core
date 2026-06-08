@@ -13,9 +13,9 @@ from .cells_default import (
     basket,
     pyramidal,
     pyramidal_ca,
-    pyramidal_l5ET,
-    pyramidal_l23,
-    interneuron,
+    pyramidal_humanl5ET,
+    pyramidal_humanl23,
+    human_gen_interneuron,
 )
 from .externals.mne import _validate_type
 
@@ -506,7 +506,7 @@ def duecker_ET_model(
 
     cell_types = {
         "L2inh": {
-            "cell_object": interneuron(cell_name="L2inh", layer=2),
+            "cell_object": human_gen_interneuron(cell_name="L2inh", layer=2),
             "cell_metadata": {
                 "morpho_type": "interneuron",
                 "electro_type": "inhibitory",
@@ -517,7 +517,7 @@ def duecker_ET_model(
             },
         },
         "L2pyr": {
-            "cell_object": pyramidal_l23(cell_name=_short_name("L2_pyramidal")),
+            "cell_object": pyramidal_humanl23(cell_name=_short_name("L2_pyramidal")),
             "cell_metadata": {
                 "morpho_type": "pyramidal",
                 "electro_type": "excitatory",
@@ -528,7 +528,7 @@ def duecker_ET_model(
             },
         },
         "L5inh": {
-            "cell_object": interneuron(cell_name="L5inh", layer=5),
+            "cell_object": human_gen_interneuron(cell_name="L5inh", layer=5),
             "cell_metadata": {
                 "morpho_type": "interneuron",
                 "electro_type": "inhibitory",
@@ -539,7 +539,7 @@ def duecker_ET_model(
             },
         },
         "L5ET": {
-            "cell_object": pyramidal_l5ET(cell_name="L5ET"),
+            "cell_object": pyramidal_humanl5ET(cell_name="L5ET"),
             "cell_metadata": {
                 "morpho_type": "pyramidal",
                 "electro_type": "excitatory",

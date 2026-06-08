@@ -867,7 +867,20 @@ def pyramidal_ca(cell_name, pos, override_params=None, gid=None):
     return cell
 
 
-def pyramidal_l5ET(cell_name, pos=(0, 0, 0), gid=None):
+def pyramidal_humanl5ET(cell_name, pos=(0, 0, 0), gid=None):
+
+    """Create a Cell object of a human L5ET pyramidal neuron (developed for duecker_ET_model).
+
+    Parameters
+    ----------
+    cell_name : str
+        Should be "L5ET".
+    pos : tuple of (int, int, int), default=(0, 0, 0)
+        Coordinates of cell soma in xyz-space
+    gid : int or None (optional)
+        The unique, "global ID" (GID) of the cell.
+    """
+
     p_all = get_L5PyrET_params()
 
     # override params according to function
@@ -1068,7 +1081,20 @@ def pyramidal_l5ET(cell_name, pos=(0, 0, 0), gid=None):
     return cell
 
 
-def pyramidal_l23(cell_name, pos=(0, 0, 0), gid=None):
+def pyramidal_humanl23(cell_name, pos=(0, 0, 0), gid=None):
+
+    """Create a Cell object of a human L52/3 pyramidal neuron (developed for duecker_ET_model).
+
+    Parameters
+    ----------
+    cell_name : str
+        Should be "L2pyr".
+    pos : tuple of (int, int, int), default=(0, 0, 0)
+        Coordinates of cell soma in xyz-space
+    gid : int or None (optional)
+        The unique, "global ID" (GID) of the cell.
+    """
+
     p_all = get_L2Pyrhuman_params()
 
     gbar_Ih = partial(
@@ -1242,7 +1268,21 @@ def pyramidal_l23(cell_name, pos=(0, 0, 0), gid=None):
     return cell
 
 
-def interneuron(cell_name, pos=(0, 0, 0), layer=2, gid=None):
+def human_gen_interneuron(cell_name, pos=(0, 0, 0), layer=2, gid=None):
+
+    """Create a Cell object of a "human generic interneuron" tuned to dynamics of aspiny human cells.
+    Stands in for both PV+ and SOM+ cells in duecker_ET_model. 
+
+    Parameters
+    ----------
+    cell_name : str
+        Should be "L2pyr".
+    pos : tuple of (int, int, int), default=(0, 0, 0)
+        Coordinates of cell soma in xyz-space
+    gid : int or None (optional)
+        The unique, "global ID" (GID) of the cell.
+    """
+
     p_all = get_Int_params()
     sections = dict()
     sections["soma"] = _get_interneuron_soma(cell_name, v_init=-69.5972)
