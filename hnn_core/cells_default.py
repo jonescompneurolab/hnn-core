@@ -896,7 +896,7 @@ def pyramidal_l5ET(cell_name, pos=(0, 0, 0), gid=None):
     )
     gbar_Ih = partial(
         _exp_g_at_dist,
-        gbar_at_zero=p_all["L5ET_dend_gbar_Ih"],
+        gbar_at_zero=p_all["L5ET_dend_gbar_Ih_hay2011"],
         exp_term=1.0 / 323,
         offset=-0.8696,
         slope=2.087,
@@ -904,18 +904,18 @@ def pyramidal_l5ET(cell_name, pos=(0, 0, 0), gid=None):
 
     # basal dendrites
     gbar_NaTs2_t = partial(
-        _linear_g_at_dist, gsoma=p_all["L5ET_basal_gbar_NaTs2_t"], gdend=0, xkink=255
+        _linear_g_at_dist, gsoma=p_all["L5ET_basal_gbar_NaTs2_t_hay2011"], gdend=0, xkink=255
     )
     gbar_SKv3_1 = partial(
-        _linear_g_at_dist, gsoma=0, gdend=p_all["L5ET_basal_gbar_SKv3_1"], xkink=255
+        _linear_g_at_dist, gsoma=0, gdend=p_all["L5ET_basal_gbar_SKv3_1_hay2011"], xkink=255
     )
 
     override_params = dict()
-    override_params["L5ET_dend_gbar_Ca_HVA"] = gbar_Ca_HVA
-    override_params["L5ET_dend_gbar_Ca_LVAst"] = gbar_Ca_LVA
-    override_params["L5ET_dend_gbar_Ih"] = gbar_Ih
-    override_params["L5ET_basal_gbar_NaTs2_t"] = gbar_NaTs2_t
-    override_params["L5ET_basal_gbar_SKv3_1"] = gbar_SKv3_1
+    override_params["L5ET_dend_gbar_Ca_HVA_hay2011"] = gbar_Ca_HVA
+    override_params["L5ET_dend_gbar_Ca_LVAst_hay2011"] = gbar_Ca_LVA
+    override_params["L5ET_dend_gbar_Ih_hay2011"] = gbar_Ih
+    override_params["L5ET_basal_gbar_NaTs2_t_hay2011"] = gbar_NaTs2_t
+    override_params["L5ET_basal_gbar_SKv3_1_hay2011"] = gbar_SKv3_1
 
     p_all = compare_dictionaries(p_all, override_params)
 
@@ -984,18 +984,18 @@ def pyramidal_l5ET(cell_name, pos=(0, 0, 0), gid=None):
 
     # Soma and apical mechanisms
     mechanisms = {
-        "NaTs2_t": ["gbar_NaTs2_t"],
-        "SKv3_1": ["gbar_SKv3_1"],
-        "Nap_Et2": ["gbar_Nap_Et2"],
-        "Ca_HVA": ["gbar_Ca_HVA"],
-        "Ca_LVAst": ["gbar_Ca_LVAst"],
-        "SK_E2": ["gbar_SK_E2"],
+        "NaTs2_t_hay2011": ["gbar_NaTs2_t_hay2011"],
+        "SKv3_1_hay2011": ["gbar_SKv3_1_hay2011"],
+        "Nap_Et2_hay2011": ["gbar_Nap_Et2_hay2011"],
+        "Ca_HVA_hay2011": ["gbar_Ca_HVA_hay2011"],
+        "Ca_LVAst_hay2011": ["gbar_Ca_LVAst_hay2011"],
+        "SK_E2_hay2011": ["gbar_SK_E2_hay2011"],
         "pas": ["g_pas", "e_pas"],
-        "Ih": ["gbar_Ih"],
-        "Im": ["gbar_Im"],
-        "K_Pst": ["gbar_K_Pst"],
-        "K_Tst": ["gbar_K_Tst"],
-        "CaDynamics_E2": ["decay_CaDynamics_E2", "gamma_CaDynamics_E2"],
+        "Ih_hay2011": ["gbar_Ih_hay2011"],
+        "Im_hay2011": ["gbar_Im_hay2011"],
+        "K_Pst_hay2011": ["gbar_K_Pst_hay2011"],
+        "K_Tst_hay2011": ["gbar_K_Tst_hay2011"],
+        "CaDynamics_E2_hay2011": ["decay_CaDynamics_E2", "gamma_CaDynamics_E2"],
     }
 
     p_mech_soma = _get_mechanisms(p_all, "L5ET", ["soma"], mechanisms)
@@ -1003,28 +1003,28 @@ def pyramidal_l5ET(cell_name, pos=(0, 0, 0), gid=None):
     section_names = ["apical_trunk", "apical_1", "apical_2", "apical_tuft"]
 
     mechanisms = {
-        "NaTa_t": ["gbar_NaTa_t"],
-        "SKv3_1": ["gbar_SKv3_1"],
-        "Ca_HVA": ["gbar_Ca_HVA"],
-        "Ca_LVAst": ["gbar_Ca_LVAst"],
-        "SK_E2": ["gbar_SK_E2"],
+        "NaTa_t_hay2011": ["gbar_NaTa_t_hay2011"],
+        "SKv3_1_hay2011": ["gbar_SKv3_1_hay2011"],
+        "Ca_HVA_hay2011": ["gbar_Ca_HVA_hay2011"],
+        "Ca_LVAst_hay2011": ["gbar_Ca_LVAst_hay2011"],
+        "SK_E2_hay2011": ["gbar_SK_E2_hay2011"],
         "pas": ["g_pas", "e_pas"],
-        "Ih": ["gbar_Ih"],
-        "Im": ["gbar_Im"],
-        "K_Pst": ["gbar_K_Pst"],
-        "K_Tst": ["gbar_K_Tst"],
-        "CaDynamics_E2": ["decay_CaDynamics_E2", "gamma_CaDynamics_E2"],
+        "Ih_hay2011": ["gbar_Ih_hay2011"],
+        "Im_hay2011": ["gbar_Im_hay2011"],
+        "K_Pst_hay2011": ["gbar_K_Pst_hay2011"],
+        "K_Tst_hay2011": ["gbar_K_Tst_hay2011"],
+        "CaDynamics_E2_hay2011": ["decay_CaDynamics_E2", "gamma_CaDynamics_E2"],
     }
 
     p_mech_apical = _get_mechanisms(p_all, "L5ET", section_names, mechanisms)
 
     # basal sections - super hacky because I can't mess with _get_mechanisms
     mechanisms = {
-        "NaTs2_t": ["gbar_NaTs2_t"],
-        "SKv3_1": ["gbar_SKv3_1"],
+        "NaTs2_t_hay2011": ["gbar_NaTs2_t_hay2011"],
+        "SKv3_1_hay2011": ["gbar_SKv3_1_hay2011"],
         "pas": ["g_pas", "e_pas"],
-        "Ih": ["gbar_Ih"],
-        "CaDynamics_E2": ["decay_CaDynamics_E2", "gamma_CaDynamics_E2"],
+        "Ih_hay2011": ["gbar_Ih_hay2011"],
+        "CaDynamics_E2_hay2011": ["decay_CaDynamics_E2", "gamma_CaDynamics_E2"],
     }
 
     section_names = ["basal_1", "basal_2", "basal_3", "apical_oblique"]
@@ -1080,7 +1080,7 @@ def pyramidal_l23(cell_name, pos=(0, 0, 0), gid=None):
 
     gbar_Ih = partial(
         _exp_g_at_dist,
-        gbar_at_zero=p_all["L2Pyr_dend_gbar_Ih"],
+        gbar_at_zero=p_all["L2Pyr_dend_gbar_Ih_hay2011"],
         exp_term=1.0 / 323,
         offset=-0.8696,
         slope=2.087,
@@ -1111,10 +1111,10 @@ def pyramidal_l23(cell_name, pos=(0, 0, 0), gid=None):
     )
 
     override_params = dict()
-    override_params["L2Pyr_dend_gbar_Ih"] = gbar_Ih
-    override_params["L2Pyr_dend_gbar_Ca_HVA"] = gbar_Ca_HVA
-    override_params["L2Pyr_dend_gbar_Ca_LVAst"] = gbar_Ca_LVA
-    override_params["L2Pyr_dend_gbar_SK_E2"] = gbar_SK_E2
+    override_params["L2Pyr_dend_gbar_Ih_hay2011"] = gbar_Ih
+    override_params["L2Pyr_dend_gbar_Ca_HVA_hay2011"] = gbar_Ca_HVA
+    override_params["L2Pyr_dend_gbar_Ca_LVAst_hay2011"] = gbar_Ca_LVA
+    override_params["L2Pyr_dend_gbar_SK_E2_hay2011"] = gbar_SK_E2
 
     p_all = compare_dictionaries(p_all, override_params)
 
@@ -1163,31 +1163,31 @@ def pyramidal_l23(cell_name, pos=(0, 0, 0), gid=None):
     sections["soma"] = _get_pyr_soma(p_all, "L2Pyr", v_init=v_init["soma"])
 
     mechanisms = {
-        "NaTs2_t_32d": ["gbar_NaTs2_t_32d"],
-        "SKv3_1": ["gbar_SKv3_1"],
-        "Nap_Et2": ["gbar_Nap_Et2"],
-        "Ca_HVA": ["gbar_Ca_HVA"],
-        "Ca_LVAst": ["gbar_Ca_LVAst"],
-        "SK_E2": ["gbar_SK_E2"],
+        "NaTs2_t_32d_hay2011": ["gbar_NaTs2_t_32d_hay2011"],
+        "SKv3_1_hay2011": ["gbar_SKv3_1_hay2011"],
+        "Nap_Et2_hay2011": ["gbar_Nap_Et2_hay2011"],
+        "Ca_HVA_hay2011": ["gbar_Ca_HVA_hay2011"],
+        "Ca_LVAst_hay2011": ["gbar_Ca_LVAst_hay2011"],
+        "SK_E2_hay2011": ["gbar_SK_E2_hay2011"],
         "pas": ["g_pas", "e_pas"],
-        "Ih": ["gbar_Ih"],
-        "Im": ["gbar_Im"],
-        "CaDynamics_E2": ["decay_CaDynamics_E2", "gamma_CaDynamics_E2"],
+        "Ih_hay2011": ["gbar_Ih_hay2011"],
+        "Im_hay2011": ["gbar_Im_hay2011"],
+        "CaDynamics_E2_hay2011": ["decay_CaDynamics_E2", "gamma_CaDynamics_E2"],
     }
 
     p_mech_soma = _get_mechanisms(p_all, "L2Pyr", ["soma"], mechanisms)
 
     # apical sections
     mechanisms = {
-        "NaTa_t_32d": ["gbar_NaTa_t_32d"],
-        "SKv3_1": ["gbar_SKv3_1"],
-        "Ca_HVA": ["gbar_Ca_HVA"],
-        "Ca_LVAst": ["gbar_Ca_LVAst"],
-        "SK_E2": ["gbar_SK_E2"],
+        "NaTa_t_32d_hay2011": ["gbar_NaTa_t_32d_hay2011"],
+        "SKv3_1_hay2011": ["gbar_SKv3_1_hay2011"],
+        "Ca_HVA_hay2011": ["gbar_Ca_HVA_hay2011"],
+        "Ca_LVAst_hay2011": ["gbar_Ca_LVAst_hay2011"],
+        "SK_E2_hay2011": ["gbar_SK_E2_hay2011"],
         "pas": ["g_pas", "e_pas"],
-        "Ih": ["gbar_Ih"],
-        "Im": ["gbar_Im"],
-        "CaDynamics_E2": ["decay_CaDynamics_E2", "gamma_CaDynamics_E2"],
+        "Ih_hay2011": ["gbar_Ih_hay2011"],
+        "Im_hay2011": ["gbar_Im_hay2011"],
+        "CaDynamics_E2_hay2011": ["decay_CaDynamics_E2", "gamma_CaDynamics_E2"],
     }
 
     section_names = ["apical_trunk", "apical_1", "apical_tuft"]
@@ -1195,11 +1195,11 @@ def pyramidal_l23(cell_name, pos=(0, 0, 0), gid=None):
 
     # basal sections - super hacky because I can't mess with _get_mechanisms
     mechanisms = {
-        "NaTs2_t_32d": ["gbar_NaTs2_t_32d"],
-        "SKv3_1": ["gbar_SKv3_1"],
+        "NaTs2_t_32d_hay2011": ["gbar_NaTs2_t_32d_hay2011"],
+        "SKv3_1_hay2011": ["gbar_SKv3_1_hay2011"],
         "pas": ["g_pas", "e_pas"],
-        "Ih": ["gbar_Ih"],
-        "CaDynamics_E2": ["decay_CaDynamics_E2", "gamma_CaDynamics_E2"],
+        "Ih_hay2011": ["gbar_Ih_hay2011"],
+        "CaDynamics_E2_hay2011": ["decay_CaDynamics_E2", "gamma_CaDynamics_E2"],
     }
 
     section_names = ["basal_1", "basal_2", "basal_3", "apical_oblique"]
@@ -1271,7 +1271,7 @@ def interneuron(cell_name, pos=(0, 0, 0), layer=2, gid=None):
         "kd": ["gbar_kd"],
         "Ih": ["gbar_Ih"],
         "pas": ["g_pas", "e_pas"],
-        "CaDynamics_E2": ["decay_CaDynamics_E2", "gamma_CaDynamics_E2"],
+        "CaDynamics_E2_hay2011": ["decay_CaDynamics_E2", "gamma_CaDynamics_E2"],
     }
 
     sections["soma"].mechs = dict()
