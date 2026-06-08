@@ -513,7 +513,7 @@ def duecker_ET_model(
                 "layer": "2",
                 "zdist_origin": 0.8,
                 "measure_dipole": False,
-                "reference": "https://doi.org/10.7554/eLife.51214",
+                "reference": "",
             },
         },
         "L2_pyramidal": {
@@ -524,7 +524,7 @@ def duecker_ET_model(
                 "layer": "2",
                 "zdist_origin": 1,
                 "measure_dipole": True,
-                "reference": "https://doi.org/10.7554/eLife.51214",
+                "reference": "",
             },
         },
         "L5_basket": {
@@ -535,7 +535,7 @@ def duecker_ET_model(
                 "layer": "5",
                 "zdist_origin": 0.2,
                 "measure_dipole": False,
-                "reference": "https://doi.org/10.7554/eLife.51214",
+                "reference": "",
             },
         },
         "L5ET": {
@@ -546,7 +546,7 @@ def duecker_ET_model(
                 "layer": "5",
                 "zdist_origin": 0,
                 "measure_dipole": True,
-                "reference": "https://doi.org/10.7554/eLife.51214",
+                "reference": "",
             },
         },
     }
