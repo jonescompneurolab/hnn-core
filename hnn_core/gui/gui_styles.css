@@ -776,8 +776,12 @@ padding-bottom: 10px !important;
 /*  restore toggle icon for the log  */
 .dark-mode .log-toggle-icon,
 .dark-mode .log-toggle-icon i {
+    color: transparent !important;
+}
+.dark-mode .log-toggle-icon i {
     color: var(--dm-theme) !important;
 }
+
 
 /*  restore red coloring for close fig and delete drive buttons  */
 .dark-mode .widget-button.red-button {
