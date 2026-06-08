@@ -1293,9 +1293,7 @@ def test_tonic_biases():
         ValueError,
         match="GID 20 was given a 'L2_pyramidal' bias but is of type 'L2_basket'. Define a separate bias per cell type.",
     ):
-        dpl = simulate_dipole(net, tstop=20)
-
-    del net, dpl
+        simulate_dipole(net, tstop=20)
 
 
 def test_network_mesh():

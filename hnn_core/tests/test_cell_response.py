@@ -60,7 +60,11 @@ def test_cell_response(tmp_path):
         "_isec",
         "_ca",
     ]
-    net_attributes = ["_times", "_cell_type_names"]  # `Network.__init__`
+    net_attributes = [
+        "_times",
+        "_cell_type_names",
+        "_cell_types_metadata",
+    ]  # `Network.__init__`
     # creates these check that we always know which response attributes are
     # simulated see #291 for discussion; objective is to keep cell_response
     # size small

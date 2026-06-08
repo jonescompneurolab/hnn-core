@@ -630,7 +630,7 @@ def duecker_ET_model(
             allow_autapses=False,
         )
 
-    # layer2 inh -> layer2 Pyr
+    # layer2 inhibitory -> layer2 Pyr
     src_cell = "L2_basket"
     target_cell = "L2_pyramidal"
     lamtha = 6.125  # *0.8  # shorter space constant (Campagnola, 2022, mice data)
@@ -646,7 +646,7 @@ def duecker_ET_model(
     weight = params[key]
     net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
-    # layer5 inh -> layer5 Pyr
+    # layer5 inhibitory -> layer5 Pyr
     src_cell = "L5_basket"
     target_cell = "L5_pyramidal"
     lamtha = 6.125  # *0.8  # shorter space constant (Campagnola, 2022, mice data)
@@ -673,7 +673,7 @@ def duecker_ET_model(
                 src_cell, target_cell, loc, receptor, weight, delay, lamtha
             )
 
-    # layer2 Basket -> layer5 Pyr
+    # layer2 inhibitory -> layer5 Pyr
     src_cell = "L2_basket"
     receptor = "gabaa_slow"
     lamtha = 6.125

@@ -1294,7 +1294,7 @@ def pyramidal_humanL23(cell_name, pos=(0, 0, 0), gid=None):
 
 def human_gen_interneuron(cell_name, pos=(0, 0, 0), layer=2, gid=None):
     """Create a Cell object of a "human generic interneuron" tuned to dynamics of aspiny human cells.
-    Stands in for both PV+ and SOM+ cells in duecker_ET_model.
+    Stands in for both Parvalbumin+ and Somatostatin+ cells in duecker_ET_model.
 
     Parameters
     ----------

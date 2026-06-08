@@ -712,19 +712,25 @@ def plot_spikes_raster(
                 f"Must be of set {allowed_types}. "
                 f"Got {cell_types}"
             )
+    else:
+        cell_types = cell_response._cell_type_names
 
     cell_types_metadata = getattr(cell_response, "_cell_types_metadata", None)
     # validate colors argument
     _validate_type(colors, (list, dict, None), "color", "list of str, or dict")
 
-    # Set default colors
-
-    if colors is None and cell_types_metadata is None:
+    # Set colors
+    if hasattr(cell_types_metadata, "color"):
+        cell_colors = {
+            cell: meta["color"] for cell, meta in cell_types_metadata.items()
+        }
+    else:
         default_colors = plt.rcParams["axes.prop_cycle"].by_key()["color"][
             : len(cell_types)
         ]
         cell_colors = {cell: color for cell, color in zip(cell_types, default_colors)}
-    elif colors:
+
+    if colors:
         if isinstance(colors, list):
             if len(colors) != len(cell_types):
                 raise ValueError(
@@ -742,10 +748,6 @@ def plot_spikes_raster(
                     f"Got {colors.keys()}"
                 )
             cell_colors.update(colors)
-    elif cell_types_metadata is not None:
-        cell_colors = {
-            cell: meta["color"] for cell, meta in cell_types_metadata.items()
-        }
 
     # validate show_legend argument
     _validate_type(show_legend, bool, "show_legend", "bool")
