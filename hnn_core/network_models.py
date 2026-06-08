@@ -505,8 +505,8 @@ def duecker_ET_model(
         params = read_params(params_fname)
 
     cell_types = {
-        "L2_basket": {
-            "cell_object": interneuron(cell_name=_short_name("L2_basket"), layer=2),
+        "L2inh": {
+            "cell_object": interneuron(cell_name="L2inh", layer=2),
             "cell_metadata": {
                 "morpho_type": "interneuron",
                 "electro_type": "inhibitory",
@@ -516,7 +516,7 @@ def duecker_ET_model(
                 "reference": "",
             },
         },
-        "L2_pyramidal": {
+        "L2pyr": {
             "cell_object": pyramidal_l23(cell_name=_short_name("L2_pyramidal")),
             "cell_metadata": {
                 "morpho_type": "pyramidal",
@@ -527,8 +527,8 @@ def duecker_ET_model(
                 "reference": "",
             },
         },
-        "L5_basket": {
-            "cell_object": interneuron(cell_name=_short_name("L5_basket"), layer=5),
+        "L5inh": {
+            "cell_object": interneuron(cell_name="L5inh", layer=5),
             "cell_metadata": {
                 "morpho_type": "interneuron",
                 "electro_type": "inhibitory",
@@ -562,9 +562,9 @@ def duecker_ET_model(
     # Map cell types to layer positions
     pos_dict = {
         "L5ET": layer_dict["L5_bottom"],
-        "L2_pyramidal": layer_dict["L2_bottom"],
-        "L5_basket": layer_dict["L5_mid"],
-        "L2_basket": layer_dict["L2_mid"],
+        "L2pyr": layer_dict["L2_bottom"],
+        "L5inh": layer_dict["L5_mid"],
+        "L2inh": layer_dict["L2_mid"],
         "origin": layer_dict["origin"],
     }
 
@@ -583,7 +583,7 @@ def duecker_ET_model(
     # layer2 Pyr -> layer2 Pyr
     lamtha = 6.125  # calculated from human data Campganola et al. 2022
     loc = "proximal"
-    target_cell = "L2_pyramidal"
+    target_cell = "L2pyr"
     for receptor in ["nmda", "ampa"]:
         key = f"gbar_{_short_name(target_cell)}_{_short_name(target_cell)}_{receptor}"
         weight = params[key]
@@ -614,54 +614,54 @@ def duecker_ET_model(
             allow_autapses=False,
         )
 
-    # layer2 Basket -> layer2 Pyr
-    src_cell = "L2_basket"
-    target_cell = "L2_pyramidal"
+    # layer2 inh -> layer2 Pyr
+    src_cell = "L2inh"
+    target_cell = "L2pyr"
     lamtha = 6.125  # *0.8  # shorter space constant (Campagnola, 2022, mice data)
     loc = "soma"
     receptor = "gabaa"
-    key = f"gbar_L2Basket_L2Pyr_{receptor}"
+    key = f"gbar_{src_cell}_{target_cell}_{receptor}"
     weight = params[key]
     net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     # this connection is 0
     receptor = "gabab"
-    key = f"gbar_L2Basket_L2Pyr_{receptor}"
+    key = f"gbar_{src_cell}_{target_cell}_{receptor}"
     weight = params[key]
     net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
-    # layer5 Basket -> layer5 Pyr
-    src_cell = "L5_basket"
+    # layer5 inh -> layer5 Pyr
+    src_cell = "L5inh"
     target_cell = "L5ET"
     lamtha = 6.125  # *0.8  # shorter space constant (Campagnola, 2022, mice data)
     loc = "soma"
     receptor = "gabaa"
-    key = f"gbar_L5Basket_{target_cell}_{receptor}"
+    key = f"gbar_{src_cell}_{target_cell}_{receptor}"
     weight = params[key]
     net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     # this connection is also 0
     receptor = "gabab"
-    key = f"gbar_L5Basket_{target_cell}_{receptor}"
+    key = f"gbar_{src_cell}_{target_cell}_{receptor}"
     weight = params[key]
     net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     # layer2 Pyr -> layer5 Pyr
-    src_cell = "L2_pyramidal"
+    src_cell = "L2pyr"
     lamtha = 6.125
     for receptor in ["ampa", "nmda"]:
         for loc in ["proximal", "apical_2"]:
-            key = f"gbar_L2Pyr_{target_cell}_{receptor}"
+            key = f"gbar_{src_cell}_{target_cell}_{receptor}"
             weight = params[key]
             net.add_connection(
                 src_cell, target_cell, loc, receptor, weight, delay, lamtha
             )
 
     # layer2 Basket -> layer5 Pyr
-    src_cell = "L2_basket"
+    src_cell = "L2inh"
     receptor = "gabaa"
     lamtha = 6.125
-    key = f"gbar_L2Basket_{target_cell}_{receptor}"
+    key = f"gbar_{src_cell}_{target_cell}_{receptor}"
     weight = params[key]
 
     # add GABAA connection to apical_2 as Martinotti-like inhibition (SST cells)
@@ -671,15 +671,15 @@ def duecker_ET_model(
     # this connection is set to 0 as we're not simulating NGF cells.
     loc = "apical_tuft"
     receptor = "gabab"
-    key = f"gbar_L2Basket_{target_cell}_{receptor}"
+    key = f"gbar_{src_cell}_{target_cell}_{receptor}"
     weight = params[key]
     net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     # xx -> layer2 Basket
-    src_cell = "L2_pyramidal"
-    target_cell = "L2_basket"
+    src_cell = "L2pyr"
+    target_cell = "L2inh"
     lamtha = 6.125 * 0.8  # shorter space constant (Campagnola, 2022, mice data)
-    key = f"gbar_L2Pyr_{_short_name(target_cell)}"
+    key = f"gbar_{src_cell}_{target_cell}"
     weight = params[key]
     loc = "soma"
     receptor = "ampa"
@@ -689,10 +689,10 @@ def duecker_ET_model(
     receptor = "nmda"
     net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
-    src_cell = "L2_basket"
+    src_cell = "L2inh"
     lamtha = 6.125
     receptor = "gabaa"
-    key = f"gbar_L2Basket_{_short_name(target_cell)}_{receptor}"
+    key = f"gbar_{src_cell}_{target_cell}_{receptor}"
     weight = params[key]
     loc = "soma"
     net.add_connection(
@@ -707,7 +707,7 @@ def duecker_ET_model(
     )
 
     receptor = "gabab"
-    key = f"gbar_L2Basket_{_short_name(target_cell)}_{receptor}"
+    key = f"gbar_{src_cell}_{target_cell}_{receptor}"
     weight = params[key]
     loc = "soma"
     net.add_connection(
@@ -722,12 +722,12 @@ def duecker_ET_model(
     )
 
     # xx -> layer5 Basket
-    src_cell = "L5_basket"
-    target_cell = "L5_basket"
+    src_cell = "L5inh"
+    target_cell = "L5inh"
     lamtha = 6.125
     loc = "soma"
     receptor = "gabaa"
-    key = f"gbar_L5Basket_{_short_name(target_cell)}_{receptor}"
+    key = f"gbar_{src_cell}_{target_cell}_{receptor}"
     weight = params[key]
     net.add_connection(
         src_cell,
@@ -741,7 +741,7 @@ def duecker_ET_model(
     )
 
     receptor = "gabab"
-    key = f"gbar_L5Basket_{_short_name(target_cell)}_{receptor}"
+    key = f"gbar_{src_cell}_{target_cell}_{receptor}"
     weight = params[key]
     net.add_connection(
         src_cell,
@@ -756,7 +756,7 @@ def duecker_ET_model(
 
     src_cell = "L5ET"
     lamtha = 6.125 * 0.8  # shorter space constant (Campagnola, 2022, mice data)
-    key = f"gbar_{src_cell}_{_short_name(target_cell)}"
+    key = f"gbar_{src_cell}_{target_cell}"
     weight = params[key]
     loc = "soma"
     receptor = "ampa"
@@ -766,9 +766,9 @@ def duecker_ET_model(
     receptor = "nmda"
     net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
-    src_cell = "L2_pyramidal"
+    src_cell = "L2pyr"
     lamtha = 6.125 * 0.8  # shorter space constant (Campagnola, 2022, mice data)
-    key = f"gbar_L2Pyr_{_short_name(target_cell)}"
+    key = f"gbar_{src_cell}_{target_cell}"
     weight = params[key]
     loc = "soma"
     receptor = "ampa"

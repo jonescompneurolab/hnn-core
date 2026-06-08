@@ -358,10 +358,7 @@ def get_L2Pyrhuman_params():
         "L2Pyr_gabaa_tau1": 0.5,
         "L2Pyr_gabaa_tau2": 5.0,
         "L2Pyr_gabaa_mechname": "Exp2Syn",
-        "L2Pyr_gabab_e": -80.0,
-        "L2Pyr_gabab_tau1": 45.0,
-        "L2Pyr_gabab_tau2": 200.0,
-        "L2Pyr_gabab_mechname": "gabab",
+        "L2Pyr_gabab_mechname": "gabab_destexhe",
         # Biophysics soma
         "L2Pyr_soma_gbar_NaTs2_t_32d_hay2011": 2.448,
         "L2Pyr_soma_gbar_SKv3_1_hay2011": 1.0394999999999999,
@@ -373,16 +370,16 @@ def get_L2Pyrhuman_params():
         "L2Pyr_soma_gbar_Im_hay2011": 0.0004,
         "L2Pyr_soma_g_pas": 2.7027027027027027e-05,
         "L2Pyr_soma_e_pas": -75,
-        "L2Pyr_soma_decay_CaDynamics_E2": 90,
-        "L2Pyr_soma_gamma_CaDynamics_E2": 0.000533,
+        "L2Pyr_soma_decay_CaDynamics_E2_hay2011": 90,
+        "L2Pyr_soma_gamma_CaDynamics_E2_hay2011": 0.000533,
         # Biophysics basal
         "L2Pyr_basal_gbar_NaTs2_t_32d_hay2011": 0.008009,
         "L2Pyr_basal_gbar_SKv3_1_hay2011": 0.000513,
         "L2Pyr_basal_gbar_Ih_hay2011": 2e-05,
         "L2Pyr_basal_g_pas": 2.7027027027027027e-05,
         "L2Pyr_basal_e_pas": -75,
-        "L2Pyr_basal_decay_CaDynamics_E2": 70,
-        "L2Pyr_basal_gamma_CaDynamics_E2": 0.0013325000000000001,
+        "L2Pyr_basal_decay_CaDynamics_E2_hay2011": 70,
+        "L2Pyr_basal_gamma_CaDynamics_E2_hay2011": 0.0013325000000000001,
         # Biophysics dends
         "L2Pyr_dend_gbar_NaTa_t_32d_hay2011": 8e-05,
         "L2Pyr_dend_gbar_SKv3_1_hay2011": 0.012,
@@ -393,8 +390,8 @@ def get_L2Pyrhuman_params():
         "L2Pyr_dend_gbar_SK_E2_hay2011": 3.0e-06,
         "L2Pyr_dend_g_pas": 2.7027027027027027e-05,
         "L2Pyr_dend_e_pas": -75,
-        "L2Pyr_dend_decay_CaDynamics_E2": 70,
-        "L2Pyr_dend_gamma_CaDynamics_E2": 0.0013325,
+        "L2Pyr_dend_decay_CaDynamics_E2_hay2011": 70,
+        "L2Pyr_dend_gamma_CaDynamics_E2_hay2011": 0.0013325,
     }
 
 
@@ -437,10 +434,7 @@ def get_L5PyrET_params():
         "L5ET_gabaa_tau1": 0.5,
         "L5ET_gabaa_tau2": 5.0,
         "L5ET_gabaa_mechname": "Exp2Syn",
-        "L5ET_gabab_e": -80.0,
-        "L5ET_gabab_tau1": 45,
-        "L5ET_gabab_tau2": 200.0,
-        "L5ET_gabab_mechname": "gabab",
+        "L5ET_gabab_mechname": "gabab_destexhe",
         # Biophysics soma
         "L5ET_soma_gbar_NaTs2_t_hay2011": 1.53,
         "L5ET_soma_gbar_SKv3_1_hay2011": 0.3465,
@@ -454,16 +448,16 @@ def get_L5PyrET_params():
         "L5ET_soma_gbar_K_Tst_hay2011": 0.0406,
         "L5ET_soma_g_pas": 8.45e-06,
         "L5ET_soma_e_pas": -90,
-        "L5ET_soma_decay_CaDynamics_E2": 460,
-        "L5ET_soma_gamma_CaDynamics_E2": 0.000501,  # *1e-10,
+        "L5ET_soma_decay_CaDynamics_E2_hay2011": 460,
+        "L5ET_soma_gamma_CaDynamics_E2_hay2011": 0.000501,  # *1e-10,
         # Biophysics basal
         "L5ET_basal_gbar_NaTs2_t_hay2011": 0.0102,
         "L5ET_basal_gbar_SKv3_1_hay2011": 0.0001305,
         "L5ET_basal_gbar_Ih_hay2011": 2.57e-05,
         "L5ET_basal_g_pas": 2.6249999999999998e-05,
         "L5ET_basal_e_pas": -90,
-        "L5ET_basal_decay_CaDynamics_E2": 50,
-        "L5ET_basal_gamma_CaDynamics_E2": 0.0005096,
+        "L5ET_basal_decay_CaDynamics_E2_hay2011": 50,
+        "L5ET_basal_gamma_CaDynamics_E2_hay2011": 0.0005096,
         # Biophysics dends
         "L5ET_dend_gbar_NaTa_t_hay2011": 0.01065,
         "L5ET_dend_gbar_SKv3_1_hay2011": 0.000261,
@@ -476,22 +470,22 @@ def get_L5PyrET_params():
         "L5ET_dend_gbar_K_Tst_hay2011": 0,
         "L5ET_dend_g_pas": 3.926666666666667e-05,
         "L5ET_dend_e_pas": -85,
-        "L5ET_dend_decay_CaDynamics_E2": 122,
-        "L5ET_dend_gamma_CaDynamics_E2": 0.0005096,
+        "L5ET_dend_decay_CaDynamics_E2_hay2011": 122,
+        "L5ET_dend_gamma_CaDynamics_E2_hay2011": 0.0005096,
     }
 
 
 def get_Int_params():
     return {
-        "Int_gbar_nas": 0.08335,
-        "Int_gbar_kdr": 0.225,
-        "Int_gbar_kd": 0.00039,
-        "Int_gbar_Ih": 2e-5,
+        "Int_gbar_nas_golomb2007": 0.08335,
+        "Int_gbar_kdr_golomb2007": 0.225,
+        "Int_gbar_kd_golomb2007": 0.00039,
+        "Int_gbar_Ih_hay2011": 2e-5,
         "Int_g_pas": 0.0001,
         "Int_e_pas": -70,
         # track calcium dynamics for new NMDA
-        "Int_decay_CaDynamics_E2": 50,
-        "Int_gamma_CaDynamics_E2": 0.0005096,
+        "Int_decay_CaDynamics_E2_hay2011": 50,
+        "Int_gamma_CaDynamics_E2_hay2011": 0.0005096,
         # Synapses
         "Int_ampa_e": 0.0,
         # Interneuron rise and decay twice as fast as pyramidal! (Destexhe, Alain, Zachary F. Mainen, and Terrence J. Sejnowski. "Kinetic models of synaptic transmission." Methods in neuronal modeling 2 (1998): 1-25.)
@@ -504,8 +498,5 @@ def get_Int_params():
         "Int_gabaa_tau1": 0.5,
         "Int_gabaa_tau2": 5.0,
         "Int_gabaa_mechname": "Exp2Syn",
-        "Int_gabab_e": -80.0,
-        "Int_gabab_tau1": 45,
-        "Int_gabab_tau2": 200,
-        "Int_gabab_mechname": "gabab",
+        "Int_gabab_mechname": "gabab_destexhe",
     }
