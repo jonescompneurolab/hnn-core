@@ -320,20 +320,11 @@ padding-bottom: 10px !important;
         tab only, since we do not want the gutter present on all tabs.
 */
 .param-window-tabs-widget >
-.widget-tab-bar:has(.lm-TabBar-tab:nth-child(3).lm-mod-current) +
-.widget-tab-contents {
-    scrollbar-gutter: stable !important;
-    overflow-y: auto !important;
-    padding-right: 10px !important;
-}
-
-/*
-    similarly style the gutter for the *parent* container of
-    visualization-tab-contents, which adds the gutter *outside*
-    of the widgets
-*/
-.param-window-tabs-widget >
-.widget-tab-bar:has(.lm-TabBar-tab:nth-child(4).lm-mod-current) +
+.widget-tab-bar:has(
+    .lm-TabBar-tab.tab-external-drives.lm-mod-current,
+    .lm-TabBar-tab.tab-optimization.lm-mod-current,
+    .lm-TabBar-tab.tab-visualization.lm-mod-current
+) +
 .widget-tab-contents {
     scrollbar-gutter: stable !important;
     overflow-y: auto !important;
@@ -344,16 +335,27 @@ padding-bottom: 10px !important;
 /* --------- style the log window --------- */
 /* ---------------------------------------- */
 
+/*  style icon to minimize/expand the log window
+
+    note: we set the initial color to transparent to hide the
+    description="Toggle Log View" for self._log_toggle_btn, then
+    we re-add the color to *only* the icon so that the text (which
+    was added for accessibility) does not display be default
+
+*/
 .log-toggle-icon {
     overflow: visible !important;
     position: absolute !important;
     top: 0px !important;
     left: 0px !important;
     z-index: 10;
-    color: var(--textbook-light-purple);
+    color: transparent;
     background: transparent !important;
     border: none !important;
-    font-size: 0 !important;
+}
+
+.log-toggle-icon i {
+    color: var(--textbook-light-purple);
 }
 
 /*  remove focus effects on the icon  */
@@ -365,10 +367,21 @@ padding-bottom: 10px !important;
     --jp-widgets-input-focus-shadow: none !important;
 }
 
-/*  remove hover effects on the icon  */
+/*  remove hover effects on the icon
+
+    note: we set the initial color to transparent to hide the
+    description="Toggle Log View" for self._log_toggle_btn, then
+    we re-add the color to *only* the icon so that the text (which
+    was added for accessibility) does not display be default
+
+*/
 .log-toggle-icon:hover {
-    color: var(--theme-color);
+    color: transparent;
     box-shadow: none !important;
+}
+
+.log-toggle-icon:hover i {
+    color: var(--theme-color);
 }
 
 /*
