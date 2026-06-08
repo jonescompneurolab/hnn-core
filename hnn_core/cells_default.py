@@ -1054,6 +1054,8 @@ def pyramidal_humanl5ET(cell_name, pos=(0, 0, 0), gid=None):
 
         if sec_name == "soma":
             section.syns = ["gabaa", "gabab"]
+        elif sec_name=="apical_2":
+            section.syns = ["ampa", "nmda", "gabaa_slow", "gabab"]
         else:
             section.syns = ["ampa", "nmda", "gabaa", "gabab"]
 
@@ -1065,7 +1067,7 @@ def pyramidal_humanl5ET(cell_name, pos=(0, 0, 0), gid=None):
     }
 
     synapses = _get_syn_props(
-        p_all, "L5ET", syn_types=["ampa", "nmda", "gabaa", "gabab"]
+        p_all, "L5ET", syn_types=["ampa", "nmda", "gabaa", "gabaa_slow", "gabab"]
     )
 
     cell = Cell(

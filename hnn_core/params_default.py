@@ -358,6 +358,10 @@ def get_L2Pyrhuman_params():
         "L2Pyr_gabaa_tau1": 0.5,
         "L2Pyr_gabaa_tau2": 5.0,
         "L2Pyr_gabaa_mechname": "Exp2Syn",
+        "L2Pyr_gabaa_slow_e": -80.0,
+        "L2Pyr_gabaa_slow_tau1": 0.5,
+        "L2Pyr_gabaa_slow_tau2": 5.0,
+        "L2Pyr_gabaa_slow_mechname": "Exp2Syn",
         "L2Pyr_gabab_mechname": "gabab_destexhe",
         # Biophysics soma
         "L2Pyr_soma_gbar_NaTs2_t_32d_hay2011": 2.448,
@@ -434,6 +438,10 @@ def get_L5PyrET_params():
         "L5ET_gabaa_tau1": 0.5,
         "L5ET_gabaa_tau2": 5.0,
         "L5ET_gabaa_mechname": "Exp2Syn",
+        "L5ET_gabaa_slow_e": -80.0,
+        "L5ET_gabaa_slow_tau1": 0.5,
+        "L5ET_gabaa_slow_tau2": 5.0,
+        "L5ET_gabaa_slow_mechname": "Exp2Syn",
         "L5ET_gabab_mechname": "gabab_destexhe",
         # Biophysics soma
         "L5ET_soma_gbar_NaTs2_t_hay2011": 1.53,

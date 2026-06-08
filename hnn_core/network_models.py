@@ -659,7 +659,7 @@ def duecker_ET_model(
 
     # layer2 Basket -> layer5 Pyr
     src_cell = "L2inh"
-    receptor = "gabaa"
+    receptor = "gabaa_slow"
     lamtha = 6.125
     key = f"gbar_{src_cell}_{target_cell}_{receptor}"
     weight = params[key]
