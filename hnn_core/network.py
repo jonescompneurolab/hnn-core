@@ -1577,7 +1577,7 @@ class Network:
         self._reset_drives()
         # each trial needs unique event time vectors
         for trial_idx in range(n_trials):
-            for d, drive in enumerate(self.external_drives.values()):
+            for drive in self.external_drives.values():
                 event_times = list()  # new list for each trial and drive
 
                 for drive_cell_gid in self.gid_ranges[drive["name"]]:

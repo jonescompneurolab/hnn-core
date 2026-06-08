@@ -103,13 +103,6 @@ def _get_dends(
             dend_prop["v0"] = v_init["all"]
         else:
             dend_prop["v0"] = v_init[section_name]
-
-            # KDTODO leaving old KD equivalent code here just in case
-            # if len(v_init) == 1:
-            #     v = v_init["all"]
-            # else:
-            #     v = v_init[section_name]
-            # KDTODO end
         sections[section_name] = Section(
             L=dend_prop["L"],
             diam=dend_prop["diam"],
@@ -190,15 +183,15 @@ def _get_basal(params, cell_type, section_names, v_init={"all": -65}):
                 middle = section_name.replace("_", "")
             dend_prop[key] = params[f"{cell_type}_{middle}_{key}"]
             if len(v_init) == 1:
-                v = v_init["all"]
+                dend_prop["v0"] = v_init["all"]
             else:
-                v = v_init[section_name]
+                dend_prop["v0"] = v_init[section_name]
         sections[section_name] = Section(
             L=dend_prop["L"],
             diam=dend_prop["diam"],
             Ra=dend_prop["Ra"],
             cm=dend_prop["cm"],
-            v0=v,
+            v0=dend_prop["v0"],
         )
     return sections
 
