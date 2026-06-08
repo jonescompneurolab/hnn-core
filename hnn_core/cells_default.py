@@ -867,14 +867,14 @@ def pyramidal_ca(cell_name, pos, override_params=None, gid=None):
     return cell
 
 
-def pyramidal_humanl5ET(cell_name, pos=(0, 0, 0), gid=None):
+def pyramidal_humanL5ET(cell_name, pos=(0, 0, 0), gid=None):
 
-    """Create a Cell object of a human L5ET pyramidal neuron (developed for duecker_ET_model).
+    """Create a Cell object of a human L5Pyr pyramidal neuron (developed for duecker_ET_model).
 
     Parameters
     ----------
     cell_name : str
-        Should be "L5ET".
+        Should be "L5Pyr".
     pos : tuple of (int, int, int), default=(0, 0, 0)
         Coordinates of cell soma in xyz-space
     gid : int or None (optional)
@@ -902,7 +902,7 @@ def pyramidal_humanl5ET(cell_name, pos=(0, 0, 0), gid=None):
     )
     gbar_Ih = partial(
         _exp_g_at_dist,
-        gbar_at_zero=p_all["L5ET_dend_gbar_Ih_hay2011"],
+        gbar_at_zero=p_all["L5Pyr_dend_gbar_Ih_hay2011"],
         exp_term=1.0 / 323,
         offset=-0.8696,
         slope=2.087,
@@ -910,18 +910,18 @@ def pyramidal_humanl5ET(cell_name, pos=(0, 0, 0), gid=None):
 
     # basal dendrites
     gbar_NaTs2_t = partial(
-        _linear_g_at_dist, gsoma=p_all["L5ET_basal_gbar_NaTs2_t_hay2011"], gdend=0, xkink=255
+        _linear_g_at_dist, gsoma=p_all["L5Pyr_basal_gbar_NaTs2_t_hay2011"], gdend=0, xkink=255
     )
     gbar_SKv3_1 = partial(
-        _linear_g_at_dist, gsoma=0, gdend=p_all["L5ET_basal_gbar_SKv3_1_hay2011"], xkink=255
+        _linear_g_at_dist, gsoma=0, gdend=p_all["L5Pyr_basal_gbar_SKv3_1_hay2011"], xkink=255
     )
 
     override_params = dict()
-    override_params["L5ET_dend_gbar_Ca_HVA_hay2011"] = gbar_Ca_HVA
-    override_params["L5ET_dend_gbar_Ca_LVAst_hay2011"] = gbar_Ca_LVA
-    override_params["L5ET_dend_gbar_Ih_hay2011"] = gbar_Ih
-    override_params["L5ET_basal_gbar_NaTs2_t_hay2011"] = gbar_NaTs2_t
-    override_params["L5ET_basal_gbar_SKv3_1_hay2011"] = gbar_SKv3_1
+    override_params["L5Pyr_dend_gbar_Ca_HVA_hay2011"] = gbar_Ca_HVA
+    override_params["L5Pyr_dend_gbar_Ca_LVAst_hay2011"] = gbar_Ca_LVA
+    override_params["L5Pyr_dend_gbar_Ih_hay2011"] = gbar_Ih
+    override_params["L5Pyr_basal_gbar_NaTs2_t_hay2011"] = gbar_NaTs2_t
+    override_params["L5Pyr_basal_gbar_SKv3_1_hay2011"] = gbar_SKv3_1
 
     p_all = compare_dictionaries(p_all, override_params)
 
@@ -973,20 +973,20 @@ def pyramidal_humanl5ET(cell_name, pos=(0, 0, 0), gid=None):
 
     sections_apcl = _get_dends(
         p_all,
-        "L5ET",
+        "L5Pyr",
         section_names=["apical_trunk", "apical_1", "apical_2", "apical_tuft"],
         v_init=v_init,
     )
     sections_basal = _get_basal(
         p_all,
-        "L5ET",
+        "L5Pyr",
         section_names=["basal_1", "basal_2", "basal_3", "apical_oblique"],
         v_init=v_init,
     )
 
     sections = {**sections_apcl, **sections_basal}
 
-    sections["soma"] = _get_pyr_soma(p_all, "L5ET", v_init=v_init["soma"])
+    sections["soma"] = _get_pyr_soma(p_all, "L5Pyr", v_init=v_init["soma"])
 
     # Soma and apical mechanisms
     mechanisms = {
@@ -1004,7 +1004,7 @@ def pyramidal_humanl5ET(cell_name, pos=(0, 0, 0), gid=None):
         "CaDynamics_E2_hay2011": ["decay_CaDynamics_E2_hay2011", "gamma_CaDynamics_E2_hay2011"],
     }
 
-    p_mech_soma = _get_mechanisms(p_all, "L5ET", ["soma"], mechanisms)
+    p_mech_soma = _get_mechanisms(p_all, "L5Pyr", ["soma"], mechanisms)
 
     section_names = ["apical_trunk", "apical_1", "apical_2", "apical_tuft"]
 
@@ -1022,7 +1022,7 @@ def pyramidal_humanl5ET(cell_name, pos=(0, 0, 0), gid=None):
         "CaDynamics_E2_hay2011": ["decay_CaDynamics_E2_hay2011", "gamma_CaDynamics_E2_hay2011"],
     }
 
-    p_mech_apical = _get_mechanisms(p_all, "L5ET", section_names, mechanisms)
+    p_mech_apical = _get_mechanisms(p_all, "L5Pyr", section_names, mechanisms)
 
     # basal sections - super hacky because I can't mess with _get_mechanisms
     mechanisms = {
@@ -1067,7 +1067,7 @@ def pyramidal_humanl5ET(cell_name, pos=(0, 0, 0), gid=None):
     }
 
     synapses = _get_syn_props(
-        p_all, "L5ET", syn_types=["ampa", "nmda", "gabaa", "gabaa_slow", "gabab"]
+        p_all, "L5Pyr", syn_types=["ampa", "nmda", "gabaa", "gabaa_slow", "gabab"]
     )
 
     cell = Cell(
@@ -1083,7 +1083,7 @@ def pyramidal_humanl5ET(cell_name, pos=(0, 0, 0), gid=None):
     return cell
 
 
-def pyramidal_humanl23(cell_name, pos=(0, 0, 0), gid=None):
+def pyramidal_humanL23(cell_name, pos=(0, 0, 0), gid=None):
 
     """Create a Cell object of a human L52/3 pyramidal neuron (developed for duecker_ET_model).
 
