@@ -130,6 +130,8 @@ def _short_name(short_name):
         L5_basket="L5Basket",
         L2_pyramidal="L2Pyr",
         L5_pyramidal="L5Pyr",
+        L2_inhibitory="L2Inh",
+        L5_inhibitory="L5Inh"
     )
     if short_name in long_name:
         return long_name[short_name]
