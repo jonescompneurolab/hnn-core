@@ -571,6 +571,7 @@ def _run_opt_cma(
     while not es.stop():
         solutions = es.ask()
         es.tell(solutions, _obj_func(solutions))
+        es.disp()
         backup_dir = obj_fun_kwargs.get("pth_backup", False)
         if backup_dir:
             if es.countiter % 10 == 0:
