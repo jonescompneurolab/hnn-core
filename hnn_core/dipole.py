@@ -13,6 +13,7 @@ import json
 import numpy as np
 from h5io import write_hdf5, read_hdf5
 from scipy import signal
+from scipy.stats import pearsonr
 
 import hnn_core
 from .externals.mne import _check_option
@@ -465,6 +466,69 @@ def _anticorr(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
     )  # transform so that 0 is a perfect fit
     return obj
 
+def _rmse_corr(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
+
+    """Calculates RMSE between data in dpl and exp_dpl
+    weighted by correlation
+    
+    Parameters
+    ----------
+    dpl : instance of Dipole
+        A dipole object with simulated data
+    exp_dpl : instance of Dipole
+        A dipole object with experimental data
+
+    Returns
+    -------
+    err : float
+        Weighted RMSE between data in dpl and exp_dpl
+        rmse**(2-corr(dpl, exp_dpl))
+    """
+    from scipy import signal
+
+    exp_times = exp_dpl.times
+    sim_times = dpl.times
+
+    for tseries in [exp_times, sim_times]:
+            if tstart < tseries[0]:
+                tstart = tseries[0]
+            if tstop > tseries[-1]:
+                tstop = tseries[-1]
+
+    # make sure start and end times are valid for both dipoles
+    exp_start_index = (np.abs(exp_times - tstart)).argmin()
+    exp_end_index = (np.abs(exp_times - tstop)).argmin()
+    exp_length = exp_end_index - exp_start_index
+
+    sim_start_index = (np.abs(sim_times - tstart)).argmin()
+    sim_end_index = (np.abs(sim_times - tstop)).argmin()
+    sim_length = sim_end_index - sim_start_index
+
+    if weights is None:
+        # weighted RMSE with weights of all 1's is equivalent to
+        # normal RMSE
+        weights = np.ones(len(sim_times[0:sim_end_index]))
+    weights = weights[sim_start_index:sim_end_index]
+
+
+    dpl1 = dpl.data["agg"][sim_start_index:sim_end_index]
+    dpl2 = exp_dpl.data["agg"][exp_start_index:exp_end_index]
+
+    if sim_length > exp_length:
+        # downsample simulation timeseries to match exp data
+        dpl1 = signal.resample(dpl1, exp_length)
+        weights = signal.resample(weights, exp_length)
+        indices = np.where(weights < 1e-4)
+        weights[indices] = 0
+    elif sim_length < exp_length:
+        # downsample exp timeseries to match simulation data
+        dpl2 = signal.resample(dpl2, sim_length)
+
+    rmse = np.sqrt((weights*(dpl1 - dpl2) ** 2).sum()/weights.sum())
+    sig_corr = pearsonr(dpl1, dpl2)[0]
+    sig_corr = np.clip(sig_corr, 1e-10, 1.0)            # avoid negative correlations
+
+    return rmse*(1-np.log(sig_corr))
 
 class Dipole(object):
     """Dipole class.

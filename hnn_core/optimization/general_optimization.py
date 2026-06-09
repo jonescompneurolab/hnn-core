@@ -12,7 +12,8 @@ from scipy.optimize import fmin_cobyla
 
 from .objective_functions import _rmse_evoked, _anticorr_evoked, _maximize_psd
 from ..externals.mne import _validate_type
-
+import os.path as op
+import pickle
 
 class Optimizer:
     def __init__(
@@ -561,6 +562,11 @@ def _run_opt_cma(
     while not es.stop():
         solutions = es.ask()
         es.tell(solutions, _obj_func(solutions))
+        backup_dir = obj_fun_kwargs.get('pth_backup', False)
+        if backup_dir: 
+            if es.countiter % 10 == 0:
+                with open(op.join(backup_dir, 'cma_checkpoint.pkl'), 'wb') as f:
+                    pickle.dump({'es': es, 'obj_values': obj_values}, f)
     es.result_pretty()
 
     # get best params
