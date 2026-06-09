@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import fmin_cobyla
 
-from .objective_functions import _rmse_evoked, _anticorr_evoked, _maximize_psd
+from .objective_functions import _rmse_evoked, _anticorr_evoked, _maximize_psd, _rmse_corr_evoked
 from ..externals.mne import _validate_type
 import os.path as op
 import pickle
@@ -111,6 +111,9 @@ class Optimizer:
             self.obj_fun_name = "maximize_psd"
         elif obj_fun == "dipole_corr":
             self.obj_fun = _anticorr_evoked
+        elif obj_fun == "dipole_rmse_corr":
+            self.obj_fun = _rmse_corr_evoked
+            self.obj_fun_name = "dipole_corr"
             self.obj_fun_name = "dipole_corr"
         else:
             self.obj_fun = obj_fun  # user-defined function
