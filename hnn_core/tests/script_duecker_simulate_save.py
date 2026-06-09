@@ -25,21 +25,21 @@ def rerun_and_save_duecker_model(suffix=""):
     net = duecker_ET_model()
     net.set_cell_positions(inplane_distance=30.0)
     weights_ampa_p1 = {
-        "L2_basket": 0.01,
+        "L2_inhibitory": 0.01,
         "L2_pyramidal": 0.015,
-        "L5_basket": 0.0,
+        "L5_inhibitory": 0.0,
         "L5_pyramidal": 0.03,
     }
     weights_nmda_p1 = {
-        "L2_basket": 0.01,
+        "L2_inhibitory": 0.01,
         "L2_pyramidal": 0.05,
-        "L5_basket": 0.0,
+        "L5_inhibitory": 0.0,
         "L5_pyramidal": 0.025,
     }
     synaptic_delays_prox = {
-        "L2_basket": 0.1,
+        "L2_inhibitory": 0.1,
         "L2_pyramidal": 0.1,
-        "L5_basket": 1,
+        "L5_inhibitory": 1,
         "L5_pyramidal": 1,
     }
 
@@ -54,9 +54,9 @@ def rerun_and_save_duecker_model(suffix=""):
         synaptic_delays=synaptic_delays_prox,
     )
 
-    weights_ampa_d1 = {"L2_basket": 0.005, "L2_pyramidal": 0.01, "L5_pyramidal": 1.0}
-    weights_nmda_d1 = {"L2_basket": 0.0, "L2_pyramidal": 0.01, "L5_pyramidal": 1.0}
-    synaptic_delays_dist = {"L2_basket": 0.1, "L2_pyramidal": 0.1, "L5_pyramidal": 0.1}
+    weights_ampa_d1 = {"L2_inhibitory": 0.005, "L2_pyramidal": 0.01, "L5_pyramidal": 1.0}
+    weights_nmda_d1 = {"L2_inhibitory": 0.0, "L2_pyramidal": 0.01, "L5_pyramidal": 1.0}
+    synaptic_delays_dist = {"L2_inhibitory": 0.1, "L2_pyramidal": 0.1, "L5_pyramidal": 0.1}
 
     net.add_evoked_drive(
         "dist1",
@@ -70,21 +70,21 @@ def rerun_and_save_duecker_model(suffix=""):
     )
 
     weights_ampa_p2 = {
-        "L2_basket": 0.01,
+        "L2_inhibitory": 0.01,
         "L2_pyramidal": 0.3,
-        "L5_basket": 0.001,
+        "L5_inhibitory": 0.001,
         "L5_pyramidal": 0.3,
     }
     weights_nmda_p2 = {
-        "L2_basket": 0.01,
+        "L2_inhibitory": 0.01,
         "L2_pyramidal": 0.2,
-        "L5_basket": 0.001,
+        "L5_inhibitory": 0.001,
         "L5_pyramidal": 0.2,
     }
     synaptic_delays_prox = {
-        "L2_basket": 0.1,
+        "L2_inhibitory": 0.1,
         "L2_pyramidal": 0.1,
-        "L5_basket": 1.0,
+        "L5_inhibitory": 1.0,
         "L5_pyramidal": 1.0,
     }
     net.add_evoked_drive(

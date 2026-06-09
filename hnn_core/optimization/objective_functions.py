@@ -474,6 +474,7 @@ def _anticorr_evoked(
 
     return obj
 
+
 def _rmse_corr_evoked(
     initial_net,
     initial_params,
@@ -485,8 +486,7 @@ def _rmse_corr_evoked(
     obj_fun_kwargs,
     best=None,
 ):
-    """TB ADDED
-    """
+    """TB ADDED"""
 
     is_batch = _check_is_batch(predicted_params)
 
@@ -526,16 +526,24 @@ def _rmse_corr_evoked(
             backend="loky",
             verbose=obj_fun_kwargs.get("verbose", True),
         )
- 
+
         dpls = list()
-        for batch_res in res['simulated_data']:
+        for batch_res in res["simulated_data"]:
             for data in batch_res:
                 # import pdb; pdb.set_trace()
                 _preprocess_dipole(dpls, obj_fun_kwargs)
                 # average dipoles
-                dpls.append(average_dipoles(data['dpl']))
+                dpls.append(average_dipoles(data["dpl"]))
 
-        obj = [_rmse_corr(dpl, obj_fun_kwargs["target"], tstop=tstop, weights=obj_fun_kwargs.get("weights", None)) for dpl in dpls]
+        obj = [
+            _rmse_corr(
+                dpl,
+                obj_fun_kwargs["target"],
+                tstop=tstop,
+                weights=obj_fun_kwargs.get("weights", None),
+            )
+            for dpl in dpls
+        ]
         obj_values.append(obj)
     else:
         # The non-"batch" case occurs if the solver is set to "cobyla" or "bayesian"

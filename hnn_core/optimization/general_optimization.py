@@ -10,10 +10,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import fmin_cobyla
 
-from .objective_functions import _rmse_evoked, _anticorr_evoked, _maximize_psd, _rmse_corr_evoked
+from .objective_functions import (
+    _rmse_evoked,
+    _anticorr_evoked,
+    _maximize_psd,
+    _rmse_corr_evoked,
+)
 from ..externals.mne import _validate_type
 import os.path as op
 import pickle
+
 
 class Optimizer:
     def __init__(
@@ -111,10 +117,10 @@ class Optimizer:
             self.obj_fun_name = "maximize_psd"
         elif obj_fun == "dipole_corr":
             self.obj_fun = _anticorr_evoked
+            self.obj_fun_name = "dipole_corr"
         elif obj_fun == "dipole_rmse_corr":
             self.obj_fun = _rmse_corr_evoked
-            self.obj_fun_name = "dipole_corr"
-            self.obj_fun_name = "dipole_corr"
+            self.obj_fun_name = "dipole_rmse_corr"
         else:
             self.obj_fun = obj_fun  # user-defined function
             self.obj_fun_name = None
@@ -565,11 +571,11 @@ def _run_opt_cma(
     while not es.stop():
         solutions = es.ask()
         es.tell(solutions, _obj_func(solutions))
-        backup_dir = obj_fun_kwargs.get('pth_backup', False)
-        if backup_dir: 
+        backup_dir = obj_fun_kwargs.get("pth_backup", False)
+        if backup_dir:
             if es.countiter % 10 == 0:
-                with open(op.join(backup_dir, 'cma_checkpoint.pkl'), 'wb') as f:
-                    pickle.dump({'es': es, 'obj_values': obj_values}, f)
+                with open(op.join(backup_dir, "cma_checkpoint.pkl"), "wb") as f:
+                    pickle.dump({"es": es, "obj_values": obj_values}, f)
     es.result_pretty()
 
     # get best params
