@@ -552,10 +552,10 @@ class NetworkBuilder(object):
                     # Targeting group of sections like proximal or distal
                     if loc in target_cell.sect_loc:
                         for sect in target_cell.sect_loc[loc]:
-                            syn_keys.append(f"{sect}_{receptor}")
+                            syn_keys.append(f"{sect}_{receptor}_{0.5}")
                     # Targeting individual section like soma or apical_tuft
                     else:
-                        syn_keys = [f"{loc}_{receptor}"]
+                        syn_keys = [f"{loc}_{receptor}_{0.5}"]
 
                     for syn_key in syn_keys:
                         nc = target_cell.parconnect_from_src(

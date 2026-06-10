@@ -616,7 +616,8 @@ class Cell:
                 for dummy in self._nrn_sections[sec_name]:
                     syn_key = f"{sec_name}_{receptor}_{dummy.x}"
                     self._nrn_synapses[syn_key] = self.syn_create(dummy, **synapses[receptor])
-                    print(syn_key)
+                    #in earlier commit used print(syn_key) but it will print for each neuron 
+
     def _create_sections(self, sections, cell_tree):
         """Create soma and set geometry.
 
