@@ -54,9 +54,17 @@ def rerun_and_save_duecker_model(suffix=""):
         synaptic_delays=synaptic_delays_prox,
     )
 
-    weights_ampa_d1 = {"L2_inhibitory": 0.005, "L2_pyramidal": 0.01, "L5_pyramidal": 1.0}
+    weights_ampa_d1 = {
+        "L2_inhibitory": 0.005,
+        "L2_pyramidal": 0.01,
+        "L5_pyramidal": 1.0,
+    }
     weights_nmda_d1 = {"L2_inhibitory": 0.0, "L2_pyramidal": 0.01, "L5_pyramidal": 1.0}
-    synaptic_delays_dist = {"L2_inhibitory": 0.1, "L2_pyramidal": 0.1, "L5_pyramidal": 0.1}
+    synaptic_delays_dist = {
+        "L2_inhibitory": 0.1,
+        "L2_pyramidal": 0.1,
+        "L5_pyramidal": 0.1,
+    }
 
     net.add_evoked_drive(
         "dist1",

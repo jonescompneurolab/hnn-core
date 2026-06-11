@@ -720,7 +720,7 @@ def plot_spikes_raster(
     _validate_type(colors, (list, dict, None), "color", "list of str, or dict")
 
     # Set colors
-    if hasattr(cell_types_metadata, "color"):
+    if "color" in cell_types_metadata[cell_types[0]]:
         cell_colors = {
             cell: meta["color"] for cell, meta in cell_types_metadata.items()
         }
