@@ -252,14 +252,14 @@ def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
     }
     p_mech = _get_mechanisms(p_all, "L2Pyr", ["soma"] + section_names, mechanisms)
 
-    syn_sections=["apical_tuft", "apical_oblique", "basal_2", "basal_3"]
+    syn_sections = ["apical_tuft", "apical_oblique", "basal_2", "basal_3"]
     for sec_name, section in sections.items():
         section._end_pts = end_pts[sec_name]
         section.mechs = p_mech[sec_name]
-        section.syns=[]
+        section.syns = []
 
     for section_name in syn_sections:
-            sections[section_name].syns = ["ampa", "nmda", "gabaa", "gabab"]    
+        sections[section_name].syns = ["ampa", "nmda", "gabaa", "gabab"]
     sections["soma"].syns = ["gabaa", "gabab"]
 
     # Node description - (section_name, end_point)
