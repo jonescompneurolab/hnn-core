@@ -965,15 +965,15 @@ def pyramidal_humanL5ET(cell_name, pos=(0, 0, 0), gid=None):
 
     # initialize section voltage
     v_init = {
-        "soma": -70.62820902070445,
-        "basal_1": -70.68833400623593,
-        "basal_2": -70.77775514983897,
-        "basal_3": -70.77775514983897,
-        "apical_oblique": -70.59471467725159,
-        "apical_trunk": -70.5815879670308,
-        "apical_1": -69.62883464685193,
-        "apical_2": -65.7496819357426,
-        "apical_tuft": -61.28751781712565,
+        "apical_trunk": -71.48542553955896,
+        "apical_1": -70.35769605104365,
+        "apical_2": -66.14104362238712,
+        "apical_tuft": -61.46835610558303,
+        "basal_1": -71.63011753935261,
+        "basal_2": -71.75799397942146,
+        "basal_3": -71.75799397942146,
+        "apical_oblique": -71.5152211455345,
+        "soma": -71.54410459169463
     }
 
     sections_apcl = _get_dends(
@@ -1183,14 +1183,14 @@ def pyramidal_humanL23(cell_name, pos=(0, 0, 0), gid=None):
     section_names = list(end_pts.keys())
 
     v_init = {
-        "soma": np.float64(-73.39101055059983),
-        "basal_1": np.float64(-73.39624055343998),
-        "basal_2": np.float64(-73.41158189918325),
-        "basal_3": np.float64(-73.41158189918325),
-        "apical_oblique": np.float64(-73.35837204391859),
-        "apical_trunk": np.float64(-73.366747618743),
-        "apical_1": np.float64(-73.19824979269559),
-        "apical_tuft": np.float64(-72.97653780031459),
+        "soma": -73.50428354728868,
+        "apical_trunk": -73.47811474309718,
+        "apical_oblique": -73.47599336437771,
+        "apical_1": -73.28714884477021,
+        "apical_tuft": -73.03187226024221,
+        "basal_1": -73.5125600678837,
+        "basal_2": -73.53699860930598,
+        "basal_3": -73.53699860930598
     }
 
     sections = _get_dends(p_all, "L2Pyr", section_names, v_init=v_init)

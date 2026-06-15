@@ -525,10 +525,12 @@ def _rmse_corr(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
 
     rmse = np.sqrt((weights * (dpl1 - dpl2) ** 2).sum() / weights.sum())
     sig_corr = pearsonr(dpl1, dpl2)[0]
+    if not np.isfinite(sig_corr):
+        sig_corr = 1e-10 
     sig_corr = np.clip(sig_corr, 1e-10, 1.0)  # avoid negative correlations
-
-    return rmse * (1 - np.log(sig_corr))
-
+    err = rmse * (1 - np.log(sig_corr))
+    return err if np.isfinite(err) else 1e6
+np
 
 class Dipole(object):
     """Dipole class.

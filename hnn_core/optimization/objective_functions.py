@@ -467,7 +467,7 @@ def _anticorr_evoked(
             best["obj"] = obj
             best["params"] = predicted_params.copy()
 
-    print(f"Mean Loss: {np.mean(obj):.2f}; Min Loss: {np.min(obj):.2f}")
+    print(f"Mean Loss: {np.mean(obj):.2f}; Min Loss: {np.min(obj):.2f}", flush=True)       
     # Update the store of objective function values via a "side-effect" in-place in the
     # parent scope
     obj_values.append(obj)
@@ -531,7 +531,7 @@ def _rmse_corr_evoked(
         for batch_res in res["simulated_data"]:
             for data in batch_res:
                 # import pdb; pdb.set_trace()
-                _preprocess_dipole(dpls, obj_fun_kwargs)
+                _preprocess_dipole(data["dpl"], obj_fun_kwargs)
                 # average dipoles
                 dpls.append(average_dipoles(data["dpl"]))
 
@@ -544,7 +544,6 @@ def _rmse_corr_evoked(
             )
             for dpl in dpls
         ]
-        obj_values.append(obj)
     else:
         # The non-"batch" case occurs if the solver is set to "cobyla" or "bayesian"
         params = update_params(initial_params, predicted_params)
@@ -564,7 +563,7 @@ def _rmse_corr_evoked(
         # smooth & scale all dipoles
         _preprocess_dipole(dpls, obj_fun_kwargs)
         dpl = average_dipoles(dpls)
-        obj = _anticorr(dpl, obj_fun_kwargs["target"], tstop=tstop)
+        obj = _rmse_corr(dpl, obj_fun_kwargs["target"], tstop=tstop)
 
         # Update best params; this is a "side-effect" that changes the `best` dictionary
         # in-place in the parent scope
@@ -572,7 +571,7 @@ def _rmse_corr_evoked(
             best["obj"] = obj
             best["params"] = predicted_params.copy()
 
-    print(f"Mean Loss: {np.mean(obj):.2f}; Min Loss: {np.min(obj):.2f}")
+    print(f"Mean Loss: {np.mean(obj):.2f}; Min Loss: {np.min(obj):.2f}", flush=True)
     # Update the store of objective function values via a "side-effect" in-place in the
     # parent scope
     obj_values.append(obj)
