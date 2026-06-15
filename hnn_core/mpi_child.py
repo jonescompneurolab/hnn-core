@@ -213,7 +213,6 @@ if __name__ == "__main__":
 
     try:
         with MPISimulation(verbose_subprocess=verbose_subprocess) as mpi_sim:
-            # XXX: _read_net -> _read_obj, fix later
             net, tstop, dt, n_trials = mpi_sim._read_net()
             sim_data = mpi_sim.run(net, tstop, dt, n_trials)
             mpi_sim._write_data_stderr(sim_data)

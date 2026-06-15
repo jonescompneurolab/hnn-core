@@ -191,14 +191,20 @@ def test_data_len_mismatch():
 
 
 def test_file_not_found():
-    """_process_child_data raises RuntimeError and warns when file is missing"""
+    """_process_child_data raises RuntimeError and warns when file is missing
+    If mpi_child returns a non existen path raise a RuntimeError
+    MPI result file missing
+    """
     with pytest.warns(UserWarning, match="Result file not found"):
         with pytest.raises(RuntimeError, match="MPI result file missing"):
             _process_child_data("/nonexistent/path/hnn_mpi_data.pkl", 42)
 
 
 def test_permission_error():
-    """_process_child_data raises RuntimeError and warns on PermissionError"""
+    """_process_child_data raises RuntimeError and warns on PermissionError
+    If the simulation result file cannot be read raise a RuntimeError
+    MPI result file unreadable"
+    """
     fd, tmp_path = tempfile.mkstemp(prefix="hnn_mpi_test_", suffix=".pkl")
     os.close(fd)
     try:
