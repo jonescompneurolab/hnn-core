@@ -965,15 +965,15 @@ def pyramidal_humanL5ET(cell_name, pos=(0, 0, 0), gid=None):
 
     # initialize section voltage
     v_init = {
-        "apical_trunk": -71.48542553955896,
-        "apical_1": -70.35769605104365,
-        "apical_2": -66.14104362238712,
-        "apical_tuft": -61.46835610558303,
-        "basal_1": -71.63011753935261,
-        "basal_2": -71.75799397942146,
-        "basal_3": -71.75799397942146,
-        "apical_oblique": -71.5152211455345,
-        "soma": -71.54410459169463
+        "apical_trunk": -71.48534399721858,
+        "apical_1": -70.35766714762656,
+        "apical_2": -66.1410056008678,
+        "apical_tuft": -61.46830840811679,
+        "basal_1": -71.63003121190522,
+        "basal_2": -71.75791098784391,
+        "basal_3": -71.75791098784391,
+        "apical_oblique": -71.51514840992614,
+        "soma": -71.54401603093514
     }
 
     sections_apcl = _get_dends(
@@ -1183,14 +1183,14 @@ def pyramidal_humanL23(cell_name, pos=(0, 0, 0), gid=None):
     section_names = list(end_pts.keys())
 
     v_init = {
-        "soma": -73.50428354728868,
-        "apical_trunk": -73.47811474309718,
-        "apical_oblique": -73.47599336437771,
-        "apical_1": -73.28714884477021,
-        "apical_tuft": -73.03187226024221,
-        "basal_1": -73.5125600678837,
-        "basal_2": -73.53699860930598,
-        "basal_3": -73.53699860930598
+        "soma": -73.50426114124605,
+        "apical_trunk": -73.47809226638849,
+        "apical_oblique": -73.47597057498221,
+        "apical_1": -73.28712400156321,
+        "apical_tuft": -73.0318451642059,
+        "basal_1": -73.51253755658675,
+        "basal_2": -73.53697581734804,
+        "basal_3": -73.53697581734804
     }
 
     sections = _get_dends(p_all, "L2Pyr", section_names, v_init=v_init)
