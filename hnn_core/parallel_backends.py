@@ -209,8 +209,8 @@ def run_subprocess(
                     count_since_last_output = 0
                 else:
                     count_since_last_output += 1
-                # look for data in stderr and print child stdout
-                data_len, proc_data_path_file = _get_data_from_child_err(err_q)
+                # look for data length and file location in stderr and print child stdout
+                data_len, proc_data_path_file = _get_data_info_from_child_err(err_q)
                 if data_len > 0:
                     data_received = True
                     _write_child_exit_signal(proc.stdin)
@@ -380,7 +380,7 @@ def _echo_child_output(out_q):
     return ""
 
 
-def _get_data_from_child_err(err_q):
+def _get_data_info_from_child_err(err_q):
     err = ""
     data_length = 0
     data_file = None

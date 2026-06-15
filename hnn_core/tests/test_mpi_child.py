@@ -12,7 +12,7 @@ from hnn_core.parallel_backends import (
     _gather_trial_data,
     _process_child_data,
     _echo_child_output,
-    _get_data_from_child_err,
+    _get_data_info_from_child_err,
     _extract_data,
     _extract_data_length,
 )
@@ -32,7 +32,7 @@ def test_get_data_from_child_err():
     err_q.put(test_string)
 
     with io.StringIO() as buf_out, redirect_stdout(buf_out):
-        _get_data_from_child_err(err_q)
+        _get_data_info_from_child_err(err_q)
         output = buf_out.getvalue()
     assert output == test_string
 
@@ -152,7 +152,7 @@ def test_child_run():
         err_q.put(stderr_str)
 
         # use _read_stderr to get data_len (but not the data this time)
-        data_len, data_path = _get_data_from_child_err(err_q)
+        data_len, data_path = _get_data_info_from_child_err(err_q)
         sim_data = _process_child_data(data_path, data_len)
         n_trials = 1
         postproc = False
