@@ -84,7 +84,9 @@
                 "electro_type": "inhibitory",
                 "layer": "2",
                 "measure_dipole": false,
-                "reference": "https://doi.org/10.7554/eLife.51214"
+                "reference": "https://doi.org/10.7554/eLife.51214",
+                "color": "m",
+                "marker": "x"
             }
         },
         "L2_pyramidal": {
@@ -480,7 +482,9 @@
                 "electro_type": "excitatory",
                 "layer": "2",
                 "measure_dipole": true,
-                "reference": "https://doi.org/10.7554/eLife.51214"
+                "reference": "https://doi.org/10.7554/eLife.51214",
+                "color": "c",
+                "marker": "^"
             }
         },
         "L5_basket": {
@@ -560,7 +564,9 @@
                 "electro_type": "inhibitory",
                 "layer": "5",
                 "measure_dipole": false,
-                "reference": "https://doi.org/10.7554/eLife.51214"
+                "reference": "https://doi.org/10.7554/eLife.51214",
+                "color": "r",
+                "marker": "x"
             }
         },
         "L5_pyramidal": {
@@ -1282,7 +1288,9 @@
                 "electro_type": "excitatory",
                 "layer": "5",
                 "measure_dipole": true,
-                "reference": "https://doi.org/10.7554/eLife.51214"
+                "reference": "https://doi.org/10.7554/eLife.51214",
+                "color": "b",
+                "marker": "^"
             }
         }
     },

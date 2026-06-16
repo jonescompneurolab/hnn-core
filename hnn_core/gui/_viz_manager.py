@@ -27,6 +27,7 @@ from ipywidgets import (
 
 from hnn_core.dipole import _anticorr, _rmse, average_dipoles
 from hnn_core.gui._logging import logger
+from hnn_core.network_models import default_drive_colors
 from hnn_core.viz import plot_dipole, plot_tfr_morlet
 
 #
@@ -298,18 +299,19 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
                 if "evdist" in name:
                     if "evdist" not in drive_locations.keys():
                         drive_locations["evdist"] = drive["location"]
-                        drive_colors["evdist"] = "g"
+                        drive_colors["evdist"] = default_drive_colors["distal"]
                 # remove all increments of default 'evprox' inputs
                 elif "evprox" in name:
                     if "evprox" not in drive_locations.keys():
                         drive_locations["evprox"] = drive["location"]
-                        drive_colors["evprox"] = "r"
+                        drive_colors["evprox"] = default_drive_colors["proximal"]
+
                 else:
                     drive_locations[name] = drive["location"]
                     if drive["location"] == "proximal":
-                        drive_colors[name] = "r"
+                        drive_colors[name] = default_drive_colors["proximal"]
                     elif drive["location"] == "distal":
-                        drive_colors[name] = "g"
+                        drive_colors[name] = default_drive_colors["distal"]
 
             # all drives to plot, excluding 'evdist' and 'evprox' increments
             all_drives = list(drive_locations.keys())
@@ -683,6 +685,13 @@ def _clear_axis(
     existing_plots,
     add_plot_button,
 ):
+    # remove attached colorbar if exists; must happen before ax.clear()
+    # since that removes some kind of global axes reference, which
+    # Colorbar.remove() relies on to restore the original axes position
+    if hasattr(fig, f"_cbar-ax-{id(ax)}"):
+        getattr(fig, f"_cbar-ax-{id(ax)}").remove()
+        delattr(fig, f"_cbar-ax-{id(ax)}")
+
     ax.clear()
 
     # Remove "plot_spikes_hist"'s inverted second axes object, if exists, and
@@ -691,11 +700,6 @@ def _clear_axis(
         for axis in fig.axes:
             if axis._label == "Inverted spike histogram":
                 axis.remove()
-
-    # remove attached colorbar if exists
-    if hasattr(fig, f"_cbar-ax-{id(ax)}"):
-        getattr(fig, f"_cbar-ax-{id(ax)}").ax.remove()
-        delattr(fig, f"_cbar-ax-{id(ax)}")
 
     ax.set_facecolor("w")
     ax.set_aspect("auto")
