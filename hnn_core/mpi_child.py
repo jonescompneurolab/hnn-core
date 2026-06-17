@@ -148,7 +148,7 @@ class MPISimulation(object):
         sys.stderr.write("@data_file:%s:%d@\n" % (tmp_path, pickled_size))
         sys.stderr.flush()  # flush to ensure signal is not buffered
 
-    def _write_data_stderr(self, sim_data):
+    def _send_data_to_parent_process(self, sim_data):
         """Pickle sim_data to a temp file and signal the parent via stderr.
 
         Rank 0 writes the file path and byte count as "@data_file:PATH:SIZE@\n";
@@ -160,14 +160,19 @@ class MPISimulation(object):
                 self.logger.info("Child process beginning to wait for exit signal")
             return
 
-        if self.logger:
-            self.logger.info(
-                "Rank 0 beginning to write data to temp file and signal parent process"
-            )
-        tmp_path, pickled_size = self._write_data_tempfile(sim_data)
-        self._signal_data_file_stderr(tmp_path, pickled_size)
-        if self.logger:
-            self.logger.info(f"Rank 0 finished writing data to temp file {tmp_path}")
+        else:
+            if self.logger:
+                self.logger.info(
+                    "Rank 0 beginning to write data to temp file and signal parent process"
+                )
+
+            tmp_path, pickled_size = self._write_data_tempfile(sim_data)
+            self._signal_data_file_stderr(tmp_path, pickled_size)
+
+            if self.logger:
+                self.logger.info(
+                    f"Rank 0 finished writing data to temp file {tmp_path}"
+                )
 
     def run(self, net, tstop, dt, n_trials):
         """Run MPI simulation(s) and write results to stderr"""
@@ -213,7 +218,7 @@ if __name__ == "__main__":
         with MPISimulation(verbose_subprocess=verbose_subprocess) as mpi_sim:
             net, tstop, dt, n_trials = mpi_sim._read_net()
             sim_data = mpi_sim.run(net, tstop, dt, n_trials)
-            mpi_sim._write_data_stderr(sim_data)
+            mpi_sim._send_data_to_parent_process(sim_data)
             mpi_sim._wait_for_exit_signal()
     except Exception:
         # This can be useful to indicate the problem to the

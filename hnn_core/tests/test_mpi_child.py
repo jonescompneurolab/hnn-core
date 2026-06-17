@@ -144,7 +144,7 @@ def test_child_run():
         assert "Trial 1: 0.03 ms..." in stdout
 
         with io.StringIO() as buf_err, redirect_stderr(buf_err):
-            mpi_sim._write_data_stderr(sim_data)
+            mpi_sim._send_data_to_parent_process(sim_data)
             stderr_str = buf_err.getvalue()
         assert "@data_file:" in stderr_str
 
@@ -196,9 +196,10 @@ def test_file_not_found():
     If mpi_child returns a non existen path raise a RuntimeError
     MPI result file missing
     """
-    with pytest.warns(UserWarning, match="Result file not found"):
-        with pytest.raises(RuntimeError, match="MPI result file missing"):
-            _process_child_data("/nonexistent/path/hnn_mpi_data.pkl", 42)
+    with pytest.warns(UserWarning, match="expected 42"):
+        with pytest.warns(UserWarning, match="Result file not found"):
+            with pytest.raises(RuntimeError, match="MPI result file missing"):
+                _process_child_data("/nonexistent/path/hnn_mpi_data.pkl", 42)
 
 
 def test_permission_error():
@@ -210,9 +211,12 @@ def test_permission_error():
     os.close(fd)
     try:
         with patch("builtins.open", side_effect=PermissionError("denied")):
-            with pytest.warns(UserWarning, match="Permission denied"):
-                with pytest.raises(RuntimeError, match="MPI result file unreadable"):
-                    _process_child_data(tmp_path, 42)
+            with pytest.warns(UserWarning, match="expected 42"):
+                with pytest.warns(UserWarning, match="Permission denied"):
+                    with pytest.raises(
+                        RuntimeError, match="MPI result file unreadable"
+                    ):
+                        _process_child_data(tmp_path, 42)
     finally:
         try:
             os.unlink(tmp_path)
