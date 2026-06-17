@@ -685,6 +685,13 @@ def _clear_axis(
     existing_plots,
     add_plot_button,
 ):
+    # remove attached colorbar if exists; must happen before ax.clear()
+    # since that removes some kind of global axes reference, which
+    # Colorbar.remove() relies on to restore the original axes position
+    if hasattr(fig, f"_cbar-ax-{id(ax)}"):
+        getattr(fig, f"_cbar-ax-{id(ax)}").remove()
+        delattr(fig, f"_cbar-ax-{id(ax)}")
+
     ax.clear()
 
     # Remove "plot_spikes_hist"'s inverted second axes object, if exists, and
@@ -693,11 +700,6 @@ def _clear_axis(
         for axis in fig.axes:
             if axis._label == "Inverted spike histogram":
                 axis.remove()
-
-    # remove attached colorbar if exists
-    if hasattr(fig, f"_cbar-ax-{id(ax)}"):
-        getattr(fig, f"_cbar-ax-{id(ax)}").ax.remove()
-        delattr(fig, f"_cbar-ax-{id(ax)}")
 
     ax.set_facecolor("w")
     ax.set_aspect("auto")
