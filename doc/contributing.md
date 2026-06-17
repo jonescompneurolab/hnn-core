@@ -842,8 +842,7 @@ MPI parallelization with NEURON requires that the simulation be launched with th
 `MPIBackend` and `MPISimulation` is outlined below.
 
 1.  Send the network: In order to pass the network to simulate from `MPIBackend` (the
-    parent process), `MPISimulation`'s (the child processe
-    s) `stdin` is used. The
+    parent process), `MPISimulation`'s (the child processes) `stdin` is used. The
     ready-to-use {class}`~hnn_core.Network` object is base64 encoded and pickled before
     being written to the child processes' `stdin` by way of a Queue in a non-blocking
     way via `_write_net`. See a how a similar implementation is [used in MNE-Python][].
