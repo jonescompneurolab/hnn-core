@@ -194,6 +194,11 @@ def run_subprocess(
         while True:
             child_terminated = proc.poll() is not None
 
+            # While polling for if data has been received, add the startup message if
+            # this is the first time the loop is being run. Then, check for whether data
+            # has been received anew.
+            #
+            # This also includes our error detection.
             if not data_received:
                 child_out = _echo_child_output(out_q)
                 if child_out:
@@ -205,10 +210,11 @@ def run_subprocess(
                                 flush=True,
                             )
                         first_output_received = True
-                    ## end Camilo's code
+
                     count_since_last_output = 0
                 else:
                     count_since_last_output += 1
+
                 # look for data length and file location in stderr and print child stdout
                 data_len, proc_data_path_file = _get_data_info_from_child_err(err_q)
                 if data_len > 0:
@@ -221,6 +227,8 @@ def run_subprocess(
                     kill_proc_name("nrniv")
                     break
 
+            # This is expected to only run once: on the first while iteration, we will
+            # send the pickled Network, which is necessary to START the simulation.
             if not sent_network:
                 # Send network object to child so it can start
                 try:
@@ -240,6 +248,8 @@ def run_subprocess(
                     # assume it was successful and move on to waiting for
                     # data in the next loop iteration.
 
+            # This tracks how long the simulation has been running without output.
+            # Currently, any forced timeout errors are disabled.
             if not child_terminated and count_since_last_output > timeout_cycles:
                 if sent_network:
                     # nrniv child is computing silently ,dont timeout
@@ -263,6 +273,7 @@ def run_subprocess(
                     kill_proc_name("nrniv")
                     break
 
+            # This is the successful exit condition.
             if child_terminated and data_received:
                 # both exit conditions have been met (also we know that
                 # the network has been sent)

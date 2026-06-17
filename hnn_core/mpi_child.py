@@ -145,7 +145,6 @@ class MPISimulation(object):
 
         # Signal the parent process the file path @data_file:/path/to/file:SIZE@
         # solves pipe buffering problems
-        # TODO make sure that this string is under 64kb right?
         sys.stderr.write("@data_file:%s:%d@\n" % (tmp_path, pickled_size))
         sys.stderr.flush()  # flush to ensure signal is not buffered
 
@@ -188,7 +187,6 @@ class MPISimulation(object):
             sim_data.append(single_sim_data)
 
             if self.logger:
-                # AES: Is this always successful?
                 self.logger.info(
                     f"Successfully finished simulation of trial {trial_idx} on rank {self.rank}"
                 )
