@@ -524,9 +524,9 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">shlex</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">base64</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">subprocess</span><span class="w"> </span><span class="kn">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">PIPE</span><span class="p">,</span> <span class="n">TimeoutExpired</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">binascii</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">queue</span><span class="w"> </span><span class="kn">import</span> <span class="n">Queue</span><span class="p">,</span> <span class="n">Empty</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">threading</span><span class="w"> </span><span class="kn">import</span> <span class="n">Thread</span><span class="p">,</span> <span class="n">Event</span>
 
@@ -609,7 +609,9 @@
     <span class="k">return</span> <span class="n">my_env</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">run_subprocess</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">proc_queue</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_subprocess</span><span class="p">(</span>
+    <span class="n">command</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">proc_queue</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Run process and communicate with it.</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -620,6 +622,8 @@
 <span class="sd">        with MPI command.</span>
 <span class="sd">    timeout : float</span>
 <span class="sd">        The number of seconds to wait for a process without output.</span>
+<span class="sd">    verbose : bool, default False</span>
+<span class="sd">        If True, prints progress messages and status updates to stdout.</span>
 <span class="sd">    *args, **kwargs : arguments</span>
 <span class="sd">        Additional arguments to pass to subprocess.Popen.</span>
 <span class="sd">    Returns</span>
@@ -627,13 +631,20 @@
 <span class="sd">    child_data : object</span>
 <span class="sd">        The data returned by the child process.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">proc_data_bytes</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span>
+
     <span class="c1"># each loop while waiting will involve two Queue.get() timeouts, each</span>
     <span class="c1"># 0.01s. This calculation will error on the side of a longer timeout</span>
     <span class="c1"># than is specified because more is done each loop that just Queue.get()</span>
     <span class="n">timeout_cycles</span> <span class="o">=</span> <span class="n">timeout</span> <span class="o">/</span> <span class="mf">0.02</span>
 
-    <span class="n">pickled_obj</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+    <span class="c1">## Maybe leaving this print for debugging purposes</span>
+    <span class="n">raw_pickle</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="n">pickled_obj</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">raw_pickle</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Network size&#39;: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">raw_pickle</span><span class="p">)</span><span class="si">}</span><span class="s2"> bytes (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">raw_pickle</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">1024</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> KB)&quot;</span><span class="p">,</span>
+            <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="c1"># non-blocking adapted from https://stackoverflow.com/questions/375427/non-blocking-read-on-a-subprocess-pipe-in-python#4896288  # noqa: E501</span>
     <span class="n">out_q</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
@@ -642,6 +653,8 @@
     <span class="n">threads_started</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="k">try</span><span class="p">:</span>
+        <span class="c1">## Timing subproces</span>
+        <span class="n">t_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="n">proc</span> <span class="o">=</span> <span class="n">Popen</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">stdin</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="c1"># now that the process has started, add it to the queue</span>
@@ -660,18 +673,65 @@
         <span class="n">data_received</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">sent_network</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">count_since_last_output</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1">## Keep track of the process is still running</span>
+        <span class="n">stay_alive_interval</span> <span class="o">=</span> <span class="mf">60.0</span>
+        <span class="n">last_alive_t</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 
-        <span class="c1"># loop while the process is running the simulation</span>
+        <span class="c1">## Wait for NEURON starts and sends first response</span>
+        <span class="n">first_output_received</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">t_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="c1">## loop while the process is running the simulation</span>
+        <span class="c1"># This loop coordinates the parent-child communication protocol:</span>
+        <span class="c1">#</span>
+        <span class="c1"># 1. Send the network: on the first iteration, serializes and writes the</span>
+        <span class="c1">#    network object to the child&#39;s stdin via _write_net(). The child&#39;s</span>
+        <span class="c1">#    rank 0 reads it, deserializes it, and broadcasts it to all MPI ranks.</span>
+        <span class="c1">#</span>
+        <span class="c1"># 2. Wait for results: after sending, polls the child&#39;s stdout</span>
+        <span class="c1">#    (_echo_child_output) for NEURON progress output and stderr</span>
+        <span class="c1">#    (_get_data_from_child_err) for the &quot;@data_file:PATH:SIZE@&quot; signal.</span>
+        <span class="c1">#    The child writes simulation results to a temp file and sends only</span>
+        <span class="c1">#    the file path + byte count over stderr to avoid pipe buffer deadlocks</span>
+        <span class="c1">#    with large payloads.</span>
+        <span class="c1">#</span>
+        <span class="c1"># 3. Acknowledge and exit: once the file signal is received, sends</span>
+        <span class="c1">#    &quot;@data_received@&quot; to the child&#39;s stdin so the child can exit cleanly,</span>
+        <span class="c1">#    then waits for the subprocess to terminate.</span>
+        <span class="c1">#</span>
+        <span class="c1"># TODO: This polling loop needs more love. It needs to be addressed in a future PR.</span>
+        <span class="c1">#   A cleaner design would use an event-driven approach (e.g. asyncio or a</span>
+        <span class="c1">#   proper event queue) with more robust timeout handling. The current</span>
+        <span class="c1">#   implementation is intentionally left as a skeleton so the next</span>
+        <span class="c1">#   implementation can use it as a reference for the communication protocol</span>
+        <span class="c1">#   and exit conditions.</span>
+
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">child_terminated</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
+            <span class="c1"># While polling for if data has been received, add the startup message if</span>
+            <span class="c1"># this is the first time the loop is being run. Then, check for whether data</span>
+            <span class="c1"># has been received anew.</span>
+            <span class="c1">#</span>
+            <span class="c1"># This also includes our error detection.</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">data_received</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">_echo_child_output</span><span class="p">(</span><span class="n">out_q</span><span class="p">):</span>
+                <span class="n">child_out</span> <span class="o">=</span> <span class="n">_echo_child_output</span><span class="p">(</span><span class="n">out_q</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">child_out</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">first_output_received</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;nrniv startup time: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">t_start</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s | &quot;</span>
+                                <span class="sa">f</span><span class="s2">&quot;first output: </span><span class="si">{</span><span class="nb">repr</span><span class="p">(</span><span class="n">child_out</span><span class="p">[:</span><span class="mi">200</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                            <span class="p">)</span>
+                        <span class="n">first_output_received</span> <span class="o">=</span> <span class="kc">True</span>
+
                     <span class="n">count_since_last_output</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">count_since_last_output</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="c1"># look for data in stderr and print child stdout</span>
-                <span class="n">data_len</span><span class="p">,</span> <span class="n">proc_data_bytes</span> <span class="o">=</span> <span class="n">_get_data_from_child_err</span><span class="p">(</span><span class="n">err_q</span><span class="p">)</span>
+
+                <span class="c1"># look for data length and file location in stderr and print child stdout</span>
+                <span class="n">data_len</span><span class="p">,</span> <span class="n">proc_data_path_file</span> <span class="o">=</span> <span class="n">_get_data_info_from_child_err</span><span class="p">(</span><span class="n">err_q</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">data_len</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">data_received</span> <span class="o">=</span> <span class="kc">True</span>
                     <span class="n">_write_child_exit_signal</span><span class="p">(</span><span class="n">proc</span><span class="o">.</span><span class="n">stdin</span><span class="p">)</span>
@@ -682,6 +742,8 @@
                     <span class="n">kill_proc_name</span><span class="p">(</span><span class="s2">&quot;nrniv&quot;</span><span class="p">)</span>
                     <span class="k">break</span>
 
+            <span class="c1"># This is expected to only run once: on the first while iteration, we will</span>
+            <span class="c1"># send the pickled Network, which is necessary to START the simulation.</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">sent_network</span><span class="p">:</span>
                 <span class="c1"># Send network object to child so it can start</span>
                 <span class="k">try</span><span class="p">:</span>
@@ -701,18 +763,39 @@
                     <span class="c1"># assume it was successful and move on to waiting for</span>
                     <span class="c1"># data in the next loop iteration.</span>
 
+            <span class="c1"># This tracks how long the simulation has been running without output.</span>
+            <span class="c1"># Currently, any forced timeout errors are disabled.</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">child_terminated</span> <span class="ow">and</span> <span class="n">count_since_last_output</span> <span class="o">&gt;</span> <span class="n">timeout_cycles</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">sent_network</span><span class="p">:</span>
+                    <span class="c1"># nrniv child is computing silently ,dont timeout</span>
+                    <span class="c1"># Print feedback to user the process is still running</span>
+                    <span class="n">t_now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">t_now</span> <span class="o">-</span> <span class="n">last_alive_t</span> <span class="o">&gt;=</span> <span class="n">stay_alive_interval</span><span class="p">:</span>
+                        <span class="n">elapsed_time</span> <span class="o">=</span> <span class="n">t_now</span> <span class="o">-</span> <span class="n">t_start</span>
+                        <span class="nb">print</span><span class="p">(</span>
+                            <span class="s2">&quot;MPI simulation is still running. This may take several minutes.&quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">elapsed_time</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">s elapsed)&quot;</span>
+                            <span class="s2">&quot;You may cancel if there is no response for a long time.&quot;</span><span class="p">,</span>
+                            <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="p">)</span>
+                        <span class="n">last_alive_t</span> <span class="o">=</span> <span class="n">t_now</span>
+                    <span class="n">count_since_last_output</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">warn</span><span class="p">(</span>
+                        <span class="s2">&quot;Timeout exceeded while waiting for child process output&quot;</span>
+                        <span class="s2">&quot;. Terminating...&quot;</span>
+                    <span class="p">)</span>
+                    <span class="n">kill_proc_name</span><span class="p">(</span><span class="s2">&quot;nrniv&quot;</span><span class="p">)</span>
+                    <span class="k">break</span>
+
+            <span class="c1"># This is the successful exit condition.</span>
             <span class="k">if</span> <span class="n">child_terminated</span> <span class="ow">and</span> <span class="n">data_received</span><span class="p">:</span>
                 <span class="c1"># both exit conditions have been met (also we know that</span>
                 <span class="c1"># the network has been sent)</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;process terminated after </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">t_start</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
                 <span class="k">break</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">child_terminated</span> <span class="ow">and</span> <span class="n">count_since_last_output</span> <span class="o">&gt;</span> <span class="n">timeout_cycles</span><span class="p">:</span>
-                <span class="n">warn</span><span class="p">(</span>
-                    <span class="s2">&quot;Timeout exceeded while waiting for child process output&quot;</span>
-                    <span class="s2">&quot;. Terminating...&quot;</span>
-                <span class="p">)</span>
-                <span class="n">kill_proc_name</span><span class="p">(</span><span class="s2">&quot;nrniv&quot;</span><span class="p">)</span>
-                <span class="k">break</span>
     <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
         <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Received KeyboardInterrupt. Stopping simulation process...&quot;</span><span class="p">)</span>
 
@@ -749,7 +832,7 @@
         <span class="c1"># simulation failed with a numeric return code</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;MPI simulation failed. Return code: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">proc</span><span class="o">.</span><span class="n">returncode</span><span class="p">)</span>
 
-    <span class="n">child_data</span> <span class="o">=</span> <span class="n">_process_child_data</span><span class="p">(</span><span class="n">proc_data_bytes</span><span class="p">,</span> <span class="n">data_len</span><span class="p">)</span>
+    <span class="n">child_data</span> <span class="o">=</span> <span class="n">_process_child_data</span><span class="p">(</span><span class="n">proc_data_path_file</span><span class="p">,</span> <span class="n">data_len</span><span class="p">)</span>
 
     <span class="c1"># clean up the queue</span>
     <span class="k">try</span><span class="p">:</span>
@@ -760,45 +843,52 @@
     <span class="k">return</span> <span class="n">proc</span><span class="p">,</span> <span class="n">child_data</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_process_child_data</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">,</span> <span class="n">data_len</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_process_child_data</span><span class="p">(</span><span class="n">path_data_file</span><span class="p">,</span> <span class="n">data_len</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Process the data returned by child process.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    data_bytes : str</span>
-<span class="sd">        The data bytes</span>
+<span class="sd">    path_data_file</span>
+<span class="sd">        Path to the temporary file written by the child.</span>
+<span class="sd">    data_len</span>
+<span class="sd">        Expected byte count for integrity check.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    data_unpickled : object</span>
 <span class="sd">        The unpickled data.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">data_len</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">path_data_file</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">data_len</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="c1"># This is indicative of a failure. For debugging purposes.</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;MPI simulation didn&#39;t produce a result file. &quot;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path_data_file</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">data_bytes</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Result file not found in path </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">path_data_file</span><span class="p">)</span>
+        <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;data length expected </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">data_len</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;MPI result file missing: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">path_data_file</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">PermissionError</span><span class="p">:</span>
+        <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Permission denied reading result file: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">path_data_file</span><span class="p">)</span>
+        <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;data length expected </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">data_len</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;MPI result file unreadable: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">path_data_file</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">path_data_file</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">)</span> <span class="o">!=</span> <span class="n">data_len</span><span class="p">:</span>
         <span class="n">warn</span><span class="p">(</span>
             <span class="s2">&quot;Length of received data unexpected. Expecting </span><span class="si">%d</span><span class="s2"> bytes, &quot;</span>
             <span class="s2">&quot;got </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">data_len</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">))</span>
         <span class="p">)</span>
-
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;MPI simulation didn&#39;t return any data&quot;</span><span class="p">)</span>
-
-    <span class="c1"># decode base64 byte string</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">data_pickled</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">except</span> <span class="n">binascii</span><span class="o">.</span><span class="n">Error</span><span class="p">:</span>
-        <span class="c1"># This is here for future debugging purposes. Unit tests can&#39;t</span>
-        <span class="c1"># reproduce an incorrectly padded string, but this has been an</span>
-        <span class="c1"># issue before</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Incorrect padding for data length </span><span class="si">%d</span><span class="s2"> bytes&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_len</span><span class="p">)</span>
-            <span class="o">+</span> <span class="s2">&quot; (mod 4 = </span><span class="si">%d</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_len</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span><span class="p">)</span>
-        <span class="p">)</span>
-
-    <span class="c1"># unpickle the data</span>
-    <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data_pickled</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">)</span>
 
 
+<span class="c1"># This is the input side.</span>
+<span class="c1"># sending the network configuration to NEURON</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">_echo_child_output</span><span class="p">(</span><span class="n">out_q</span><span class="p">):</span>
     <span class="n">out</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
@@ -807,16 +897,19 @@
         <span class="k">except</span> <span class="n">Empty</span><span class="p">:</span>
             <span class="k">break</span>
 
+    <span class="c1"># Return the output instead of just a boolean value so callers can</span>
+    <span class="c1"># tell if anything was received and check the actual content</span>
+    <span class="c1"># (logging the first line of nrniv output).</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-        <span class="k">return</span> <span class="kc">True</span>
-    <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">out</span>
+    <span class="k">return</span> <span class="s2">&quot;&quot;</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_get_data_from_child_err</span><span class="p">(</span><span class="n">err_q</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_data_info_from_child_err</span><span class="p">(</span><span class="n">err_q</span><span class="p">):</span>
     <span class="n">err</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="n">data_length</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">data_bytes</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span>
+    <span class="n">data_file</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
@@ -824,22 +917,20 @@
         <span class="k">except</span> <span class="n">Empty</span><span class="p">:</span>
             <span class="k">break</span>
 
-    <span class="c1"># check for data signal</span>
-    <span class="n">extracted_data</span> <span class="o">=</span> <span class="n">_extract_data</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">extracted_data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="c1"># _extract_data only returns data when signals on</span>
-        <span class="c1"># both sides were seen</span>
-
-        <span class="n">err</span> <span class="o">=</span> <span class="n">err</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;@start_of_data@&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-        <span class="n">err</span> <span class="o">=</span> <span class="n">err</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">extracted_data</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-        <span class="n">data_length</span> <span class="o">=</span> <span class="n">_extract_data_length</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">)</span>
-        <span class="n">err</span> <span class="o">=</span> <span class="n">err</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;@end_of_data:</span><span class="si">%d</span><span class="s2">@</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">data_length</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-        <span class="n">data_bytes</span> <span class="o">=</span> <span class="n">extracted_data</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+    <span class="c1"># check for file signal @data_file</span>
+    <span class="c1"># This regex is trying to find the string</span>
+    <span class="c1"># @data_file:(path_to_file):(size_of_data)</span>
+    <span class="c1"># where path is a path to a file system and size_of_data is a number</span>
+    <span class="n">file_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;@data_file:(.+):(\d+)@&quot;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">file_match</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">data_file</span> <span class="o">=</span> <span class="n">file_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">data_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">file_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="n">err</span><span class="p">[:</span> <span class="n">file_match</span><span class="o">.</span><span class="n">start</span><span class="p">()]</span> <span class="o">+</span> <span class="n">err</span><span class="p">[</span><span class="n">file_match</span><span class="o">.</span><span class="n">end</span><span class="p">()</span> <span class="p">:]</span>
 
     <span class="c1"># print the rest of the child&#39;s stderr to our stdout</span>
     <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">data_length</span><span class="p">,</span> <span class="n">data_bytes</span>
+    <span class="k">return</span> <span class="n">data_length</span><span class="p">,</span> <span class="n">data_file</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_has_mpi4py</span><span class="p">():</span>
@@ -1368,6 +1459,8 @@
 <span class="sd">        A Queue object to hold process handles from Popen in a thread-safe way.</span>
 <span class="sd">        There will be a valid process handle present the queue when a MPI</span>
 <span class="sd">        simulation is running.</span>
+<span class="sd">    verbose : bool, default False</span>
+<span class="sd">        If True, prints progress messages and status updates to stdout.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -1378,10 +1471,12 @@
         <span class="n">sensible_default_cores</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">override_hwthreading_option</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">override_oversubscribe_option</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">expected_data_length</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">proc</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">proc_queue</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
 
         <span class="c1"># Check of psutil and mpi4py import has been moved into this function,</span>
         <span class="c1"># since this function is called by GUI before MPIBackend()</span>
@@ -1517,12 +1612,12 @@
         <span class="p">)</span>
 
         <span class="n">env</span> <span class="o">=</span> <span class="n">_get_mpi_env</span><span class="p">()</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">proc</span><span class="p">,</span> <span class="n">sim_data</span> <span class="o">=</span> <span class="n">run_subprocess</span><span class="p">(</span>
             <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span><span class="p">,</span>
             <span class="n">obj</span><span class="o">=</span><span class="p">[</span><span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">],</span>
-            <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
             <span class="n">proc_queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">proc_queue</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span>
             <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">,</span>
             <span class="n">cwd</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span>
             <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>

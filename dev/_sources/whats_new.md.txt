@@ -36,13 +36,23 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ### Bug Fixes
 
+- [Camilo Diaz][] did considerable work in fixing our long-standing MPI Timeout issues
+  and putting in place a permanent solution that uses tempfiles instead of standard
+  input/output/error streams. Thanks Camilo!
+
 ### Public API Changes
 
 ### People who contributed to this release:
 
 - [Shivansh Bhageria][]
+- [Camilo Diaz][]
 
 ### Changelog
+
+- Document and remove problematic MPI Timeouts (while keeping code intact), and
+  implement a new tempfile-based mechanism for transmitting MPI data from child
+  processes back to rank 0 child process then parent process,
+  by [Camilo Diaz][] in {gh}`1312` and {gh}`1315`.
 
 - Improve y-axis labels and ticks of LFP and CSD plotting,
   by [Shivansh Bhageria][] in {gh}`1191`. This was their first PR, thanks Shivansh!

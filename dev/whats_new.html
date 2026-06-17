@@ -540,6 +540,11 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 </section>
 <section id="bug-fixes">
 <h3>Bug Fixes<a class="headerlink" href="#bug-fixes" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/kmilo9999">Camilo Diaz</a> did considerable work in fixing our long-standing MPI Timeout issues
+and putting in place a permanent solution that uses tempfiles instead of standard
+input/output/error streams. Thanks Camilo!</p></li>
+</ul>
 </section>
 <section id="public-api-changes">
 <h3>Public API Changes<a class="headerlink" href="#public-api-changes" title="Link to this heading">#</a></h3>
@@ -548,11 +553,16 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 <h3>People who contributed to this release:<a class="headerlink" href="#people-who-contributed-to-this-release" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/Shivansh1205">Shivansh Bhageria</a></p></li>
+<li><p><a class="reference external" href="https://github.com/kmilo9999">Camilo Diaz</a></p></li>
 </ul>
 </section>
 <section id="changelog">
 <h3>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">#</a></h3>
 <ul class="simple">
+<li><p>Document and remove problematic MPI Timeouts (while keeping code intact), and
+implement a new tempfile-based mechanism for transmitting MPI data from child
+processes back to rank 0 child process then parent process,
+by <a class="reference external" href="https://github.com/kmilo9999">Camilo Diaz</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1312">#1312</a> and <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1315">#1315</a>.</p></li>
 <li><p>Improve y-axis labels and ticks of LFP and CSD plotting,
 by <a class="reference external" href="https://github.com/Shivansh1205">Shivansh Bhageria</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1191">#1191</a>. This was their first PR, thanks Shivansh!</p></li>
 </ul>
