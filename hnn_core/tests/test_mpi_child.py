@@ -15,6 +15,7 @@ from hnn_core.parallel_backends import (
     _get_data_info_from_child_err,
     _extract_data,
     _extract_data_length,
+    requires_mpi4py,
 )
 
 import pickle
@@ -217,3 +218,10 @@ def test_permission_error():
             os.unlink(tmp_path)
         except OSError:
             pass
+
+
+@requires_mpi4py
+@pytest.mark.uses_mpi
+def test_logging():
+    with MPISimulation(verbose_subprocess=True) as mpi_sim:
+        assert "mpi_child.rank" in mpi_sim.logger.name
