@@ -3,11 +3,12 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
-import pytest
-
 from hnn_core import neymotin_2020_model, simulate_dipole
+from hnn_core.dipole import _rmse
 from hnn_core.optimization import Optimizer
+
 import numpy as np
+import pytest
 
 
 @pytest.mark.parametrize("solver", ["bayesian", "cobyla", "cma"])
@@ -541,8 +542,6 @@ def test_custom_loss_fun(solver):
     constraints.update({"mu": (1, 6), "sigma": (1, 3)})
 
     def custom_loss(dpl, obj_fun_kwargs):
-        from hnn_core.dipole import _rmse
-
         return _rmse(dpl, obj_fun_kwargs["target"], tstop=tstop)
 
     optim = Optimizer(
