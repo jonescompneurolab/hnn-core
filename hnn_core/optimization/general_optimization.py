@@ -56,8 +56,9 @@ class Optimizer:
             The optimizer, 'bayesian', 'cobyla', or 'cma'.
         obj_fun : str | func
             The objective function to be minimized. Can be 'dipole_rmse',
-            'maximize_psd', "dipole_corr", "custom", or a user-defined function. The default is
-            'dipole_rmse'.
+            'maximize_psd', 'dipole_corr', 'custom', or a user-defined function. See the docstring for
+            ``Optimizer.fit`` to view the required and optional arguments for each of these cases. The
+            default is 'dipole_rmse'.
         max_iter : int, optional
             The max number of calls to the objective function. The default is
             200.
