@@ -228,6 +228,10 @@ def test_gui_upload_connectivity():
 def test_gui_smart_gains_upload_connectivity(setup_gui):
     """Test if gui 'smartly' handles upload of Network with non-default global gains."""
     gui = setup_gui
+    # The non-uniform-gain warning is emitted via ``print`` and only reaches the
+    # GUI log window because, in a notebook, the GUI globally redirects stdout to
+    # its logger (``_GUI_PrintToLogger``). pytest's stdout capture clobbers that
+    # redirect, so we reuse it here to ensure we catch everything.
     sys.stdout = _GUI_PrintToLogger()
 
     global_gain_test_value_1 = 1.2
