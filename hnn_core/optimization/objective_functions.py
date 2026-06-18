@@ -93,7 +93,8 @@ def _calculate_obj_fun(
         The simulated dipole's duration.
     obj_fun_kwargs : dict
         Assorted dictionary of arguments that are either used for simulation management
-        or are needed for your specific objective function.
+        or are needed for your specific objective function. See ``Optimizer.fit`` for
+        more details.
     """
     is_batch = _check_is_batch(predicted_params)
 
@@ -187,16 +188,20 @@ def _rmse_evoked(
     update_params : func
         Function to update params.
     obj_values : list
-         List of objective values for each epoch (aka iteration) during optimization.
-         Updated as a side effect of evaluating the objective function.
+        List of objective values for each epoch (aka iteration) during optimization.
+        Updated as a side effect of evaluating the objective function.
     tstop : float
         The simulated dipole's duration.
-    target : instance of Dipole
-        A dipole object with experimental data.
-    n_trials : int
-        Number of trials to simulate and average.
-    verbose : bool
-        If True, print build steps and simulation progress to console. Default: True.
+    obj_fun_kwargs : dict
+        Additional arguments along with their respective values to be passed
+        to the objective function (see ``Optimizer.fit`` for more details):
+
+        target : instance of Dipole (Required)
+            A dipole object with experimental data.
+        n_trials : int, optional
+            Number of trials to simulate and average.
+        verbose : bool, optional
+            If True, print build steps and simulation progress to console. Default: True.
 
     Returns
     -------
@@ -241,15 +246,22 @@ def _maximize_psd(
         Parameters selected by the optimizer.
     update_params : func
         Function to update params.
+    obj_values : list
+        List of objective values for each epoch (aka iteration) during optimization.
+        Updated as a side effect of evaluating the objective function.
     tstop : float
         The simulated dipole's duration.
-    f_bands : list of tuples
-        Lower and higher limit for each frequency band.
-    relative_bandpower : list of float | float
-        Weight for each frequency band in f_bands. If a single float is provided,
-        the same weight is applied to all frequency bands.
-    verbose : bool
-        If True, print build steps and simulation progress to console. Default: True.
+    obj_fun_kwargs : dict
+        Additional arguments along with their respective values to be passed
+        to the objective function (see ``Optimizer.fit`` for more details):
+
+        f_bands : list of tuples (Required)
+            Lower and higher limit for each frequency band.
+        relative_bandpower : list of float | float (Required)
+            Weight for each frequency band in f_bands. If a single float is provided,
+            the same weight is applied to all frequency bands.
+        verbose : bool, optional
+            If True, print build steps and simulation progress to console. Default: True.
 
     Returns
     -------
@@ -302,14 +314,21 @@ def _anticorr_evoked(
         Parameters selected by the optimizer.
     update_params : func
         Function to update params.
+    obj_values : list
+        List of objective values for each epoch (aka iteration) during optimization.
+        Updated as a side effect of evaluating the objective function.
     tstop : float
         The simulated dipole's duration.
-    target : instance of Dipole
-        A dipole object with experimental data.
-    n_trials : int
-        Number of trials to simulate and average.
-    verbose : bool
-        If True, print build steps and simulation progress to console. Default: True.
+    obj_fun_kwargs : dict
+        Additional arguments along with their respective values to be passed
+        to the objective function (see ``Optimizer.fit`` for more details):
+
+        target : instance of Dipole (Required)
+            A dipole object with experimental data.
+        n_trials : int, optional
+            Number of trials to simulate and average.
+        verbose : bool, optional
+            If True, print build steps and simulation progress to console. Default: True.
 
     Returns
     -------
@@ -354,6 +373,9 @@ def _custom_objective_function(
         Parameters selected by the optimizer.
     update_params : func
         Function to update params.
+    obj_values : list
+        List of objective values for each epoch (aka iteration) during optimization.
+        Updated as a side effect of evaluating the objective function.
     tstop : float
         The simulated dipole's duration.
     obj_fun_kwargs : dict

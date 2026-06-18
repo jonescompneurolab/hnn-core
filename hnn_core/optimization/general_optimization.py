@@ -56,9 +56,9 @@ class Optimizer:
             The optimizer, 'bayesian', 'cobyla', or 'cma'.
         obj_fun : str | func
             The objective function to be minimized. Can be 'dipole_rmse',
-            'maximize_psd', 'dipole_corr', 'custom', or a user-defined function. See the docstring for
-            ``Optimizer.fit`` to view the required and optional arguments for each of these cases. The
-            default is 'dipole_rmse'.
+            'maximize_psd', 'dipole_corr', 'custom', or a user-defined function. See the
+            docstring for ``Optimizer.fit`` to view the required and optional arguments
+            for each of these cases. The default is 'dipole_rmse'.
         max_iter : int, optional
             The max number of calls to the objective function. The default is
             200.
@@ -180,7 +180,9 @@ class Optimizer:
             the same weight is applied to all frequency bands.
         loss_fun : callable (Required if obj_fun='custom')
             Objective loss function to be provided by user. The function must accept a
-            single ``Dipole`` object as its first argument, and `obj_fun_kwargs` as its second argument, where `obj_fun_kwargs` is the same as the kwargs passed to this ``Optimizer.fit` function.
+            single ``Dipole`` object as its first argument, and `obj_fun_kwargs` as its
+            second argument, where `obj_fun_kwargs` is the same as the kwargs passed to
+            this ``Optimizer.fit` function.
         sigma0 : float| array-like (Only used if solver='cma')
             Initial standard deviation of CME-ES algorithm. If float, sigma0 is scaled
             by bounds defined in the constraints for each parameter. If array-like, The
