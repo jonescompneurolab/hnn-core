@@ -1106,8 +1106,8 @@ class _VizManager:
         # However, just in case, we will still support fallback backends like Tushar
         # added here:
         backend = matplotlib.get_backend().lower()
-        self.use_ipympl = any(
-            name in backend for name in ("ipympl", "nbagg", "widget", "agg")
+        self.use_dynamic_rendering = any(
+            name in backend for name in ("ipympl", "nbagg", "widget")
         )
 
         self.axes_config_output = Output()
@@ -1169,7 +1169,7 @@ class _VizManager:
     def data(self):
         """Provides easy access to visualization-related data."""
         return {
-            "use_ipympl": self.use_ipympl,
+            "use_ipympl": self.use_dynamic_rendering,
             "simulations": self.gui_data["simulation_data"],
             "fig_idx": self.fig_idx,
             "visualization_window": self.viz_layout["visualization_window"],
@@ -1356,7 +1356,7 @@ class _VizManager:
                 template_name,
                 fig=self.figs[fig_key],
                 idx=fig_key,
-                use_ipympl=self.use_ipympl,
+                use_ipympl=self.use_dynamic_rendering,
                 widgets=self.widgets,
             )
 
