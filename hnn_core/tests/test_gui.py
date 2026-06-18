@@ -4,14 +4,17 @@
 import codecs
 import io
 import json
+import logging
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-import pytest
-import traitlets
 import os
-
+import pytest
+import time
+import traitlets
 from pathlib import Path
+from urllib.request import urlretrieve
+
 from hnn_core import Dipole, Network, simulate_dipole
 from hnn_core.gui import HNNGUI
 from hnn_core.gui._viz_manager import (
@@ -22,7 +25,7 @@ from hnn_core.gui._viz_manager import (
 )
 from hnn_core.gui.gui import (
     _init_network_from_widgets,
-    _prepare_upload_file,
+    _simulate_prepare_upload_file,
     _update_nested_dict,
     serialize_simulation,
     serialize_config,
@@ -129,7 +132,7 @@ def test_gui_compose():
     plt.close("all")
 
 
-def test_prepare_upload_file():
+def test_simulate_prepare_upload_file():
     """Tests that input files from local or url sources import correctly"""
 
     def _import_json(content):
@@ -140,8 +143,8 @@ def test_prepare_upload_file():
     url = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/param/default.json"  # noqa
     file = Path(hnn_core_root, "param", "default.json")
 
-    content_from_url = _prepare_upload_file(url)[0]
-    content_from_local = _prepare_upload_file(file)[0]
+    content_from_url = _simulate_prepare_upload_file(url)[0]
+    content_from_local = _simulate_prepare_upload_file(file)[0]
 
     assert content_from_url["name"] == content_from_local["name"] == "default.json"
     assert content_from_url["type"] == content_from_local["type"] == "application/json"
@@ -303,6 +306,7 @@ def test_gui_upload_data():
     file1_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/S1_SupraT.txt"  # noqa
     file2_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/yes_trial_S1_ERP_all_avg.txt"  # noqa
     gui._simulate_upload_data(file1_url)
+
     assert len(gui.data["simulation_data"]) == 1
     assert "S1_SupraT" in gui.data["simulation_data"].keys()
     assert gui.data["simulation_data"]["S1_SupraT"]["net"] is None
@@ -964,8 +968,9 @@ def test_dipole_data_overlay(setup_gui):
     assert ax.legend_.texts[0]._text == "default: average"
     assert ax.legend_.texts[1]._text == "test_default"
 
-    # Check RMSE is printed
+    # Check RMSE and Corr are printed
     assert "RMSE(default, test_default):" in ax.texts[0]._text
+    assert "Corr(default, test_default):" in ax.texts[0]._text
 
     plt.close("all")
 
@@ -1180,11 +1185,14 @@ def test_gui_add_tonic_input():
         gui.global_gain_widgets,
     )
 
+    tonic_drive_name = last_drive["name"]
+    assert tonic_drive_name == "Tonic3"
+
     net = _single_simulation["net"]
-    assert net.external_biases["tonic"] is not None
-    assert net.external_biases["tonic"]["L5_pyramidal"]["t0"] == 0.0
-    assert net.external_biases["tonic"]["L5_pyramidal"]["tstop"] == 15.0
-    assert net.external_biases["tonic"]["L5_pyramidal"]["amplitude"] == 10.0
+    assert net.external_biases[tonic_drive_name] is not None
+    assert net.external_biases[tonic_drive_name]["L5_pyramidal"]["t0"] == 0.0
+    assert net.external_biases[tonic_drive_name]["L5_pyramidal"]["tstop"] == 15.0
+    assert net.external_biases[tonic_drive_name]["L5_pyramidal"]["amplitude"] == 10.0
 
 
 def test_gui_cell_params_widgets(setup_gui):
@@ -1716,3 +1724,412 @@ def test_diff_gui_vs_api_networks_simulations():
         dpls_gui[0].data["agg"],
         dpls_api[0].data["agg"],
     )
+
+
+# Some notes about this run config:
+# - `cma` does not need to be run against MPI Backend because `cma` does not actually
+# use EITHER Joblib or MPI Backend. Instead, it uses BatchSimulate's, which uses its
+# own. This also means it can be run independent of needing MPI.
+# - The `dt` parameter is heterogeneous because (see #960 and #663), MPI simulations
+# appear to fail for larger `dt` values, but only in certain (not completely known)
+# situations. The below values are the biggest `dt` values that AES has found that work.
+@requires_mpi4py
+@requires_psutil
+@pytest.mark.parametrize(
+    "backend_selection,opt_solver,dt",
+    [
+        ("Joblib", "bayesian", 0.5),
+        ("Joblib", "cobyla", 0.5),
+        ("Joblib", "cma", 0.5),
+        pytest.param("MPI", "bayesian", 0.025, marks=pytest.mark.uses_mpi),
+        pytest.param("MPI", "cobyla", 0.025, marks=pytest.mark.uses_mpi),
+    ],
+)
+def test_gui_run_optimization(backend_selection, opt_solver, dt, setup_gui):
+    """Comprehensively test optimization functionality in the GUI.
+
+    This is a pretty comprehensive test of optimization usage in the GUI (but of course
+    is not completely exhaustive). This includes many tests of existing optimization run
+    (and tab) functionality, including:
+
+    - Tests that optimization runs successfully in the cases of:
+        - all current drive and bias types included
+        - all solvers
+        - all backends
+        - the `dipole_rmse` (default), `dipole_corr`, and `maximize_psd` objective
+          functions, including with real target data for `dipole_*` functions
+        - n_trials > 1
+        - max optimization iterations > 1
+        - max "safe" cores (i.e. the max allowed in the GUI)
+
+    - Tests that the relevant GUI widgets are properly updated at setup and after
+      consecutive, heterogeneous optimization runs, including that:
+        - Enabled constraint checkboxes remain enabled across runs
+        - The final resulting simulation after the optimization run is added to the main
+          list of simulations, has a new appropriate name, and has existing Dipole data
+        - Selected constraint values after a run are within the initial provided
+          constraint bounds (this not a very good test of this because we are using very
+          few optimization iterations, but whatevs)
+        - All of the above works after a second optimization run, including in the case
+          that the objective function is different between runs
+
+    TODO: future refactor: add deterministic testing for Cobyla and, after testing
+    seeds, Bayesian and CMA
+    """
+    gui = setup_gui
+
+    # Setup initial params:
+    # so that we avoid windowing errors for short sims
+    gui.widget_default_smoothing.value = 1
+    gui.widget_tstop.value = 3.0
+    gui.widget_dt.value = dt
+    gui.widget_backend_selection.value = backend_selection
+
+    assert gui.widget_opt_obj_fun.value == "dipole_rmse"
+    gui.widget_opt_solver.value = opt_solver
+    gui.widget_ntrials.value = 2
+    gui.widget_opt_max_iter.value = 2
+    # Paradoxically, because the simulation is so short, using more cores actually makes
+    # the whole operation more slow. So we want the minimum number of cores that are
+    # needed for MPI, which is 2
+    gui.widget_n_jobs.value = 2
+    gui.opt_solver_widgets["popsize"].value = 2
+
+    # Load target data (and download if necessary)
+    file_path = Path("S1_SupraT.txt")
+    if not file_path.exists():
+        data_url = f"https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/{file_path}"  # noqa
+        urlretrieve(data_url, file_path)
+    gui._simulate_upload_data(file_path)
+
+    # Our first optimization run will use the  objective function of `dipole_corr`
+    # ----------------------------------------------------------------------------------
+    gui.widget_opt_obj_fun.value = "dipole_corr"
+    # Set our target data, this emulates selecting a named simulation in the dropdown
+    # menu
+    gui.opt_target_widgets["target_dipole_data"].value = file_path.stem
+
+    for _ in range(0, len(gui.drive_widgets) + 1):
+        gui.delete_drive_button.click()
+
+    drive_index_evoked = 0
+    drive_index_poisson = 2
+    drive_index_rhythmic = 4
+    drive_index_tonic = 6
+
+    assert len(gui.drive_widgets) == len(gui.opt_drive_widgets)
+
+    for val_drive_type in ("Evoked", "Poisson", "Rhythmic", "Tonic"):
+        for val_location in ("Distal", "Proximal"):
+            gui.widget_drive_type_selection.value = val_drive_type
+            gui.widget_location_selection.value = val_location
+            gui.add_drive_button.click()
+
+    # Enable at least one constraint from each type of drive and bias to ensure they are
+    # all included in the optimization
+    # ----------------------------------------------------------------------------------
+    # This checks an Evoked drive
+    gui.opt_drive_widgets[drive_index_evoked]["mu_opt_checkbox"].value = True
+    # This checks a Poisson drive
+    gui.opt_drive_widgets[drive_index_poisson]["rate_constant"][
+        "L5_pyramidal_opt_checkbox"
+    ].value = True
+    # This checks a Rhythmic drive
+    gui.opt_drive_widgets[drive_index_rhythmic]["burst_rate_opt_checkbox"].value = True
+    # This checks a Tonic bias
+    gui.opt_drive_widgets[drive_index_tonic]["amplitude"][
+        "L2_pyramidal_opt_checkbox"
+    ].value = True
+    # Give it a non-zero value so it actually affects the simulation
+    gui.opt_drive_widgets[drive_index_tonic]["amplitude"]["L2_pyramidal"].value = 0.2
+
+    # Record the initial values of these parameters
+    initial_mu = gui.opt_drive_widgets[drive_index_evoked]["mu"].value
+    initial_rate_const = gui.opt_drive_widgets[drive_index_poisson]["rate_constant"][
+        "L5_pyramidal"
+    ].value
+    initial_burst_rate = gui.opt_drive_widgets[drive_index_rhythmic]["burst_rate"].value
+    initial_amplitude = gui.opt_drive_widgets[drive_index_tonic]["amplitude"][
+        "L2_pyramidal"
+    ].value
+
+    # Perform the first run of optimization
+    gui.run_opt_button.click()
+
+    # Give the GUI time to regenerate
+    time.sleep(2)
+
+    # Check that our target data and constraint checkboxes have not been reset
+    assert gui.opt_target_widgets["target_dipole_data"].value == file_path.stem
+
+    # Check that optimized values are within their original constraint proportions
+    # [initial * opt_min%, initial * opt_max%]. Initial values come from
+    # jones_2009_model (evdist1 mu), gui.py defaults (Poisson rate_constant, Rhythmic
+    # burst_rate), and the explicit assignment above (tonic amplitude).
+    constrained_vars = [
+        (gui.opt_drive_widgets[drive_index_evoked], "mu", initial_mu),
+        (
+            gui.opt_drive_widgets[drive_index_poisson]["rate_constant"],
+            "L5_pyramidal",
+            initial_rate_const,
+        ),
+        (gui.opt_drive_widgets[drive_index_rhythmic], "burst_rate", initial_burst_rate),
+        (
+            gui.opt_drive_widgets[drive_index_tonic]["amplitude"],
+            "L2_pyramidal",
+            initial_amplitude,
+        ),
+    ]
+    for drive, var, initial in constrained_vars:
+        assert (
+            drive[f"{var}_opt_min"].value / 100 * initial
+            <= drive[var].value
+            <= drive[f"{var}_opt_max"].value / 100 * initial
+        )
+
+    assert gui.opt_drive_widgets[drive_index_evoked]["mu_opt_checkbox"].value
+    assert gui.opt_drive_widgets[drive_index_poisson]["rate_constant"][
+        "L5_pyramidal_opt_checkbox"
+    ].value
+    assert gui.opt_drive_widgets[drive_index_rhythmic]["burst_rate_opt_checkbox"].value
+    assert gui.opt_drive_widgets[drive_index_tonic]["amplitude"][
+        "L2_pyramidal_opt_checkbox"
+    ].value
+
+    # Perform some basic checks, like that the optimized sim name has changed, there is
+    # existing Dipole data, etc.
+    new_sim_name_1 = gui.widget_simulation_name.value + "_optimized"
+    dpls = gui.simulation_data[new_sim_name_1]["dpls"]
+    assert isinstance(gui.simulation_data[new_sim_name_1]["net"], Network)
+    assert isinstance(dpls, list)
+    assert len(dpls) > 0
+    assert all([isinstance(dpl, Dipole) for dpl in dpls])
+
+    # Now, let's prepare to run a second run of optimization, but with a different
+    # objective function:
+    # ----------------------------------------------------------------------------------
+    gui.widget_opt_obj_fun.value = "dipole_rmse"
+
+    # Perform the first run of optimization
+    gui.run_opt_button.click()
+
+    # Give the GUI time to regenerate
+    time.sleep(2)
+
+    # Check that our target data and constraint checkboxes have not been reset
+    assert gui.opt_drive_widgets[drive_index_evoked]["mu_opt_checkbox"].value
+    assert gui.opt_drive_widgets[drive_index_poisson]["rate_constant"][
+        "L5_pyramidal_opt_checkbox"
+    ].value
+    assert gui.opt_drive_widgets[drive_index_rhythmic]["burst_rate_opt_checkbox"].value
+    assert gui.opt_drive_widgets[drive_index_tonic]["amplitude"][
+        "L2_pyramidal_opt_checkbox"
+    ].value
+
+    # Perform some basic checks, like that the optimized sim name has changed, there is
+    # existing Dipole data, etc. This also tests the auto-rename of multiple consecutive
+    # optimization runs.
+    new_sim_name_2 = gui.widget_simulation_name.value + "_optimized" + "_1"
+    assert new_sim_name_2 == "default_optimized_1"
+    dpls = gui.simulation_data[new_sim_name_2]["dpls"]
+    assert isinstance(gui.simulation_data[new_sim_name_2]["net"], Network)
+    assert isinstance(dpls, list)
+    assert len(dpls) > 0
+    assert all([isinstance(dpl, Dipole) for dpl in dpls])
+
+    # Now, let's prepare to run a third run of optimization, but with a different
+    # objective function:
+    # ----------------------------------------------------------------------------------
+    gui.widget_opt_obj_fun.value = "maximize_psd"
+
+    gui.opt_target_widgets["psd_target_band1_min"].value = 15.0
+    gui.opt_target_widgets["psd_target_band1_max"].value = 30.0
+    gui.opt_target_widgets["psd_target_band2_checkbox"].value = True
+    gui.opt_target_widgets["psd_target_band1_proportion"].value = 0.8
+    # Ensure correct automatic calculation of the band2 proportion
+    assert np.isclose(gui.opt_target_widgets["psd_target_band2_proportion"].value, 0.2)
+
+    # Perform the second run of optimization
+    gui.run_opt_button.click()
+
+    # Give the GUI time to regenerate
+    time.sleep(2)
+
+    # Check that our target data and constraint checkboxes have not been reset
+    assert gui.opt_drive_widgets[drive_index_evoked]["mu_opt_checkbox"].value
+    assert gui.opt_drive_widgets[drive_index_poisson]["rate_constant"][
+        "L5_pyramidal_opt_checkbox"
+    ].value
+    assert gui.opt_drive_widgets[drive_index_rhythmic]["burst_rate_opt_checkbox"].value
+    assert gui.opt_drive_widgets[drive_index_tonic]["amplitude"][
+        "L2_pyramidal_opt_checkbox"
+    ].value
+
+    # Perform some basic checks, like that the optimized sim name has changed, there is
+    # existing Dipole data, etc. This also tests the auto-rename of multiple consecutive
+    # optimization runs.
+    new_sim_name_3 = gui.widget_simulation_name.value + "_optimized" + "_2"
+    assert new_sim_name_3 == "default_optimized_2"
+    dpls = gui.simulation_data[new_sim_name_3]["dpls"]
+    assert isinstance(gui.simulation_data[new_sim_name_3]["net"], Network)
+    assert isinstance(dpls, list)
+    assert len(dpls) > 0
+    assert all([isinstance(dpl, Dipole) for dpl in dpls])
+
+    plt.close("all")
+
+
+def test_gui_optimization_no_constraints(setup_gui):
+    """Test that optimization fails gracefully when no constraints are selected."""
+    gui = setup_gui
+
+    # Using this objective function because we don't have to load target data and run it
+    # without any additional config
+    gui.widget_opt_obj_fun.value = "maximize_psd"
+
+    # Ensure no constraints are selected (this is the default)
+    for drive_widget in gui.opt_drive_widgets:
+        # Check all checkbox-type widgets
+        for key, val in drive_widget.items():
+            if key.endswith("_opt_checkbox"):
+                assert val.value is False
+
+    # Run optimization - should fail with error message
+    gui.run_opt_button.click()
+
+    # Check that optimization was marked as failed, and the appropriate error message
+    # was logged
+    assert gui._simulation_status_bar.value == gui._simulation_status_contents["failed"]
+    assert any(
+        "You have not selected any parameters to constrain" in entry["text"]
+        for entry in gui._log_out.outputs
+    )
+
+    # Verify that no optimized simulation was created
+    assert "default_optimized" not in gui.simulation_data
+
+    plt.close("all")
+
+
+def test_gui_optimization_no_target_data(setup_gui):
+    """Test that optimization fails when no target data is selected."""
+    gui = setup_gui
+
+    # Select a constraint but don't upload target data
+    gui.opt_drive_widgets[0]["mu_opt_checkbox"].value = True
+
+    # Try to run optimization without target data
+    gui.run_opt_button.click()
+
+    # Check that optimization was marked as failed, and the appropriate error message
+    # was logged
+    assert gui._simulation_status_bar.value == gui._simulation_status_contents["failed"]
+    assert any(
+        "You have not selected a dataset to use as the target" in entry["text"]
+        for entry in gui._log_out.outputs
+    )
+
+    # Verify that no optimized simulation was created
+    assert "default_optimized" not in gui.simulation_data
+
+    plt.close("all")
+
+
+def test_traceback_logging(setup_gui, monkeypatch):
+    logger = logging.getLogger("hnn_gui")
+    gui = setup_gui
+    tstop_trials_tstep = [(10, 1, 0.25)]
+    gui.widget_backend_selection.value = "Joblib"
+    sim_count = 0
+
+    # Verify successful simulations produce no errors or tracebacks in the log:
+    logger.info("asdf info")
+    logger.warning("qwerty warning")
+    for val_tstop, val_ntrials, val_tstep in tstop_trials_tstep:
+        sim_name = f"test_{sim_count}"
+        gui.widget_simulation_name.value = sim_name
+        gui.widget_tstop.value = val_tstop
+        gui.widget_ntrials.value = val_ntrials
+        gui.widget_dt.value = val_tstep
+
+        gui.run_button.click()
+        dpls = gui.simulation_data[sim_name]["dpls"]
+        assert isinstance(gui.simulation_data[sim_name]["net"], Network)
+        assert isinstance(dpls, list)
+        assert len(dpls) > 0
+        assert all([isinstance(dpl, Dipole) for dpl in dpls])
+        sim_count += 1
+
+    logs = [msg["text"] for msg in gui._log_out.outputs]
+    compiled_log_text = "\n".join(logs)
+
+    # Test that our test log messages are included, but no errors or tracebacks are
+    # present:
+    assert "asdf info" in compiled_log_text
+    assert "qwerty warning" in compiled_log_text
+    assert "Traceback" not in compiled_log_text
+    assert "[ERROR]" not in compiled_log_text
+
+    def raise_exception(*args, **kwargs):
+        raise ValueError("Test 314159 exception")
+
+    monkeypatch.setattr("hnn_core.gui.gui.simulate_dipole", raise_exception)
+
+    for val_tstop, val_ntrials, val_tstep in tstop_trials_tstep:
+        gui.widget_simulation_name.value = f"test_{sim_count}"
+        gui.widget_tstop.value = val_tstop
+        gui.widget_ntrials.value = val_ntrials
+        gui.widget_dt.value = val_tstep
+
+        gui.run_button.click()
+        sim_count += 1
+
+    logs = [msg["text"] for msg in gui._log_out.outputs]
+    compiled_log_text = "\n".join(logs)
+
+    # Test that now, our error messages are included in the overall log:
+    assert "Test 314159 exception" in compiled_log_text
+    assert "Traceback" in compiled_log_text
+    assert "[ERROR]" in compiled_log_text
+
+    # Test that our new simulate error was logged AFTER the prior warning from the
+    # beginning of the test
+    for log_index in range(len(logs)):
+        if "Test 314159 exception" in logs[log_index]:
+            err_log_index = log_index
+        elif "qwerty warning" in logs[log_index]:
+            assert err_log_index < log_index
+
+    def raise_exception_opt(*args, **kwargs):
+        raise ValueError("Test 87654321 exception")
+
+    monkeypatch.setattr("hnn_core.gui.gui.simulate_dipole", raise_exception_opt)
+
+    for val_tstop, val_ntrials, val_tstep in tstop_trials_tstep:
+        gui.widget_simulation_name.value = f"test_{sim_count}"
+        gui.widget_tstop.value = val_tstop
+        gui.widget_ntrials.value = val_ntrials
+        gui.widget_dt.value = val_tstep
+
+        # opt-specific values that need to be set for the run
+        gui.widget_opt_obj_fun.value = "maximize_psd"
+        gui.opt_drive_widgets[0]["mu_opt_checkbox"].value = True
+
+        gui.run_opt_button.click()
+        sim_count += 1
+
+    logs = [msg["text"] for msg in gui._log_out.outputs]
+    compiled_log_text = "\n".join(logs)
+
+    # Test that now, our new error message is included in the overall log:
+    assert "Test 87654321 exception" in compiled_log_text
+
+    # Test that our new opt simulate error was logged AFTER the simulate error from
+    # before
+    for log_index in range(len(logs)):
+        if "Test 87654321 exception" in logs[log_index]:
+            err_log_index = log_index
+        elif "Test 314159 exception" in logs[log_index]:
+            assert err_log_index < log_index
+
+    plt.close("all")

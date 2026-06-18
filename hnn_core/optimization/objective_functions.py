@@ -70,7 +70,9 @@ def _calculate_obj_fun(
     predicted_params,
     update_params,
     tstop,
+    obj_values,
     obj_fun_kwargs,
+    best=None,
 ):
     """Run simulations, calculate your objective function, and return its value(s).
 
@@ -89,16 +91,37 @@ def _calculate_obj_fun(
         Parameters selected by the optimizer.
     update_params : func
         Function to update params.
+    obj_values : list
+        List to store objective function values.
     tstop : float
         The simulated dipole's duration.
     obj_fun_kwargs : dict
-        Assorted dictionary of arguments that are either used for simulation management
-        or are needed for your specific objective function. See ``Optimizer.fit`` for
-        more details.
+        A kwargs-style dictionary that contains additional arguments for this particular
+        objective function and/or a particular solver. See `Optimizer.fit` for more
+        details. The key-value pairs specific to this objective function are:
+
+        target : instance of Dipole
+            Required. A dipole object with experimental data.
+        n_trials : int, default=1
+            Number of trials to simulate and average.
+
+    best : dict, optional
+        Dictionary with keys "obj" and "params" to store the best objective value and
+        corresponding parameters. Note that `best` will be updated as a "side-effect"
+        (similar to "pass-by-reference"), and is not returned by the function; this is
+        necessary because the optimization routines in `scipy.optimize` require the
+        objective functions to return a single scalar value. Only used if the solver is
+        set to "cobyla" or "cma".
+
+    Returns
+    -------
+    obj : float
+        Normalized RMSE between recorded and simulated dipole.
     """
     is_batch = _check_is_batch(predicted_params)
 
     if is_batch:
+        # The "batch" case only occurs if the solver is set to "cma"
         predicted_params = np.array(predicted_params).reshape(-1, len(initial_params))
         print(predicted_params.shape)
         params_batch = {
@@ -109,12 +132,9 @@ def _calculate_obj_fun(
         # simulate dpl with predicted params
         new_net = initial_net.copy()
 
-        def set_params_batch(a, b):
-            set_params(b, a)  # need to fix this
-
         batch_simulation = BatchSimulate(
             net=new_net,
-            set_params=set_params_batch,
+            set_params=set_params,
             save_outputs=False,
             save_dpl=True,
             dt=obj_fun_kwargs.get("dt", 0.025),
@@ -143,6 +163,7 @@ def _calculate_obj_fun(
         obj = [obj_fun_lambda(dpl) for dpl in dpls]
 
     else:
+        # The non-"batch" case occurs if the solver is set to "cobyla" or "bayesian"
         params = update_params(initial_params, predicted_params)
 
         # simulate dpl with predicted params
@@ -150,7 +171,10 @@ def _calculate_obj_fun(
         set_params(new_net, params)
 
         dpls = simulate_dipole(
-            new_net, tstop=tstop, n_trials=obj_fun_kwargs["n_trials"]
+            new_net,
+            tstop=tstop,
+            dt=obj_fun_kwargs.get("dt", 0.025),
+            n_trials=obj_fun_kwargs.get("n_trials", 1),
         )
 
         # smooth & scale all dipoles
@@ -159,7 +183,17 @@ def _calculate_obj_fun(
         dpl = average_dipoles(dpls)
         obj = obj_fun_lambda(dpl)
 
+        # Update best params; this is a "side-effect" that changes the `best` dictionary
+        # in-place in the parent scope
+        if best is not None and obj < best["obj"]:
+            best["obj"] = obj
+            best["params"] = predicted_params.copy()
+
     print(f"Mean Loss: {np.mean(obj):.2f}; Min Loss: {np.min(obj):.2f}")
+    # Update the store of objective function values via a "side-effect" in-place in the
+    # parent scope
+    obj_values.append(obj)
+
     return obj
 
 
@@ -172,6 +206,7 @@ def _rmse_evoked(
     obj_values,
     tstop,
     obj_fun_kwargs,
+    best=None,
 ):
     """The objective function for evoked responses.
 
@@ -216,7 +251,9 @@ def _rmse_evoked(
         predicted_params,
         update_params,
         tstop,
+        obj_values,
         obj_fun_kwargs,
+        best,
     )
     obj_values.append(obj)
     return obj
@@ -231,6 +268,7 @@ def _maximize_psd(
     obj_values,
     tstop,
     obj_fun_kwargs,
+    best=None,
 ):
     """The objective function for PSDs.
 
@@ -252,8 +290,9 @@ def _maximize_psd(
     tstop : float
         The simulated dipole's duration.
     obj_fun_kwargs : dict
-        Additional arguments along with their respective values to be passed
-        to the objective function (see ``Optimizer.fit`` for more details):
+        A kwargs-style dictionary that contains additional arguments for this particular
+        objective function and/or a particular solver. See `Optimizer.fit` for more
+        details. The key-value pairs specific to this objective function are:
 
         f_bands : list of tuples (Required)
             Lower and higher limit for each frequency band.
@@ -263,6 +302,14 @@ def _maximize_psd(
         verbose : bool, optional
             If True, print build steps and simulation progress to console. Default: True.
 
+    best : dict, optional
+        Dictionary with keys "obj" and "params" to store the best objective value and
+        corresponding parameters. Note that `best` will be updated as a "side-effect"
+        (similar to "pass-by-reference"), and is not returned by the function; this is
+        necessary because the optimization routines in `scipy.optimize` require the
+        objective functions to return a single scalar value. Only used if the solver is
+        set to "cobyla" or "cma".
+
     Returns
     -------
     obj : float
@@ -270,11 +317,11 @@ def _maximize_psd(
 
     Notes
     -----
-    The objective function minimizes the sum of the weighted (user-defined)
-    frequency band PSDs (user-defined) relative to the total PSD of the signal.
-    The objective function can be represented as -Σc[ΣPSD(i)/ΣPSD(j)] where c
-    is the weight for each frequency band, PSD(i) is the PSD for each frequency
-    band, and PSD(j) is the total PSD of the signal.
+    The objective function minimizes the sum of the weighted (user-defined) frequency
+    band PSDs (user-defined) relative to the total PSD of the signal. The objective
+    function can be represented as -Σc[ΣPSD(i)/ΣPSD(j)] where c is the weight for each
+    frequency band, PSD(i) is the PSD for each frequency band, and PSD(j) is the total
+    PSD of the signal.
     """
     obj = _calculate_obj_fun(
         lambda dpl: _get_relative_power(dpl, obj_fun_kwargs),
@@ -284,7 +331,9 @@ def _maximize_psd(
         predicted_params,
         update_params,
         tstop,
+        obj_values,
         obj_fun_kwargs,
+        best,
     )
     obj_values.append(obj)
     return obj
@@ -299,6 +348,7 @@ def _anticorr_evoked(
     obj_values,
     tstop,
     obj_fun_kwargs,
+    best=None,
 ):
     """The objective function for evoked responses.
 
@@ -320,15 +370,24 @@ def _anticorr_evoked(
     tstop : float
         The simulated dipole's duration.
     obj_fun_kwargs : dict
-        Additional arguments along with their respective values to be passed
-        to the objective function (see ``Optimizer.fit`` for more details):
+        A kwargs-style dictionary that contains additional arguments for this particular
+        objective function and/or a particular solver. See `Optimizer.fit` for more
+        details. The key-value pairs specific to this objective function are:
 
         target : instance of Dipole (Required)
             A dipole object with experimental data.
-        n_trials : int, optional
+        n_trials : int, default=1
             Number of trials to simulate and average.
         verbose : bool, optional
             If True, print build steps and simulation progress to console. Default: True.
+
+    best : dict, optional
+        Dictionary with keys "obj" and "params" to store the best objective value and
+        corresponding parameters. Note that `best` will be updated as a "side-effect"
+        (similar to "pass-by-reference"), and is not returned by the function; this is
+        necessary because the optimization routines in `scipy.optimize` require the
+        objective functions to return a single scalar value. Only used if the solver is
+        set to "cobyla" or "cma".
 
     Returns
     -------
@@ -343,7 +402,9 @@ def _anticorr_evoked(
         predicted_params,
         update_params,
         tstop,
+        obj_values,
         obj_fun_kwargs,
+        best,
     )
     obj_values.append(obj)
     return obj
@@ -358,6 +419,7 @@ def _custom_objective_function(
     obj_values,
     tstop,
     obj_fun_kwargs,
+    best=None,
 ):
     """The generic objective function for user-defined loss functions.
 
@@ -395,7 +457,9 @@ def _custom_objective_function(
         predicted_params,
         update_params,
         tstop,
+        obj_values,
         obj_fun_kwargs,
+        best,
     )
     obj_values.append(obj)
     return obj

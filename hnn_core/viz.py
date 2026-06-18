@@ -24,6 +24,27 @@ from scipy.signal import decimate, periodogram
 from .externals.mne import tfr_array_morlet, _validate_type
 
 
+def _get_cell_colors_from_metadata(cell_types_dict):
+    """Get color and marker mappings from cell_metadata.
+
+    Parameters
+    ----------
+    cell_types_dict : dict
+
+    Returns
+    -------
+    colors : dict
+    markers : dict
+    """
+    colors = dict()
+    markers = dict()
+    for cell_name in sorted(cell_types_dict.keys()):
+        meta = cell_types_dict[cell_name].get("cell_metadata", {})
+        colors[cell_name] = meta.get("color", "k")
+        markers[cell_name] = meta.get("marker", "o")
+    return colors, markers
+
+
 def _lighten_color(color, amount=0.5):
     try:
         c = matplotlib.colors.cnames[color]
@@ -220,7 +241,7 @@ def plot_laminar_lfp(
             ax.set_xlim(left=times[0], right=times[-1])
     if voltage_offset is not None:
         ax.set_ylim(-voltage_offset, n_offsets * voltage_offset)
-        ylabel = "Individual contact traces"
+        ylabel = "Individual contact traces\nat depth [µm]"
         if len(contact_labels) != n_offsets:
             raise ValueError(
                 f"contact_labels is length {len(contact_labels)},"
@@ -231,7 +252,13 @@ def plot_laminar_lfp(
                 0, len(contact_labels) * voltage_offset, voltage_offset
             )
             ax.set_yticks(trace_ticks)
-            ax.set_yticklabels(contact_labels)
+
+            ylabel_skip = 3
+            reduced_labels = [
+                label if i % ylabel_skip == 0 else ""
+                for i, label in enumerate(contact_labels)
+            ]
+            ax.set_yticklabels(reduced_labels)
 
         if voltage_scalebar is None:
             voltage_scalebar = voltage_offset
@@ -481,7 +508,11 @@ def plot_spikes_hist(
     spike_types_mask = {
         s_type: np.isin(spike_types_data, s_type) for s_type in unique_types
     }
-    cell_types = ["L5_pyramidal", "L5_basket", "L2_pyramidal", "L2_basket"]
+    # fetching the cell types
+    from .network_models import default_cell_metadata
+
+    known_cell_types = set(default_cell_metadata.keys())
+    cell_types = sorted([ct for ct in unique_types if ct in known_cell_types])
     input_types = np.setdiff1d(unique_types, cell_types)
 
     if isinstance(spike_types, str):
@@ -546,6 +577,12 @@ def plot_spikes_hist(
         spike_label: list() for spike_label in np.unique(list(spike_labels.values()))
     }
     spike_color = dict()  # Store colors specified for each spike_label
+    # NOTE: Currently, since `CellResponse` only contains the "type" (aka drive name or
+    # cell name) of what produced each spike, but not whether that drive was proximal or
+    # distal, there is currently no way to apply the coloring of
+    # `hnn_core.network_models.default_drive_colors` to the spikes in this plot. If
+    # `CellResponse` is ever guaranteed access to the `Network` information in the
+    # future, then this will be fixable.
     for spike_type, spike_label in spike_labels.items():
         if spike_label not in spike_color:
             if isinstance(color, dict):
@@ -557,6 +594,9 @@ def plot_spikes_hist(
                     color[spike_label], str, "Dictionary values of color", "str"
                 )
                 spike_color[spike_label] = color[spike_label]
+            elif spike_label in default_cell_metadata.keys():
+                # Overwrite spike colors if the spikes come from true cells
+                spike_color[spike_label] = default_cell_metadata[spike_label]["color"]
             else:
                 spike_color[spike_label] = next(color_cycle)
         spike_type_times[spike_label].extend(spike_times[spike_types_mask[spike_type]])
@@ -703,14 +743,17 @@ def plot_spikes_raster(
                 f"Got {cell_types}"
             )
     else:
-        # Use default cell types
-        cell_types = ["L2_basket", "L2_pyramidal", "L5_basket", "L5_pyramidal"]
+        from .network_models import default_cell_metadata
 
-    # Set default colors
-    default_colors = plt.rcParams["axes.prop_cycle"].by_key()["color"][
-        : len(cell_types)
-    ]
-    cell_colors = {cell: color for cell, color in zip(cell_types, default_colors)}
+        known_cell_types = set(default_cell_metadata.keys())
+        cell_types = sorted([ct for ct in unique_spike_types if ct in known_cell_types])
+        if not cell_types:
+            cell_types = sorted(list(known_cell_types))
+
+    # default colors from cell metadata
+    from .network_models import default_cell_metadata as _meta
+
+    cell_colors = {cell: _meta.get(cell, {}).get("color", "k") for cell in cell_types}
 
     # validate colors argument
     _validate_type(colors, (list, dict, None), "color", "list of str, or dict")
@@ -913,27 +956,20 @@ def plot_cells(net, ax=None, show=True):
             f"Expected 'ax' to be an instance of Axes3D, but got {type(ax).__name__}"
         )
 
-    colors = {
-        "L5_pyramidal": "b",
-        "L2_pyramidal": "c",
-        "L5_basket": "r",
-        "L2_basket": "m",
-    }
-    markers = {
-        "L5_pyramidal": "^",
-        "L2_pyramidal": "^",
-        "L5_basket": "x",
-        "L2_basket": "x",
-    }
+    # colors and markers from cell metadata
+    if net.cell_types:
+        colors, markers = _get_cell_colors_from_metadata(net.cell_types)
+    else:
+        colors = dict()
+        markers = dict()
 
-    for cell_type in net.cell_types:
+    for cell_type in sorted(net.cell_types.keys()):
         x = [pos[0] for pos in net.pos_dict[cell_type]]
         y = [pos[1] for pos in net.pos_dict[cell_type]]
         z = [pos[2] for pos in net.pos_dict[cell_type]]
-        if cell_type in colors:
-            color = colors[cell_type]
-            marker = markers[cell_type]
-            ax.scatter(x, y, z, c=color, s=50, marker=marker, label=cell_type)
+        color = colors.get(cell_type, "k")
+        marker = markers.get(cell_type, "o")
+        ax.scatter(x, y, z, c=color, s=50, marker=marker, label=cell_type)
 
     if net.rec_arrays:
         cols = plt.get_cmap("inferno", len(net.rec_arrays) + 2)
@@ -1837,7 +1873,7 @@ def plot_laminar_csd(
         times, new_depths, data, cmap=cmap, shading="auto", vmin=vmin, vmax=vmax
     )
     ax.set_xlabel("time (s)")
-    ax.set_ylabel("electrode depth")
+    ax.set_ylabel("electrode depth [µm]")
     if colorbar:
         color_axis = ax.inset_axes([1.05, 0, 0.02, 1], transform=ax.transAxes)
         plt.colorbar(im, ax=ax, cax=color_axis).set_label(r"$CSD (uV/um^{2})$")

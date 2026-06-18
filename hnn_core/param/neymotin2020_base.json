@@ -47,17 +47,20 @@
                     "ampa": {
                         "e": 0,
                         "tau1": 0.5,
-                        "tau2": 5.0
+                        "tau2": 5.0,
+                        "mechname": "Exp2Syn"
                     },
                     "gabaa": {
                         "e": -80,
                         "tau1": 0.5,
-                        "tau2": 5.0
+                        "tau2": 5.0,
+                        "mechname": "Exp2Syn"
                     },
                     "nmda": {
                         "e": 0,
                         "tau1": 1.0,
-                        "tau2": 20.0
+                        "tau2": 20.0,
+                        "mechname": "Exp2Syn"
                     }
                 },
                 "cell_tree": null,
@@ -81,7 +84,9 @@
                 "electro_type": "inhibitory",
                 "layer": "2",
                 "measure_dipole": false,
-                "reference": "https://doi.org/10.7554/eLife.51214"
+                "reference": "https://doi.org/10.7554/eLife.51214",
+                "color": "m",
+                "marker": "x"
             }
         },
         "L2_pyramidal": {
@@ -392,22 +397,26 @@
                     "ampa": {
                         "e": 0.0,
                         "tau1": 0.5,
-                        "tau2": 5.0
+                        "tau2": 5.0,
+                        "mechname": "Exp2Syn"
                     },
                     "nmda": {
                         "e": 0.0,
                         "tau1": 1.0,
-                        "tau2": 20.0
+                        "tau2": 20.0,
+                        "mechname": "Exp2Syn"
                     },
                     "gabaa": {
                         "e": -80.0,
                         "tau1": 0.5,
-                        "tau2": 5.0
+                        "tau2": 5.0,
+                        "mechname": "Exp2Syn"
                     },
                     "gabab": {
                         "e": -80.0,
                         "tau1": 1.0,
-                        "tau2": 20.0
+                        "tau2": 20.0,
+                        "mechname": "Exp2Syn"
                     }
                 },
                 "cell_tree": {
@@ -473,7 +482,9 @@
                 "electro_type": "excitatory",
                 "layer": "2",
                 "measure_dipole": true,
-                "reference": "https://doi.org/10.7554/eLife.51214"
+                "reference": "https://doi.org/10.7554/eLife.51214",
+                "color": "c",
+                "marker": "^"
             }
         },
         "L5_basket": {
@@ -518,17 +529,20 @@
                     "ampa": {
                         "e": 0,
                         "tau1": 0.5,
-                        "tau2": 5.0
+                        "tau2": 5.0,
+                        "mechname": "Exp2Syn"
                     },
                     "gabaa": {
                         "e": -80,
                         "tau1": 0.5,
-                        "tau2": 5.0
+                        "tau2": 5.0,
+                        "mechname": "Exp2Syn"
                     },
                     "nmda": {
                         "e": 0,
                         "tau1": 1.0,
-                        "tau2": 20.0
+                        "tau2": 20.0,
+                        "mechname": "Exp2Syn"
                     }
                 },
                 "cell_tree": null,
@@ -550,7 +564,9 @@
                 "electro_type": "inhibitory",
                 "layer": "5",
                 "measure_dipole": false,
-                "reference": "https://doi.org/10.7554/eLife.51214"
+                "reference": "https://doi.org/10.7554/eLife.51214",
+                "color": "r",
+                "marker": "x"
             }
         },
         "L5_pyramidal": {
@@ -1181,22 +1197,26 @@
                     "ampa": {
                         "e": 0.0,
                         "tau1": 0.5,
-                        "tau2": 5.0
+                        "tau2": 5.0,
+                        "mechname": "Exp2Syn"
                     },
                     "nmda": {
                         "e": 0.0,
                         "tau1": 1.0,
-                        "tau2": 20.0
+                        "tau2": 20.0,
+                        "mechname": "Exp2Syn"
                     },
                     "gabaa": {
                         "e": -80.0,
                         "tau1": 0.5,
-                        "tau2": 5.0
+                        "tau2": 5.0,
+                        "mechname": "Exp2Syn"
                     },
                     "gabab": {
                         "e": -80.0,
                         "tau1": 1.0,
-                        "tau2": 20.0
+                        "tau2": 20.0,
+                        "mechname": "Exp2Syn"
                     }
                 },
                 "cell_tree": {
@@ -1268,7 +1288,9 @@
                 "electro_type": "excitatory",
                 "layer": "5",
                 "measure_dipole": true,
-                "reference": "https://doi.org/10.7554/eLife.51214"
+                "reference": "https://doi.org/10.7554/eLife.51214",
+                "color": "b",
+                "marker": "^"
             }
         }
     },

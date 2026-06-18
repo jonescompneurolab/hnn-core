@@ -46,22 +46,24 @@ class Optimizer:
 
                 ``set_params(net, params) -> None``
 
-            where ``net`` is a Network object and ``params`` is a dictionary
-            of the parameters that will be set inside the function.
+            where ``net`` is a Network object and ``params`` is a dictionary of the
+            parameters that will be set inside the function.
         initial_params : dict, optional
-            Initial parameters for the objective function. Keys are parameter
-            names, values are initial parameters. The default is None.
-            If None, the parameters will be set to the midpoints of parameter ranges.
+            Initial parameters for the objective function. Keys are parameter names,
+            values are initial parameters. The default is None. If None, the parameters
+            will be set to the midpoints of parameter ranges.
         solver : str
             The optimizer, 'bayesian', 'cobyla', or 'cma'.
         obj_fun : str | func
             The objective function to be minimized. Can be 'dipole_rmse',
             'maximize_psd', 'dipole_corr', 'custom', or a user-defined function. See the
             docstring for ``Optimizer.fit`` to view the required and optional arguments
-            for each of these cases. The default is 'dipole_rmse'.
+            for each of these cases. If a user-defined function is provided, it must
+            have the same function signature as the existing objective functions
+            (i.e. `_rmse_evoked` and `_maximize_psd` in objective_functions.py).The
+            default is 'dipole_rmse'.
         max_iter : int, optional
-            The max number of calls to the objective function. The default is
-            200.
+            The max number of calls to the objective function. The default is 200.
 
         Attributes
         ----------
@@ -169,12 +171,12 @@ class Optimizer:
 
         Parameters
         ----------
-        target : instance of Dipole (Required if obj_fun='dipole_rmse')
+        target : instance of Dipole (Required if obj_fun='dipole_rmse' or 'dipole_corr')
             A dipole object with experimental data.
-        n_trials : int (Optional if obj_fun='dipole_rmse')
+        n_trials : int (Optional if obj_fun='dipole_rmse' or 'dipole_corr')
             Number of trials to simulate and average.
         f_bands : list of tuples (Required if obj_fun='maximize_psd')
-            Lower and higher limit for each frequency band.
+            Lower and higher limit for each frequency band in Hz.
         relative_bandpower : list of float | float (Required if obj_fun='maximize_psd')
             Weight for each frequency band in f_bands. If a single float is provided,
             the same weight is applied to all frequency bands.
@@ -192,21 +194,24 @@ class Optimizer:
         n_jobs : int (Only used if solver='cma')
             The number of jobs to start in parallel. If None, then 1 trial will be
             started without parallelism.
-        tolfun : float
+        seed : int, optional (Only used if solver='cma')
+            Optional seed for random number generator of optimizer.
+        tolfun : float (Only used if solver='cma')
             Termination criteria. Stops if the range of the best objective function
             values of the last 10 + ((30 * n_parameters) / popsize) generations and all
             function values of the recent generation is below tolfun. Default 0.01.
-        dt : float
-            The integration time step of h.CVode (ms). Default: 0.025 ms
+        dt : float, default=0.025
+            The integration time step of h.CVode (in ms)
         scale_factor : float, optional
-            The dipole scale factor.
+            The dipole scale factor to use after every optimization iteration before
+            data comparison. There is no scaling applied by default, so you must pass a
+            value if you want any scaling.
         smooth_window_len : float, optional
-            The smooth window length.
-        seed : int, optional (Only used if solver='cma')
-            Optional seed for random number generator of optimizer.
-        verbose : bool
-            If True, print build steps and simulation progress to console. Default:
-            True.
+            The smooth window length to use after every optimization iteration before
+            data comparison. There is no smoothing applied by default, so you must pass
+            a value if you want any smoothing.
+        verbose : bool, default=True
+            If True, print build steps and simulation progress to console.
 
         Notes
         -----
@@ -646,6 +651,11 @@ def _run_opt_cobyla(
     # the list is passed to `_obj_func()` and updated in place
     obj_values = list()
 
+    best = {
+        "obj": np.inf,
+        "params": None,
+    }
+
     def _obj_func(predicted_params):
         return obj_fun(
             initial_net=initial_net,
@@ -656,9 +666,10 @@ def _run_opt_cobyla(
             obj_values=obj_values,
             tstop=tstop,
             obj_fun_kwargs=obj_fun_kwargs,
+            best=best,
         )
 
-    opt_results = fmin_cobyla(
+    fmin_cobyla(
         _obj_func,
         cons=constraints,
         rhobeg=0.1,
@@ -669,7 +680,7 @@ def _run_opt_cobyla(
     )
 
     # get optimized params
-    opt_params = opt_results
+    opt_params = best["params"]
 
     # get objective values
     obj = [np.min(obj_values[:idx]) for idx in range(1, max_iter + 1)]
@@ -680,3 +691,120 @@ def _run_opt_cobyla(
     set_params(net_, params)
 
     return opt_params, obj, net_
+
+
+def generate_opt_history_table(opt_results, report_timestamp):
+    """Generate a human-readable text table of optimization history.
+
+    Parameters
+    ----------
+    opt_results : list of dict
+        List of optimization results, where each dict contains the following key-value pairs:
+        "initial_params" : dict
+            Initial parameter values
+        "opt_params" : list
+            Optimized parameter values
+        "obj_values" : list
+            Objective function values at each iteration
+        "solver" : str
+            Solver name used
+        "obj_fun" : str
+            Objective function name
+        "max_iter" : int
+            Maximum iterations
+        "target_data" : str, optional
+            Target dataset name (for dipole_rmse)
+        "n_trials" : int, optional
+            Number of trials (for dipole_rmse)
+        "psd_f_bands" : list of tuple, optional
+            Frequency bands (for maximize_psd)
+        "psd_relative_bandpower" : list of float, optional
+            Relative bandpower weights (for maximize_psd)
+    report_timestamp : str
+        A timestamp which will be used to indicate the time when the report
+        was generated. This will represent the same time as the time used to
+        generate the filename for the report.
+
+    Returns
+    -------
+    str
+        A formatted text table documenting the initial and final values
+        of optimized parameters and the first/final objective function values
+        for each full optimization run.
+    """
+    if not opt_results:
+        return "No optimization runs have been completed yet."
+
+    lines = []
+    lines.append("=" * 100)
+    lines.append("OPTIMIZATION HISTORY")
+    lines.append(f"Generated: {report_timestamp}")
+    lines.append("=" * 100)
+    lines.append("")
+
+    for run_idx, opt_result in enumerate(opt_results, start=1):
+        solver = opt_result.get("solver", "N/A")
+        obj_fun = opt_result.get("obj_fun", "unknown")
+        max_iter = opt_result.get("max_iter", "N/A")
+
+        lines.append(f"Run #{run_idx}")
+        lines.append("-" * 100)
+        lines.append(f"Solver: {solver}")
+        lines.append(f"Objective Function: {obj_fun}")
+        lines.append(f"Max Iterations: {max_iter}")
+
+        # Add target dataset info if using dipole_rmse
+        if obj_fun == "dipole_rmse" and "target_data" in opt_result:
+            lines.append(f"Target Dataset: {opt_result['target_data']}")
+            if "n_trials" in opt_result:
+                lines.append(f"Number of Trials: {opt_result['n_trials']}")
+
+        # Add frequency band info if using maximize_psd
+        if obj_fun == "maximize_psd" and "psd_f_bands" in opt_result:
+            f_bands = opt_result["psd_f_bands"]
+            rel_bandpower = opt_result["psd_relative_bandpower"]
+            for i, (band, weight) in enumerate(zip(f_bands, rel_bandpower), start=1):
+                lines.append(
+                    f"  Frequency Band {i}: {band[0]:.1f}-{band[1]:.1f} Hz (weight: {weight:.3f})"
+                )
+
+        lines.append("")
+
+        # Get parameter names from initial_params dict
+        param_names = list(opt_result["initial_params"].keys())
+
+        # Create header
+        header = f"{'Parameter':<40} {'Initial Value':>15} {'Final Value':>15} {'Change':>15}"
+        lines.append(header)
+        lines.append("-" * 100)
+
+        # Add each parameter
+        for param_idx, param_name in enumerate(param_names):
+            initial_val = opt_result["initial_params"][param_name]
+            # opt_params should be a list in the same order as "initial_params"
+            final_val = opt_result["opt_params"][param_idx]
+            change = final_val - initial_val
+
+            # Format the values with appropriate precision
+            param_str = f"{param_name:<40}"
+            initial_str = f"{initial_val:>15.6f}"
+            final_str = f"{final_val:>15.6f}"
+            change_str = f"{change:>+15.6f}"
+
+            line = f"{param_str} {initial_str} {final_str} {change_str}"
+            lines.append(line)
+
+        lines.append("")
+        lines.append(f"Objective Function ({obj_fun}) Values:")
+
+        for obj_idx, obj_out in enumerate(opt_result["obj_values"]):
+            lines.append(f"  Iteration {obj_idx}: {obj_out:>15.6f}")
+
+        obj_diff = opt_result["obj_values"][-1] - opt_result["obj_values"][0]
+        lines.append(f"Total Change:  {obj_diff:>+15.6f}")
+
+        lines.append("")
+        lines.append("=" * 100)
+        lines.append("")
+
+    return "\n".join(lines)

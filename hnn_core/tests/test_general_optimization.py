@@ -571,3 +571,74 @@ def test_custom_loss_fun(solver):
             <= param
             <= list(constraints.values())[param_idx][1]
         ), "Optimized parameter is not in user-defined range"
+
+
+def test_cobyla_best():
+    """Verify COBYLA optimizer returns the best-seen params, not the final iterate.
+
+    COBYLA does not guarantee monotonic improvement — it can move away from the best
+    point it has found. This test uses a mock objective function (in place of any
+    particular function from `objective_functions.py`) that returns a non-monotonic
+    sequence of values to confirm that `best` inside the objective function reflects the
+    params corresponding to the minimum observed objective, not wherever COBYLA stopped.
+    """
+    max_iter = 5
+    tstop = 10.0
+    net = neymotin_2020_model(mesh_shape=(3, 3))
+
+    def set_params(net, params):
+        pass
+
+    constraints = {"mu": (1.0, 6.0), "sigma": (1.0, 3.0)}
+
+    call_log = []
+    call_counter = 0
+    # Non-monotonic: minimum is at index 1 (value 1.0), final is at index 4 (value 4.0)
+    obj_sequence = [5.0, 1.0, 3.0, 2.0, 4.0]
+
+    def mock_obj_fun(
+        initial_net,
+        initial_params,
+        set_params,
+        predicted_params,
+        update_params,
+        obj_values,
+        tstop,
+        obj_fun_kwargs,
+        best=None,
+    ):
+        nonlocal call_counter
+        call_idx = call_counter
+        obj = obj_sequence[min(call_idx, len(obj_sequence) - 1)]
+        call_counter += 1
+
+        params_copy = np.array(predicted_params).copy()
+        call_log.append((obj, params_copy))
+        obj_values.append(obj)
+
+        if best is not None and obj < best["obj"]:
+            best["obj"] = obj
+            best["params"] = params_copy
+
+        return obj
+
+    optim = Optimizer(
+        net,
+        tstop=tstop,
+        constraints=constraints,
+        set_params=set_params,
+        solver="cobyla",
+        obj_fun=mock_obj_fun,
+        max_iter=max_iter,
+    )
+    optim.fit()
+
+    assert len(call_log) >= 2, "COBYLA should evaluate the objective at least twice"
+
+    best_call_idx = np.argmin([entry[0] for entry in call_log])
+    expected_best_params = call_log[best_call_idx][1]
+
+    assert np.allclose(optim.opt_params_, expected_best_params), (
+        f"opt_params_ should equal params from the best objective call "
+        f"(call index {best_call_idx}), not the final iterate"
+    )
