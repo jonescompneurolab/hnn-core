@@ -33,7 +33,7 @@ Network Models (:py:mod:`hnn_core`):
 .. autosummary::
    :toctree: generated/
 
-   jones_2009_model
+   neymotin_2020_model
    law_2021_model
    calcium_model
 
@@ -46,6 +46,16 @@ Optimization (:py:mod:`hnn_core.optimization`):
    :toctree: generated/
 
    Optimizer
+
+Batch Simulation (:py:mod:`hnn_core.batch_simulate`):
+-----------------------------------------------------
+
+.. currentmodule:: hnn_core.batch_simulate
+
+.. autosummary::
+   :toctree: generated/
+
+   BatchSimulate
 
 Dipole (:py:mod:`hnn_core.dipole`):
 -----------------------------------

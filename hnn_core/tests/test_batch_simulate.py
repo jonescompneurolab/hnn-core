@@ -10,7 +10,7 @@ import numpy as np
 import os
 
 from hnn_core.batch_simulate import BatchSimulate
-from hnn_core import jones_2009_model
+from hnn_core import neymotin_2020_model
 
 hnn_core_root = Path(__file__).parents[1]
 assets_path = Path(hnn_core_root, "tests", "assets")
@@ -47,7 +47,7 @@ def batch_simulate_instance(tmp_path):
             synaptic_delays=synaptic_delays,
         )
 
-    net = jones_2009_model(mesh_shape=(3, 3))
+    net = neymotin_2020_model(mesh_shape=(3, 3))
     return BatchSimulate(
         net=net,
         set_params=set_params,
@@ -149,9 +149,6 @@ def test_simulate_batch(batch_simulate_instance, param_grid):
     with pytest.raises(ValueError, match="Invalid value for the 'backend'"):
         batch_simulate_instance.simulate_batch(param_combinations, backend="invalid")
 
-    with pytest.raises(TypeError, match="verbose must be"):
-        batch_simulate_instance.simulate_batch(param_combinations, verbose="invalid")
-
 
 def test_run(batch_simulate_instance, param_grid):
     """Test the run method of the batch_simulate_instance."""
@@ -177,7 +174,7 @@ def test_run(batch_simulate_instance, param_grid):
         return_output=True,
         combinations=False,
         backend="loky",
-        verbose=50,
+        verbose=False,
     )
 
     assert results_with_cache is not None

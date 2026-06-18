@@ -828,7 +828,7 @@ def convert_to_json(params_fname, out_fname, include_drives=True, overwrite=True
     -------
     None
     """
-    from .network_models import jones_2009_model
+    from .network_models import neymotin_2020_model
 
     # Validate inputs
     _validate_type(params_fname, (str, Path), "params_fname")
@@ -842,7 +842,7 @@ def convert_to_json(params_fname, out_fname, include_drives=True, overwrite=True
     if out_fname.suffix != ".json":
         out_fname = out_fname.with_suffix(".json")
 
-    net = jones_2009_model(
+    net = neymotin_2020_model(
         params=read_params(params_fname),
         add_drives_from_params=include_drives,
         legacy_mode=(True if params_suffix == "param" else False),

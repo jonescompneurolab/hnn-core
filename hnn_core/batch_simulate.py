@@ -5,14 +5,16 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
-import numpy as np
 import os
+from itertools import product
+
+import numpy as np
 from joblib import Parallel, delayed, parallel_config
 
 from .network import Network
 from .externals.mne import _validate_type, _check_option
 from .dipole import simulate_dipole
-from .network_models import jones_2009_model
+from .network_models import neymotin_2020_model
 
 
 class BatchSimulate(object):
@@ -31,11 +33,11 @@ class BatchSimulate(object):
         The network model to use for simulations. Examples include the
         returned value of the following functions:
 
-        - `jones_2009_model`: A network model based on Jones et al. (2009).
+        - `neymotin_2020_model`: A network model based on Jones et al. (2009).
         - `law_2021_model`: A network model based on Law et al. (2021).
         - `calcium_model`: A network model incorporating calcium dynamics.
 
-        Default is ``jones_2009_model()``.
+        Default is ``neymotin_2020_model()``.
     tstop : float, optional
         The stop time for the simulation. Default is 170 ms.
     dt : float, optional
@@ -105,7 +107,7 @@ class BatchSimulate(object):
     def __init__(
         self,
         set_params,
-        net=jones_2009_model(),
+        net=neymotin_2020_model(),
         tstop=170,
         dt=0.025,
         n_trials=1,
@@ -168,6 +170,7 @@ class BatchSimulate(object):
         self.postproc = postproc
         self.clear_cache = clear_cache
         self.summary_func = summary_func
+        self._verbose = True
 
     def run(
         self,
@@ -176,7 +179,7 @@ class BatchSimulate(object):
         combinations=True,
         n_jobs=1,
         backend="loky",
-        verbose=50,
+        verbose=True,
     ):
         """Run batch simulations.
 
@@ -197,8 +200,8 @@ class BatchSimulate(object):
             `multiprocessing`, or `dask`. WARNING: currently only `loky` is
             completely operationable; all other backends are in
             development. Default is `loky`.
-        verbose : int, optional
-            The verbosity level for parallel execution. Default is 50.
+        verbose : bool
+            If True, print build steps and simulation progress to console. Default: True.
 
         Returns
         -------
@@ -217,7 +220,8 @@ class BatchSimulate(object):
         _check_option(
             "backend", backend, ["loky", "threading", "multiprocessing", "dask"]
         )
-        _validate_type(verbose, types="int", item_name="verbose")
+        _validate_type(verbose, types=(bool,), item_name="verbose")
+        self._verbose = verbose
 
         param_combinations = self._generate_param_combinations(param_grid, combinations)
         total_sims = len(param_combinations)
@@ -232,7 +236,6 @@ class BatchSimulate(object):
                 param_combinations[start_idx:end_idx],
                 n_jobs=n_jobs,
                 backend=backend,
-                verbose=verbose,
             )
 
             if self.save_outputs:
@@ -261,7 +264,6 @@ class BatchSimulate(object):
         param_combinations,
         n_jobs=1,
         backend="loky",
-        verbose=50,
     ):
         """Simulate a batch of parameter sets in parallel.
 
@@ -276,8 +278,6 @@ class BatchSimulate(object):
             `multiprocessing`, or `dask`. WARNING: currently only `loky` is
             completely operationable; all other backends are in
             development. Default is `loky`.
-        verbose : int, optional
-            The verbosity level for parallel execution. Default is 50.
 
         Returns
         -------
@@ -297,10 +297,9 @@ class BatchSimulate(object):
         _check_option(
             "backend", backend, ["loky", "threading", "multiprocessing", "dask"]
         )
-        _validate_type(verbose, types="int", item_name="verbose")
 
         with parallel_config(backend=backend):
-            res = Parallel(n_jobs=n_jobs, verbose=verbose)(
+            res = Parallel(n_jobs=n_jobs)(
                 delayed(self._run_single_sim)(params) for params in param_combinations
             )
         return res
@@ -337,6 +336,7 @@ class BatchSimulate(object):
                 record_vsec=self.record_vsec,
                 record_isec=self.record_isec,
                 postproc=self.postproc,
+                verbose=self._verbose,
             )
             results["dpl"] = dpl
 
@@ -378,7 +378,6 @@ class BatchSimulate(object):
         param_combinations: list
             List of parameter combinations.
         """
-        from itertools import product
 
         keys, values = zip(*param_grid.items())
         if combinations:

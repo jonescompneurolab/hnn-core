@@ -3,17 +3,37 @@
 
 Please read the contribution guide **until the end** before beginning contributions.
 
-Contributions are welcome in the form of Pull Requests. You must abide by our [Code of
+Contributions are welcome in the form of Pull Requests (PR's). You must abide by our [Code of
 Conduct, found
-here](https://github.com/jonescompneurolab/hnn-core/blob/master/CODE_OF_CONDUCT.md). Our
-{doc}`Governance Model can be found here <governance>`.
+here](https://github.com/jonescompneurolab/hnn-core/blob/master/CODE_OF_CONDUCT.md),
+which includes instructions on what kind of AI- and LLM-generated code contributions we
+accept. Our {doc}`Governance Model can be found here <governance>`.
 
-Once the implementation of a piece of functionality is considered to be bug free and
-properly documented (both API docs and an example script), it can be incorporated into
-the `master` branch, which is where our releases come from.
+Please **double-check that your new Pull Request does not accomplish the same task as
+any existing Pull Request**! We reserve the right to close any new PRs that are
+"duplicates" of work (and any PR in general). Please tie your Pull Requests to specific
+Issues. Once the implementation of a piece of functionality is considered to be bug free
+and properly documented (both API docs and possibly an example script), and we have
+reviewed it, we may merge it into the `master` branch, which is where our releases come
+from.
 
-To contribute to `hnn-core` development, you need a special kind of installation, see the
-["`pip` Source Installation" section of our Installation Guide][] on our [Textbook website][].
+If you are interested in contributing to `hnn-core` as part of Google Summer of Code
+2026, [please see the Issue here for the latest
+information](https://github.com/jonescompneurolab/hnn-core/issues/1202).
+
+To contribute to `hnn-core` development, you need a special kind of installation, see
+the ["`pip` Source Installation" section of our Installation Guide][] on our [Textbook
+website][]. Note that this is **different** from the "`pip` Package Installation" type
+on that webpage!
+
+We are experimenting with having once-monthly HNN Development meetings which are open to
+the public. These take place on the first Monday of every month at 1:00 PM, United
+States Eastern time (the [timezone of Providence, RI, viewable
+here](https://www.timeanddate.com/worldclock/usa/providence)). You can access the Zoom
+room here
+[https://brown.zoom.us/j/99212200748](https://brown.zoom.us/j/99212200748). Note that
+there is a waiting room and you *must raise your hand* before you will be granted
+audio/video privileges. We will kick out anyone causing disruptions during the meeting.
 
 ## How to contribute code
 
@@ -791,6 +811,12 @@ Note that `make test` first runs the checks above for linting, spell-checking, a
 formatting, and then runs the test suite only *after* your code successfully passes
 those initial checks.
 
+Tests for parallel backends utilize a special `@pytest.mark.incremental` decorator
+(defined in `conftest.py`) that causes a test failure to skip subsequent tests in the
+incremental block. For example, if a test running a simple MPI simulation fails,
+subsequent tests that compare simulation output between different backends will be
+skipped. These types of failures will be marked as a failure in CI.
+
 ### Continuous Integration
 
 The repository is tested via continuous integration with GitHub Actions and
@@ -811,53 +837,41 @@ e.g., from `v2` to `v3`.
 MPI parallelization with NEURON requires that the simulation be launched with the
 `nrniv` binary from the command-line. The `mpiexec` command is used to launch multiple
 `nrniv` processes which communicate via MPI.  This is done using `subprocess.Popen()` in
-`MPIBackend.simulate()` to launch parallel child processes (`MPISimulation`) to carry
-out the simulation. The communication sequence between `MPIBackend` and `MPISimulation`
-is outlined below.
+`MPIBackend.simulate()` to launch parallel child processes
+(`MPISimulation`) to carry out the simulation. The communication sequence between
+`MPIBackend` and `MPISimulation` is outlined below.
 
-1.  In order to pass the network to simulate from `MPIBackend`, the child
-    `MPISimulation` processes' `stdin` is used. The ready-to-use
-    {class}`~hnn_core.Network` object is base64 encoded and pickled before being written
-    to the child processes' `stdin` by way of a Queue in a non-blocking way. See how it
-    is [used in MNE-Python][].  The data is marked by start and end signals that are
-    used to extract the pickled net object. After being unpickled, the parallel
-    simulation begins.
-2.  Output from the simulation (either to `stdout` or `stderr`) is communicated back to
-    `MPIBackend`, where it will be printed to the console. Typical output at this point
-    would be simulation progress messages as well as any MPI warnings/errors during the
-    simulation.
-3.  Once the simulation has completed, the rank 0 of the child process sends back the
-    simulation data by base64 encoding and pickling the data object. It also adds
-    markings for the start and end of the encoded data, including the expected length of
-    data (in bytes) in the end of data marking. Finally rank 0 writes the whole string
-    with markings and encoded data to `stderr`.
-4.  `MPIBackend` will look for these markings to know that data is being sent (and will
-    not print this). It will verify the length of data it receives, printing a
-    `UserWarning` if the data length received doesn't match the length part of the
-    marking.
-5.  To signal that the child process should terminate, `MPIBackend` sends a signal to
-    the child proccesses' `stdin`. After sending the simulation data, rank 0 waits for
-    this completion signal before continuing and letting all ranks of the MPI process
-    exit successfully.
-6.  At this point, `MPIBackend.simulate()` decodes and unpickles the data, populates the
-    network's CellResponse object, and returns the simulation dipoles to the caller.
+1.  Send the network: In order to pass the network to simulate from `MPIBackend` (the
+    parent process), `MPISimulation`'s (the child processes) `stdin` is used. The
+    ready-to-use {class}`~hnn_core.Network` object is base64 encoded and pickled before
+    being written to the child processes' `stdin` by way of a Queue in a non-blocking
+    way via `_write_net`. See a how a similar implementation is [used in MNE-Python][].
+2.  Read the network: The `MPISimulation` child's rank 0 reads it, deserializes it, and
+    broadcasts it to all MPI child ranks.
+3.  Wait for results: after sending the network, the parent process polls the child's `stdout`
+    for NEURON progress output and `stderr` for the `"@data_file:PATH:SIZE@"` signal.
+    The child rank 0 writes simulation results to a temp file and sends only
+    the file path + byte count over `stderr` to the parent process in order to avoid pipe
+    buffer deadlocks with large payloads.
+4.  `MPIBackend` parent process will verify the existence and access to the temp the
+    file, length of data it receives, printing a `UserWarning` if the data length
+    received doesn't match the expected length.
+5.  Acknowledge and exit: once the file signal is received, parent process sends
+    `"@data_received@"` to the child's stdin so the child can exit cleanly,
+    then waits for the subprocess to terminate.
+6.  At this point, `MPIBackend.simulate()` loads the simulation data from the temp file into a
+    network's {class}`~hnn_core.CellResponse` object, and returns the simulation dipoles to the caller.
 
 It is important that `flush()` is used whenever data is written to stdin or stderr to
 ensure that the signal will immediately be available for reading by the other side.
 
-Tests for parallel backends utilize a special `@pytest.mark.incremental` decorator
-(defined in `conftest.py`) that causes a test failure to skip subsequent tests in the
-incremental block. For example, if a test running a simple MPI simulation fails,
-subsequent tests that compare simulation output between different backends will be
-skipped. These types of failures will be marked as a failure in CI.
-
 ## Making changes to the default network
 
 If you ever need to make scientific or technical changes to the default network
-(i.e. the `jones_2009_model` network), you need to do three things:
+(i.e. the `neymotin_2020_model` network), you need to do three things:
 
 1. Step 1: If needed, manually make changes to `hnn_core/param/default.json`. This is
-   the base file used for the important `jones_2009_model()` function. Make sure that if
+   the base file used for the important `neymotin_2020_model()` function. Make sure that if
    you need to change certain parameters, then change them in this all-important file
    **manually**. Note that not all parameters are in this file. If your changes do not
    affect the parameters in this file, then you don't need to make any change to the
@@ -875,12 +889,12 @@ If you ever need to make scientific or technical changes to the default network
     sufficient. However, you **do** need to commit the new versions of these files. The
     two files:
 
-    A. `hnn_core/param/jones2009_base.json`: This is the base file used for the
+    A. `hnn_core/param/neymotin2020_base.json`: This is the base file used for the
        GUI. This file has been built using the code in
        `hnn_core/params.py::convert_to_json` by way of
        `dev_scripts/regenerate_base_network.py`.
 
-    B. `hnn_core/test/assets/jones2009_3x3_drives.json`: This is the base file used for
+    B. `hnn_core/test/assets/neymotin2020_3x3_drives.json`: This is the base file used for
        many tests. This file has been built using the script in
        `hnn_core/tests/regenerate_test_network.py`.
 

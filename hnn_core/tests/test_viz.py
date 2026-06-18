@@ -10,7 +10,9 @@ from numpy.testing import assert_allclose
 import pytest
 
 import hnn_core
-from hnn_core import read_params, jones_2009_model
+from hnn_core import read_params, neymotin_2020_model
+from hnn_core.dipole import simulate_dipole
+from hnn_core.network_models import default_cell_metadata
 from hnn_core.viz import (
     plot_cells,
     plot_dipole,
@@ -21,7 +23,6 @@ from hnn_core.viz import (
     plot_drive_strength,
     NetworkPlotter,
 )
-from hnn_core.dipole import simulate_dipole
 
 matplotlib.use("agg")
 
@@ -38,7 +39,7 @@ def setup_net():
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, "param", "default.json")
     params = read_params(params_fname)
-    net = jones_2009_model(params, mesh_shape=(3, 3))
+    net = neymotin_2020_model(params, mesh_shape=(3, 3))
 
     return net
 
@@ -327,7 +328,7 @@ class TestCellResponsePlotters:
         hnn_core_root = op.dirname(hnn_core.__file__)
         params_fname = op.join(hnn_core_root, "param", "default.json")
         params = read_params(params_fname)
-        net = jones_2009_model(params, mesh_shape=(3, 3))
+        net = neymotin_2020_model(params, mesh_shape=(3, 3))
 
         return net
 
@@ -399,13 +400,16 @@ class TestCellResponsePlotters:
             labels = [text.get_text() for text in fig.axes[0].legend_.get_texts()]
             return colors, labels
 
-        # Default colors should be the default color cycle
+        # Default colors should come from cell metadata
         fig = net.cell_response.plot_spikes_raster(trial_idx=0, show=False)
-        colors, _ = _get_line_hex_colors(fig)
-        default_colors = plt.rcParams["axes.prop_cycle"].by_key()["color"][
-            0 : len(colors)
+        colors, labels = _get_line_hex_colors(fig)
+
+        expected_cell_types = sorted(default_cell_metadata.keys())
+        expected_colors = [
+            matplotlib.colors.to_hex(default_cell_metadata[ct]["color"])
+            for ct in expected_cell_types
         ]
-        assert colors == default_colors
+        assert colors == expected_colors
 
         # Custom hex colors as list
         custom_colors = ["#daf7a6", "#ffc300", "#ff5733", "#c70039"]
