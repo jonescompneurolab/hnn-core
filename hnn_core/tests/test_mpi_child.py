@@ -7,15 +7,22 @@ import pytest
 
 import hnn_core
 from hnn_core import read_params, Network, neymotin_2020_model
-from hnn_core.mpi_child import MPISimulation, _str_to_net, _pickle_data
+from hnn_core.mpi_child import MPISimulation, _str_to_net
 from hnn_core.parallel_backends import (
     _gather_trial_data,
     _process_child_data,
     _echo_child_output,
-    _get_data_from_child_err,
+    _get_data_info_from_child_err,
     _extract_data,
     _extract_data_length,
+    requires_mpi4py,
 )
+
+import pickle
+import base64
+import tempfile
+import os
+from unittest.mock import patch
 
 
 def test_get_data_from_child_err():
@@ -26,7 +33,7 @@ def test_get_data_from_child_err():
     err_q.put(test_string)
 
     with io.StringIO() as buf_out, redirect_stdout(buf_out):
-        _get_data_from_child_err(err_q)
+        _get_data_info_from_child_err(err_q)
         output = buf_out.getvalue()
     assert output == test_string
 
@@ -85,7 +92,7 @@ def test_str_to_net():
     params = read_params(params_fname)
     net = neymotin_2020_model(params, add_drives_from_params=True)
 
-    pickled_net = _pickle_data(net)
+    pickled_net = base64.b64encode(pickle.dumps(net))
 
     input_str = (
         "@start_of_net@"
@@ -137,18 +144,17 @@ def test_child_run():
         assert "Trial 1: 0.03 ms..." in stdout
 
         with io.StringIO() as buf_err, redirect_stderr(buf_err):
-            mpi_sim._write_data_stderr(sim_data)
+            mpi_sim._send_data_to_parent_process(sim_data)
             stderr_str = buf_err.getvalue()
-        assert "@start_of_data@" in stderr_str
-        assert "@end_of_data:" in stderr_str
+        assert "@data_file:" in stderr_str
 
         # write data to queue
         err_q = Queue()
         err_q.put(stderr_str)
 
         # use _read_stderr to get data_len (but not the data this time)
-        data_len, data = _get_data_from_child_err(err_q)
-        sim_data = _process_child_data(data, data_len)
+        data_len, data_path = _get_data_info_from_child_err(err_q)
+        sim_data = _process_child_data(data_path, data_len)
         n_trials = 1
         postproc = False
         dpls = _gather_trial_data(sim_data, net_reduced, n_trials, postproc)
@@ -157,20 +163,24 @@ def test_child_run():
 
 def test_empty_data():
     """Test that an empty string raises RuntimeError"""
-    data_bytes = b""
-    with pytest.raises(RuntimeError, match="MPI simulation didn't return any data"):
-        _process_child_data(data_bytes, len(data_bytes))
+    data_path = None
+    with pytest.raises(
+        RuntimeError, match="MPI simulation didn't produce a result file"
+    ):
+        _process_child_data(data_path, 0)
 
 
 def test_data_len_mismatch():
     """Test that padded data can be unpickled with warning for length"""
 
-    pickled_bytes = _pickle_data({})
+    pickled_bytes = pickle.dumps({})
+    fd, temp_file_path = tempfile.mkstemp(suffix=".pkl")
+    with os.fdopen(fd, "wb") as f:
+        f.write(pickled_bytes)
 
     expected_len = len(pickled_bytes) + 1
-
     with pytest.warns(UserWarning) as record:
-        _process_child_data(pickled_bytes, expected_len)
+        _process_child_data(temp_file_path, expected_len)
 
     expected_string = (
         "Length of received data unexpected. "
@@ -179,3 +189,43 @@ def test_data_len_mismatch():
 
     assert len(record) == 1
     assert record[0].message.args[0] == expected_string
+
+
+def test_file_not_found():
+    """_process_child_data raises RuntimeError and warns when file is missing
+    If mpi_child returns a non existen path raise a RuntimeError
+    MPI result file missing
+    """
+    with pytest.warns(UserWarning, match="expected 42"):
+        with pytest.warns(UserWarning, match="Result file not found"):
+            with pytest.raises(RuntimeError, match="MPI result file missing"):
+                _process_child_data("/nonexistent/path/hnn_mpi_data.pkl", 42)
+
+
+def test_permission_error():
+    """_process_child_data raises RuntimeError and warns on PermissionError
+    If the simulation result file cannot be read raise a RuntimeError
+    MPI result file unreadable"
+    """
+    fd, tmp_path = tempfile.mkstemp(prefix="hnn_mpi_test_", suffix=".pkl")
+    os.close(fd)
+    try:
+        with patch("builtins.open", side_effect=PermissionError("denied")):
+            with pytest.warns(UserWarning, match="expected 42"):
+                with pytest.warns(UserWarning, match="Permission denied"):
+                    with pytest.raises(
+                        RuntimeError, match="MPI result file unreadable"
+                    ):
+                        _process_child_data(tmp_path, 42)
+    finally:
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
+
+
+@requires_mpi4py
+@pytest.mark.uses_mpi
+def test_logging():
+    with MPISimulation(verbose_subprocess=True) as mpi_sim:
+        assert "mpi_child.rank" in mpi_sim.logger.name
