@@ -128,12 +128,9 @@ def _rmse_evoked(
         # simulate dpl with predicted params
         new_net = initial_net.copy()
 
-        def set_params_batch(a, b):
-            set_params(b, a)  # need to fix this
-
         batch_simulation = BatchSimulate(
             net=new_net,
-            set_params=set_params_batch,
+            set_params=set_params,
             save_outputs=False,
             save_dpl=True,
             dt=obj_fun_kwargs.get("dt", 0.025),
@@ -272,12 +269,9 @@ def _maximize_psd(
         # simulate dpl with predicted params
         new_net = initial_net.copy()
 
-        def set_params_batch(a, b):
-            set_params(b, a)  # need to fix this
-
         batch_simulation = BatchSimulate(
             net=new_net,
-            set_params=set_params_batch,
+            set_params=set_params,
             save_outputs=False,
             save_dpl=True,
             dt=obj_fun_kwargs.get("dt", 0.025),
@@ -398,12 +392,9 @@ def _anticorr_evoked(
         # simulate dpl with predicted params
         new_net = initial_net.copy()
 
-        def set_params_batch(a, b):
-            set_params(b, a)  # need to fix this
-
         batch_simulation = BatchSimulate(
             net=new_net,
-            set_params=set_params_batch,
+            set_params=set_params,
             save_outputs=False,
             save_dpl=True,
             dt=obj_fun_kwargs.get("dt", 0.025),
