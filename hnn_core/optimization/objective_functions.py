@@ -186,6 +186,9 @@ def _rmse_evoked(
         Parameters selected by the optimizer.
     update_params : func
         Function to update params.
+    obj_values : list
+         List of objective values for each epoch (aka iteration) during optimization.
+         Updated as a side effect of evaluating the objective function.
     tstop : float
         The simulated dipole's duration.
     target : instance of Dipole
