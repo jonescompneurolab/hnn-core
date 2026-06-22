@@ -615,7 +615,8 @@ class Cell:
         for sec_name in sections:
             for receptor in sections[sec_name].syns:
                 syn_key = f"{sec_name}_{receptor}"
-                value = seg_x[sec_name] 
+                value = seg_x.get(sec_name, 0.5)
+                print(seg_x)
                 seg = self._nrn_sections[sec_name](value)
                 self._nrn_synapses[syn_key] = self.syn_create(seg, **synapses[receptor])
 
@@ -676,6 +677,7 @@ class Cell:
         h.define_shape()
 
     def build(self, sec_name_apical=None):
+        
         """Build cell in Neuron and insert dipole if applicable.
 
         Parameters
@@ -686,7 +688,7 @@ class Cell:
             of a pyramidal neuron.
         """
         self._create_sections(self.sections, self.cell_tree)
-        self._create_synapses(self.sections, self.synapses,self.seg_x)
+        self._create_synapses(self.sections, self.synapses, self.seg_x)
         self._set_biophysics(self.sections)
         if sec_name_apical in self._nrn_sections:
             self._insert_dipole(sec_name_apical)
