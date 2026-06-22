@@ -539,6 +539,7 @@ def _rmse_corr_evoked(
             _rmse_corr(
                 dpl,
                 obj_fun_kwargs["target"],
+                tstart=obj_fun_kwargs.get("tstart", 0),
                 tstop=tstop,
                 weights=obj_fun_kwargs.get("weights", None),
             )
@@ -563,7 +564,7 @@ def _rmse_corr_evoked(
         # smooth & scale all dipoles
         _preprocess_dipole(dpls, obj_fun_kwargs)
         dpl = average_dipoles(dpls)
-        obj = _rmse_corr(dpl, obj_fun_kwargs["target"], tstop=tstop)
+        obj = _rmse_corr(dpl, obj_fun_kwargs["target"], tstart=obj_fun_kwargs.get("tstart", 0), tstop=tstop)
 
         # Update best params; this is a "side-effect" that changes the `best` dictionary
         # in-place in the parent scope
