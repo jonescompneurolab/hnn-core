@@ -1,0 +1,28 @@
+import copy
+from hnn_core import jones_2009_model, simulate_dipole
+net = jones_2009_model()
+print(dir(net))
+
+
+l2_conns = [c for c in net.connectivity if c['target_type'] == 'L2_pyramidal']
+net.connectivity = [c for c in net.connectivity if c['target_type'] != 'L2_pyramidal']
+
+for conn in l2_conns:
+    net.add_connection(
+        conn['src_type'],
+        conn['target_type'],
+        conn['loc'],
+        conn['receptor'],
+        conn['nc_dict']['A_weight'],
+        conn['nc_dict']['A_delay'],
+        conn['nc_dict']['lamtha'],
+        seg_x=0.99,
+    )
+
+
+dpl = simulate_dipole(net, tstop=170., n_trials=1)
+print("\nSimulation complete")
+
+for cell_type, cell_data in net.cell_types.items():
+    cell_obj = cell_data["cell_object"]
+    print(f"{cell_type} seg_x: {cell_obj.seg_x}")
