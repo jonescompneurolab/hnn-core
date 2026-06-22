@@ -19,6 +19,9 @@ def _get_target_properties(
     location,
     cell_types,
     probability=1.0,
+    weights_gabaa=None,
+    weights_gabab=None,
+    weights_gabaa_slow=None,
 ):
     """Retrieve drive properties associated with each target cell type
 
@@ -26,20 +29,29 @@ def _get_target_properties(
     weight and delay parameters keys defined by the user.
     """
 
+    # map each receptor name to its (possibly None) user-supplied weights dict;
     # allow passing weights as None, but make iterable here
-    if weights_ampa is None:
-        weights_ampa = dict()
-    if weights_nmda is None:
-        weights_nmda = dict()
-
-    weights_by_type = {
-        cell_type: dict()
-        for cell_type in (set(weights_ampa.keys()) | set(weights_nmda.keys()))
+    weights_by_receptor = {
+        "ampa": weights_ampa,
+        "nmda": weights_nmda,
+        "gabaa": weights_gabaa,
+        "gabab": weights_gabab,
+        "gabaa_slow": weights_gabaa_slow,
     }
-    for cell_type in weights_ampa:
-        weights_by_type[cell_type].update({"ampa": weights_ampa[cell_type]})
-    for cell_type in weights_nmda:
-        weights_by_type[cell_type].update({"nmda": weights_nmda[cell_type]})
+    weights_by_receptor = {
+        receptor: (weights if weights is not None else dict())
+        for receptor, weights in weights_by_receptor.items()
+    }
+
+    # target cell types are the union of cells named in any receptor's weights
+    all_target_cells = set()
+    for weights in weights_by_receptor.values():
+        all_target_cells |= set(weights.keys())
+
+    weights_by_type = {cell_type: dict() for cell_type in all_target_cells}
+    for receptor, weights in weights_by_receptor.items():
+        for cell_type in weights:
+            weights_by_type[cell_type].update({receptor: weights[cell_type]})
 
     target_populations = set(weights_by_type)
     if not target_populations:

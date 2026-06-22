@@ -257,7 +257,7 @@ def pick_connection(net, src_gids=None, target_gids=None, loc=None, receptor=Non
     _validate_type(receptor, (str, list, None), "receptor", "str, list, or None")
 
     valid_loc = ["proximal", "distal", "soma"]
-    valid_receptor = ["ampa", "nmda", "gabaa", "gabab"]
+    valid_receptor = ["ampa", "nmda", "gabaa", "gabab", "gabaa_slow"]
 
     # Convert receptor and loc to list
     loc_list = _string_input_to_list(loc, valid_loc, "loc")
@@ -1204,6 +1204,259 @@ class Network:
             probability,
         )
 
+    def add_inhibitory_drive(
+        self,
+        name,
+        pattern,
+        *,
+        location,
+        weights_gabaa=None,
+        weights_gabab=None,
+        weights_gabaa_slow=None,
+        mu=None,
+        sigma=None,
+        numspikes=None,
+        rate_constant=None,
+        tstart=0,
+        tstart_std=0,
+        tstop=None,
+        burst_rate=None,
+        burst_std=0,
+        spike_isi=10,
+        n_drive_cells="n_cells",
+        cell_specific=True,
+        synaptic_delays=0.1,
+        space_constant=3.0,
+        probability=1.0,
+        event_seed=2,
+        conn_seed=3,
+    ):
+        """Add an inhibitory external drive to the network.
+
+        An inhibitory drive consists of artificial cells whose spikes are
+        connected to the GABAergic synapses of the targeted cells. The timing
+        of the spikes is governed by one of three dynamics ``pattern``s, which
+        mirror the corresponding excitatory drives:
+
+        - ``'gaussian'`` : spikes occur at a mean time ``mu`` with dispersion
+          ``sigma`` (cf. :meth:`add_evoked_drive`).
+        - ``'poisson'`` : Poisson-distributed spikes from ``tstart`` to
+          ``tstop`` at ``rate_constant`` (cf. :meth:`add_poisson_drive`).
+        - ``'bursty'`` : rhythmic bursts of spikes (cf.
+          :meth:`add_bursty_drive`).
+
+        Parameters
+        ----------
+        name : str
+            Unique name for the drive
+        pattern : str
+            The temporal dynamics of the drive. One of 'gaussian', 'poisson',
+            or 'bursty'.
+        location : str
+            Target location of synapses. Must be an element of
+            `Cell.sect_loc` such as 'proximal' or 'distal', which defines a
+            group of sections, or an existing section such as 'soma' or
+            'apical_tuft' (defined in `Cell.sections` for all targeted cells).
+            All targeted sections must define the GABAergic synapses given
+            non-zero weights below.
+        weights_gabaa : dict or None
+            Synaptic weights (in uS) of GABA_A receptors on each targeted cell
+            type (dict keys). Cell types omitted from the dict are set to zero.
+        weights_gabab : dict or None
+            Synaptic weights (in uS) of GABA_B receptors on each targeted cell
+            type (dict keys). Cell types omitted from the dict are set to zero.
+        weights_gabaa_slow : dict or None
+            Synaptic weights (in uS) of slow GABA_A receptors on each targeted
+            cell type (dict keys). Cell types omitted from the dict are set to
+            zero.
+        mu : float
+            Mean of Gaussian event time distribution. Required when
+            ``pattern='gaussian'``.
+        sigma : float
+            Standard deviation of event time distribution. Required when
+            ``pattern='gaussian'``.
+        numspikes : int
+            Number of spikes per target cell (``pattern='gaussian'``) or the
+            number of spikes per burst (``pattern='bursty'``, default 2).
+        rate_constant : float or dict of floats
+            Rate constant (lambda > 0) of the Poisson process. Required when
+            ``pattern='poisson'``. If a float, the same rate is applied to all
+            target cell types; use a dict to map cell type -> rate.
+        tstart : float
+            Start time (ms) of the spike train (``'poisson'``/``'bursty'``).
+        tstart_std : float
+            Standard deviation (ms) of the burst start time across trials
+            (``pattern='bursty'``).
+        tstop : float
+            End time (ms) of the spike train (``'poisson'``/``'bursty'``).
+            Defaults to the end of the simulation.
+        burst_rate : float
+            The mean rate (Hz) at which cyclic bursts occur. Required when
+            ``pattern='bursty'``.
+        burst_std : float
+            Standard deviation (ms) of the burst occurrence on each cycle
+            (``pattern='bursty'``).
+        spike_isi : float
+            Time between spike events within a burst (ms, ``pattern='bursty'``).
+        n_drive_cells : int | 'n_cells'
+            The number of drive cells that contribute to this drive. See
+            :meth:`add_evoked_drive` for details.
+        cell_specific : bool
+            Whether each artificial drive cell has 1-to-1 (True, default) or
+            all-to-all (False) connectivity. See :meth:`add_evoked_drive`.
+        synaptic_delays : dict or float
+            Synaptic delay (in ms) at the column origin. If float, applies to
+            all target cell types. Use dict to create delay->cell mapping.
+        space_constant : float
+            Describes lateral dispersion (from the column origin) of synaptic
+            weights and delays within the simulated column.
+        probability : dict or float (default: 1.0)
+            Probability of connection between any src-target pair.
+        event_seed : int
+            Optional initial seed for the event-time random number generator
+            (default: 2).
+        conn_seed : int
+            Optional initial seed for the connectivity random number generator
+            (default: 3).
+        """
+        _validate_type(pattern, str, "pattern", "str")
+        _check_option("pattern", pattern, ["gaussian", "poisson", "bursty"])
+
+        if (
+            weights_gabaa is None
+            and weights_gabab is None
+            and weights_gabaa_slow is None
+        ):
+            raise ValueError(
+                "An inhibitory drive must define at least one of "
+                "'weights_gabaa', 'weights_gabab', or 'weights_gabaa_slow'."
+            )
+
+        drive = _NetworkDrive()
+        drive["location"] = location
+        drive["n_drive_cells"] = n_drive_cells
+        drive["event_seed"] = event_seed
+        drive["conn_seed"] = conn_seed
+        drive["events"] = list()
+
+        if pattern == "gaussian":
+            for param_name, param in [("mu", mu), ("sigma", sigma)]:
+                if param is None:
+                    raise ValueError(
+                        f"The '{param_name}' parameter is required for a "
+                        "'gaussian' inhibitory drive."
+                    )
+            if numspikes is None:
+                raise ValueError(
+                    "The 'numspikes' parameter is required for a 'gaussian' "
+                    "inhibitory drive."
+                )
+            if not self._legacy_mode:
+                _check_drive_parameter_values(
+                    "gaussian", sigma=sigma, numspikes=numspikes
+                )
+            # 'gaussian' shares event-time dynamics with the evoked drive
+            drive["type"] = "gaussian"
+            drive["dynamics"] = dict(mu=mu, sigma=sigma, numspikes=numspikes)
+        elif pattern == "poisson":
+            if rate_constant is None:
+                raise ValueError(
+                    "The 'rate_constant' parameter is required for a 'poisson' "
+                    "inhibitory drive."
+                )
+            _check_drive_parameter_values("poisson", tstart=tstart, tstop=tstop)
+            # rate constants are validated/expanded against target populations
+            target_populations, _, _, _ = _get_target_properties(
+                None,
+                None,
+                synaptic_delays,
+                location,
+                self.cell_types,
+                probability=probability,
+                weights_gabaa=weights_gabaa,
+                weights_gabab=weights_gabab,
+                weights_gabaa_slow=weights_gabaa_slow,
+            )
+            _check_poisson_rates(
+                rate_constant, target_populations, self.cell_types.keys()
+            )
+            if isinstance(rate_constant, dict):
+                if not cell_specific:
+                    raise ValueError(
+                        f"Drives specific to cell types are only "
+                        f"possible with cell_specific=True and "
+                        f"n_drive_cells='n_cells'. Got cell_specific"
+                        f" cell_specific={cell_specific} and "
+                        f"n_drive_cells={n_drive_cells}."
+                    )
+            elif isinstance(rate_constant, (float, int)):
+                if cell_specific:
+                    rate_constant = {
+                        cell_type: rate_constant for cell_type in target_populations
+                    }
+            drive["type"] = "poisson"
+            drive["dynamics"] = dict(
+                tstart=tstart, tstop=tstop, rate_constant=rate_constant
+            )
+        elif pattern == "bursty":
+            if burst_rate is None:
+                raise ValueError(
+                    "The 'burst_rate' parameter is required for a 'bursty' "
+                    "inhibitory drive."
+                )
+            if numspikes is None:
+                numspikes = 2
+            if not self._legacy_mode:
+                _check_drive_parameter_values(
+                    "bursty",
+                    tstart=tstart,
+                    tstop=tstop,
+                    sigma=tstart_std,
+                    location=location,
+                )
+                _check_drive_parameter_values(
+                    "bursty",
+                    sigma=burst_std,
+                    numspikes=numspikes,
+                    spike_isi=spike_isi,
+                    burst_rate=burst_rate,
+                )
+            drive["type"] = "bursty"
+            drive["dynamics"] = dict(
+                tstart=tstart,
+                tstart_std=tstart_std,
+                tstop=tstop,
+                burst_rate=burst_rate,
+                burst_std=burst_std,
+                numspikes=numspikes,
+                spike_isi=spike_isi,
+            )
+
+        # Need to save this information
+        drive["weights_ampa"] = None
+        drive["weights_nmda"] = None
+        drive["weights_gabaa"] = weights_gabaa
+        drive["weights_gabab"] = weights_gabab
+        drive["weights_gabaa_slow"] = weights_gabaa_slow
+        drive["synaptic_delays"] = synaptic_delays
+        drive["probability"] = probability
+
+        self._attach_drive(
+            name,
+            drive,
+            None,
+            None,
+            location,
+            space_constant,
+            synaptic_delays,
+            n_drive_cells,
+            cell_specific,
+            probability,
+            weights_gabaa=weights_gabaa,
+            weights_gabab=weights_gabab,
+            weights_gabaa_slow=weights_gabaa_slow,
+        )
+
     def add_spike_train_drive(
         self,
         name,
@@ -1340,6 +1593,9 @@ class Network:
         n_drive_cells,
         cell_specific,
         probability,
+        weights_gabaa=None,
+        weights_gabab=None,
+        weights_gabaa_slow=None,
     ):
         """Attach a drive to network based on connectivity information
 
@@ -1410,6 +1666,9 @@ class Network:
                 location,
                 self.cell_types,
                 probability=probability,
+                weights_gabaa=weights_gabaa,
+                weights_gabab=weights_gabab,
+                weights_gabaa_slow=weights_gabaa_slow,
             )
         )
 
