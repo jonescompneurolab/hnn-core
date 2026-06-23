@@ -1097,7 +1097,22 @@ class _VizManager:
         plt.close("all")
         self.viz_layout = viz_layout
         self.fig_default_params = fig_default_params
-        self.use_ipympl = "ipympl" in matplotlib.get_backend()
+
+        # The choice of backend here controls whether our plots elsewhere in this file
+        # use `_static_rerender` or `_dynamic_rerender`, and we prefer the latter.
+        #
+        # This `use` call attempts to force use of the `ipympl` backend, which should be
+        # safe to do because:
+        # 1. `ipympl` is always installed with the GUI dependencies
+        # 2. We are only forcing this for the GUI itself (via `_VizManager`), not for a
+        #    user's general plotting
+        matplotlib.use("ipympl")
+        # However, just in case, we will still support fallback backends like Tushar
+        # added here:
+        backend = matplotlib.get_backend().lower()
+        self.use_dynamic_rendering = any(
+            name in backend for name in ("ipympl", "nbagg", "widget")
+        )
 
         self.axes_config_output = Output()
         self.figs_output = Output()
@@ -1158,7 +1173,7 @@ class _VizManager:
     def data(self):
         """Provides easy access to visualization-related data."""
         return {
-            "use_ipympl": self.use_ipympl,
+            "use_ipympl": self.use_dynamic_rendering,
             "simulations": self.gui_data["simulation_data"],
             "fig_idx": self.fig_idx,
             "visualization_window": self.viz_layout["visualization_window"],
@@ -1345,7 +1360,7 @@ class _VizManager:
                 template_name,
                 fig=self.figs[fig_key],
                 idx=fig_key,
-                use_ipympl=self.use_ipympl,
+                use_ipympl=self.use_dynamic_rendering,
                 widgets=self.widgets,
             )
 
