@@ -54,7 +54,7 @@ from hnn_core.dipole import _read_dipole_txt, average_dipoles
 from hnn_core.gui._logging import logger
 from hnn_core.gui._viz_manager import _idx2figname, _VizManager
 from hnn_core.hnn_io import dict_to_network, write_network_configuration
-from hnn_core.network import pick_connection
+from hnn_core.network import pick_connection, _check_global_synaptic_gains_uniformity
 from hnn_core.optimization import Optimizer, generate_opt_history_table
 from hnn_core.parallel_backends import (
     _determine_cores_hwthreading,
@@ -4384,15 +4384,46 @@ def add_network_connectivity_tab(
     ### Global synaptic gains
     # ---------------------------------------------------------------
     global_gain_out.clear_output()
-    gain_values = net.get_global_synaptic_gains()
-    gain_types = ("e_e", "e_i", "i_e", "i_i")
+    gui_global_gain_types = ("e_e", "e_i", "i_e", "i_i")
+
+    # Do "smart" loading of the synaptic gains, where custom global gains are
+    # "extracted" from the network and displayed in the "global gains" parts of the GUI,
+    # not the individual. This requires overwriting the "global gains" of the Network
+    # itself, since the only "state" that contains the global gain information will be
+    # the GUI itself! (This is because the Network can only store one gain value per
+    # connection, but the GUI offers multiple ways to change gains...).
+    if _check_global_synaptic_gains_uniformity(net):
+        # If the check passes, then we can faithfully rely on the getter function to get
+        # the global gain of each class, including the non-default ones.
+        gui_global_gain_values = net.get_global_synaptic_gains()
+        if not np.allclose(1.0, list(gui_global_gain_values.values())):
+            # If any of the global gain classes use a non-default value, then reset it
+            # in the Network to the default, since we're ONLY going to keep the "state"
+            # of that global gain value in the GUI via `gui_global_gain_values` (until the GUI
+            # later creates a new Network).
+            #
+            # Apparently can't just pass a dictionary...
+            net.set_global_synaptic_gains(
+                e_e=1.0,
+                e_i=1.0,
+                i_e=1.0,
+                i_i=1.0,
+            )
+    else:
+        # If the check does NOT pass, then "all bets are off": the user will have
+        # received a warning in the log window that the gains are NOT uniform within
+        # their class. To be safe, it is better to set all the global values to their
+        # default rather than show non-default values which are not correct (since they
+        # don't hold to the uniformity assumption). The individual, single gains that
+        # are displayed later in the accordion should be accurate and up-to-date.
+        gui_global_gain_values = {type: 1.0 for type in gui_global_gain_types}
 
     # Same as _get_connectivity_widgets
     style = {"description_width": "100px"}
 
-    for gain_type in gain_types:
+    for gain_type in gui_global_gain_types:
         gain_widget = BoundedFloatText(
-            value=gain_values[gain_type],
+            value=gui_global_gain_values[gain_type],
             description=f"{global_gain_type_display_dict[gain_type]}",
             min=0,
             max=1e6,
