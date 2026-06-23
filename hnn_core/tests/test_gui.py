@@ -306,9 +306,10 @@ def test_gui_smart_gains_upload_connectivity(setup_gui):
         file1_path = Path(tmp_dir) / "custom_global_gains_nonuniform.json"
         write_network_configuration(net2, file1_path)
 
-        # Set the GUI global gains back to defaults
-        gui.global_gain_widgets["i_e"].value = 1.0
-        gui.global_gain_widgets["i_i"].value = 1.0
+        # Set the GUI global gains back to their custom test values JUST IN CASE
+        # in order to ensure the upload of the file resets the global gain values back to 1.0
+        gui.global_gain_widgets["i_e"].value = global_gain_test_value_1
+        gui.global_gain_widgets["i_i"].value = global_gain_test_value_2
 
         gui._simulate_upload_connectivity(file1_path)
 
