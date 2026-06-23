@@ -472,29 +472,6 @@ class NetworkBuilder(object):
                 # instantiate NEURON object
                 # using meta data style
                 src_type_metadata = self.net.cell_types[src_type]["cell_metadata"]
-                if src_type == 'L2_pyramidal':
-                    print(f"  total conns = {len(self.net.connectivity)}")
-                for c in self.net.connectivity:
-                    print(f"    target={c['target_type']}, seg_x={c.get('seg_x')!r}")
-                    break
-                seg_x = {}
-                for conn in self.net.connectivity:
-                    if conn["src_type"] != src_type or conn.get("seg_x") is None:
-                        continue
-                    loc = conn["loc"]
-                    val = conn["seg_x"]
-                    cell_obj = self.net.cell_types[src_type]["cell_object"]
-                    if loc in cell_obj.sect_loc:
-                        for sec_name in cell_obj.sect_loc[loc]:
-                            
-                            seg_x[sec_name] = val
-                    else:
-                        seg_x[loc] = val
-                
-                if seg_x:
-                    cell.seg_x = seg_x
-
-
                 if src_type_metadata.get("measure_dipole", False):
                     cell.build(sec_name_apical="apical_trunk")
                 else:
