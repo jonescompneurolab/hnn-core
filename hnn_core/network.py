@@ -1704,7 +1704,7 @@ class Network:
         allow_autapses=True,
         probability=1.0,
         conn_seed=None,
-        seg_x=None#first what
+        seg_x=0.5
     ):
         """Appends connections to connectivity list
 

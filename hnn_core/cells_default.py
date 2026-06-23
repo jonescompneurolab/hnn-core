@@ -254,13 +254,6 @@ def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
 
     syn_sections = ["apical_tuft", "apical_oblique", "basal_2", "basal_3"]
     
-    syn_seg_x = {#maybe like we can additional segments value of sections
-    'apical_oblique': 0.5,
-    'apical_tuft':    0.5,
-    'basal_2':        0.5,
-    'basal_3':        0.5,
-    'soma':           0.5,
-    }
     
     for sec_name, section in sections.items():
         section._end_pts = end_pts[sec_name]
@@ -302,7 +295,6 @@ def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
         sect_loc=sect_loc,
         cell_tree=cell_tree,
         gid=gid,
-        seg_x=syn_seg_x,
     )
 
 
@@ -424,13 +416,6 @@ def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
 
     syn_sections = ["apical_tuft", "apical_oblique", "basal_2", "basal_3"]
     
-    syn_seg_x = {
-    'apical_oblique': 0.5,
-    'apical_tuft':    0.5,
-    'basal_2':        0.5,
-    'basal_3':        0.5,
-    'soma':           0.5,
-}
     
     for sec_name, section in sections.items():
         section._end_pts = end_pts[sec_name]
@@ -477,7 +462,6 @@ def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
         sect_loc=sect_loc,
         cell_tree=cell_tree,
         gid=gid,
-        seg_x=syn_seg_x
     )
 
 
@@ -716,7 +700,6 @@ def basket(cell_name, pos=(0, 0, 0), gid=None):
     synapses = _get_basket_syn_props()
     sections["soma"].syns = list(synapses.keys())
     sections["soma"].mechs = {"hh2": dict()}
-    seg_x = {"soma": 0.5}
     cell_tree = None
     return Cell(
         cell_name,
@@ -726,7 +709,6 @@ def basket(cell_name, pos=(0, 0, 0), gid=None):
         sect_loc=sect_loc,
         cell_tree=cell_tree,
         gid=gid,
-        seg_x=seg_x
     )
 
 
