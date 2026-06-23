@@ -97,16 +97,16 @@ resulting in the complex waveforms observed.
 
 
 
-    def set_params(param_values, net=None):
+    def set_params(net, param_values):
         """
         Set parameters for the network drives.
 
         Parameters
         ----------
+        net : instance of Network
+            The network object to modify.
         param_values : dict
             Dictionary of parameter values.
-        net : instance of Network, optional
-            If None, a new network is created using the specified model type.
         """
         weights_ampa = {'L2_basket': param_values['weight_basket'],
                         'L2_pyramidal': param_values['weight_pyr'],
@@ -226,64 +226,64 @@ Run the batch simulation and collect the results.
     Simulation results: {'summary_statistics': [[{'min_peak': np.float64(-1.948723369916257e-05), 'max_peak': np.float64(2.438299811172486e-05)}, {'min_peak': np.float64(-1.948723369916257e-05), 'max_peak': np.float64(3.5625970074068165e-05)}, {'min_peak': np.float64(-1.948723369916257e-05), 'max_peak': np.float64(5.187123572695802e-05)}, {'min_peak': np.float64(-1.948723369916257e-05), 'max_peak': np.float64(7.539737690213312e-05)}, {'min_peak': np.float64(-1.948723369916257e-05), 'max_peak': np.float64(0.0001096227163976112)}, {'min_peak': np.float64(-0.0008187098140745243), 'max_peak': np.float64(0.0011853731897260916)}, {'min_peak': np.float64(-0.0006900911098816527), 'max_peak': np.float64(0.0014532366142034129)}, {'min_peak': np.float64(-7.443630674152272e-05), 'max_peak': np.float64(0.0006303483688791759)}, {'min_peak': np.float64(-0.00038312472505001556), 'max_peak': np.float64(0.0015588783545866054)}, {'min_peak': np.float64(-0.0005827286517535943), 'max_peak': np.float64(0.0014794795458269719)}, {'min_peak': np.float64(-0.0005759203533290843), 'max_peak': np.float64(0.001453923529524903)}, {'min_peak': np.float64(-1.948723369916257e-05), 'max_peak': np.float64(0.0013262182394243893)}, {'min_peak': np.float64(-1.948723369916257e-05), 'max_peak': np.float64(0.001328331309960038)}, {'min_peak': np.float64(-1.948723369916257e-05), 'max_peak': np.float64(0.0011853462053579675)}, {'min_peak': np.float64(-1.948723369916257e-05), 'max_peak': np.float64(0.0011649633329457551)}, {'min_peak': np.float64(-1.948723369916257e-05), 'max_peak': np.float64(0.001184585414815373)}, {'min_peak': np.float64(-1.948723369916257e-05), 'max_peak': np.float64(0.0012311552850961124)}, {'min_peak': np.float64(-1.948723369916257e-05), 'max_peak': np.float64(0.0013115554222262733)}, {'min_peak': np.float64(-1.948723369916257e-05), 'max_peak': np.float64(0.001431431523222179)}, {'min_peak': np.float64(-1.948723369916257e-05), 'max_peak': np.float64(0.0015123789975719434)}]], 'simulated_data': [[{'net': <Network | 3 L2_basket cells
     9 L2_pyramidal cells
     3 L5_basket cells
-    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.0001), 'weight_pyr': np.float64(0.0001)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x78b84a652d50>]}, {'net': <Network | 3 L2_basket cells
+    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.0001), 'weight_pyr': np.float64(0.0001)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x780e4a5e8c50>]}, {'net': <Network | 3 L2_basket cells
     9 L2_pyramidal cells
     3 L5_basket cells
-    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.0001438449888287663), 'weight_pyr': np.float64(0.0001438449888287663)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x78b8408d8090>]}, {'net': <Network | 3 L2_basket cells
+    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.0001438449888287663), 'weight_pyr': np.float64(0.0001438449888287663)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x780e3bc99690>]}, {'net': <Network | 3 L2_basket cells
     9 L2_pyramidal cells
     3 L5_basket cells
-    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.00020691380811147902), 'weight_pyr': np.float64(0.00020691380811147902)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x78b849f7b450>]}, {'net': <Network | 3 L2_basket cells
+    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.00020691380811147902), 'weight_pyr': np.float64(0.00020691380811147902)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x780e3bc2e490>]}, {'net': <Network | 3 L2_basket cells
     9 L2_pyramidal cells
     3 L5_basket cells
-    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.00029763514416313193), 'weight_pyr': np.float64(0.00029763514416313193)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x78b849f1cf50>]}, {'net': <Network | 3 L2_basket cells
+    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.00029763514416313193), 'weight_pyr': np.float64(0.00029763514416313193)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x780e4a455a90>]}, {'net': <Network | 3 L2_basket cells
     9 L2_pyramidal cells
     3 L5_basket cells
-    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.00042813323987193956), 'weight_pyr': np.float64(0.00042813323987193956)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x78b8394ba7d0>]}, {'net': <Network | 3 L2_basket cells
+    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.00042813323987193956), 'weight_pyr': np.float64(0.00042813323987193956)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x780e3afc1810>]}, {'net': <Network | 3 L2_basket cells
     9 L2_pyramidal cells
     3 L5_basket cells
-    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.0006158482110660267), 'weight_pyr': np.float64(0.0006158482110660267)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x78b838ade7d0>]}, {'net': <Network | 3 L2_basket cells
+    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.0006158482110660267), 'weight_pyr': np.float64(0.0006158482110660267)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x780e3bc2d350>]}, {'net': <Network | 3 L2_basket cells
     9 L2_pyramidal cells
     3 L5_basket cells
-    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.0008858667904100822), 'weight_pyr': np.float64(0.0008858667904100822)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x78b8404a59d0>]}, {'net': <Network | 3 L2_basket cells
+    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.0008858667904100822), 'weight_pyr': np.float64(0.0008858667904100822)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x780e4a60a490>]}, {'net': <Network | 3 L2_basket cells
     9 L2_pyramidal cells
     3 L5_basket cells
-    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.0012742749857031334), 'weight_pyr': np.float64(0.0012742749857031334)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x78b849f1c810>]}, {'net': <Network | 3 L2_basket cells
+    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.0012742749857031334), 'weight_pyr': np.float64(0.0012742749857031334)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x780e3bc2e790>]}, {'net': <Network | 3 L2_basket cells
     9 L2_pyramidal cells
     3 L5_basket cells
-    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.0018329807108324356), 'weight_pyr': np.float64(0.0018329807108324356)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x78b838e95150>]}, {'net': <Network | 3 L2_basket cells
+    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.0018329807108324356), 'weight_pyr': np.float64(0.0018329807108324356)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x780e3901e710>]}, {'net': <Network | 3 L2_basket cells
     9 L2_pyramidal cells
     3 L5_basket cells
-    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.0026366508987303583), 'weight_pyr': np.float64(0.0026366508987303583)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x78b84a09b450>]}, {'net': <Network | 3 L2_basket cells
+    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.0026366508987303583), 'weight_pyr': np.float64(0.0026366508987303583)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x780e3ae73590>]}, {'net': <Network | 3 L2_basket cells
     9 L2_pyramidal cells
     3 L5_basket cells
-    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.00379269019073225), 'weight_pyr': np.float64(0.00379269019073225)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x78b849f1de10>]}, {'net': <Network | 3 L2_basket cells
+    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.00379269019073225), 'weight_pyr': np.float64(0.00379269019073225)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x780e3aec2d50>]}, {'net': <Network | 3 L2_basket cells
     9 L2_pyramidal cells
     3 L5_basket cells
-    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.005455594781168515), 'weight_pyr': np.float64(0.005455594781168515)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x78b849cdb110>]}, {'net': <Network | 3 L2_basket cells
+    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.005455594781168515), 'weight_pyr': np.float64(0.005455594781168515)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x780e403aead0>]}, {'net': <Network | 3 L2_basket cells
     9 L2_pyramidal cells
     3 L5_basket cells
-    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.007847599703514606), 'weight_pyr': np.float64(0.007847599703514606)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x78b849f79750>]}, {'net': <Network | 3 L2_basket cells
+    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.007847599703514606), 'weight_pyr': np.float64(0.007847599703514606)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x780e39082a50>]}, {'net': <Network | 3 L2_basket cells
     9 L2_pyramidal cells
     3 L5_basket cells
-    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.011288378916846883), 'weight_pyr': np.float64(0.011288378916846883)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x78b840499a90>]}, {'net': <Network | 3 L2_basket cells
+    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.011288378916846883), 'weight_pyr': np.float64(0.011288378916846883)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x780e3ae4b0d0>]}, {'net': <Network | 3 L2_basket cells
     9 L2_pyramidal cells
     3 L5_basket cells
-    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.01623776739188721), 'weight_pyr': np.float64(0.01623776739188721)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x78b838adcad0>]}, {'net': <Network | 3 L2_basket cells
+    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.01623776739188721), 'weight_pyr': np.float64(0.01623776739188721)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x780e4a5be510>]}, {'net': <Network | 3 L2_basket cells
     9 L2_pyramidal cells
     3 L5_basket cells
-    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.023357214690901212), 'weight_pyr': np.float64(0.023357214690901212)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x78b84a650c90>]}, {'net': <Network | 3 L2_basket cells
+    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.023357214690901212), 'weight_pyr': np.float64(0.023357214690901212)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x780e3bc2c190>]}, {'net': <Network | 3 L2_basket cells
     9 L2_pyramidal cells
     3 L5_basket cells
-    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.03359818286283781), 'weight_pyr': np.float64(0.03359818286283781)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x78b8404bbad0>]}, {'net': <Network | 3 L2_basket cells
+    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.03359818286283781), 'weight_pyr': np.float64(0.03359818286283781)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x780e4a5edd50>]}, {'net': <Network | 3 L2_basket cells
     9 L2_pyramidal cells
     3 L5_basket cells
-    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.04832930238571752), 'weight_pyr': np.float64(0.04832930238571752)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x78b84a017dd0>]}, {'net': <Network | 3 L2_basket cells
+    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.04832930238571752), 'weight_pyr': np.float64(0.04832930238571752)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x780e4a444ed0>]}, {'net': <Network | 3 L2_basket cells
     9 L2_pyramidal cells
     3 L5_basket cells
-    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.06951927961775606), 'weight_pyr': np.float64(0.06951927961775606)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x78b849f1d390>]}, {'net': <Network | 3 L2_basket cells
+    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.06951927961775606), 'weight_pyr': np.float64(0.06951927961775606)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x780e3ae3b190>]}, {'net': <Network | 3 L2_basket cells
     9 L2_pyramidal cells
     3 L5_basket cells
-    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.1), 'weight_pyr': np.float64(0.1)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x78b8394a6b50>]}]]}
+    9 L5_pyramidal cells>, 'param_values': {'weight_basket': np.float64(0.1), 'weight_pyr': np.float64(0.1)}, 'dpl': [<hnn_core.dipole.Dipole object at 0x780e39076610>]}]]}
 
 
 
@@ -394,7 +394,7 @@ dipole activity changes as we vary the synaptic strength parameter.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 16.580 seconds)
+   **Total running time of the script:** (0 minutes 16.612 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_batch_simulate.py:
