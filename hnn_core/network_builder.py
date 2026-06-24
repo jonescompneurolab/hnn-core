@@ -497,6 +497,10 @@ class NetworkBuilder(object):
                     cell.build(sec_name_apical="apical_trunk")
                 else:
                     cell.build()
+                if src_type == 'L5_pyramidal':
+                    print(f"{src_type}and its gid is {cell.gid} and seg_x is {cell.seg_x}")
+                    for syn_key, syn in cell._nrn_synapses.items():
+                        print(f"  {syn_key} → {syn.get_segment().x}")    
                 # add tonic biases
                 for bias in self.net.external_biases:
                     if src_type in self.net.external_biases[bias]:

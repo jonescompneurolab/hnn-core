@@ -615,7 +615,10 @@ class Cell:
         for sec_name in sections:
             for receptor in sections[sec_name].syns:
                 syn_key = f"{sec_name}_{receptor}"
-                pos = seg_x.get(sec_name, 0.5) if seg_x is not None else 0.5
+                if seg_x is not None:
+                    pos = seg_x.get(sec_name, 0.5) 
+                else:
+                    pos= 0.5
                 seg = self._nrn_sections[sec_name](pos)
                 self._nrn_synapses[syn_key] = self.syn_create(seg, **synapses[receptor])
 
