@@ -697,6 +697,7 @@ class Network:
         probability=1.0,
         event_seed=2,
         conn_seed=3,
+        seg_x=None
     ):
         """Add an 'evoked' external drive to the network
 
@@ -806,6 +807,7 @@ class Network:
             n_drive_cells,
             cell_specific,
             probability,
+            seg_x=seg_x
         )
 
     def add_poisson_drive(
@@ -1236,6 +1238,7 @@ class Network:
         n_drive_cells,
         cell_specific,
         probability,
+        seg_x=None,
     ):
         """Attach a drive to network based on connectivity information
 
@@ -1427,6 +1430,7 @@ class Network:
                         lamtha=space_constant,
                         probability=probability,
                         conn_seed=drive["conn_seed"] + seed_increment,
+                        seg_x=seg_x,
                     )
                     # Ensure that AMPA/NMDA connections target the same gids
                     if receptor_idx > 0:
@@ -1449,6 +1453,7 @@ class Network:
                         lamtha=space_constant,
                         probability=probability,
                         conn_seed=drive["conn_seed"] + seed_increment,
+                        seg_x=seg_x,
                     )
                     # Ensure that AMPA/NMDA connections target the same gids
                     # when probability < 1
