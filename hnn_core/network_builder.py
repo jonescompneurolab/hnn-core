@@ -473,22 +473,25 @@ class NetworkBuilder(object):
                 # using meta data style
                 src_type_metadata = self.net.cell_types[src_type]["cell_metadata"]
 
-                # build seg_x dict from connectivity for this cell type
+                #this collects custom synapse location seg_x for cell type from net.connectivity.
+                #if a connection targets this cell type and carries
+                #a seg_x value,map it so create_synapse can use instead of default 0.5
                 seg_x = {}
                 cell_obj = self.net.cell_types[src_type]["cell_object"]
                 for conn in self.net.connectivity:
                     if conn["target_type"] != src_type or conn.get("seg_x") is None:
+                        #we will skip connections that dont have target to this cell type or have no seg_x
                         continue
                     loc = conn["loc"]
                     val = conn["seg_x"]
                     if loc in cell_obj.sect_loc:
                         for sec_name in cell_obj.sect_loc[loc]:
                             seg_x[sec_name] = val
-                        else:
-                            seg_x[loc] = val
+                    else:
+                        seg_x[loc] = val
 
                 if seg_x:
-                    cell.seg_x = seg_x  # this feeds into build() → _create_synapses()
+                    cell.seg_x = seg_x  # this gives the value into build() to _create_synapses()
 
                 if src_type_metadata.get("measure_dipole", False):
                     cell.build(sec_name_apical="apical_trunk")

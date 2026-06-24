@@ -16,4 +16,12 @@ for conn in l5_conns:
         conn['nc_dict']['lamtha'],
         seg_x=0.99,
     )
+for c in net.connectivity:
+    if c['target_type'] == 'L5_pyramidal':
+        print(c.get('seg_x'), c['src_type'], c['loc'])
+        break
 dpls=simulate_dipole(net,tstop=170)
+for c in net.connectivity:
+    if c['target_type'] == 'L5_pyramidal':
+        print(c.get('seg_x'), c['src_type'], c['loc'])
+        break
