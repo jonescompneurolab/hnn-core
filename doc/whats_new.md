@@ -6,7 +6,7 @@ orphan: true
 # What's new?
 
 <!-- Protip: the Github PRs webpage does NOT give you the true order of *when* PRs were
-merged into `master`! Use `git log` instead and cross-reference instead. -->
+merged into `main`! Use `git log` instead and cross-reference instead. -->
 
 <!-- template below for new release notes: -->
 
@@ -483,7 +483,7 @@ If you expect that you will still require `hnn_core` using Python 3.8, please re
   Guide](https://jonescompneurolab.github.io/hnn-core/dev/contributing.html#quality-control)
   for details.
 
-- Updates to Linkcheck Workflow frequency so it only runs on every merge to `master` and
+- Updates to Linkcheck Workflow frequency so it only runs on every merge to `main` and
   on the 1st and 15th of every month,
   by [Maira Usman][] in {gh}`1043` (new contributor!!!).
 
@@ -562,7 +562,7 @@ If you expect that you will still require `hnn_core` using Python 3.8, please re
   LFP or CSD output. Identified and fixed
   by [Katharina Duecker][] in {gh}`1062`.
 
-- Updates to Linkcheck Workflow frequency so it only runs on every merge to `master` and
+- Updates to Linkcheck Workflow frequency so it only runs on every merge to `main` and
   on the 1st and 15th of every month,
   by [Maira Usman][] in {gh}`1043` (new contributor!!!).
 

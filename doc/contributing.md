@@ -5,7 +5,7 @@ Please read the contribution guide **until the end** before beginning contributi
 
 Contributions are welcome in the form of Pull Requests (PR's). You must abide by our [Code of
 Conduct, found
-here](https://github.com/jonescompneurolab/hnn-core/blob/master/CODE_OF_CONDUCT.md),
+here](https://github.com/jonescompneurolab/hnn-core/blob/main/CODE_OF_CONDUCT.md),
 which includes instructions on what kind of AI- and LLM-generated code contributions we
 accept. Our {doc}`Governance Model can be found here <governance>`.
 
@@ -14,7 +14,7 @@ any existing Pull Request**! We reserve the right to close any new PRs that are
 "duplicates" of work (and any PR in general). Please tie your Pull Requests to specific
 Issues. Once the implementation of a piece of functionality is considered to be bug free
 and properly documented (both API docs and possibly an example script), and we have
-reviewed it, we may merge it into the `master` branch, which is where our releases come
+reviewed it, we may merge it into the `main` branch, which is where our releases come
 from.
 
 If you are interested in contributing to `hnn-core` as part of Google Summer of Code
@@ -39,7 +39,7 @@ audio/video privileges. We will kick out anyone causing disruptions during the m
 
 We use the ["fork and pull model" on
 Github](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/getting-started/about-collaborative-development-models)
-to incorporate changes onto our `master` branch. We want commits in `hnn-core`
+to incorporate changes onto our `main` branch. We want commits in `hnn-core`
 to follow a linear history, therefore we use a "rebase" workflow instead of "merge
 commits" to incorporate work. See [this
 article](https://www.atlassian.com/git/tutorials/merging-vs-rebasing) for more details
@@ -156,19 +156,19 @@ contribution to `doc/whats_new.md` so that you can can publicly receive credit.
     upstream    https://github.com/jonescompneurolab/hnn-core (push)
     ```
 
-10. You should **never** write code directly to the `master` branch (this is important
+10. You should **never** write code directly to the `main` branch (this is important
     for the [next section on
     Rebasing](#keeping-your-code-up-to-date-by-rebasing)). Instead, all of your new work
     should be organized on new, separate "feature branches", which themselves are built
-    off of the `master` version of the code. To start a new feature branch, we will copy
-    the existing `master` branch from the `upstream` remote and give it a specific
+    off of the `main` version of the code. To start a new feature branch, we will copy
+    the existing `main` branch from the `upstream` remote and give it a specific
     name. [See here for a guide on working with different
     branches](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging). You
     can use the following commands to do this, which will create and "`checkout`" (a.k.a.
     switch to) a feature branch called `cool-feature`:
 
     ```
-    git fetch upstream master:cool-feature
+    git fetch upstream main:cool-feature
     git checkout cool-feature
     ```
 
@@ -252,7 +252,7 @@ contribution to `doc/whats_new.md` so that you can can publicly receive credit.
     ```
 
 16. Now, if you go to the webpage for your fork
-    (e.g. <https://github.com/asoplata/hnn-core> ) and click `master` on the left, you
+    (e.g. <https://github.com/asoplata/hnn-core> ) and click `main` on the left, you
     should see that your new branch is now viewable. Github is aware of your branch, but
     there is no Pull Request yet.
 
@@ -260,12 +260,12 @@ contribution to `doc/whats_new.md` so that you can can publicly receive credit.
     <https://github.com/jonescompneurolab/hnn-core/compare>, then click "compare across
     forks". Don't change the `base repository` dropdown button (it should say
     `jonescompneurolab/hnn-core`) and don't change `base` (it should say
-    `master`). Instead, click on the `head repository` dropdown button and select your
+    `main`). Instead, click on the `head repository` dropdown button and select your
     fork. Then, click on the `compare` dropdown and select your new feature
     branch. Finally, click the green `Create Pull Request` to make it!
     - If your feature branch is "complete" and you are happy with it, add `[MRG]` to the
       beginning of your Pull Request's title to indicate that it is ready for merge into
-      `master`.
+      `main`.
     - If your feature branch is incomplete, add `[WIP]` to the beginning of your Pull
       Request's title to indicate that it is a Work In Progress.
     - There are also other, more convenient ways to create the Pull Request, but it must
@@ -286,11 +286,11 @@ contribution to `doc/whats_new.md` so that you can can publicly receive credit.
 ### Keeping your code up-to-date by rebasing
 
 Imagine the following scenario: you just successfully got your Pull Request for
-`cool-feature` merged into `master`, and you start work on a second feature called
+`cool-feature` merged into `main`, and you start work on a second feature called
 `cool-feature-2`. However, while you're working on `cool-feature-2`, someone *else* got
-their own Pull Request, called `other-persons-feature`, also merged into `master`. Now,
-from your fork's perspective, both `master` and `cool-feature-2` are "out of date" with
-respect to the `upstream` remote (a.k.a. the `master` version of the code at
+their own Pull Request, called `other-persons-feature`, also merged into `main`. Now,
+from your fork's perspective, both `main` and `cool-feature-2` are "out of date" with
+respect to the `upstream` remote (a.k.a. the `main` version of the code at
 <https://github.com/jonescompneurolab/hnn-core> ). What do you do? Use the magic of `git
 rebase` to rewrite history! Great Scott!
 
@@ -301,7 +301,7 @@ with each other. In contrast,
 ["rebasing"](https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History) can be thought
 of as *editing previous, existing commits* in order to make two different branches
 compatible. We do **not** recommend using merging or "merge commits" to bring changes
-from `master` into your feature branch, since using "merge commits" makes the git
+from `main` into your feature branch, since using "merge commits" makes the git
 history *significantly* more difficult to manage and rebase for us! (Note that "*merge
 conflicts*" and "*merge commits*" are very different things.)
 
@@ -319,11 +319,11 @@ Here are some useful guides that discuss "rebasing", including how it is differe
 - <https://docs.github.com/en/get-started/using-git/about-git-rebase>
 - <https://docs.github.com/en/get-started/using-git/resolving-merge-conflicts-after-a-git-rebase>
 
-To rebase, we're going to download the latest commits from `upstream` remote's `master`
-branch (also called `upstream/master`). Then we're going to rebase both our local and
-`origin` remote's `master` branch (also called `origin/master`) onto
-`upstream/master`. Then, finally, we're going to rebase our local `cool-feature-2`
-branch onto our newly-updated `master` branch, bringing everything up to date.
+To rebase, we're going to download the latest commits from `upstream` remote's `main`
+branch (also called `upstream/main`). Then we're going to rebase both our local and
+`origin` remote's `main` branch (also called `origin/main`) onto
+`upstream/main`. Then, finally, we're going to rebase our local `cool-feature-2`
+branch onto our newly-updated `main` branch, bringing everything up to date.
 
 1. First, make a **backup copy** of your code repository somewhere else on your
    computer. Until you are very confident with rebasing and altering `git` history, you
@@ -348,52 +348,52 @@ branch onto our newly-updated `master` branch, bringing everything up to date.
     upstream    https://github.com/jonescompneurolab/hnn-core (push)
     ```
 
-    In the current situation, the `master` branch of our `upstream` remote has new work
+    In the current situation, the `main` branch of our `upstream` remote has new work
     on it that we want to incorporate. This new work is not present on our local
-    `master` branch, the `master` branch of our `origin` remote (i.e. Github's copy of
+    `main` branch, the `main` branch of our `origin` remote (i.e. Github's copy of
     our fork), nor on our local `cool-feature-2` branch.
 
 3. We need to download those new commits from `upstream`. We can do this using the
    following command:
 
     ```
-    git fetch upstream master
+    git fetch upstream main
     ```
 
-    This downloads the latest commits to `upstream`'s `master` branch (a.k.a.
-    `upstream/master`), but **does not change** any other branches, including our copy
-    of `origin`'s `master` branch (a.k.a. `origin/master`) or our local
+    This downloads the latest commits to `upstream`'s `main` branch (a.k.a.
+    `upstream/main`), but **does not change** any other branches, including our copy
+    of `origin`'s `main` branch (a.k.a. `origin/main`) or our local
     `cool-feature-2`. This only downloads the commits "in the background", so to speak.
 
-4. Let's checkout our local `master` branch:
+4. Let's checkout our local `main` branch:
 
     ```
-    git checkout master
+    git checkout main
     ```
 
-5. Now that we're on our local `master` branch, we need to rebase this branch "onto"
-   `upstream`'s `master` branch (also called `upstream/master`). We can do this with the
+5. Now that we're on our local `main` branch, we need to rebase this branch "onto"
+   `upstream`'s `main` branch (also called `upstream/main`). We can do this with the
    following command:
 
     ```
-    git rebase upstream/master
+    git rebase upstream/main
     ```
 
     This should work automatically, without any other changes needed. If there are
     problems, then see [Troubleshooting `git` problems](#troubleshooting-git-problems)
-    below. You have probably added additional, local commits onto your local `master`
+    below. You have probably added additional, local commits onto your local `main`
     branch, which you shouldn't do in the future.
 
-6. Now that our local `master` is fully synchronized with the latest `upstream` commits,
-   we also need to update `origin`'s `master` branch on Github's servers. This is easily
+6. Now that our local `main` is fully synchronized with the latest `upstream` commits,
+   we also need to update `origin`'s `main` branch on Github's servers. This is easily
    doable with a typical push command:
 
     ```
-    git push origin master
+    git push origin main
     ```
 
-7. At this point, all of the `master` branches (local, `origin`, and `upstream`) are now
-   successfully synchronized with `upstream/master`. That's the easy part, however. The
+7. At this point, all of the `main` branches (local, `origin`, and `upstream`) are now
+   successfully synchronized with `upstream/main`. That's the easy part, however. The
    next, second rebase often (but not always) requires some real work. Let's checkout
    our `cool-feature-2` branch:
 
@@ -402,18 +402,18 @@ branch onto our newly-updated `master` branch, bringing everything up to date.
     ```
 
 8. Next, we want to rebase our new commits in `cool-feature-2` "onto" the latest commits
-   in `master`. At this point, our `master` branch is up-to-date and includes the work
+   in `main`. At this point, our `main` branch is up-to-date and includes the work
    from both prior feature branches, including both `cool-feature` and
    `other-persons-feature`. When we rebase, it will be as if we're "replaying" our
    `cool-feature-2` commits, but pretending that we wrote them AFTER the latest commit
-   in `master`. Let's begin the rebase:
+   in `main`. Let's begin the rebase:
 
     ```
-    git rebase master
+    git rebase main
     ```
 
 9. If you're lucky, the rebase will work automatically. If you're not, then there will
-   be a "merge conflict", due to the fact that some code change in the new `master`
+   be a "merge conflict", due to the fact that some code change in the new `main`
    commits is "conflicting" with one or more code changes in your `cool-feature-2`
    commits. In this case, the rebase will stop mid-way, and your entire `git` repository
    will be in a special kind of "merge conflict" state that prevents some normal `git`
@@ -428,7 +428,7 @@ branch onto our newly-updated `master` branch, bringing everything up to date.
         ```
         git rebase --abort
         ```
-      This will return the git repo to the state it was before you ran `git rebase master`
+      This will return the git repo to the state it was before you ran `git rebase main`
       in case you want to try a different solution.
     - For how to fix the conflicts in the files themselves, one helpful link from the
       above page is
@@ -460,16 +460,16 @@ branch onto our newly-updated `master` branch, bringing everything up to date.
         ```
 
     - To make something clear: yes, this means that you are responsible for making sure
-      your proposed, un-merged code changes are compatible with `upstream/master` before
+      your proposed, un-merged code changes are compatible with `upstream/main` before
       we are willing to merge them, even if `upstream` is being updated as you are
       developing your own code. We are happy to help you with this process as well; for
       example, you are free to make a Pull Request that has merge conflicts with
-      `upstream/master` or our tests, and ask for help in fixing the
-      incompatibilities. But we will never rebase `upstream/master` itself -- *all
+      `upstream/main` or our tests, and ask for help in fixing the
+      incompatibilities. But we will never rebase `upstream/main` itself -- *all
       rebasing and merge conflicts need to be handled on the feature-branches, not on
-      `master`.*
+      `main`.*
 
-10. Assuming the last rebase succeeded, that's it! Your `master` branches and your
+10. Assuming the last rebase succeeded, that's it! Your `main` branches and your
     `cool-feature-2` are now up to date against the latest commits, and you can continue
     developing on `cool-feature-2`. Note that you only strictly need to do this process
     if your Github Pull Request explicitly says that your changes cannot automatically
@@ -483,19 +483,19 @@ branch onto our newly-updated `master` branch, bringing everything up to date.
 - Here's a very helpful website with how to fix or reverse your changes, if you get your
   `git` repository in a confusing or broken state: <https://dangitgit.com/en>
 
-- If you have accidentally written *new* code commits to your local `master` or
-  `origin`'s `master` branch (a.k.a. it is "out-of-sync" with `upstream/master`), below
+- If you have accidentally written *new* code commits to your local `main` or
+  `origin`'s `main` branch (a.k.a. it is "out-of-sync" with `upstream/main`), below
   you will find one way that you can fix the problem. These steps will show you how to
-  make a second branch that points to your current `master` branch's latest commit (a
-  backup of your work), delete your `master` branch, then re-download the "upstream"
-  version of `master`. At the end, your work will still be available on a separate
-  branch, but your `master` branch should be identical to that of `upstream`'s `master`
+  make a second branch that points to your current `main` branch's latest commit (a
+  backup of your work), delete your `main` branch, then re-download the "upstream"
+  version of `main`. At the end, your work will still be available on a separate
+  branch, but your `main` branch should be identical to that of `upstream`'s `main`
   branch. Do the following:
 
     1. First, make a backup of your git repo somewhere else on your computer, just in
        case!
 
-    2. Checkout `master`. This will bring you to the latest of your new commits.
+    2. Checkout `main`. This will bring you to the latest of your new commits.
 
     3. Create and checkout a new branch at that commit (let's call the new branch
        `cool-feature-3`), for example by using:
@@ -510,37 +510,37 @@ branch onto our newly-updated `master` branch, bringing everything up to date.
     git branch --set-upstream-to=origin cool-feature-3
     ```
 
-    5. **Delete** your local `master` branch, using the following:
+    5. **Delete** your local `main` branch, using the following:
 
     ```
-    git branch -D master
+    git branch -D main
     ```
 
-    6. Download the latest version of `upstream`'s `master` branch, AND make a new
-       `master` branch locally that is the same as `upstream`'s `master`, using the
+    6. Download the latest version of `upstream`'s `main` branch, AND make a new
+       `main` branch locally that is the same as `upstream`'s `main`, using the
        following:
 
     ```
-    git fetch upstream master:master
+    git fetch upstream main:main
     ```
 
     7. **Only if** you already pushed your out-of-sync commits to `origin`, you should
-       force `origin`'s `master` to use your new, local `master` branch, using the
+       force `origin`'s `main` to use your new, local `main` branch, using the
        following. **Note: You should NEVER `git push --force upstream` to your
        `upstream` remote.** The `--set-upstream` option is fine, but always make sure
        you only `git push --force origin`, and never `git push --force upstream`! You
        probably will not be allowed to, but you still need to be cautious.
 
     ```
-    git checkout master
-    git branch --set-upstream-to=origin master
+    git checkout main
+    git branch --set-upstream-to=origin main
     git push --force origin
     ```
 
-    8. The situation should now be resolved: the code you had on `master` is now on
-       `cool-feature-3`. Your local and `origin` `master` branch is now fully
-       synchronized with `upstream`'s `master`. You can now continue your work
-       developing on feature branches, but never the `master` branch.
+    8. The situation should now be resolved: the code you had on `main` is now on
+       `cool-feature-3`. Your local and `origin` `main` branch is now fully
+       synchronized with `upstream`'s `main`. You can now continue your work
+       developing on feature branches, but never the `main` branch.
 
 ## Documentation
 
@@ -569,7 +569,7 @@ We provide multiple sources of documentation (including websites) for HNN:
    website](https://jonescompneurolab.github.io/hnn-core/stable/index.html), where you
    currently are. Changes to the Developer Portal are handled by the source code at the
    `doc` subdirectory of `hnn-core` located here:
-   <https://github.com/jonescompneurolab/hnn-core/tree/master/doc>. This includes
+   <https://github.com/jonescompneurolab/hnn-core/tree/main/doc>. This includes
    written content helpful for developers, but also the "Public API Documentation"
    available here: <https://jonescompneurolab.github.io/hnn-core/stable/api.html>. The
    API documentation is *automatically generated* from the [NumPy-style

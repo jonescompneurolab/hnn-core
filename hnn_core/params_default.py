@@ -1,4 +1,4 @@
-"""Master list of changeable params."""
+"""Main list of changeable params."""
 
 # Authors: Mainak Jas <mjas@mgh.harvard.edu>
 #          Sam Neymotin <samnemo@gmail.com>

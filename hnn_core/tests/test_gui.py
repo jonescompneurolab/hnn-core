@@ -140,7 +140,7 @@ def test_simulate_prepare_upload_file():
         json_content = json.load(io.StringIO(decode))
         return json_content
 
-    url = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/param/default.json"  # noqa
+    url = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/main/hnn_core/param/default.json"  # noqa
     file = Path(hnn_core_root, "param", "default.json")
 
     content_from_url = _simulate_prepare_upload_file(url)[0]
