@@ -430,13 +430,13 @@ class BatchSimulate(object):
         save_data["metadata"] = metadata
 
         save_folder = Path(self.save_folder)
-        file_name = save_folder / f"sim_run_{start_idx}-{end_idx}.npz"
-        if file_name.exists() and not self.overwrite:
+        file_path = save_folder / f"sim_run_{start_idx}-{end_idx}.npz"
+        if file_path.exists() and not self.overwrite:
             raise FileExistsError(
-                f"File {file_name} already exists and overwrite is set to False."
+                f"File {file_path} already exists and overwrite is set to False."
             )
 
-        np.savez(file_name, **save_data)
+        np.savez(file_path, **save_data)
 
     def load_results(self, file_path, return_data=None):
         """Load simulation results from a file.
