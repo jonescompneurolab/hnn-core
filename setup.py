@@ -71,7 +71,7 @@ class build_py_mod(build_py):
     def run(self):
         self.run_command("build_mod")
 
-        build_dir = self.build_lib/ "hnn_core"/ "mod"
+        build_dir = Path(self.build_lib)/ "hnn_core"/ "mod"
         mod_path = Path(__file__).parent / "hnn_core" / "mod"
         shutil.copytree(mod_path, build_dir)
 
