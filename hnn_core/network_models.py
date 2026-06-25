@@ -527,7 +527,7 @@ def duecker_ET_model(
     """ "Initiate like old calcium model and then replace with new cells"""
 
     hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, "param", "default_human_ET.json")
+    params_fname = op.join(hnn_core_root, "param", "default_duecker_ET.json")
     if params is None:
         params = read_params(params_fname)
 

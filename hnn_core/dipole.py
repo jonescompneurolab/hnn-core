@@ -883,7 +883,7 @@ class Dipole(object):
 
         # load the baseline dipole
         with open(
-            op.join(hnn_core_root, "param", "bsl_dipole_dueckerET.json"), "r"
+            op.join(hnn_core_root, "param", "bsl_corr_duecker_ET.json"), "r"
         ) as f:
             bsl_dpl = json.load(f)
 
