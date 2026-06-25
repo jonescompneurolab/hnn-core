@@ -920,7 +920,9 @@ def plot_cells(net, ax=None, show=True, colors=None, markers=None):
         If True, show the figure.
     colors : dict | None
         Dictionary mapping cell type names to colors. If None,
-        colors are assigned automatically from the default color cycle.
+        colors are assigned automatically from the ``Network``'s
+        cell metadata if they exist, else they are taken from the
+        default Matplotlib color cycle.
     markers : dict | None
         Dictionary mapping cell type names to markers. If None,
         markers are assigned based on ``morpho_type`` in cell metadata:
@@ -943,26 +945,29 @@ def plot_cells(net, ax=None, show=True, colors=None, markers=None):
             f"Expected 'ax' to be an instance of Axes3D, but got {type(ax).__name__}"
         )
 
-    morpho_marker_map = {"pyramidal": "^", "basket": "x", "interneuron": "o"}
-    color_cycle = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+    default_marker_map = {"pyramidal": "^", "basket": "x", "interneuron": "o"}
+    default_color_cycle = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 
-    for c, cell_type in enumerate(net.cell_types):
+    for cell_type_index, cell_type in enumerate(net.cell_types):
         x = [pos[0] for pos in net.pos_dict[cell_type]]
         y = [pos[1] for pos in net.pos_dict[cell_type]]
         z = [pos[2] for pos in net.pos_dict[cell_type]]
 
         if colors:
-            color = colors.get(cell_type, color_cycle[c % len(color_cycle)])
+            color = colors.get(
+                cell_type,
+                default_color_cycle[cell_type_index % len(default_color_cycle)],
+            )
         else:
             color = net.cell_types[cell_type]["cell_metadata"].get(
-                "color", color_cycle[c % len(color_cycle)]
+                "color", default_color_cycle[cell_type_index % len(default_color_cycle)]
             )
 
         morpho_type = net.cell_types[cell_type]["cell_metadata"].get(
             "morpho_type", None
         )
         if morpho_type:
-            alt_marker = morpho_marker_map[morpho_type]
+            alt_marker = default_marker_map[morpho_type]
         else:
             alt_marker = "o"
 
