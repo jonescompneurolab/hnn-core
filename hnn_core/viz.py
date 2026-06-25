@@ -721,15 +721,13 @@ def plot_spikes_raster(
     else:
         cell_types = cell_response._cell_type_names
 
-    cell_types_metadata = getattr(cell_response, "_cell_types_metadata", None)
+    cell_type_metadata = getattr(cell_response, "_cell_type_metadata", None)
     # validate colors argument
     _validate_type(colors, (list, dict, None), "color", "list of str, or dict")
 
     # Set colors
-    if "color" in cell_types_metadata[cell_types[0]]:
-        cell_colors = {
-            cell: meta["color"] for cell, meta in cell_types_metadata.items()
-        }
+    if "color" in cell_type_metadata[cell_types[0]]:
+        cell_colors = {cell: meta["color"] for cell, meta in cell_type_metadata.items()}
     else:
         default_colors = plt.rcParams["axes.prop_cycle"].by_key()["color"][
             : len(cell_types)

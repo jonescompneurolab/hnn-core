@@ -400,10 +400,10 @@ class TestCellResponsePlotters:
             return colors, labels
 
         metadata_colors = []
-        for cell_type in net.cell_response._cell_types_metadata:
+        for cell_type in net.cell_response._cell_type_metadata:
             metadata_colors.append(
                 matplotlib.colors.to_hex(
-                    net.cell_response._cell_types_metadata[cell_type]["color"]
+                    net.cell_response._cell_type_metadata[cell_type]["color"]
                 )
             )
 

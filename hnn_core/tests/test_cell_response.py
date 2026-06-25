@@ -63,7 +63,7 @@ def test_cell_response(tmp_path):
     net_attributes = [
         "_times",
         "_cell_type_names",
-        "_cell_types_metadata",
+        "_cell_type_metadata",
     ]  # `Network.__init__`
     # creates these check that we always know which response attributes are
     # simulated see #291 for discussion; objective is to keep cell_response
