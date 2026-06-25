@@ -359,8 +359,8 @@ def get_L2Pyrhuman_params():
         "L2Pyr_gabaa_tau2": 5.0,
         "L2Pyr_gabaa_mechname": "Exp2Syn",
         "L2Pyr_gabaa_slow_e": -80.0,
-        "L2Pyr_gabaa_slow_tau1": 0.5,
-        "L2Pyr_gabaa_slow_tau2": 5.0,
+        "L2Pyr_gabaa_slow_tau1": 1.5,
+        "L2Pyr_gabaa_slow_tau2": 20.0,
         "L2Pyr_gabaa_slow_mechname": "Exp2Syn",
         "L2Pyr_gabab_mechname": "gabab_neymotin2016",
         # Biophysics soma
