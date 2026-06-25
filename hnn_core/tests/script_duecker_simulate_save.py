@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from hnn_core import (
-    # MPIBackend,
+    MPIBackend,
     duecker_ET_model,
     simulate_dipole,
 )
@@ -14,10 +14,6 @@ def rerun_and_save_duecker_model(suffix=""):
     print("---------------------------------\n")
     print("-->REMEMBER to recompile the mods\n")
     print("---------------------------------\n")
-
-    # net = neymotin_2020_model(add_drives_from_params=True)
-    # # keyerror currently
-    # net = duecker_ET_model(add_drives_from_params=True)
 
     # --------------------------------------------------------------------------------------
     # Begin network setup and drive config from
@@ -107,9 +103,8 @@ def rerun_and_save_duecker_model(suffix=""):
     )
     # End of drive config
     # --------------------------------------------------------------------------------------
-    # with MPIBackend(mpi_cmd="mpiexec"): KD: MPI is timing out for me
-    dpls = simulate_dipole(net, tstop=170.0, bsl_cor="duecker")
-    # dpls = simulate_dipole(net, tstop=170.0, bsl_cor="jones")
+    with MPIBackend(mpi_cmd="mpiexec"):
+        dpls = simulate_dipole(net, tstop=170.0, bsl_cor="duecker")
 
     write_network_configuration(net, "net_d_duecker.json")
 
