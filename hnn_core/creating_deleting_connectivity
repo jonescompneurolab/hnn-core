@@ -1,21 +1,25 @@
 from hnn_core import jones_2009_model, simulate_dipole
 net = jones_2009_model()
-
-l5_conns = [c for c in net.connectivity if c['target_type'] == 'L5_pyramidal']
-net.connectivity = [c for c in net.connectivity if c['target_type'] != 'L5_pyramidal']
-
-
-for conn in l5_conns:
-    net.add_connection(
-        conn['src_type'],
-        conn['target_type'],
-        conn['loc'],
-        conn['receptor'],
-        conn['nc_dict']['A_weight'],
-        conn['nc_dict']['A_delay'],
-        conn['nc_dict']['lamtha'],
-        seg_x=0.99,
-    )
-net.add_evoked_drive('evprox',mu=40,sigma=5,numspikes=1,location='proximal',seg_x=0.99)
+net.add_evoked_drive(
+    'evprox',
+    mu=40,
+    sigma=5,
+    numspikes=1,
+    location='proximal',
+    weights_ampa={'L5_pyramidal': 0.01},
+    synaptic_delays={'L5_pyramidal': 0.1},
+    seg_x=0.11,
+)
 dpls=simulate_dipole(net,tstop=170)
+import numpy as np
+from hnn_core.viz import plot_dipole
+import matplotlib.pyplot as plt
+print(f"Max dipole: {np.max(dpls[0].data['agg'])} nAm")
+print(f"Min dipole: {np.min(dpls[0].data['agg'])} nAm")
+print(f"Peak-to-peak: {np.ptp(dpls[0].data['agg'])} nAm")
 
+
+fig, ax = plt.subplots()
+plot_dipole(dpls, ax=ax, layer='agg')
+fig.savefig('dipole_plot_1.png')
+print("Plot saved to dipole_plot_1.png")
