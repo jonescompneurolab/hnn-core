@@ -559,58 +559,24 @@ class Network:
 
         else:
             # Default behavior - create standard network
+            from .network_models import default_cell_metadata
+
             cell_types_default = {
                 "L2_basket": {
                     "cell_object": basket(cell_name="L2_basket"),
-                    "cell_metadata": {
-                        "morpho_type": "basket",
-                        "electro_type": "inhibitory",
-                        "layer": "2",
-                        "zdist_origin": 0.8,  # distance to origin in percent of layer_separation
-                        "measure_dipole": False,
-                        "reference": "https://doi.org/10.7554/eLife.51214",
-                        "color": "m",
-                        "marker": "x",
-                    },
+                    "cell_metadata": deepcopy(default_cell_metadata["L2_basket"]),
                 },
                 "L2_pyramidal": {
                     "cell_object": pyramidal(cell_name="L2_pyramidal"),
-                    "cell_metadata": {
-                        "morpho_type": "pyramidal",
-                        "electro_type": "excitatory",
-                        "layer": "2",
-                        "zdist_origin": 1,
-                        "measure_dipole": True,
-                        "reference": "https://doi.org/10.7554/eLife.51214",
-                        "color": "c",
-                        "marker": "^",
-                    },
+                    "cell_metadata": deepcopy(default_cell_metadata["L2_pyramidal"]),
                 },
                 "L5_basket": {
                     "cell_object": basket(cell_name="L5_basket"),
-                    "cell_metadata": {
-                        "morpho_type": "basket",
-                        "electro_type": "inhibitory",
-                        "layer": "5",
-                        "zdist_origin": 0.2,
-                        "measure_dipole": False,
-                        "reference": "https://doi.org/10.7554/eLife.51214",
-                        "color": "r",
-                        "marker": "x",
-                    },
+                    "cell_metadata": deepcopy(default_cell_metadata["L5_basket"]),
                 },
                 "L5_pyramidal": {
                     "cell_object": pyramidal(cell_name="L5_pyramidal"),
-                    "cell_metadata": {
-                        "morpho_type": "pyramidal",
-                        "electro_type": "excitatory",
-                        "layer": "5",
-                        "zdist_origin": 0,
-                        "measure_dipole": True,
-                        "reference": "https://doi.org/10.7554/eLife.51214",
-                        "color": "b",
-                        "marker": "^",
-                    },
+                    "cell_metadata": deepcopy(default_cell_metadata["L5_pyramidal"]),
                 },
             }
 

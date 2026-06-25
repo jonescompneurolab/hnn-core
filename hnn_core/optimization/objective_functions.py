@@ -128,12 +128,9 @@ def _rmse_evoked(
         # simulate dpl with predicted params
         new_net = initial_net.copy()
 
-        def set_params_batch(a, b):
-            set_params(b, a)  # need to fix this
-
         batch_simulation = BatchSimulate(
             net=new_net,
-            set_params=set_params_batch,
+            set_params=set_params,
             save_outputs=False,
             save_dpl=True,
             dt=obj_fun_kwargs.get("dt", 0.025),
@@ -274,12 +271,9 @@ def _maximize_psd(
         # simulate dpl with predicted params
         new_net = initial_net.copy()
 
-        def set_params_batch(a, b):
-            set_params(b, a)  # need to fix this
-
         batch_simulation = BatchSimulate(
             net=new_net,
-            set_params=set_params_batch,
+            set_params=set_params,
             save_outputs=False,
             save_dpl=True,
             dt=obj_fun_kwargs.get("dt", 0.025),
@@ -405,12 +399,9 @@ def _anticorr_evoked(
         # simulate dpl with predicted params
         new_net = initial_net.copy()
 
-        def set_params_batch(a, b):
-            set_params(b, a)  # need to fix this
-
         batch_simulation = BatchSimulate(
             net=new_net,
-            set_params=set_params_batch,
+            set_params=set_params,
             save_outputs=False,
             save_dpl=True,
             dt=obj_fun_kwargs.get("dt", 0.025),
@@ -467,7 +458,7 @@ def _anticorr_evoked(
             best["obj"] = obj
             best["params"] = predicted_params.copy()
 
-    print(f"Mean Loss: {np.mean(obj):.2f}; Min Loss: {np.min(obj):.2f}", flush=True)       
+    print(f"Mean Loss: {np.mean(obj):.2f}; Min Loss: {np.min(obj):.2f}", flush=True)
     # Update the store of objective function values via a "side-effect" in-place in the
     # parent scope
     obj_values.append(obj)
@@ -564,7 +555,12 @@ def _rmse_corr_evoked(
         # smooth & scale all dipoles
         _preprocess_dipole(dpls, obj_fun_kwargs)
         dpl = average_dipoles(dpls)
-        obj = _rmse_corr(dpl, obj_fun_kwargs["target"], tstart=obj_fun_kwargs.get("tstart", 0), tstop=tstop)
+        obj = _rmse_corr(
+            dpl,
+            obj_fun_kwargs["target"],
+            tstart=obj_fun_kwargs.get("tstart", 0),
+            tstop=tstop,
+        )
 
         # Update best params; this is a "side-effect" that changes the `best` dictionary
         # in-place in the parent scope

@@ -85,7 +85,9 @@
                 "layer": "2",
                 "zdist_origin": 0.8,
                 "measure_dipole": false,
-                "reference": "https://doi.org/10.7554/eLife.51214"
+                "reference": "https://doi.org/10.7554/eLife.51214",
+                "color": "m",
+                "marker": "x"
             }
         },
         "L2_pyramidal": {
@@ -482,7 +484,9 @@
                 "layer": "2",
                 "zdist_origin": 1,
                 "measure_dipole": true,
-                "reference": "https://doi.org/10.7554/eLife.51214"
+                "reference": "https://doi.org/10.7554/eLife.51214",
+                "color": "c",
+                "marker": "^"
             }
         },
         "L5_basket": {
@@ -563,7 +567,9 @@
                 "layer": "5",
                 "zdist_origin": 0.2,
                 "measure_dipole": false,
-                "reference": "https://doi.org/10.7554/eLife.51214"
+                "reference": "https://doi.org/10.7554/eLife.51214",
+                "color": "r",
+                "marker": "x"
             }
         },
         "L5_pyramidal": {
@@ -1286,7 +1292,9 @@
                 "layer": "5",
                 "zdist_origin": 0,
                 "measure_dipole": true,
-                "reference": "https://doi.org/10.7554/eLife.51214"
+                "reference": "https://doi.org/10.7554/eLife.51214",
+                "color": "b",
+                "marker": "^"
             }
         }
     },

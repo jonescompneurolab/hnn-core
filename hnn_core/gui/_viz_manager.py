@@ -27,6 +27,7 @@ from ipywidgets import (
 
 from hnn_core.dipole import _anticorr, _rmse, average_dipoles
 from hnn_core.gui._logging import logger
+from hnn_core.network_models import default_drive_colors
 from hnn_core.viz import plot_dipole, plot_tfr_morlet
 
 #
@@ -298,18 +299,19 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
                 if "evdist" in name:
                     if "evdist" not in drive_locations.keys():
                         drive_locations["evdist"] = drive["location"]
-                        drive_colors["evdist"] = "g"
+                        drive_colors["evdist"] = default_drive_colors["distal"]
                 # remove all increments of default 'evprox' inputs
                 elif "evprox" in name:
                     if "evprox" not in drive_locations.keys():
                         drive_locations["evprox"] = drive["location"]
-                        drive_colors["evprox"] = "r"
+                        drive_colors["evprox"] = default_drive_colors["proximal"]
+
                 else:
                     drive_locations[name] = drive["location"]
                     if drive["location"] == "proximal":
-                        drive_colors[name] = "r"
+                        drive_colors[name] = default_drive_colors["proximal"]
                     elif drive["location"] == "distal":
-                        drive_colors[name] = "g"
+                        drive_colors[name] = default_drive_colors["distal"]
 
             # all drives to plot, excluding 'evdist' and 'evprox' increments
             all_drives = list(drive_locations.keys())
@@ -683,6 +685,13 @@ def _clear_axis(
     existing_plots,
     add_plot_button,
 ):
+    # remove attached colorbar if exists; must happen before ax.clear()
+    # since that removes some kind of global axes reference, which
+    # Colorbar.remove() relies on to restore the original axes position
+    if hasattr(fig, f"_cbar-ax-{id(ax)}"):
+        getattr(fig, f"_cbar-ax-{id(ax)}").remove()
+        delattr(fig, f"_cbar-ax-{id(ax)}")
+
     ax.clear()
 
     # Remove "plot_spikes_hist"'s inverted second axes object, if exists, and
@@ -691,11 +700,6 @@ def _clear_axis(
         for axis in fig.axes:
             if axis._label == "Inverted spike histogram":
                 axis.remove()
-
-    # remove attached colorbar if exists
-    if hasattr(fig, f"_cbar-ax-{id(ax)}"):
-        getattr(fig, f"_cbar-ax-{id(ax)}").ax.remove()
-        delattr(fig, f"_cbar-ax-{id(ax)}")
 
     ax.set_facecolor("w")
     ax.set_aspect("auto")
@@ -1093,7 +1097,22 @@ class _VizManager:
         plt.close("all")
         self.viz_layout = viz_layout
         self.fig_default_params = fig_default_params
-        self.use_ipympl = "ipympl" in matplotlib.get_backend()
+
+        # The choice of backend here controls whether our plots elsewhere in this file
+        # use `_static_rerender` or `_dynamic_rerender`, and we prefer the latter.
+        #
+        # This `use` call attempts to force use of the `ipympl` backend, which should be
+        # safe to do because:
+        # 1. `ipympl` is always installed with the GUI dependencies
+        # 2. We are only forcing this for the GUI itself (via `_VizManager`), not for a
+        #    user's general plotting
+        matplotlib.use("ipympl")
+        # However, just in case, we will still support fallback backends like Tushar
+        # added here:
+        backend = matplotlib.get_backend().lower()
+        self.use_dynamic_rendering = any(
+            name in backend for name in ("ipympl", "nbagg", "widget")
+        )
 
         self.axes_config_output = Output()
         self.figs_output = Output()
@@ -1154,7 +1173,7 @@ class _VizManager:
     def data(self):
         """Provides easy access to visualization-related data."""
         return {
-            "use_ipympl": self.use_ipympl,
+            "use_ipympl": self.use_dynamic_rendering,
             "simulations": self.gui_data["simulation_data"],
             "fig_idx": self.fig_idx,
             "visualization_window": self.viz_layout["visualization_window"],
@@ -1341,7 +1360,7 @@ class _VizManager:
                 template_name,
                 fig=self.figs[fig_key],
                 idx=fig_key,
-                use_ipympl=self.use_ipympl,
+                use_ipympl=self.use_dynamic_rendering,
                 widgets=self.widgets,
             )
 

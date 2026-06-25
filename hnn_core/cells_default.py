@@ -973,7 +973,7 @@ def pyramidal_humanL5ET(cell_name, pos=(0, 0, 0), gid=None):
         "basal_2": -71.75791098784391,
         "basal_3": -71.75791098784391,
         "apical_oblique": -71.51514840992614,
-        "soma": -71.54401603093514
+        "soma": -71.54401603093514,
     }
 
     sections_apcl = _get_dends(
@@ -1190,7 +1190,7 @@ def pyramidal_humanL23(cell_name, pos=(0, 0, 0), gid=None):
         "apical_tuft": -73.0318451642059,
         "basal_1": -73.51253755658675,
         "basal_2": -73.53697581734804,
-        "basal_3": -73.53697581734804
+        "basal_3": -73.53697581734804,
     }
 
     sections = _get_dends(p_all, "L2Pyr", section_names, v_init=v_init)
