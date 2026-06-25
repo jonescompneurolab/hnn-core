@@ -20,7 +20,7 @@ assets_path = Path(hnn_core_root, "tests", "assets")
 def batch_simulate_instance(tmp_path):
     """Fixture for creating a BatchSimulate instance with custom parameters."""
 
-    def set_params(param_values, net):
+    def set_params(net, param_values):
         weights_ampa = {
             "L2_basket": param_values["weight_basket"],
             "L2_pyramidal": param_values["weight_pyr"],

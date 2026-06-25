@@ -36,13 +36,23 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ### Bug Fixes
 
+- [Camilo Diaz][] did considerable work in fixing our long-standing MPI Timeout issues
+  and putting in place a permanent solution that uses tempfiles instead of standard
+  input/output/error streams. Thanks Camilo!
+
 ### Public API Changes
 
 ### People who contributed to this release:
 
 - [Shivansh Bhageria][]
+- [Camilo Diaz][]
 
 ### Changelog
+
+- Document and remove problematic MPI Timeouts (while keeping code intact), and
+  implement a new tempfile-based mechanism for transmitting MPI data from child
+  processes back to rank 0 child process then parent process,
+  by [Camilo Diaz][] in {gh}`1312` and {gh}`1315`.
 
 - Improve y-axis labels and ticks of LFP and CSD plotting,
   by [Shivansh Bhageria][] in {gh}`1191`. This was their first PR, thanks Shivansh!
@@ -230,6 +240,10 @@ here](https://github.com/jonescompneurolab/hnn-core/releases/tag/v0.6.0).
   by [Tushar Jamdade][] in {gh}`1214`. This was their first PR, thanks Tushar!
 
 ----------------------------------------------------------------------------------------
+
+### Public API Changes
+
+- `BatchSimulate` now expects the `set_params` callback to accept arguments in the order `(net, param_values)` instead of `(param_values, net)`, aligning it with the `Optimizer` class, by [Rahul Tripathi][] in {gh}`1208`.
 
 ## 0.5.0 Release Notes
 
@@ -1447,6 +1461,7 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [Mohamed W. ElSayed]: https://github.com/wagdy88
 [Maira Usman]: https://github.com/Myrausman
 [Chetan Kandpal]: https://github.com/Chetank99
+[Rahul Tripathi]: https://github.com/Rahul-2k4
 [NEURON]: https://nrn.readthedocs.io
 [Karthikeya Kodlai]: https://github.com/sketch123456
 [Tushar Jamdade]: https://github.com/Tusharjamdade

@@ -9,9 +9,9 @@ import re
 import shlex
 import pickle
 import base64
+import time
 from warnings import warn
 from subprocess import Popen, PIPE, TimeoutExpired
-import binascii
 from queue import Queue, Empty
 from threading import Thread, Event
 
@@ -134,7 +134,9 @@ def _get_mpi_env():
     return my_env
 
 
-def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
+def run_subprocess(
+    command, obj, timeout, proc_queue=None, verbose=False, *args, **kwargs
+):
     """Run process and communicate with it.
     Parameters
     ----------
@@ -145,6 +147,8 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
         with MPI command.
     timeout : float
         The number of seconds to wait for a process without output.
+    verbose : bool, default False
+        If True, prints progress messages and status updates to stdout.
     *args, **kwargs : arguments
         Additional arguments to pass to subprocess.Popen.
     Returns
@@ -152,13 +156,20 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
     child_data : object
         The data returned by the child process.
     """
-    proc_data_bytes = b""
+
     # each loop while waiting will involve two Queue.get() timeouts, each
     # 0.01s. This calculation will error on the side of a longer timeout
     # than is specified because more is done each loop that just Queue.get()
     timeout_cycles = timeout / 0.02
 
-    pickled_obj = base64.b64encode(pickle.dumps(obj))
+    ## Maybe leaving this print for debugging purposes
+    raw_pickle = pickle.dumps(obj)
+    pickled_obj = base64.b64encode(raw_pickle)
+    if verbose:
+        print(
+            f"Network size': {len(raw_pickle)} bytes ({len(raw_pickle) / 1024:.2f} KB)",
+            flush=True,
+        )
 
     # non-blocking adapted from https://stackoverflow.com/questions/375427/non-blocking-read-on-a-subprocess-pipe-in-python#4896288  # noqa: E501
     out_q = Queue()
@@ -167,6 +178,8 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
     threads_started = False
 
     try:
+        ## Timing subproces
+        t_start = time.time()
         proc = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE, *args, **kwargs)
 
         # now that the process has started, add it to the queue
@@ -185,18 +198,65 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
         data_received = False
         sent_network = False
         count_since_last_output = 0
+        ## Keep track of the process is still running
+        stay_alive_interval = 60.0
+        last_alive_t = time.time()
 
-        # loop while the process is running the simulation
+        ## Wait for NEURON starts and sends first response
+        first_output_received = False
+        t_start = time.time()
+
+        ## loop while the process is running the simulation
+        # This loop coordinates the parent-child communication protocol:
+        #
+        # 1. Send the network: on the first iteration, serializes and writes the
+        #    network object to the child's stdin via _write_net(). The child's
+        #    rank 0 reads it, deserializes it, and broadcasts it to all MPI ranks.
+        #
+        # 2. Wait for results: after sending, polls the child's stdout
+        #    (_echo_child_output) for NEURON progress output and stderr
+        #    (_get_data_from_child_err) for the "@data_file:PATH:SIZE@" signal.
+        #    The child writes simulation results to a temp file and sends only
+        #    the file path + byte count over stderr to avoid pipe buffer deadlocks
+        #    with large payloads.
+        #
+        # 3. Acknowledge and exit: once the file signal is received, sends
+        #    "@data_received@" to the child's stdin so the child can exit cleanly,
+        #    then waits for the subprocess to terminate.
+        #
+        # TODO: This polling loop needs more love. It needs to be addressed in a future PR.
+        #   A cleaner design would use an event-driven approach (e.g. asyncio or a
+        #   proper event queue) with more robust timeout handling. The current
+        #   implementation is intentionally left as a skeleton so the next
+        #   implementation can use it as a reference for the communication protocol
+        #   and exit conditions.
+
         while True:
             child_terminated = proc.poll() is not None
 
+            # While polling for if data has been received, add the startup message if
+            # this is the first time the loop is being run. Then, check for whether data
+            # has been received anew.
+            #
+            # This also includes our error detection.
             if not data_received:
-                if _echo_child_output(out_q):
+                child_out = _echo_child_output(out_q)
+                if child_out:
+                    if not first_output_received:
+                        if verbose:
+                            print(
+                                f"nrniv startup time: {time.time() - t_start:.2f}s | "
+                                f"first output: {repr(child_out[:200])}",
+                                flush=True,
+                            )
+                        first_output_received = True
+
                     count_since_last_output = 0
                 else:
                     count_since_last_output += 1
-                # look for data in stderr and print child stdout
-                data_len, proc_data_bytes = _get_data_from_child_err(err_q)
+
+                # look for data length and file location in stderr and print child stdout
+                data_len, proc_data_path_file = _get_data_info_from_child_err(err_q)
                 if data_len > 0:
                     data_received = True
                     _write_child_exit_signal(proc.stdin)
@@ -207,6 +267,8 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
                     kill_proc_name("nrniv")
                     break
 
+            # This is expected to only run once: on the first while iteration, we will
+            # send the pickled Network, which is necessary to START the simulation.
             if not sent_network:
                 # Send network object to child so it can start
                 try:
@@ -226,18 +288,39 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
                     # assume it was successful and move on to waiting for
                     # data in the next loop iteration.
 
+            # This tracks how long the simulation has been running without output.
+            # Currently, any forced timeout errors are disabled.
+            if not child_terminated and count_since_last_output > timeout_cycles:
+                if sent_network:
+                    # nrniv child is computing silently ,dont timeout
+                    # Print feedback to user the process is still running
+                    t_now = time.time()
+                    if t_now - last_alive_t >= stay_alive_interval:
+                        elapsed_time = t_now - t_start
+                        print(
+                            "MPI simulation is still running. This may take several minutes."
+                            f"({elapsed_time:.1f}s elapsed)"
+                            "You may cancel if there is no response for a long time.",
+                            flush=True,
+                        )
+                        last_alive_t = t_now
+                    count_since_last_output = 0
+                else:
+                    warn(
+                        "Timeout exceeded while waiting for child process output"
+                        ". Terminating..."
+                    )
+                    kill_proc_name("nrniv")
+                    break
+
+            # This is the successful exit condition.
             if child_terminated and data_received:
                 # both exit conditions have been met (also we know that
                 # the network has been sent)
+                if verbose:
+                    print(f"process terminated after {time.time() - t_start:.2f}s")
                 break
 
-            if not child_terminated and count_since_last_output > timeout_cycles:
-                warn(
-                    "Timeout exceeded while waiting for child process output"
-                    ". Terminating..."
-                )
-                kill_proc_name("nrniv")
-                break
     except KeyboardInterrupt:
         warn("Received KeyboardInterrupt. Stopping simulation process...")
 
@@ -274,7 +357,7 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
         # simulation failed with a numeric return code
         raise RuntimeError("MPI simulation failed. Return code: %d" % proc.returncode)
 
-    child_data = _process_child_data(proc_data_bytes, data_len)
+    child_data = _process_child_data(proc_data_path_file, data_len)
 
     # clean up the queue
     try:
@@ -285,45 +368,52 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
     return proc, child_data
 
 
-def _process_child_data(data_bytes, data_len):
+def _process_child_data(path_data_file, data_len):
     """Process the data returned by child process.
 
     Parameters
     ----------
-    data_bytes : str
-        The data bytes
+    path_data_file
+        Path to the temporary file written by the child.
+    data_len
+        Expected byte count for integrity check.
 
     Returns
     -------
     data_unpickled : object
         The unpickled data.
     """
-    if not data_len == len(data_bytes):
+    if path_data_file is None or data_len == 0:
         # This is indicative of a failure. For debugging purposes.
+        raise RuntimeError("MPI simulation didn't produce a result file. ")
+
+    try:
+        with open(path_data_file, "rb") as f:
+            data_bytes = f.read()
+    except FileNotFoundError:
+        warn("Result file not found in path %s" % path_data_file)
+        warn("data length expected %d" % data_len)
+        raise RuntimeError("MPI result file missing: %s" % path_data_file)
+    except PermissionError:
+        warn("Permission denied reading result file: %s" % path_data_file)
+        warn("data length expected %d" % data_len)
+        raise RuntimeError("MPI result file unreadable: %s" % path_data_file)
+    finally:
+        try:
+            os.unlink(path_data_file)
+        except OSError:
+            pass
+
+    if len(data_bytes) != data_len:
         warn(
             "Length of received data unexpected. Expecting %d bytes, "
             "got %d" % (data_len, len(data_bytes))
         )
-
-    if len(data_bytes) == 0:
-        raise RuntimeError("MPI simulation didn't return any data")
-
-    # decode base64 byte string
-    try:
-        data_pickled = base64.b64decode(data_bytes, validate=True)
-    except binascii.Error:
-        # This is here for future debugging purposes. Unit tests can't
-        # reproduce an incorrectly padded string, but this has been an
-        # issue before
-        raise ValueError(
-            "Incorrect padding for data length %d bytes" % len(data_len)
-            + " (mod 4 = %d)" % (len(data_len) % 4)
-        )
-
-    # unpickle the data
-    return pickle.loads(data_pickled)
+    return pickle.loads(data_bytes)
 
 
+# This is the input side.
+# sending the network configuration to NEURON
 def _echo_child_output(out_q):
     out = ""
     while True:
@@ -332,16 +422,19 @@ def _echo_child_output(out_q):
         except Empty:
             break
 
+    # Return the output instead of just a boolean value so callers can
+    # tell if anything was received and check the actual content
+    # (logging the first line of nrniv output).
     if len(out) > 0:
         sys.stdout.write(out)
-        return True
-    return False
+        return out
+    return ""
 
 
-def _get_data_from_child_err(err_q):
+def _get_data_info_from_child_err(err_q):
     err = ""
     data_length = 0
-    data_bytes = b""
+    data_file = None
 
     while True:
         try:
@@ -349,22 +442,20 @@ def _get_data_from_child_err(err_q):
         except Empty:
             break
 
-    # check for data signal
-    extracted_data = _extract_data(err, "data")
-    if len(extracted_data) > 0:
-        # _extract_data only returns data when signals on
-        # both sides were seen
-
-        err = err.replace("@start_of_data@", "")
-        err = err.replace(extracted_data, "")
-        data_length = _extract_data_length(err, "data")
-        err = err.replace("@end_of_data:%d@\n" % data_length, "")
-        data_bytes = extracted_data.encode()
+    # check for file signal @data_file
+    # This regex is trying to find the string
+    # @data_file:(path_to_file):(size_of_data)
+    # where path is a path to a file system and size_of_data is a number
+    file_match = re.search(r"@data_file:(.+):(\d+)@", err)
+    if file_match is not None:
+        data_file = file_match.group(1)
+        data_length = int(file_match.group(2))
+        err = err[: file_match.start()] + err[file_match.end() :]
 
     # print the rest of the child's stderr to our stdout
     sys.stdout.write(err)
 
-    return data_length, data_bytes
+    return data_length, data_file
 
 
 def _has_mpi4py():
@@ -888,6 +979,8 @@ class MPIBackend(object):
         A Queue object to hold process handles from Popen in a thread-safe way.
         There will be a valid process handle present the queue when a MPI
         simulation is running.
+    verbose : bool, default False
+        If True, prints progress messages and status updates to stdout.
     """
 
     def __init__(
@@ -898,10 +991,12 @@ class MPIBackend(object):
         sensible_default_cores: bool = True,
         override_hwthreading_option: Union[None, bool] = None,
         override_oversubscribe_option: Union[None, bool] = None,
+        verbose: bool = False,
     ) -> None:
         self.expected_data_length = 0
         self.proc = None
         self.proc_queue = Queue()
+        self.verbose = verbose
 
         # Check of psutil and mpi4py import has been moved into this function,
         # since this function is called by GUI before MPIBackend()
@@ -1043,12 +1138,12 @@ class MPIBackend(object):
         )
 
         env = _get_mpi_env()
-
         self.proc, sim_data = run_subprocess(
             command=self.mpi_cmd,
             obj=[net, tstop, dt, n_trials],
-            timeout=60,
+            timeout=10,
             proc_queue=self.proc_queue,
+            verbose=self.verbose,
             env=env,
             cwd=os.getcwd(),
             universal_newlines=True,
