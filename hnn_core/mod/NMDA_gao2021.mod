@@ -9,7 +9,7 @@ Essentially the same as /examples/nrniv/netcon/ampa.mod in the NEURON
 distribution - i.e. Alain Destexhe's simple AMPA model - but with
 different binding and unbinding rates and with a magnesium block.
 Modified by Andrew Davison, The Babraham Institute, May 2000
-
+: Taken from Gao 2021 https://doi.org/10.1152/jn.00734.2019 :
 
 	Simple model for glutamate AMPA receptors
 	=========================================
@@ -64,7 +64,7 @@ ENDCOMMENT
 
 
 NEURON {
-	POINT_PROCESS NMDA_gao
+	POINT_PROCESS NMDA_gao2021
 	RANGE g, Alpha, Beta, e, gmax, ica, Cdur, iNMDA, i
 	USEION ca WRITE ica
 	NONSPECIFIC_CURRENT i, iNMDA

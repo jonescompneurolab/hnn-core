@@ -920,7 +920,7 @@ class Cell:
                 # This tries to obtain the synapse object as if it is an attribute of
                 # the HOC interpreter as a whole, which all valid synapse mechanisms
                 # should be. In other words, if you have compiled a synapse mechanism
-                # called e.g. 'NMDA_gao', then `h.NMDA_gao` should exist.
+                # called e.g. 'NMDA_gao2021', then `h.NMDA_gao2021` should exist.
                 synapse_class = getattr(h, kwargs["mechname"])
             except AttributeError:
                 raise ValueError(

@@ -72,7 +72,7 @@
                     },
                     "nmda": {
                         "e": 0.0,
-                        "mechname": "NMDA_gao"
+                        "mechname": "NMDA_gao2021"
                     },
                     "gabaa": {
                         "e": -80.0,
@@ -81,7 +81,7 @@
                         "mechname": "Exp2Syn"
                     },
                     "gabab": {
-                        "mechname": "gabab_destexhe"
+                        "mechname": "gabab_neymotin2016"
                     }
                 },
                 "cell_tree": null,
@@ -703,7 +703,7 @@
                     },
                     "nmda": {
                         "e": 0.0,
-                        "mechname": "NMDA_gao"
+                        "mechname": "NMDA_gao2021"
                     },
                     "gabaa": {
                         "e": -80.0,
@@ -712,7 +712,7 @@
                         "mechname": "Exp2Syn"
                     },
                     "gabab": {
-                        "mechname": "gabab_destexhe"
+                        "mechname": "gabab_neymotin2016"
                     }
                 },
                 "cell_tree": {
@@ -851,7 +851,7 @@
                     },
                     "nmda": {
                         "e": 0.0,
-                        "mechname": "NMDA_gao"
+                        "mechname": "NMDA_gao2021"
                     },
                     "gabaa": {
                         "e": -80.0,
@@ -860,7 +860,7 @@
                         "mechname": "Exp2Syn"
                     },
                     "gabab": {
-                        "mechname": "gabab_destexhe"
+                        "mechname": "gabab_neymotin2016"
                     }
                 },
                 "cell_tree": null,
@@ -1795,7 +1795,7 @@
                     },
                     "nmda": {
                         "e": 0.0,
-                        "mechname": "NMDA_gao"
+                        "mechname": "NMDA_gao2021"
                     },
                     "gabaa": {
                         "e": -80.0,
@@ -1810,7 +1810,7 @@
                         "mechname": "Exp2Syn"
                     },
                     "gabab": {
-                        "mechname": "gabab_destexhe"
+                        "mechname": "gabab_neymotin2016"
                     }
                 },
                 "cell_tree": {

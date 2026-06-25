@@ -571,7 +571,7 @@ def _get_syn_props(p_all, cell_type, syn_types=["ampa", "nmda", "gabaa", "gabab"
     When parameters in `p_all` are provided for a "syn_type" (of the set {ampa, nmda,
     gabaa, gabab}), and no "syn_type_mechname" key is present in p_all, then this will
     *always* return the default synapse mechanism of "Exp2Syn". In order to use a custom
-    "mechanism" (such as "NMDA_gao" or "gabab_destexhe"), the incoming parameters in
+    "mechanism" (such as "NMDA_gao2021" or "gabab_neymotin2016"), the incoming parameters in
     `p_all` should include a key of the form `f"{cell_type}_{syn_type}_mechname"` with
     the value being the name of the custom mechanism.
 
