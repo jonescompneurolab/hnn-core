@@ -104,6 +104,8 @@ def _gather_trial_data(sim_data, net, n_trials, postproc, bsl_cor="jones"):
 
         dpl._convert_fAm_to_nAm()  # always applied, cf. #264
 
+        # The Duecker baseline correction was made after already converting from fAm to
+        # nAm.
         if bsl_cor == "duecker":
             if net._verbose:
                 print("Applying Duecker model baseline correction", flush=True)
