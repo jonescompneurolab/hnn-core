@@ -868,7 +868,7 @@ def pyramidal_ca(cell_name, pos, override_params=None, gid=None):
 
 
 def pyramidal_humanL5ET(cell_name, pos=(0, 0, 0), gid=None):
-    """Create a Cell object of a human L5Pyr pyramidal neuron (developed for duecker_ET_model).
+    """Create a Cell object of a human extra-telencephalic-projecting L5Pyr pyramidal neuron (developed for duecker_ET_model).
 
     Parameters
     ----------
@@ -1098,7 +1098,7 @@ def pyramidal_humanL5ET(cell_name, pos=(0, 0, 0), gid=None):
 
 
 def pyramidal_humanL23(cell_name, pos=(0, 0, 0), gid=None):
-    """Create a Cell object of a human L52/3 pyramidal neuron (developed for duecker_ET_model).
+    """Create a Cell object of a human L2/3 pyramidal neuron (developed for duecker_ET_model).
 
     Parameters
     ----------
