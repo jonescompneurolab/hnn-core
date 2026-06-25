@@ -697,7 +697,7 @@ class Network:
         probability=1.0,
         event_seed=2,
         conn_seed=3,
-        seg_x=None
+        seg_x=None,
     ):
         """Add an 'evoked' external drive to the network
 
@@ -827,6 +827,7 @@ class Network:
         probability=1.0,
         event_seed=2,
         conn_seed=3,
+        seg_x=None,
     ):
         """Add a Poisson-distributed external drive to the network
 
@@ -974,6 +975,7 @@ class Network:
         probability=1.0,
         event_seed=2,
         conn_seed=3,
+        seg_x=None,
     ):
         """Add a bursty (rhythmic) external drive to all cells of the network
 
@@ -1114,6 +1116,7 @@ class Network:
         space_constant=3.0,
         probability=1.0,
         conn_seed=None,
+        seg_x=None,
     ):
         """Add an external drive from explicitly defined spike trains.
 
