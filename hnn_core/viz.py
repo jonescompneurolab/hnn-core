@@ -552,6 +552,12 @@ def plot_spikes_hist(
         spike_label: list() for spike_label in np.unique(list(spike_labels.values()))
     }
     spike_color = dict()  # Store colors specified for each spike_label
+    # NOTE: Currently, since `CellResponse` only contains the "type" (aka drive name or
+    # cell name) of what produced each spike, but not whether that drive was proximal or
+    # distal, there is currently no way to apply the coloring of
+    # `hnn_core.network_models.default_drive_colors` to the spikes in this plot. If
+    # `CellResponse` is ever guaranteed access to the `Network` information in the
+    # future, then this will be fixable.
     for spike_type, spike_label in spike_labels.items():
         if spike_label not in spike_color:
             if isinstance(color, dict):
