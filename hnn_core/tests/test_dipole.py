@@ -327,7 +327,7 @@ def test_rmse():
         times=extdata[:, 0], data=np.c_[extdata[:, 1], extdata[:, 1], extdata[:, 1]]
     )
 
-    hnn_core_root = Path(hnn_core.__file__).resolve().parent
+    hnn_core_root = Path(hnn_core.__file__).parent
     params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
 

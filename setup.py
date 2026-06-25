@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 import platform
-import os.path as op
+from pathlib import Path
 import os
 import subprocess
 import shutil
@@ -20,7 +20,7 @@ DOWNLOAD_URL = "http://github.com/jonescompneurolab/hnn-core"
 
 # get the version
 version = None
-with open(os.path.join("hnn_core", "__init__.py"), "r") as fid:
+with open(Path("hnn_core") / "__init__.py", "r") as fid:
     for line in (line.strip() for line in fid):
         if line.startswith("__version__"):
             version = line.split("=")[1].strip().strip('"')
@@ -55,7 +55,7 @@ class BuildMod(Command):
         else:
             shell = False
 
-        mod_path = op.join(op.dirname(__file__), "hnn_core", "mod")
+        mod_path = Path(__file__).parent / "hnn_core" / "mod"
         process = subprocess.Popen(
             ["nrnivmodl"],
             cwd=mod_path,
@@ -71,8 +71,8 @@ class build_py_mod(build_py):
     def run(self):
         self.run_command("build_mod")
 
-        build_dir = op.join(self.build_lib, "hnn_core", "mod")
-        mod_path = op.join(op.dirname(__file__), "hnn_core", "mod")
+        build_dir = self.build_lib/ "hnn_core"/ "mod"
+        mod_path = Path(__file__).parent / "hnn_core" / "mod"
         shutil.copytree(mod_path, build_dir)
 
         build_py.run(self)
