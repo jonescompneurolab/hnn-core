@@ -5,7 +5,8 @@
 
 This example shows how to do batch simulations in HNN-core, allowing users to
 efficiently run multiple simulations with different parameters
-for comprehensive analysis.
+for comprehensive analysis. The BatchSimulate class permits embarrassingly parallel
+simulations over multiple CPU cores.
 """
 
 ###############################################################################
