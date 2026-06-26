@@ -5,7 +5,7 @@
 
 This example shows how to do batch simulations in HNN-core, using the Dask backend,
 allowing users to efficiently run multiple simulations with different parameters for
-comprehensive analysis across potentially very many cores.
+comprehensive analysis. The BatchSimulate class permits embarrassingly parallel simulations over multiple CPU cores. While Dask can be used on a locally on a personal computer, it is particularly useful for parallelization with high-performance computing clusters (HPC's) which potentially provide access to CPU cores spread across multiple nodes. If HPC's are not being used, the default 'loky' backend is recommended. 
 
 For the sample example using the built-in ``BatchSimulate`` backend, [see our other guide here: https://jonescompneurolab.github.io/hnn-core/stable/auto_examples/howto/plot_batch_simulate.html#sphx-glr-auto-examples-howto-plot-batch-simulate-py .
 """
@@ -203,7 +203,7 @@ if __name__ == "__main__":
     ###############################################################################
     # Using Dask backend for distributed computing
     # --------------------------------------------
-    # Dask can also be used as a backend for distributed computing.
+    # Dask can be used as a backend for distributed computing.
     # For local use, ``LocalCluster`` can be used as shown below.
     # Note that ``threads_per_worker=1`` is required to avoid NEURON conflicts.
     # To run on a remote cluster instead, replace ``LocalCluster`` with a
