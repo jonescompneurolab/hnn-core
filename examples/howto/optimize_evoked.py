@@ -28,17 +28,8 @@ from matplotlib.lines import Line2D
 import hnn_core
 from hnn_core import (MPIBackend, neymotin_2020_model, simulate_dipole,
                       read_dipole)
+from hnn_core.optimization import Optimizer
 from hnn_core.viz import plot_dipole
-
-# Let us ensure we used the ``hnn_core`` install with the correct special dependencies
-# for this example.
-try:
-    from hnn_core.optimization import Optimizer
-
-except ImportError:
-    print("HNN-Core Optimization not installed. Run the following command: ")
-    print("pip install \"hnn-core[opt]\"")
-
 
 hnn_core_root = op.join(op.dirname(hnn_core.__file__))
 

@@ -18,19 +18,7 @@ without the need to install and configure MPI.
 
 ###############################################################################
 # Let us import hnn_core
-from hnn_core import simulate_dipole, neymotin_2020_model
-
-# Let us ensure we used the ``hnn_core`` install with the correct special dependencies
-# for this example.
-try:
-    from hnn_core import MPIBackend
-
-except ImportError:
-    print("For MPI to work, you must first install MPI using the instructions at: ")
-    print("https://jonescompneurolab.github.io/textbook/content/01_getting_started/installation.html ")
-    print("Then, you must install HNN-Core with its `parallel` packages via running the following command: ")
-    print("pip install \"hnn-core[parallel]\"")
-
+from hnn_core import MPIBackend, simulate_dipole, neymotin_2020_model
 
 ###############################################################################
 # Following :ref:`the alpha example
