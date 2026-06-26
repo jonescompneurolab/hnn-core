@@ -10,7 +10,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import fmin_cobyla
 
-from .objective_functions import _rmse_evoked, _anticorr_evoked, _maximize_psd
+from .objective_functions import (
+    _rmse_evoked,
+    _anticorr_evoked,
+    _maximize_psd,
+    _custom_objective_function,
+)
 from ..externals.mne import _validate_type
 
 
@@ -51,10 +56,12 @@ class Optimizer:
             The optimizer, 'bayesian', 'cobyla', or 'cma'.
         obj_fun : str | func
             The objective function to be minimized. Can be 'dipole_rmse',
-            'maximize_psd', or a user-defined function. The default is 'dipole_rmse'. If
-            a user-defined function is provided, it must have the same function
-            signature as the existing objective functions (i.e. `_rmse_evoked` and
-            `_maximize_psd` in objective_functions.py).
+            'maximize_psd', 'dipole_corr', 'custom', or a user-defined function. See the
+            docstring for ``Optimizer.fit`` to view the required and optional arguments
+            for each of these cases. If a user-defined function is provided, it must
+            have the same function signature as the existing objective functions
+            (i.e. `_rmse_evoked` and `_maximize_psd` in objective_functions.py).The
+            default is 'dipole_rmse'.
         max_iter : int, optional
             The max number of calls to the objective function. The default is 200.
 
@@ -111,6 +118,9 @@ class Optimizer:
         elif obj_fun == "dipole_corr":
             self.obj_fun = _anticorr_evoked
             self.obj_fun_name = "dipole_corr"
+        elif obj_fun == "custom":
+            self.obj_fun = _custom_objective_function
+            self.obj_fun_name = "custom"
         else:
             self.obj_fun = obj_fun  # user-defined function
             self.obj_fun_name = None
@@ -170,17 +180,22 @@ class Optimizer:
         relative_bandpower : list of float | float (Required if obj_fun='maximize_psd')
             Weight for each frequency band in f_bands. If a single float is provided,
             the same weight is applied to all frequency bands.
-        n_jobs : int (Only used if solver='cma')
-            The number of jobs to start in parallel. If None, then 1 trial will be
-            started without parallelism.
-        popsize : int (Only used if solver='cma')
-            Number of parameter samples simulated per epoch. Default: 16
-        seed : int, optional (Only used if solver='cma')
-            Optional seed for random number generator of optimizer.
-        sigma0 : float | array-like (Only used if solver='cma')
+        loss_fun : callable (Required if obj_fun='custom')
+            Objective loss function to be provided by user. The function must accept a
+            single ``Dipole`` object as its first argument, and `obj_fun_kwargs` as its
+            second argument, where `obj_fun_kwargs` is the same as the kwargs passed to
+            this ``Optimizer.fit` function.
+        sigma0 : float| array-like (Only used if solver='cma')
             Initial standard deviation of CME-ES algorithm. If float, sigma0 is scaled
             by bounds defined in the constraints for each parameter. If array-like, The
             length of sigma0 must equal the length of constraints. Default: 0.25
+        popsize : int (Only used if solver='cma')
+            Number of parameter samples simulated per epoch. Default: 16
+        n_jobs : int (Only used if solver='cma')
+            The number of jobs to start in parallel. If None, then 1 trial will be
+            started without parallelism.
+        seed : int, optional (Only used if solver='cma')
+            Optional seed for random number generator of optimizer.
         tolfun : float (Only used if solver='cma')
             Termination criteria. Stops if the range of the best objective function
             values of the last 10 + ((30 * n_parameters) / popsize) generations and all
@@ -210,17 +225,30 @@ class Optimizer:
         to the number of parameters being optimized (N). 4+3*log(N)
 
         """
+        if "n_trials" not in obj_fun_kwargs:
+            obj_fun_kwargs["n_trials"] = 1
+
         if self.obj_fun_name == "dipole_rmse" or self.obj_fun_name == "dipole_corr":
             if "target" not in obj_fun_kwargs:
                 raise Exception("target must be specified")
-            elif "n_trials" not in obj_fun_kwargs:
+
+        elif self.obj_fun_name == "maximize_psd":
+            if (
+                "f_bands" not in obj_fun_kwargs
+                or "relative_bandpower" not in obj_fun_kwargs
+            ):
+                raise Exception("f_bands and relative_bandpower must be specified")
+            elif obj_fun_kwargs["n_trials"] > 1:
+                print(
+                    "WARNING: For the `_maximize_psd` objective function, currently only 1 trial is supported. Overwriting the number of trials to be 1."
+                )
                 obj_fun_kwargs["n_trials"] = 1
 
-        elif self.obj_fun_name == "maximize_psd" and (
-            "f_bands" not in obj_fun_kwargs
-            or "relative_bandpower" not in obj_fun_kwargs
-        ):
-            raise Exception("f_bands and relative_bandpower must be specified")
+        elif self.obj_fun_name == "custom":
+            if "loss_fun" not in obj_fun_kwargs:
+                raise Exception("loss_fun must be specified when obj_fun='custom'")
+            elif not callable(obj_fun_kwargs["loss_fun"]):
+                raise Exception("loss_fun must be a callable")
 
         constraints = self._assemble_constraints(self.constraints)
 
