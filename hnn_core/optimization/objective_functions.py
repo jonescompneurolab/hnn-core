@@ -238,6 +238,14 @@ def _rmse_evoked(
         verbose : bool, optional
             If True, print build steps and simulation progress to console. Default: True.
 
+    best : dict, optional
+        Dictionary with keys "obj" and "params" to store the best objective value and
+        corresponding parameters. Note that `best` will be updated as a "side-effect"
+        (similar to "pass-by-reference"), and is not returned by the function; this is
+        necessary because the optimization routines in `scipy.optimize` require the
+        objective functions to return a single scalar value. Only used if the solver is
+        set to "cobyla" or "cma".
+
     Returns
     -------
     obj : float
@@ -443,6 +451,14 @@ def _custom_objective_function(
     obj_fun_kwargs : dict
         Additional arguments to pass to the objective function, must contain
         'loss_fun', a callable.
+
+    best : dict, optional
+        Dictionary with keys "obj" and "params" to store the best objective value and
+        corresponding parameters. Note that `best` will be updated as a "side-effect"
+        (similar to "pass-by-reference"), and is not returned by the function; this is
+        necessary because the optimization routines in `scipy.optimize` require the
+        objective functions to return a single scalar value. Only used if the solver is
+        set to "cobyla" or "cma".
 
     Returns
     -------
