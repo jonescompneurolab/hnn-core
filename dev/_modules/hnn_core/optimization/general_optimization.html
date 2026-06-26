@@ -525,7 +525,12 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">fmin_cobyla</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">.objective_functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">_rmse_evoked</span><span class="p">,</span> <span class="n">_anticorr_evoked</span><span class="p">,</span> <span class="n">_maximize_psd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.objective_functions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_rmse_evoked</span><span class="p">,</span>
+    <span class="n">_anticorr_evoked</span><span class="p">,</span>
+    <span class="n">_maximize_psd</span><span class="p">,</span>
+    <span class="n">_custom_objective_function</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..externals.mne</span><span class="w"> </span><span class="kn">import</span> <span class="n">_validate_type</span>
 
 
@@ -568,10 +573,12 @@
 <span class="sd">            The optimizer, &#39;bayesian&#39;, &#39;cobyla&#39;, or &#39;cma&#39;.</span>
 <span class="sd">        obj_fun : str | func</span>
 <span class="sd">            The objective function to be minimized. Can be &#39;dipole_rmse&#39;,</span>
-<span class="sd">            &#39;maximize_psd&#39;, or a user-defined function. The default is &#39;dipole_rmse&#39;. If</span>
-<span class="sd">            a user-defined function is provided, it must have the same function</span>
-<span class="sd">            signature as the existing objective functions (i.e. `_rmse_evoked` and</span>
-<span class="sd">            `_maximize_psd` in objective_functions.py).</span>
+<span class="sd">            &#39;maximize_psd&#39;, &#39;dipole_corr&#39;, &#39;custom&#39;, or a user-defined function. See the</span>
+<span class="sd">            docstring for ``Optimizer.fit`` to view the required and optional arguments</span>
+<span class="sd">            for each of these cases. If a user-defined function is provided, it must</span>
+<span class="sd">            have the same function signature as the existing objective functions</span>
+<span class="sd">            (i.e. `_rmse_evoked` and `_maximize_psd` in objective_functions.py).The</span>
+<span class="sd">            default is &#39;dipole_rmse&#39;.</span>
 <span class="sd">        max_iter : int, optional</span>
 <span class="sd">            The max number of calls to the objective function. The default is 200.</span>
 
@@ -628,6 +635,9 @@
         <span class="k">elif</span> <span class="n">obj_fun</span> <span class="o">==</span> <span class="s2">&quot;dipole_corr&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun</span> <span class="o">=</span> <span class="n">_anticorr_evoked</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">=</span> <span class="s2">&quot;dipole_corr&quot;</span>
+        <span class="k">elif</span> <span class="n">obj_fun</span> <span class="o">==</span> <span class="s2">&quot;custom&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun</span> <span class="o">=</span> <span class="n">_custom_objective_function</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">=</span> <span class="s2">&quot;custom&quot;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun</span> <span class="o">=</span> <span class="n">obj_fun</span>  <span class="c1"># user-defined function</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">=</span> <span class="kc">None</span>
@@ -692,17 +702,22 @@
 <span class="sd">        relative_bandpower : list of float | float (Required if obj_fun=&#39;maximize_psd&#39;)</span>
 <span class="sd">            Weight for each frequency band in f_bands. If a single float is provided,</span>
 <span class="sd">            the same weight is applied to all frequency bands.</span>
-<span class="sd">        n_jobs : int (Only used if solver=&#39;cma&#39;)</span>
-<span class="sd">            The number of jobs to start in parallel. If None, then 1 trial will be</span>
-<span class="sd">            started without parallelism.</span>
-<span class="sd">        popsize : int (Only used if solver=&#39;cma&#39;)</span>
-<span class="sd">            Number of parameter samples simulated per epoch. Default: 16</span>
-<span class="sd">        seed : int, optional (Only used if solver=&#39;cma&#39;)</span>
-<span class="sd">            Optional seed for random number generator of optimizer.</span>
-<span class="sd">        sigma0 : float | array-like (Only used if solver=&#39;cma&#39;)</span>
+<span class="sd">        loss_fun : callable (Required if obj_fun=&#39;custom&#39;)</span>
+<span class="sd">            Objective loss function to be provided by user. The function must accept a</span>
+<span class="sd">            single ``Dipole`` object as its first argument, and `obj_fun_kwargs` as its</span>
+<span class="sd">            second argument, where `obj_fun_kwargs` is the same as the kwargs passed to</span>
+<span class="sd">            this ``Optimizer.fit` function.</span>
+<span class="sd">        sigma0 : float| array-like (Only used if solver=&#39;cma&#39;)</span>
 <span class="sd">            Initial standard deviation of CME-ES algorithm. If float, sigma0 is scaled</span>
 <span class="sd">            by bounds defined in the constraints for each parameter. If array-like, The</span>
 <span class="sd">            length of sigma0 must equal the length of constraints. Default: 0.25</span>
+<span class="sd">        popsize : int (Only used if solver=&#39;cma&#39;)</span>
+<span class="sd">            Number of parameter samples simulated per epoch. Default: 16</span>
+<span class="sd">        n_jobs : int (Only used if solver=&#39;cma&#39;)</span>
+<span class="sd">            The number of jobs to start in parallel. If None, then 1 trial will be</span>
+<span class="sd">            started without parallelism.</span>
+<span class="sd">        seed : int, optional (Only used if solver=&#39;cma&#39;)</span>
+<span class="sd">            Optional seed for random number generator of optimizer.</span>
 <span class="sd">        tolfun : float (Only used if solver=&#39;cma&#39;)</span>
 <span class="sd">            Termination criteria. Stops if the range of the best objective function</span>
 <span class="sd">            values of the last 10 + ((30 * n_parameters) / popsize) generations and all</span>
@@ -732,17 +747,30 @@
 <span class="sd">        to the number of parameters being optimized (N). 4+3*log(N)</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;n_trials&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span><span class="p">:</span>
+            <span class="n">obj_fun_kwargs</span><span class="p">[</span><span class="s2">&quot;n_trials&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">==</span> <span class="s2">&quot;dipole_rmse&quot;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">==</span> <span class="s2">&quot;dipole_corr&quot;</span><span class="p">:</span>
             <span class="k">if</span> <span class="s2">&quot;target&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;target must be specified&quot;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="s2">&quot;n_trials&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span><span class="p">:</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">==</span> <span class="s2">&quot;maximize_psd&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="s2">&quot;f_bands&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span>
+                <span class="ow">or</span> <span class="s2">&quot;relative_bandpower&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span>
+            <span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;f_bands and relative_bandpower must be specified&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">obj_fun_kwargs</span><span class="p">[</span><span class="s2">&quot;n_trials&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="s2">&quot;WARNING: For the `_maximize_psd` objective function, currently only 1 trial is supported. Overwriting the number of trials to be 1.&quot;</span>
+                <span class="p">)</span>
                 <span class="n">obj_fun_kwargs</span><span class="p">[</span><span class="s2">&quot;n_trials&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">==</span> <span class="s2">&quot;maximize_psd&quot;</span> <span class="ow">and</span> <span class="p">(</span>
-            <span class="s2">&quot;f_bands&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span>
-            <span class="ow">or</span> <span class="s2">&quot;relative_bandpower&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span>
-        <span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;f_bands and relative_bandpower must be specified&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">==</span> <span class="s2">&quot;custom&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;loss_fun&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;loss_fun must be specified when obj_fun=&#39;custom&#39;&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">obj_fun_kwargs</span><span class="p">[</span><span class="s2">&quot;loss_fun&quot;</span><span class="p">]):</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;loss_fun must be a callable&quot;</span><span class="p">)</span>
 
         <span class="n">constraints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_assemble_constraints</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">)</span>
 

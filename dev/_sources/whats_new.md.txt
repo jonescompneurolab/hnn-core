@@ -32,6 +32,21 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ### New Features
 
+- Users can now specify their own custom objective function in two different ways:
+    1. Passing a `obj_fun='custom'` to `Optimizer`. If passing `custom`, then users can
+      provide a function that simply accepts a single `Dipole` object and accepts
+      `obj_fun_kwargs`. They must then pass this function as `loss_fun` in
+      `Optimizer.fit`. More details are available in the description for
+      `Optimizer.fit`.
+    2. Passing their own callable via `obj_fun=<callable>`. If users want to use an
+      objective function that does not use only a single `Dipole`, then they can write
+      their own function similar to the existing code in
+      `optimization/objective_functions.py` and pass that function to
+      `Optimizer(... obj_fun=<function>)`. Note that this function must accept all the
+      same arguments as the other objective functions in
+      `optimization/objective_functions.py` and run a simulation.
+      by [Vaishnavi Baghel][] in {gh}`1271`.
+
 ### Upcoming Deprecations
 
 ### Bug Fixes
@@ -44,10 +59,14 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ### People who contributed to this release:
 
+- [Vaishnavi Baghel][]
 - [Shivansh Bhageria][]
 - [Camilo Diaz][]
 
 ### Changelog
+
+- Easier optimization custom function usage
+  by [Vaishnavi Baghel][] in {gh}`1271`.
 
 - Document and remove problematic MPI Timeouts (while keeping code intact), and
   implement a new tempfile-based mechanism for transmitting MPI data from child

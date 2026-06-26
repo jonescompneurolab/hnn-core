@@ -556,16 +556,21 @@
 <dt><strong>relative_bandpower</strong><span class="classifier">list of float | float (Required if obj_fun=’maximize_psd’)</span></dt><dd><p>Weight for each frequency band in f_bands. If a single float is provided,
 the same weight is applied to all frequency bands.</p>
 </dd>
-<dt><strong>n_jobs</strong><span class="classifier">int (Only used if solver=’cma’)</span></dt><dd><p>The number of jobs to start in parallel. If None, then 1 trial will be
-started without parallelism.</p>
+<dt><strong>loss_fun</strong><span class="classifier">callable (Required if obj_fun=’custom’)</span></dt><dd><p>Objective loss function to be provided by user. The function must accept a
+single <code class="docutils literal notranslate"><span class="pre">Dipole</span></code> object as its first argument, and <em class="xref py py-obj">obj_fun_kwargs</em> as its
+second argument, where <em class="xref py py-obj">obj_fun_kwargs</em> is the same as the kwargs passed to
+this <a href="#id1"><span class="problematic" id="id2">``</span></a>Optimizer.fit` function.</p>
+</dd>
+<dt><strong>sigma0</strong><span class="classifier">float| array-like (Only used if solver=’cma’)</span></dt><dd><p>Initial standard deviation of CME-ES algorithm. If float, sigma0 is scaled
+by bounds defined in the constraints for each parameter. If array-like, The
+length of sigma0 must equal the length of constraints. Default: 0.25</p>
 </dd>
 <dt><strong>popsize</strong><span class="classifier">int (Only used if solver=’cma’)</span></dt><dd><p>Number of parameter samples simulated per epoch. Default: 16</p>
 </dd>
-<dt><strong>seed</strong><span class="classifier">int, optional (Only used if solver=’cma’)</span></dt><dd><p>Optional seed for random number generator of optimizer.</p>
+<dt><strong>n_jobs</strong><span class="classifier">int (Only used if solver=’cma’)</span></dt><dd><p>The number of jobs to start in parallel. If None, then 1 trial will be
+started without parallelism.</p>
 </dd>
-<dt><strong>sigma0</strong><span class="classifier">float | array-like (Only used if solver=’cma’)</span></dt><dd><p>Initial standard deviation of CME-ES algorithm. If float, sigma0 is scaled
-by bounds defined in the constraints for each parameter. If array-like, The
-length of sigma0 must equal the length of constraints. Default: 0.25</p>
+<dt><strong>seed</strong><span class="classifier">int, optional (Only used if solver=’cma’)</span></dt><dd><p>Optional seed for random number generator of optimizer.</p>
 </dd>
 <dt><strong>tolfun</strong><span class="classifier">float (Only used if solver=’cma’)</span></dt><dd><p>Termination criteria. Stops if the range of the best objective function
 values of the last 10 + ((30 * n_parameters) / popsize) generations and all

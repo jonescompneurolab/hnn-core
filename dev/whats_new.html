@@ -534,6 +534,25 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 </section>
 <section id="new-features">
 <h3>New Features<a class="headerlink" href="#new-features" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Users can now specify their own custom objective function in two different ways:</p>
+<ol class="arabic simple">
+<li><p>Passing a <code class="docutils literal notranslate"><span class="pre">obj_fun='custom'</span></code> to <code class="docutils literal notranslate"><span class="pre">Optimizer</span></code>. If passing <code class="docutils literal notranslate"><span class="pre">custom</span></code>, then users can
+provide a function that simply accepts a single <code class="docutils literal notranslate"><span class="pre">Dipole</span></code> object and accepts
+<code class="docutils literal notranslate"><span class="pre">obj_fun_kwargs</span></code>. They must then pass this function as <code class="docutils literal notranslate"><span class="pre">loss_fun</span></code> in
+<code class="docutils literal notranslate"><span class="pre">Optimizer.fit</span></code>. More details are available in the description for
+<code class="docutils literal notranslate"><span class="pre">Optimizer.fit</span></code>.</p></li>
+<li><p>Passing their own callable via <code class="docutils literal notranslate"><span class="pre">obj_fun=&lt;callable&gt;</span></code>. If users want to use an
+objective function that does not use only a single <code class="docutils literal notranslate"><span class="pre">Dipole</span></code>, then they can write
+their own function similar to the existing code in
+<code class="docutils literal notranslate"><span class="pre">optimization/objective_functions.py</span></code> and pass that function to
+<code class="docutils literal notranslate"><span class="pre">Optimizer(...</span> <span class="pre">obj_fun=&lt;function&gt;)</span></code>. Note that this function must accept all the
+same arguments as the other objective functions in
+<code class="docutils literal notranslate"><span class="pre">optimization/objective_functions.py</span></code> and run a simulation.
+by <a class="reference external" href="https://github.com/vshnvii">Vaishnavi Baghel</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1271">#1271</a>.</p></li>
+</ol>
+</li>
+</ul>
 </section>
 <section id="upcoming-deprecations">
 <h3>Upcoming Deprecations<a class="headerlink" href="#upcoming-deprecations" title="Link to this heading">#</a></h3>
@@ -552,6 +571,7 @@ input/output/error streams. Thanks Camilo!</p></li>
 <section id="people-who-contributed-to-this-release">
 <h3>People who contributed to this release:<a class="headerlink" href="#people-who-contributed-to-this-release" title="Link to this heading">#</a></h3>
 <ul class="simple">
+<li><p><a class="reference external" href="https://github.com/vshnvii">Vaishnavi Baghel</a></p></li>
 <li><p><a class="reference external" href="https://github.com/Shivansh1205">Shivansh Bhageria</a></p></li>
 <li><p><a class="reference external" href="https://github.com/kmilo9999">Camilo Diaz</a></p></li>
 </ul>
@@ -559,6 +579,8 @@ input/output/error streams. Thanks Camilo!</p></li>
 <section id="changelog">
 <h3>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">#</a></h3>
 <ul class="simple">
+<li><p>Easier optimization custom function usage
+by <a class="reference external" href="https://github.com/vshnvii">Vaishnavi Baghel</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1271">#1271</a>.</p></li>
 <li><p>Document and remove problematic MPI Timeouts (while keeping code intact), and
 implement a new tempfile-based mechanism for transmitting MPI data from child
 processes back to rank 0 child process then parent process,
