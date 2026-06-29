@@ -610,13 +610,11 @@ class Cell:
         return self.sections
     
     def _create_synapses(self, synapse_tree,):
-        import simple
         """Creating synapses from synapse_tree"""
         for section , section_tree in synapse_tree.items():
             for seg_x , receptor_list in section_tree.items():
                 seg= self._nrn_sections[section](seg_x)
                 for receptor in receptor_list:
-                    simple.count+=1
                     syn_key= f"{section}_{receptor}"
                     self._nrn_synapses[syn_key]=self.syn_create(seg,**self.synapses[receptor])
             
