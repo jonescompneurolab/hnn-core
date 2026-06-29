@@ -2,7 +2,7 @@
 
 # Authors: Nick Tolley <nicholas_tolley@brown.edu>
 
-import os.path as op
+from pathlib import Path
 from copy import deepcopy
 import warnings
 
@@ -120,10 +120,10 @@ def neymotin_2020_model(
            MEG/EEG Data." eLife 9 (January):e51214. https://doi.org/10.7554/eLife.51214
 
     """
-    hnn_core_root = op.dirname(hnn_core.__file__)
+    hnn_core_root = Path(hnn_core.__file__).parent
     if params is None:
-        params = op.join(hnn_core_root, "param", "default.json")
-    if isinstance(params, str):
+        params = hnn_core_root / "param" / "default.json"
+    if isinstance(params, (str, Path)):
         params = read_params(params)
 
     # Define cell types for Jones 2009 model
@@ -490,8 +490,8 @@ def calcium_model(
            Evoked Responses Revealed By Human Neocortical Neurosolver."
            Brain Topography, 35, 19–35 (2022).
     """
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, "param", "default.json")
+    hnn_core_root = Path(hnn_core.__file__).parent
+    params_fname = hnn_core_root / "param" / "default.json"
     if params is None:
         params = read_params(params_fname)
 

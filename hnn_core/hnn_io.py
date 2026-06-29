@@ -4,7 +4,6 @@
 #          Nick Tolley <nicholas_tolley@brown.edu>
 #          George Dang <george_dang@brown.edu>
 
-import os
 import json
 import numpy as np
 
@@ -455,10 +454,11 @@ def write_network_configuration(net, output, overwrite=True):
     net_data_converted = _convert_np_array_to_list(net_data)
 
     if isinstance(output, (str, Path)):
-        if overwrite is False and os.path.exists(output):
+        output = Path(output)
+        if overwrite is False and output.exists():
             raise FileExistsError(
-                "File already exists at path %s. Rename "
-                "the file or set overwrite=True." % (output,)
+                f"File already exists at path {output}. Rename "
+                f"the file or set overwrite=True."
             )
         # Saving file
         with open(output, "w", encoding="utf-8") as f:
