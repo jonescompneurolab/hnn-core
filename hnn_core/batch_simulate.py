@@ -429,7 +429,6 @@ class BatchSimulate(object):
         }
         save_data["metadata"] = metadata
 
-        save_folder = Path(self.save_folder)
         file_path = save_folder / f"sim_run_{start_idx}-{end_idx}.npz"
         if file_path.exists() and not self.overwrite:
             raise FileExistsError(
