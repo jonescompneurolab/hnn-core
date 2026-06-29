@@ -384,7 +384,7 @@ class Cell:
         )
     """
 
-    def __init__(self, name, pos, sections, synapses, sect_loc, cell_tree, synapse_tree=None, gid=None,seg_x=None):
+    def __init__(self, name, pos, sections, synapses, sect_loc, cell_tree, synapse_tree=None, gid=None):
         self.name = name
         self.pos = pos
         for section in sections.values():
@@ -406,7 +406,6 @@ class Cell:
         self.list_IClamp = list()
         self._gid = None
         self.tonic_biases = list()
-        self.seg_x=seg_x
         if gid is not None:
             self.gid = gid  # use setter method to check input argument gid
 
@@ -609,13 +608,15 @@ class Cell:
                             seg_vals.append(val(sec_end_dist + (seg_x * section.L)))
                         p_mech[attr] = [seg_xs, seg_vals]
         return self.sections
-
+    
     def _create_synapses(self, synapse_tree,):
+        import simple
         """Creating synapses from synapse_tree"""
         for section , section_tree in synapse_tree.items():
             for seg_x , receptor_list in section_tree.items():
                 seg= self._nrn_sections[section](seg_x)
                 for receptor in receptor_list:
+                    simple.count+=1
                     syn_key= f"{section}_{receptor}"
                     self._nrn_synapses[syn_key]=self.syn_create(seg,**self.synapses[receptor])
             
