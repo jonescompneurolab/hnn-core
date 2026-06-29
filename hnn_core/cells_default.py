@@ -252,15 +252,24 @@ def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
     }
     p_mech = _get_mechanisms(p_all, "L2Pyr", ["soma"] + section_names, mechanisms)
 
+    syn_sections = ["apical_tuft", "apical_oblique", "basal_2", "basal_3"]
+    
+    syn_seg_x = {#maybe like we can additional segments value of sections
+    'apical_oblique': 0.5,
+    'apical_tuft':    0.5,
+    'basal_2':        0.5,
+    'basal_3':        0.5,
+    'soma':           0.5,
+    }
+    
     for sec_name, section in sections.items():
         section._end_pts = end_pts[sec_name]
-
-        if sec_name == "soma":
-            section.syns = ["gabaa", "gabab"]
-        else:
-            section.syns = ["ampa", "nmda", "gabaa", "gabab"]
-
         section.mechs = p_mech[sec_name]
+        section.syns = []
+
+    for section_name in syn_sections:
+        sections[section_name].syns = ["ampa", "nmda", "gabaa", "gabab"]
+    sections["soma"].syns = ["gabaa", "gabab"]
 
     # Node description - (section_name, end_point)
     cell_tree = {
@@ -293,6 +302,7 @@ def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
         sect_loc=sect_loc,
         cell_tree=cell_tree,
         gid=gid,
+        seg_x=syn_seg_x,
     )
 
 
@@ -412,21 +422,29 @@ def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
     }
     p_mech = _get_mechanisms(p_all, "L5Pyr", ["soma"] + section_names, mechanisms)
 
+    syn_sections = ["apical_tuft", "apical_oblique", "basal_2", "basal_3"]
+    
+    syn_seg_x = {
+    'apical_oblique': 0.5,
+    'apical_tuft':    0.5,
+    'basal_2':        0.5,
+    'basal_3':        0.5,
+    'soma':           0.5,
+}
+    
     for sec_name, section in sections.items():
         section._end_pts = end_pts[sec_name]
-
-        if sec_name == "soma":
-            section.syns = ["gabaa", "gabab"]
-        else:
-            section.syns = ["ampa", "nmda", "gabaa", "gabab"]
-
         section.mechs = p_mech[sec_name]
+        section.syns = []
 
         if sec_name != "soma":
             sections[sec_name].mechs["ar"]["gbar_ar"] = partial(
                 _exp_g_at_dist, gbar_at_zero=1e-6, exp_term=3e-3, offset=0.0
             )
 
+    for section_name in syn_sections:
+        sections[section_name].syns = ["ampa", "nmda", "gabaa", "gabab"]
+    sections["soma"].syns = ["gabaa", "gabab"]
     cell_tree = {
         ("apical_trunk", 0): [("apical_trunk", 1)],
         ("apical_1", 0): [("apical_1", 1)],
@@ -459,6 +477,7 @@ def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
         sect_loc=sect_loc,
         cell_tree=cell_tree,
         gid=gid,
+        seg_x=syn_seg_x
     )
 
 
@@ -697,7 +716,7 @@ def basket(cell_name, pos=(0, 0, 0), gid=None):
     synapses = _get_basket_syn_props()
     sections["soma"].syns = list(synapses.keys())
     sections["soma"].mechs = {"hh2": dict()}
-
+    seg_x = {"soma": 0.5}
     cell_tree = None
     return Cell(
         cell_name,
@@ -707,6 +726,7 @@ def basket(cell_name, pos=(0, 0, 0), gid=None):
         sect_loc=sect_loc,
         cell_tree=cell_tree,
         gid=gid,
+        seg_x=seg_x
     )
 
 

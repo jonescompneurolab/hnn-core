@@ -384,7 +384,7 @@ class Cell:
         )
     """
 
-    def __init__(self, name, pos, sections, synapses, sect_loc, cell_tree, gid=None):
+    def __init__(self, name, pos, sections, synapses, sect_loc, cell_tree, gid=None,seg_x=None):
         self.name = name
         self.pos = pos
         for section in sections.values():
@@ -406,6 +406,7 @@ class Cell:
         self.list_IClamp = list()
         self._gid = None
         self.tonic_biases = list()
+        self.seg_x=seg_x
         if gid is not None:
             self.gid = gid  # use setter method to check input argument gid
 
@@ -609,12 +610,13 @@ class Cell:
                         p_mech[attr] = [seg_xs, seg_vals]
         return self.sections
 
-    def _create_synapses(self, sections, synapses):
+    def _create_synapses(self, sections, synapses, seg_x=None):
         """Create synapses."""
         for sec_name in sections:
             for receptor in sections[sec_name].syns:
                 syn_key = f"{sec_name}_{receptor}"
-                seg = self._nrn_sections[sec_name](0.5)
+                value = seg_x[sec_name] 
+                seg = self._nrn_sections[sec_name](value)
                 self._nrn_synapses[syn_key] = self.syn_create(seg, **synapses[receptor])
 
     def _create_sections(self, sections, cell_tree):
@@ -684,7 +686,7 @@ class Cell:
             of a pyramidal neuron.
         """
         self._create_sections(self.sections, self.cell_tree)
-        self._create_synapses(self.sections, self.synapses)
+        self._create_synapses(self.sections, self.synapses,self.seg_x)
         self._set_biophysics(self.sections)
         if sec_name_apical in self._nrn_sections:
             self._insert_dipole(sec_name_apical)
