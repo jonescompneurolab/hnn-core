@@ -384,7 +384,7 @@ class Cell:
         )
     """
 
-    def __init__(self, name, pos, sections, synapses, sect_loc, cell_tree, gid=None,seg_x=None):
+    def __init__(self, name, pos, sections, synapses, sect_loc, cell_tree, synapse_tree=None, gid=None,seg_x=None):
         self.name = name
         self.pos = pos
         for section in sections.values():
@@ -412,7 +412,7 @@ class Cell:
 
         # Store the tree representation of the cell
         self.cell_tree = cell_tree
-
+        self.synapse_tree=synapse_tree
         self._update_end_pts()  # New implementation
 
         self._compute_section_mechs()  # Set mech values of all sections
@@ -610,17 +610,15 @@ class Cell:
                         p_mech[attr] = [seg_xs, seg_vals]
         return self.sections
 
-    def _create_synapses(self, sections, synapses, seg_x=None):
-        """Create synapses."""
-        for sec_name in sections:
-            for receptor in sections[sec_name].syns:
-                syn_key = f"{sec_name}_{receptor}"
-                if seg_x is not None:
-                    pos = seg_x.get(sec_name, 0.5) 
-                else:
-                    pos= 0.5
-                seg = self._nrn_sections[sec_name](pos)
-                self._nrn_synapses[syn_key] = self.syn_create(seg, **synapses[receptor])
+    def _create_synapses(self, synapse_tree,):
+        """Creating synapses from synapse_tree"""
+        for section , section_tree in synapse_tree.items():
+            for seg_x , receptor_list in section_tree.items():
+                seg= self._nrn_sections[section](seg_x)
+                for receptor in receptor_list:
+                    syn_key= f"{section}_{receptor}"
+                    self._nrn_synapses[syn_key]=self.syn_create(seg,**self.synapses[receptor])
+            
 
     def _create_sections(self, sections, cell_tree):
         """Create soma and set geometry.
@@ -690,7 +688,7 @@ class Cell:
             of a pyramidal neuron.
         """
         self._create_sections(self.sections, self.cell_tree)
-        self._create_synapses(self.sections, self.synapses, self.seg_x)
+        self._create_synapses(self.synapse_tree)
         self._set_biophysics(self.sections)
         if sec_name_apical in self._nrn_sections:
             self._insert_dipole(sec_name_apical)

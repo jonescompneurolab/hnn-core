@@ -285,7 +285,13 @@ def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
         "proximal": ["apical_oblique", "basal_2", "basal_3"],
         "distal": ["apical_tuft"],
     }
-
+    synapse_tree = {
+    'soma':           {0.5: ['gabaa', 'gabab']},
+    'apical_tuft':   {0.5: ['ampa', 'nmda', 'gabaa', 'gabab']},
+    'apical_oblique': {0.5: ['ampa', 'nmda', 'gabaa', 'gabab']},
+    'basal_2':       {0.5: ['ampa', 'nmda', 'gabaa', 'gabab']},
+    'basal_3':       {0.5: ['ampa', 'nmda', 'gabaa', 'gabab']},
+    }
     synapses = _get_syn_props(p_all, "L2Pyr")
     return Cell(
         "L2Pyr",
@@ -295,6 +301,7 @@ def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
         sect_loc=sect_loc,
         cell_tree=cell_tree,
         gid=gid,
+        synapse_tree=synapse_tree
     )
 
 
@@ -452,6 +459,13 @@ def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
         "proximal": ["apical_oblique", "basal_2", "basal_3"],
         "distal": ["apical_tuft"],
     }
+    synapse_tree = {
+    'soma':           {0.5: ['gabaa', 'gabab']},
+    'apical_tuft':   {0.5: ['ampa', 'nmda', 'gabaa', 'gabab']},
+    'apical_oblique': {0.5: ['ampa', 'nmda', 'gabaa', 'gabab']},
+    'basal_2':       {0.5: ['ampa', 'nmda', 'gabaa', 'gabab']},
+    'basal_3':       {0.5: ['ampa', 'nmda', 'gabaa', 'gabab']},
+    }
 
     synapses = _get_syn_props(p_all, "L5Pyr")
     return Cell(
@@ -462,6 +476,7 @@ def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
         sect_loc=sect_loc,
         cell_tree=cell_tree,
         gid=gid,
+        synapse_tree=synapse_tree
     )
 
 
@@ -701,6 +716,9 @@ def basket(cell_name, pos=(0, 0, 0), gid=None):
     sections["soma"].syns = list(synapses.keys())
     sections["soma"].mechs = {"hh2": dict()}
     cell_tree = None
+    synapse_tree = {
+    'soma': {0.5: ['ampa', 'nmda', 'gabaa']} 
+    }
     return Cell(
         cell_name,
         pos,
@@ -708,6 +726,7 @@ def basket(cell_name, pos=(0, 0, 0), gid=None):
         synapses=synapses,
         sect_loc=sect_loc,
         cell_tree=cell_tree,
+        synapse_tree=synapse_tree,
         gid=gid,
     )
 
