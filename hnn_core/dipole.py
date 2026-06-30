@@ -469,6 +469,12 @@ def _anticorr(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
 def _rmse_corr(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
     """Calculates correlation-weighted RMSE between data in dpl and exp_dpl
 
+    Penalizes solutions with a low correlation, encouraging the optimizer to find
+    solutions that reproduce the waveform shape rather than regressing to the mean.
+    For small correlations (clipped at 1e-10), rmse will be
+    multiplied by a large positive number and the error is large.
+    For correlations close to 1, the error will be equal to the rmse.
+
     Parameters
     ----------
     dpl : instance of Dipole
@@ -489,12 +495,7 @@ def _rmse_corr(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
     err : float
         Weighted RMSE between data in dpl and exp_dpl
         err = rmse * (1 - np.log(sig_corr))
-        This function penalizes solutions with a low correlation,
-        forcing the optimizer to find solutions that reproduce
-        the waveform shape rather than regressing to the mean.
-        For small correlations (clipped at 1e-10), rmse will be
-        multiplied by a large positive number. For correlations close
-        to 1, rmse will be multiplied by 1.
+
     """
     exp_times = exp_dpl.times
     sim_times = dpl.times
