@@ -1232,9 +1232,9 @@ def test_tonic_biases():
     ):
         net.add_tonic_bias(amplitude={"L2_pyramidal": 0.5}, section="apical_4")
 
-    # Updated tonic bias tests for GID definitions
-
-    # Target gid defined and stored correctly
+    # Tests for custom GID usage with tonic biases
+    # ----------------------------------------------------------------------------------
+    # Single target gid defined and stored correctly
     net = neymotin_2020_model()
     net.clear_connectivity()
     target_gid = 35
@@ -1258,9 +1258,38 @@ def test_tonic_biases():
     assert np.unique(np.array(net.cell_response.spike_gids)) == target_gid
     del net, dpl
 
+    # list of target gid defined and stored correctly
+    # ----------------------------------------------------------------------------------
+    net = neymotin_2020_model()
+    net.clear_connectivity()
+    target_gids = [56, 67]
+    cell_type = "L2_pyramidal"
+
+    # Correct type
+    for target_gid in target_gids:
+        assert target_gid in net.gid_ranges[cell_type]
+
+    net.add_tonic_bias(
+        cell_type=cell_type,
+        gid=target_gids,
+        bias_name="tonic_soma",
+        amplitude=3,
+        t0=10,
+        tstop=15,
+    )
+
+    # stored correctly
+    assert target_gids == net.external_biases["tonic_soma"][cell_type]["gid"]
+    dpl = simulate_dipole(net, tstop=20)
+    # the only neuron that fires when connectivity is cleared
+    only_spiking_gids = np.unique(np.array(net.cell_response.spike_gids))
+    for spiking_gid in only_spiking_gids:
+        assert spiking_gid in target_gids
+    del net, dpl, target_gids, only_spiking_gids
+
     # If no target gid given, bias applied to all cells of cell_type (backwards compatibility)
     # For this test, remove all connections and ensure that the cells of that particular type spike
-
+    # ----------------------------------------------------------------------------------
     net = neymotin_2020_model()
     for cell_type in net.cell_types.keys():
         del net
