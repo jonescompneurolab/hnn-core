@@ -220,6 +220,7 @@ def _read_cell_response(cell_response_data, read_output):
         return None
     cell_response = CellResponse(
         cell_type_names=cell_response_data["cell_type_names"],
+        cell_type_metadata=cell_response_data.get("cell_type_metadata", None),
         spike_times=cell_response_data["spike_times"],
         spike_gids=cell_response_data["spike_gids"],
         spike_types=cell_response_data["spike_types"],

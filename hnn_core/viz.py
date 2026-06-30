@@ -943,6 +943,19 @@ def plot_cells(net, ax=None, show=True, colors=None, markers=None):
             f"Expected 'ax' to be an instance of Axes3D, but got {type(ax).__name__}"
         )
 
+    if colors:
+        for color_key in colors.keys():
+            if color_key not in net.cell_types.keys():
+                raise ValueError(
+                    f"Color cell type {color_key} does not exist in given Network"
+                )
+    if markers:
+        for marker_key in markers.keys():
+            if marker_key not in net.cell_types.keys():
+                raise ValueError(
+                    f"Marker cell type {marker_key} does not exist in given Network"
+                )
+
     default_marker_map = {"pyramidal": "^", "basket": "x", "interneuron": "o"}
     default_color_cycle = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 
