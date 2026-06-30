@@ -105,6 +105,10 @@ def _calculate_obj_fun(
             Required. A dipole object with experimental data.
         n_trials : int, default=1
             Number of trials to simulate and average.
+        bsl_cor : str
+            Baseline correction method for the simulation. Default: 'jones'
+            For jones_2009_model and law_2021_model, use method 'jones' (manual correction).
+            For duecker_ET_model, use method 'duecker'.
 
     best : dict, optional
         Dictionary with keys "obj" and "params" to store the best objective value and
