@@ -7,9 +7,17 @@ import pytest
 import numpy as np
 
 from hnn_core import CellResponse, read_spikes
+from hnn_core.network_models import default_cell_metadata
 
 
-def test_cell_response(tmp_path):
+@pytest.mark.parametrize(
+    "input_metadata",
+    [
+        None,
+        default_cell_metadata,
+    ],
+)
+def test_cell_response(tmp_path, input_metadata):
     """Test CellResponse object."""
     # Round-trip test
     spike_times = [[2.3456, 7.89], [4.2812, 93.2]]
@@ -26,6 +34,7 @@ def test_cell_response(tmp_path):
     default_cell_type_names = ["L2_basket", "L2_pyramidal", "L5_basket", "L5_pyramidal"]
     cell_response = CellResponse(
         cell_type_names=default_cell_type_names,
+        cell_type_metadata=input_metadata,
         spike_times=spike_times,
         spike_gids=spike_gids,
         spike_types=spike_types,
@@ -75,6 +84,7 @@ def test_cell_response(tmp_path):
     # Test recovery of empty spike files
     empty_spike = CellResponse(
         cell_type_names=default_cell_type_names,
+        cell_type_metadata=input_metadata,
         spike_times=[[], []],
         spike_gids=[[], []],
         spike_types=[[], []],
@@ -89,6 +99,7 @@ def test_cell_response(tmp_path):
     with pytest.raises(TypeError, match="spike_times should be a list of lists"):
         cell_response = CellResponse(
             cell_type_names=default_cell_type_names,
+            cell_type_metadata=input_metadata,
             spike_times=([2.3456, 7.89], [4.2812, 93.2]),
             spike_gids=spike_gids,
             spike_types=spike_types,
@@ -97,6 +108,7 @@ def test_cell_response(tmp_path):
     with pytest.raises(TypeError, match="spike_times should be a list of lists"):
         cell_response = CellResponse(
             cell_type_names=default_cell_type_names,
+            cell_type_metadata=input_metadata,
             spike_times=[1, 2],
             spike_gids=spike_gids,
             spike_types=spike_types,
@@ -108,6 +120,7 @@ def test_cell_response(tmp_path):
     ):
         cell_response = CellResponse(
             cell_type_names=default_cell_type_names,
+            cell_type_metadata=input_metadata,
             spike_times=[[2.3456, 7.89]],
             spike_gids=spike_gids,
             spike_types=spike_types,
@@ -115,6 +128,7 @@ def test_cell_response(tmp_path):
 
     cell_response = CellResponse(
         cell_type_names=default_cell_type_names,
+        cell_type_metadata=input_metadata,
         spike_times=spike_times,
         spike_gids=spike_gids,
         spike_types=spike_types,

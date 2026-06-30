@@ -12,6 +12,7 @@ import pytest
 import hnn_core
 from hnn_core import read_params, neymotin_2020_model
 from hnn_core.dipole import simulate_dipole
+from hnn_core.network_models import default_cell_metadata
 from hnn_core.viz import (
     plot_cells,
     plot_dipole,
@@ -321,7 +322,7 @@ def test_drive_strength(setup_net):
 class TestCellResponsePlotters:
     """Tests plotting methods of the CellResponse class"""
 
-    @pytest.fixture(scope="class")
+    @pytest.fixture
     def class_setup_net(self):
         """Creates a base network for tests within this class"""
         hnn_core_root = op.dirname(hnn_core.__file__)
@@ -331,8 +332,15 @@ class TestCellResponsePlotters:
 
         return net
 
-    @pytest.fixture(scope="class")
-    def base_simulation_spikes(self, class_setup_net):
+    # AES Had to remove scope=class because we do NOT want only one instance of the
+    # fixture per class anymore
+    @pytest.fixture(
+        params=[
+            None,
+            default_cell_metadata,
+        ],
+    )
+    def base_simulation_spikes(self, class_setup_net, request):
         """Adds drives with spikes for testing of spike visualizations"""
         net = class_setup_net
         weights_ampa = {"L2_pyramidal": 0.1, "L5_pyramidal": 1.0}
@@ -366,6 +374,7 @@ class TestCellResponsePlotters:
         )
         dpls = simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
 
+        net.cell_response._cell_type_metadata = request.param
         return net, dpls
 
     def test_spikes_raster_trial_idx(self, base_simulation_spikes):
@@ -400,18 +409,17 @@ class TestCellResponsePlotters:
             return colors, labels
 
         metadata_colors = []
-        for cell_type in net.cell_response._cell_type_metadata:
-            metadata_colors.append(
-                matplotlib.colors.to_hex(
-                    net.cell_response._cell_type_metadata[cell_type]["color"]
+        if net.cell_response._cell_type_metadata:
+            for cell_type in net.cell_response._cell_type_metadata:
+                metadata_colors.append(
+                    matplotlib.colors.to_hex(
+                        net.cell_response._cell_type_metadata[cell_type]["color"]
+                    )
                 )
-            )
-
-        # Default colors should be from the CellResponse metadata
-        fig = net.cell_response.plot_spikes_raster(trial_idx=0, show=False)
-        colors, _ = _get_line_hex_colors(fig)
-
-        assert colors == metadata_colors
+            # Default colors should be from the CellResponse metadata
+            fig = net.cell_response.plot_spikes_raster(trial_idx=0, show=False)
+            colors, _ = _get_line_hex_colors(fig)
+            assert colors == metadata_colors
 
         # Custom hex colors as list
         custom_colors = ["#daf7a6", "#ffc300", "#ff5733", "#c70039"]

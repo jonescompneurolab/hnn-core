@@ -662,6 +662,7 @@ def test_network_drives():
     with pytest.raises(TypeError, match="'times' is an np.ndarray of simulation times"):
         _ = CellResponse(
             cell_type_names=["L2_basket", "L2_pyramidal", "L5_basket", "L5_pyramidal"],
+            cell_type_metadata=None,
             times="blah",
         )
 
@@ -869,6 +870,7 @@ def test_network_drives_legacy():
     with pytest.raises(TypeError, match="'times' is an np.ndarray of simulation times"):
         _ = CellResponse(
             cell_type_names=["L2_basket", "L2_pyramidal", "L5_basket", "L5_pyramidal"],
+            cell_type_metadata=None,
             times="blah",
         )
 
@@ -1808,6 +1810,7 @@ def test_spike_train_drive_formats_and_simulation():
             spike_gids=spike_gids,
             spike_types=spike_types,
             cell_type_names=cell_types,
+            cell_type_metadata=None,
         )
 
         # Write spike data to file
