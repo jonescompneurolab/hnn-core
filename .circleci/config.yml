@@ -84,7 +84,7 @@ jobs:
               destination: html
 
     docs-deploy:
-        # will only be run on master branch
+        # will only be run on main branch
         docker:
           - image: node:8.10.0
         steps:
@@ -120,4 +120,4 @@ workflows:
             - build_docs
           filters:
             branches:
-              only: master
+              only: main

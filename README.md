@@ -5,9 +5,9 @@
 
 # hnn-core
 
-[![tests](https://github.com/jonescompneurolab/hnn-core/actions/workflows/unix_unit_tests.yml/badge.svg?branch=master)](https://github.com/jonescompneurolab/hnn-core/actions/?query=branch:master)
+[![tests](https://github.com/jonescompneurolab/hnn-core/actions/workflows/unix_unit_tests.yml/badge.svg?branch=main)](https://github.com/jonescompneurolab/hnn-core/actions/?query=branch:main)
 [![CircleCI](https://circleci.com/gh/jonescompneurolab/hnn-core.svg?style=svg)](https://circleci.com/gh/jonescompneurolab/hnn-core)
-[![Codecov](https://codecov.io/gh/jonescompneurolab/hnn-core/branch/master/graph/badge.svg)](https://codecov.io/gh/jonescompneurolab/hnn-core)
+[![Codecov](https://codecov.io/gh/jonescompneurolab/hnn-core/branch/main/graph/badge.svg)](https://codecov.io/gh/jonescompneurolab/hnn-core)
 [![PyPI](https://img.shields.io/pypi/dm/hnn-core.svg?label=PyPI%20downloads)](https://pypi.org/project/hnn-core/)
 [![JOSS](https://joss.theoj.org/papers/10.21105/joss.05848/status.svg)](https://doi.org/10.21105/joss.05848)
 
@@ -99,7 +99,7 @@ Discussions page](https://github.com/jonescompneurolab/hnn-core/discussions).
 
 Contributors are always welcome! Please read our [Contributing Guide][] and make sure to
 abide by our [Code of
-Conduct](https://github.com/jonescompneurolab/hnn-core/blob/master/CODE_OF_CONDUCT.md). Our
+Conduct](https://github.com/jonescompneurolab/hnn-core/blob/main/CODE_OF_CONDUCT.md). Our
 [governance structure can be found
 here](https://jonescompneurolab.github.io/hnn-core/stable/governance.html).
 

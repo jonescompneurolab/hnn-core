@@ -42,7 +42,7 @@ Last updated: 2025-10-24
 ## 1. Before making a release
 
 - Make sure all milestones are achieved or migrated to the next version.
-- Make sure the CI passes on master.
+- Make sure the CI passes on main.
 - Make sure that for both TestPyPI and PyPI, there are NOT already existing releases for the new version that you want to push. You can view [TestPyPI releases here](https://test.pypi.org/project/hnn-core/#history) and [PyPI releases here](https://pypi.org/project/hnn-core/#history).
 
 ## 2. Prepare your local version of the release
@@ -156,8 +156,8 @@ git add hnn_core/__init__.py doc/conf.py doc/whats_new.md doc/_static/versions.j
     4. Push your tag to `upstream` using the following command (again substituting your version) `git push upstream v0.4.4.rc0`.
     5. If it builds and deploys correctly, you should now be able to find your new version available on TestPyPI. Note that the command provided on the TestPyPI webpage will NOT install the new package correctly! Instead, you must slightly change the command to be like the following: `pip install --extra-index-url https://test.pypi.org/simple/ "hnn-core"`.
     6. Make sure to test that it installs and runs correctly!
-7. Finally, when ready to merge to `master`, use "SQUASH and merge" to merge the PR as a single commit. We will refer to the commit you just pushed to `master` as the "release commit".
-    - If you created a version on the PR for TestPyPI usage, it may not be included in the final version of the PR that is created on the `master` branch. This would make your example `v0.4.4.rc0` release an "orphaned" release that is not on the `master` branch. This is totally okay, since that version was for testing the release.
+7. Finally, when ready to merge to `main`, use "SQUASH and merge" to merge the PR as a single commit. We will refer to the commit you just pushed to `main` as the "release commit".
+    - If you created a version on the PR for TestPyPI usage, it may not be included in the final version of the PR that is created on the `main` branch. This would make your example `v0.4.4.rc0` release an "orphaned" release that is not on the `main` branch. This is totally okay, since that version was for testing the release.
 8. Note: If you have "cyclical documentation dependencies", such as if you reference a new web-page on the `stable` version of the docs, but that page doesn't exist yet in the `stable` doc version, then that is fine. You can do the following:
     1. create this PR but don't merge it yet,
     2. follow the next section ("5. Update the documentation") to update the stable docs, then
@@ -176,13 +176,13 @@ cp -r ~/new-docs/* stable
 ```
 5. Create a new folder with the version identifier, and copy the *same* files into that directory *too*.
 6. You should have two directories with identical files in them: `stable` and `v<version identifier>`. This step is necessary for the version to be indicated in the dropdown on the code-website.
-7. Create a new git commit with ALL these changes and push it to `upstream/gh-pages`. You can instead do this through a PR, but you must make sure that the PR is for merging into the `gh-pages` branch of `jonescompneurolab/hnn-core`, NOT the `master` branch!
+7. Create a new git commit with ALL these changes and push it to `upstream/gh-pages`. You can instead do this through a PR, but you must make sure that the PR is for merging into the `gh-pages` branch of `jonescompneurolab/hnn-core`, NOT the `main` branch!
 
 ## 6. Push a git tag to build the release
 
 1. Note that the steps in this section will only be possible for a Maintainer with full Admin permissions for the Github repository of <https://github.com/jonescompneurolab/hnn-core>.
-2. Switch back to the `master` branch.
-3. Update your `master` branch such that it is in sync with `upstream`, and that its current commit is the "release commit" you previously merged through your PR.
+2. Switch back to the `main` branch.
+3. Update your `main` branch such that it is in sync with `upstream`, and that its current commit is the "release commit" you previously merged through your PR.
 4. Create a tag for this release commit, where the tag is `v<new version>`, including the `v`. For example, if the new version that you just updated to is `0.4.4`, then you could do the following to create the tag locally:
 ```
 git tag v0.4.4
@@ -193,13 +193,13 @@ git tag v0.4.4
     2. Click on "Environments" on the left-hand side under the "Code and automation" section.
     3. Click on the `pypi` Environment (it should indicate it has "1 protection rule" nearby).
     4. Next to the "Deployment branches and tags" section, there is a dropdown that currently says "Protected branches only". **Change** the value of that dropdown to "No restriction".
-    5. You can now proceed to push the tag (move on to the next step). (Note: In theory, this is supposed to allow the build Action to proceed and deploy directly from `master` by itself. However, I can't figure out an unknown issue that prevents deployment; it may be the fact that the branch has permission, but the "tag" does not. However, if you change the settings to allow for branch `master` and tag `v*`, Github treats that as an OR rather than an AND, so *any* tag on each branch (or PR!) can push a new version to our public PyPI, which is a security risk. Testing/debugging these protection rules is a *pain* since we do NOT want to mess up official stable package builds going to PyPI...)
+    5. You can now proceed to push the tag (move on to the next step). (Note: In theory, this is supposed to allow the build Action to proceed and deploy directly from `main` by itself. However, I can't figure out an unknown issue that prevents deployment; it may be the fact that the branch has permission, but the "tag" does not. However, if you change the settings to allow for branch `main` and tag `v*`, Github treats that as an OR rather than an AND, so *any* tag on each branch (or PR!) can push a new version to our public PyPI, which is a security risk. Testing/debugging these protection rules is a *pain* since we do NOT want to mess up official stable package builds going to PyPI...)
 7. Push the tag to `upstream`. Continuing the example from before, you could do this with:
 ```
 git push upstream v0.4.4
 ```
 8. Congrats! Github will now automatically begin building the package directly from the commit using a "Publish (etc.)" workflow (you can watch it in our [Actions here](https://github.com/jonescompneurolab/hnn-core/actions)). Once Github has built the package file, it will automatically publish that package to both PyPI and TestPyPI.
-    - The workflow code that Github uses to build and publish the packages is [located here](https://github.com/jonescompneurolab/hnn-core/blob/master/.github/workflows/publish-packages-on-tag.yml).
+    - The workflow code that Github uses to build and publish the packages is [located here](https://github.com/jonescompneurolab/hnn-core/blob/main/.github/workflows/publish-packages-on-tag.yml).
     - Note that if you ever change the filename of the workflow, you **must** go to TestPyPI and PyPI and add a new "Publisher" to the `hnn-core` project. The new "Publisher" must use the new filename, in addition to other metadata. You can see the PyPI and TestPyPI-specific [instructions here](https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/#configuring-trusted-publishing). Note that to add a new "Publisher" to the `hnn-core` project in the first place, you must have the necessary permissions. Ask Austin or Dylan if you need to upgrade your permissions.
     - Note that the publishing workflow uses the version exactly from `hnn_core/__init__.py`, NOT from the git tag itself. This is why it is important to double check that your tag numbers are consistent. It will not detect if there is a tag version mismatch.
 9. Assuming nothing went wrong with the Github Actions "Publish (etc.)" workflow, your new version should now be live on both [PyPI](https://pypi.org/project/hnn-core/#history) and [TestPyPI](https://test.pypi.org/project/hnn-core/#history).
@@ -232,7 +232,7 @@ pip install --extra-index-url https://test.pypi.org/simple/ "hnn-core"
 Only do these steps if you have made a stable release.
 
 1. In your terminal, make a new "maintenance branch" by doing the following:
-     1. Return to your `hnn-code` repository on the `master` branch in your terminal.
+     1. Return to your `hnn-code` repository on the `main` branch in your terminal.
      2. Create a new branch matching `maint/<new version>` for the new version, beginning at the release commit.
      3. Push that new branch to `upstream`.
 2. In your browser, make an official "Github Release":
@@ -244,9 +244,9 @@ Only do these steps if you have made a stable release.
 
 ## 9. Increment version again, to a development version
 
-1. Return to your `hnn-code` repository on the `master` branch in your terminal.
+1. Return to your `hnn-code` repository on the `main` branch in your terminal.
 2. Start to realize that this is a lot of steps. Maybe too many.
-3. Begin incrementing the version *again* to the *next development version*. You can do this via a personal branch then PR, or just do it as a single commit that you will later push to `upstream/master`.
+3. Begin incrementing the version *again* to the *next development version*. You can do this via a personal branch then PR, or just do it as a single commit that you will later push to `upstream/main`.
 4. View the [TestPyPI page here](https://test.pypi.org/project/hnn-core/#history) and [PyPI here](https://pypi.org/project/hnn-core/#history), and check to make sure that the next development version you want to use has not already been taken by an existing package. It is possible for this to happen, due to the necessity to debug our package building pipeline, etc. Increment your next development version so it's higher. For example, if you just released version `0.4.4` but there is a pre-existing package for version `0.4.5dev1`, then you should prepare to increment the next development version to `0.4.5dev2`.
 5. Update `hnn_core/__init__.py` and `doc/conf.py` to use the next development version. You do NOT need to make any changes to `doc/_static/versions.json`.
 6. Add a new section to the top of `doc/whats_new.md` that says "Current", pushing the most recent version release notes downwards.
@@ -254,7 +254,7 @@ Only do these steps if you have made a stable release.
 ```
 git add hnn_core/__init__.py doc/conf.py doc/whats_new.md
 ```
-8. Make a commit, then push. You can push this to `upstream/master` directly. It is *not* recommended that you push a version tag for this commit, *unless* you need this development version to be available from `pip`. (If you for some reason need to be publishing a development version as a package available from pip, then you may be better off having that user install `hnn-core` from source instead).
+8. Make a commit, then push. You can push this to `upstream/main` directly. It is *not* recommended that you push a version tag for this commit, *unless* you need this development version to be available from `pip`. (If you for some reason need to be publishing a development version as a package available from pip, then you may be better off having that user install `hnn-core` from source instead).
 
 ## 10. Build and distribute Conda package utilizing the new version
 

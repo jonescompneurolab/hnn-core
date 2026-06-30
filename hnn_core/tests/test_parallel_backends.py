@@ -97,7 +97,7 @@ class TestParallelBackends:
     dpls_reduced_joblib = None
 
     def test_run_default(self, run_hnn_core_fixture):
-        """Test consistency between default backend simulation and master"""
+        """Test consistency between default backend simulation and main"""
         global dpls_reduced_default
         dpls_reduced_default, _ = run_hnn_core_fixture(None, reduced=True)
         # test consistency across all parallel backends for multiple trials
@@ -109,7 +109,7 @@ class TestParallelBackends:
         )
 
     def test_run_joblibbackend(self, run_hnn_core_fixture):
-        """Test consistency between joblib backend simulation with master"""
+        """Test consistency between joblib backend simulation with main"""
         global dpls_reduced_default, dpls_reduced_joblib
 
         dpls_reduced_joblib, _ = run_hnn_core_fixture(
@@ -389,7 +389,7 @@ class TestParallelBackends:
         )
         if not op.exists("dpl.txt"):
             urlretrieve(data_url, "dpl.txt")
-        dpl_master = loadtxt("dpl.txt")
+        dpl_main = loadtxt("dpl.txt")
 
         dpls, net = run_hnn_core_fixture(backend=backend)
         dpl = dpls[0].smooth(30).scale(3000)
@@ -399,8 +399,8 @@ class TestParallelBackends:
         dpl.write(fname)
 
         dpl_pr = loadtxt(fname)
-        assert_array_equal(dpl_pr[:, 2], dpl_master[:, 2])  # L2
-        assert_array_equal(dpl_pr[:, 3], dpl_master[:, 3])  # L5
+        assert_array_equal(dpl_pr[:, 2], dpl_main[:, 2])  # L2
+        assert_array_equal(dpl_pr[:, 3], dpl_main[:, 3])  # L5
 
         # Test spike type counts
         spike_type_counts = {}
