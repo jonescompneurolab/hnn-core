@@ -146,15 +146,6 @@ def _transfer_resistance(
     sec_start = np.array([section.x3d(0), section.y3d(0), section.z3d(0)])
     sec_end = np.array([section.x3d(1), section.y3d(1), section.z3d(1)])
 
-    # this gets the position of the section end points relative to origin of cell (soma)
-    # not relative to the position of the soma! This is why everything ends up at origin!
-    # print(f'Section start: { sec_start} '
-    #         f'Section end: { sec_end}')
-
-    # this gets the position of the section end points relative to origin of cell (soma)
-    # not relative to the position of the soma! This is why everything ends up at origin!
-    # print(f'Section start: { sec_start} '
-    #         f'Section end: { sec_end}')
     sec_vec = sec_end - sec_start
 
     # NB segment lengths aren't equal! First/last segment center point is
