@@ -488,9 +488,13 @@ def _rmse_corr(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
     -------
     err : float
         Weighted RMSE between data in dpl and exp_dpl
-        rmse**(2-corr(dpl, exp_dpl))
-        KDTODO this equation appears to be different than what's in the code:
         err = rmse * (1 - np.log(sig_corr))
+        This function penalizes solutions with a low correlation,
+        forcing the optimizer to find solutions that reproduce
+        the waveform shape rather than regressing to the mean.
+        For small correlations (clipped at 1e-10), rmse will be
+        multiplied by a large positive number. For correlations close
+        to 1, rmse will be multiplied by 1.
     """
     exp_times = exp_dpl.times
     sim_times = dpl.times
