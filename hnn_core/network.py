@@ -2576,9 +2576,7 @@ def _resolve_bias_gids(network, cell_types, gid):
                     f"gid dictionary key '{_cell_type}' is not among the cell "
                     f"types with a defined bias ({cell_types})."
                 )
-            gid_by_type[_cell_type] = (
-                [_gids] if isinstance(_gids, int) else list(_gids)
-            )
+            gid_by_type[_cell_type] = [_gids] if isinstance(_gids, int) else list(_gids)
         return gid_by_type, fallback_types
 
     # Flat int or list of gids.
