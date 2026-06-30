@@ -556,7 +556,6 @@ def add_erp_drives_to_jones_model(net, tstart=0.0):
         location="distal",
         synaptic_delays=synaptic_delays_d1,
         event_seed=274,
-        seg_x=0.01,
     )
 
     # Add proximal drives
@@ -582,7 +581,6 @@ def add_erp_drives_to_jones_model(net, tstart=0.0):
         location="proximal",
         synaptic_delays=synaptic_delays_prox,
         event_seed=544,
-        seg_x=0.01,
     )
 
     weights_ampa_p2 = {
@@ -600,5 +598,4 @@ def add_erp_drives_to_jones_model(net, tstart=0.0):
         location="proximal",
         synaptic_delays=synaptic_delays_prox,
         event_seed=814,
-        seg_x=0.01,
     )
