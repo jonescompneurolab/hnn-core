@@ -832,7 +832,6 @@ def _linear_g_at_dist(
 
     return gbar
 
-    return gbar
 
 
 def pyramidal_ca(cell_name, pos, override_params=None, gid=None):
