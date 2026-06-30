@@ -109,6 +109,18 @@ def test_network_visualization(setup_net):
         TypeError, match="'ax' to be an instance of Axes3D, but got Axes"
     ):
         plot_cells(net, ax=axes, show=False)
+
+    # Test that colors input works for valid cell types, and does not for invalid cell
+    # types
+    plot_cells(net, show=False, colors={"L2_pyramidal": "y"})
+    with pytest.raises(ValueError, match="does not exist in given Network"):
+        plot_cells(net, show=False, colors={"L3333_pyrdamial": "b"})
+    # Test that markers input works for valid cell types, and does not for invalid cell
+    # types
+    plot_cells(net, show=False, markers={"L2_pyramidal": "+"})
+    with pytest.raises(ValueError, match="does not exist in given Network"):
+        plot_cells(net, show=False, markers={"L3333_pyrdamial": "x"})
+
     cell_type["cell_object"].plot_morphology(pos=(1.0, 2.0, 3.0))
     with pytest.raises(TypeError, match="pos must be"):
         cell_type["cell_object"].plot_morphology(pos=123)
