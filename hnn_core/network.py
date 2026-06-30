@@ -1540,6 +1540,8 @@ class Network:
         amplitude,
         t0=0,
         tstop=None,
+        probability=1.0,
+        bias_seed=3,
     ):
         """Attaches parameters of tonic bias input for given cell types
 
@@ -1568,6 +1570,12 @@ class Network:
             The end time of tonic input (in ms). Default: end of simulation.
             This value will be applied to all the  tonic biases if
             multiple are specified with the `amplitude` keyword.
+        probability : dict | float
+            Probability of connection between tonic bias and target cells.
+            Use dict to create probability->cell-type mapping. If float, applies to
+            all target cell types.
+        bias_seed : int
+            Random seed for generating tonic bias events.
         """
 
         # old functionality single cell type - amplitude
@@ -1590,18 +1598,34 @@ class Network:
                 amplitude=float(amplitude),
                 t_0=t0,
                 t_stop=tstop,
+                probability=probability,
+                bias_seed=bias_seed,
             )
         else:
             _validate_type(amplitude, dict, "amplitude")
-            if len(amplitude) == 0:
+            _validate_type(probability, (float, dict), "probability")
+            if isinstance(probability, float):
+                # single probability for all cell types
+                probability = {
+                    cell_type: float(probability) for cell_type in amplitude.keys()
+                }
+            if len(amplitude) == 0 or len(probability) == 0:
                 warnings.warn(
                     "No bias have been defined, no action taken",
                     UserWarning,
                     stacklevel=1,
                 )
                 return
+            if len(amplitude) != len(probability):
+                raise ValueError(
+                    "amplitude and probability must have the same number of "
+                    "cell types defined"
+                )
 
-            for _cell_type, _amplitude in amplitude.items():
+            seed_offset = 0
+            for (_cell_type, _amplitude), _probability in zip(
+                amplitude.items(), probability.values()
+            ):
                 _add_cell_type_bias(
                     network=self,
                     cell_type=_cell_type,
@@ -1610,7 +1634,10 @@ class Network:
                     amplitude=_amplitude,
                     t_0=t0,
                     t_stop=tstop,
+                    probability=_probability,
+                    bias_seed=bias_seed + seed_offset,
                 )
+                seed_offset += 1
 
     def _add_cell_type(self, cell_name, pos, cell_template=None):
         """Add cell type by updating pos_dict and gid_ranges."""
@@ -2392,6 +2419,8 @@ def _add_cell_type_bias(
     bias_name="tonic",
     t_0=0,
     t_stop=None,
+    probability=1.0,
+    bias_seed=3,
 ):
     """Add a tonic bias to a specific cell type in the network.
 
@@ -2415,6 +2444,10 @@ def _add_cell_type_bias(
     t_stop : float, optional
         The end time of the tonic input in milliseconds. If None, the bias
         continues until the end of the simulation.
+    probability : float, default 1.0
+        Probability of connection between tonic bias and target cells.
+    bias_seed : int, default 3
+        Random seed for generating tonic bias events.
     """
     # Validate cell_type value
     if cell_type not in network.cell_types:
@@ -2435,6 +2468,8 @@ def _add_cell_type_bias(
         "t0": t_0,
         "tstop": t_stop,
         "section": section,
+        "probability": probability,
+        "bias_seed": bias_seed,
     }
 
     sections = list(network.cell_types[cell_type]["cell_object"].sections.keys())
