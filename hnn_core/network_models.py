@@ -533,7 +533,7 @@ def duecker_ET_model(
 
     cell_types = {
         "L2_inhibitory": {
-            "cell_object": human_gen_interneuron(cell_name="L2inh", layer=2),
+            "cell_object": human_gen_interneuron(cell_name="L2Inh", layer=2),
             "cell_metadata": {
                 "morpho_type": "interneuron",
                 "electro_type": "inhibitory",
