@@ -12,7 +12,7 @@ import pytest
 
 
 @pytest.mark.parametrize("solver", ["bayesian", "cobyla", "cma"])
-@pytest.mark.parametrize("obj_fun", ["dipole_rmse", "dipole_corr"])
+@pytest.mark.parametrize("obj_fun", ["dipole_corr", "dipole_rmse", "dipole_rmse_corr"])
 def test_optimize_evoked(solver, obj_fun):
     """Test optimization routines for evoked drives in a reduced network."""
 
