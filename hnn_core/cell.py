@@ -613,9 +613,10 @@ class Cell:
         """Create synapses."""
         for sec_name in sections:
             for receptor in sections[sec_name].syns:
-                syn_key = f"{sec_name}_{receptor}"
-                seg = self._nrn_sections[sec_name](0.5)
-                self._nrn_synapses[syn_key] = self.syn_create(seg, **synapses[receptor])
+                for dummy in self._nrn_sections[sec_name]:
+                    syn_key = f"{sec_name}_{receptor}_{dummy.x}"
+                    self._nrn_synapses[syn_key] = self.syn_create(dummy, **synapses[receptor])
+                    #in earlier commit used print(syn_key) but it will print for each neuron 
 
     def _create_sections(self, sections, cell_tree):
         """Create soma and set geometry.
