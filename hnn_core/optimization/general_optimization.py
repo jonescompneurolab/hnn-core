@@ -177,10 +177,16 @@ class Optimizer:
 
         Parameters
         ----------
-        target : instance of Dipole (Required if obj_fun='dipole_rmse' or 'dipole_corr')
+        target : instance of Dipole (Required if obj_fun='dipole_corr', 'dipole_rmse', or 'dipole_rmse_corr')
             A dipole object with experimental data.
-        n_trials : int (Optional if obj_fun='dipole_rmse' or 'dipole_corr')
+        n_trials : int (Optional if obj_fun='dipole_corr', 'dipole_rmse', or 'dipole_rmse_corr')
             Number of trials to simulate and average.
+        tstart : float (Optional if obj_fun='dipole_corr', 'dipole_rmse', or 'dipole_rmse_corr')
+            Time at beginning of range over which to calculate the objective function
+        weights : array (Optional if obj_fun='dipole_corr', 'dipole_rmse', or 'dipole_rmse_corr')
+            An array of weights to be applied to each point in simulated dpl. Must have
+            length >= dpl.data . If None, weights will be replaced with 1's for typical
+            objective function calculation.
         f_bands : list of tuples (Required if obj_fun='maximize_psd')
             Lower and higher limit for each frequency band in Hz.
         relative_bandpower : list of float | float (Required if obj_fun='maximize_psd')

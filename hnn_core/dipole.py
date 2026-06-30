@@ -443,13 +443,12 @@ def _anticorr(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
     exp_dpl : instance of Dipole
         A dipole object with experimental data
     tstart : None | float
-        Time at beginning of range over which to calculate RMSE
+        Time at beginning of range over which to calculate Anticorrelation
     tstop : None | float
-        Time at end of range over which to calculate RMSE
+        Time at end of range over which to calculate Anticorrelation
     weights : None | array
         An array of weights to be applied to each point in
-        simulated dpl. Must have length >= dpl.data
-        If None, weights will be replaced with 1's for typical RMSE
+        simulated dpl. Must have length >= dpl.data . If None, weights will be replaced with 1's for typical Anticorrelation
         calculation.
 
     Returns
@@ -468,8 +467,7 @@ def _anticorr(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
 
 
 def _rmse_corr(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
-    """Calculates RMSE between data in dpl and exp_dpl
-    weighted by correlation
+    """Calculates correlation-weighted RMSE between data in dpl and exp_dpl
 
     Parameters
     ----------
@@ -477,15 +475,23 @@ def _rmse_corr(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
         A dipole object with simulated data
     exp_dpl : instance of Dipole
         A dipole object with experimental data
+    tstart : float, default=0.0
+        Time at beginning of range over which to calculate RMSE
+    tstop : float, default=0.0
+        Time at end of range over which to calculate RMSE
+    weights : None | array
+        An array of weights to be applied to each point in simulated dpl. Must have
+        length >= dpl.data . If None, weights will be replaced with 1's for typical RMSE
+        calculation.
 
     Returns
     -------
     err : float
         Weighted RMSE between data in dpl and exp_dpl
         rmse**(2-corr(dpl, exp_dpl))
+        KDTODO this equation appears to be different than what's in the code:
+        err = rmse * (1 - np.log(sig_corr))
     """
-    from scipy import signal
-
     exp_times = exp_dpl.times
     sim_times = dpl.times
 
@@ -530,9 +536,6 @@ def _rmse_corr(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
     sig_corr = np.clip(sig_corr, 1e-10, 1.0)  # avoid negative correlations
     err = rmse * (1 - np.log(sig_corr))
     return err if np.isfinite(err) else 1e6
-
-
-np
 
 
 class Dipole(object):
