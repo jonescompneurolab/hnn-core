@@ -1123,7 +1123,9 @@ def test_tonic_biases():
     assert net.external_biases["tonic"]["L2_pyramidal"] is not None
     net.external_biases = dict()
 
-    with pytest.raises(TypeError, match="amplitude must be an instance of dict"):
+    # A float amplitude without cell_type now requires gid so the cell type(s)
+    # of the targeted cells can be inferred.
+    with pytest.raises(ValueError, match="`gid` must be specified"):
         net.add_tonic_bias(amplitude=0.1, t0=5.0, tstop=-1.0)
 
     tonic_bias_2 = {"L2_pyramidal": 1.0, "L5_basket": 0.5}
@@ -1251,8 +1253,8 @@ def test_tonic_biases():
         tstop=15,
     )
 
-    # stored correctly
-    assert target_gid == net.external_biases["tonic_soma"][cell_type]["gid"]
+    # stored correctly (single gids are normalized to a list internally)
+    assert [target_gid] == net.external_biases["tonic_soma"][cell_type]["gid"]
     dpl = simulate_dipole(net, tstop=20)
     # the only neuron that fires when connectivity is cleared
     assert np.unique(np.array(net.cell_response.spike_gids)) == target_gid
@@ -1306,23 +1308,120 @@ def test_tonic_biases():
 
     del net, dpl
 
-    # Assert value error when GID is not in cell type range
+    # Assert value error when GID is not in cell type range. The gid is now
+    # validated at bias definition time rather than at simulation time.
     net = neymotin_2020_model()
     cell_type = "L2_pyramidal"
     target_gids = 20
-    net.add_tonic_bias(
-        cell_type=cell_type,
-        gid=target_gids,
-        bias_name="tonic_soma",
-        amplitude=3,
-        t0=10,
-        tstop=15,
-    )
     with pytest.raises(
         ValueError,
-        match="GID 20 was given a 'L2_pyramidal' bias but is of type 'L2_basket'. Define a separate bias per cell type.",
+        match="GID 20 was given a 'L2_pyramidal' bias but is of type 'L2_basket'. When defining cell types alongside GIDs, ensure that GIDs are within the correct range.",
     ):
-        simulate_dipole(net, tstop=20)
+        net.add_tonic_bias(
+            cell_type=cell_type,
+            gid=target_gids,
+            bias_name="tonic_soma",
+            amplitude=3,
+            t0=10,
+            tstop=15,
+        )
+
+
+def test_tonic_bias_gid_routing():
+    """Test routing of gids to cell types when biasing multiple cell types."""
+    amplitude = {"L2_pyramidal": 0.5, "L5_pyramidal": 1.0}
+
+    # gids given as a {cell_type: [gids]} dictionary are stored as given
+    # ----------------------------------------------------------------------------------
+    net = jones_2009_model()
+    l2_gids = list(net.gid_ranges["L2_pyramidal"])[:2]
+    l5_gids = list(net.gid_ranges["L5_pyramidal"])[:2]
+    net.add_tonic_bias(
+        amplitude=amplitude,
+        gid={"L2_pyramidal": l2_gids, "L5_pyramidal": l5_gids},
+    )
+    assert net.external_biases["tonic"]["L2_pyramidal"]["gid"] == l2_gids
+    assert net.external_biases["tonic"]["L5_pyramidal"]["gid"] == l5_gids
+
+    # a single gid in the dictionary is normalized to a list
+    net = jones_2009_model()
+    net.add_tonic_bias(
+        amplitude=amplitude,
+        gid={"L2_pyramidal": l2_gids[0], "L5_pyramidal": l5_gids[0]},
+    )
+    assert net.external_biases["tonic"]["L2_pyramidal"]["gid"] == [l2_gids[0]]
+    assert net.external_biases["tonic"]["L5_pyramidal"]["gid"] == [l5_gids[0]]
+
+    # a flat list spanning both cell types is routed to each cell type
+    # ----------------------------------------------------------------------------------
+    net = jones_2009_model()
+    net.add_tonic_bias(amplitude=amplitude, gid=l2_gids + l5_gids)
+    assert net.external_biases["tonic"]["L2_pyramidal"]["gid"] == l2_gids
+    assert net.external_biases["tonic"]["L5_pyramidal"]["gid"] == l5_gids
+
+    # a flat list covering only one cell type applies the bias to all cells of
+    # the uncovered cell type, with a warning for each cell type
+    # ----------------------------------------------------------------------------------
+    net = jones_2009_model()
+    with pytest.warns(UserWarning) as record:
+        net.add_tonic_bias(amplitude=amplitude, gid=l2_gids)
+    assert net.external_biases["tonic"]["L2_pyramidal"]["gid"] == l2_gids
+    # None means "all cells of this type"
+    assert net.external_biases["tonic"]["L5_pyramidal"]["gid"] is None
+    messages = [str(w.message) for w in record]
+    assert any(
+        f"applied to gids {l2_gids} for L2_pyramidal" in m for m in messages
+    )
+    assert any("applied to all gids of L5_pyramidal" in m for m in messages)
+
+    # a gid belonging to neither biased cell type raises
+    # ----------------------------------------------------------------------------------
+    net = jones_2009_model()
+    basket_gid = list(net.gid_ranges["L2_basket"])[0]
+    with pytest.raises(
+        ValueError,
+        match=f"gid {basket_gid} belongs to cell type 'L2_basket', which is not",
+    ):
+        net.add_tonic_bias(amplitude=amplitude, gid=[basket_gid])
+
+    # a {cell_type: gids} key that is not among the biased cell types raises
+    # ----------------------------------------------------------------------------------
+    net = jones_2009_model()
+    with pytest.raises(
+        ValueError,
+        match="gid dictionary key 'L2_basket' is not among the cell types",
+    ):
+        net.add_tonic_bias(
+            amplitude=amplitude, gid={"L2_basket": basket_gid}
+        )
+
+    # a single float amplitude with gids infers the cell type(s) from the gids
+    # ----------------------------------------------------------------------------------
+    net = jones_2009_model()
+    with pytest.warns(UserWarning) as record:
+        net.add_tonic_bias(amplitude=0.5, gid=l2_gids + l5_gids)
+    assert net.external_biases["tonic"]["L2_pyramidal"]["gid"] == l2_gids
+    assert net.external_biases["tonic"]["L5_pyramidal"]["gid"] == l5_gids
+    assert net.external_biases["tonic"]["L2_pyramidal"]["amplitude"] == 0.5
+    assert net.external_biases["tonic"]["L5_pyramidal"]["amplitude"] == 0.5
+    messages = [str(w.message) for w in record]
+    assert any(
+        f"applied to gids {l2_gids} for L2_pyramidal" in m for m in messages
+    )
+    assert any(
+        f"applied to gids {l5_gids} for L5_pyramidal" in m for m in messages
+    )
+
+    # a single float amplitude with a single gid (int) also works
+    net = jones_2009_model()
+    with pytest.warns(UserWarning, match="applied to gids"):
+        net.add_tonic_bias(amplitude=0.5, gid=l2_gids[0])
+    assert net.external_biases["tonic"]["L2_pyramidal"]["gid"] == [l2_gids[0]]
+
+    # a float amplitude without gid raises
+    net = jones_2009_model()
+    with pytest.raises(ValueError, match="`gid` must be specified"):
+        net.add_tonic_bias(amplitude=0.5)
 
 
 def test_network_mesh():

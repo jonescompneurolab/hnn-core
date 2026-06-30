@@ -488,23 +488,9 @@ class NetworkBuilder(object):
                     bias_params = self.net.external_biases[bias][src_type]
                     target_gids = bias_params["gid"]
 
-                    # make sure that GID for this bias is the right one
-                    # (None means "all cells of this type", so there's nothing to validate.)
-                    if target_gids is None:
-                        gids_to_check = []
-                    elif isinstance(target_gids, list):
-                        gids_to_check = target_gids
-                    else:
-                        gids_to_check = [target_gids]
-
-                    for tgid in gids_to_check:
-                        if tgid not in self.net.gid_ranges[src_type]:
-                            actual_type = self.net.gid_to_type(tgid)
-                            raise ValueError(
-                                f"GID {tgid} was given a '{src_type}' bias but is of type "
-                                f"'{actual_type}'. Define a separate bias per cell type."
-                            )
-
+                    # Gids are validated against their cell type at bias
+                    # definition time (Network.add_tonic_bias), so here we only
+                    # decide which cells the bias targets.
                     # Which cells does this bias target?
                     #   None -> all cells of this type
                     #   list -> cells whose gid is in the list
