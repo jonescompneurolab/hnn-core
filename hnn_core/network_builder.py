@@ -267,6 +267,86 @@ def _create_parallel_context(n_cores=None, expose_imem=False):
     if expose_imem:
         _CVODE.use_fast_imem(1)
 
+def build_synapse_tree(net):
+    max_gid = 0#earleir had hardocded it as 270
+    #first we find max_gid size. . didnt face any issue but then if we have any drive it would also have gid
+    for conn in net.connectivity:#we need max size as create need a list 
+        for target_gid in conn['target_gids']:
+            max_gid = max(max_gid, target_gid)
+    synapse_trees = [dict() for _ in range(max_gid+1)]#earlier had it as max_gid.but when execute script found out index error. by trial added +1 and -1.
+    # this made me realise that this +1 probably needed as max gid 269 . so it makes a list of 269 places that is index 0 -> 268 . so the 270 give indexing error
+    #synapse tree is basically now an [{},{},270 times]
+    for conn in net.connectivity:
+        """
+        first as discussed , we have source -> section -> segment -> receptor
+        we store all of this info so we can use it after  
+        """
+        src_type=conn['src_type']
+        target_type=conn['target_type']
+        loc=conn['loc']
+        receptor=conn['receptor']
+        target_cell=net.cell_types[target_type]['cell_object']#first we store just pyramidal/basket object(just a python object)
+        #in my prev commits( https://github.com/jonescompneurolab/hnn-core/pull/1322/changes/b3923019df0aed3b01186100fd7fc88095636c1c) for 3 cell L5,L2 , basket
+        if loc == 'soma':
+            valid_sections = ['soma']
+        else:
+            valid_sections = target_cell.sect_loc[loc]
+        """
+        these were the valid_sections in target_cell for all of the connections (16 connections)
+        ['apical_oblique', 'basal_2', 'basal_3']
+        ['apical_oblique', 'basal_2', 'basal_3']
+        ['apical_oblique', 'basal_2', 'basal_3']
+        ['apical_oblique', 'basal_2', 'basal_3']
+        ['soma']
+        ['soma']
+        ['soma']
+        ['soma']
+        ['apical_oblique', 'basal_2', 'basal_3']
+        ['apical_tuft']
+        ['apical_tuft']
+        ['soma']
+        ['soma']
+        ['soma']
+        ['soma']
+        ['soma']
+
+        we can see that liek currently we have 5 sections on which synapses are being made for L5 and L2 . but no connection attaches to all
+        doing some math 
+                                                    (sections targetting are given above)
+        1st conn  -> L2_Pyr    -> L2_Pyr     NMDA   : 3 * 100 = 300
+        2nd conn  -> L2_Pyr    -> L2_Pyr     AMPA   : 3 * 100 = 300
+        3rd conn  -> L5_Pyr    -> L5_Pyr     NMDA   : 3 * 100 = 300
+        4th conn  -> L5_Pyr    -> L5_Pyr     AMPA   : 3 * 100 = 300
+        5th conn  -> L2_Basket -> L2_Pyr     GABAA  : 1 * 100 = 100
+        6th conn  -> L2_Basket -> L2_Pyr     GABAB  : 1 * 100 = 100
+        7th conn  -> L5_Basket -> L5_Pyr     GABAA  : 1 * 100 = 100
+        8th conn  -> L5_Basket -> L5_Pyr     GABAB  : 1 * 100 = 100
+        9th conn  -> L2_Pyr    -> L5_Pyr     AMPA   : 3 * 100 = 300
+        10th conn -> L2_Pyr    -> L5_Pyr     AMPA   : 1 * 100 = 100
+        11th conn -> L2_Basket -> L5_Pyr     GABAA  : 1 * 100 = 100
+        12th conn -> L2_Pyr    -> L2_Basket  AMPA   : 1 * 35  = 35
+        13th conn -> L2_Basket -> L2_Basket  GABAA  : 1 * 35  = 35
+        14th conn -> L5_Basket -> L5_Basket  GABAA  : 1 * 35  = 35
+        15th conn -> L5_Pyr    -> L5_Basket  AMPA   : 1 * 35  = 35
+        16th conn -> L2_Pyr    -> L5_Basket  AMPA   : 1 * 35  = 35
+
+        total =2275
+        """
+        segment = 0.5 # just hardcoded for now .we can maybe calculate it using probabilty distrubtion (idk)
+
+        for target_gid in conn['target_gids']:
+            tree = synapse_trees[target_gid]
+            tree.setdefault(src_type, {})
+
+            for sec_name in valid_sections:
+                tree[src_type].setdefault(sec_name, {})
+                tree[src_type][sec_name].setdefault(segment, [])
+                if receptor not in tree[src_type][sec_name][segment]:
+                    tree[src_type][sec_name][segment].append(receptor)
+
+
+    net.synapse_trees = synapse_trees
+    return synapse_trees
 
 class NetworkBuilder(object):
     """The NetworkBuilder class.
@@ -453,7 +533,7 @@ class NetworkBuilder(object):
         These drives are spike SOURCES but cells are also targets.
         External inputs are not targets.
         """
-
+        build_synapse_tree(self.net)
         for gid in self._gid_list:
             _PC.set_gid2node(gid, self._rank)
 
@@ -472,10 +552,11 @@ class NetworkBuilder(object):
                 # instantiate NEURON object
                 # using meta data style
                 src_type_metadata = self.net.cell_types[src_type]["cell_metadata"]
+                syn_tree_gid = self.net.synapse_trees[gid]
                 if src_type_metadata.get("measure_dipole", False):
-                    cell.build(sec_name_apical="apical_trunk")
+                    cell.build(syn_tree_gid=syn_tree_gid,sec_name_apical="apical_trunk")
                 else:
-                    cell.build()
+                    cell.build(syn_tree_gid=syn_tree_gid)
                 # add tonic biases
                 for bias in self.net.external_biases:
                     if src_type in self.net.external_biases[bias]:
@@ -547,15 +628,14 @@ class NetworkBuilder(object):
                     # NB pos_dict for this drive must include ALL cell types!
                     nc_dict["pos_src"] = net.pos_dict[_long_name(src_type)][pos_idx]
 
-                    # get synapse locations
-                    syn_keys = list()
-                    # Targeting group of sections like proximal or distal
-                    if loc in target_cell.sect_loc:
-                        for sect in target_cell.sect_loc[loc]:
-                            syn_keys.append(f"{sect}_{receptor}")
-                    # Targeting individual section like soma or apical_tuft
-                    else:
-                        syn_keys = [f"{loc}_{receptor}"]
+                    # get synapse locations( now we modify it as we use synapse_tree)
+                    syn_keys = []
+                    syn_tree = self.net.synapse_trees[target_gid]
+                    if src_type in syn_tree:
+                        for sec_name, seg_dict in syn_tree[src_type].items():
+                            for segment, receptors in seg_dict.items():
+                                if receptor in receptors:
+                                    syn_keys.append(f"{src_type}_{sec_name}_{segment}_{receptor}")
 
                     for syn_key in syn_keys:
                         nc = target_cell.parconnect_from_src(
