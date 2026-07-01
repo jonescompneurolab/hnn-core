@@ -533,8 +533,7 @@ class NetworkBuilder(object):
         These drives are spike SOURCES but cells are also targets.
         External inputs are not targets.
         """
-        if not hasattr(self.net, 'synapse_trees'):
-            build_synapse_tree(self.net)
+        build_synapse_tree(self.net)
         for gid in self._gid_list:
             _PC.set_gid2node(gid, self._rank)
 

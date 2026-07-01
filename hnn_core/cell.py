@@ -610,14 +610,12 @@ class Cell:
     
     def _create_synapses(self, syn_tree_gid):
         """Create synapses."""
-        import simple
         for source in syn_tree_gid:
             for sec_name in syn_tree_gid[source]:
                 for segment in syn_tree_gid[source][sec_name]:
                     for receptor in syn_tree_gid[source][sec_name][segment]:
                         syn_key = f"{source}_{sec_name}_{segment}_{receptor}"
                         seg = self._nrn_sections[sec_name](segment)
-                        simple.total+=1
                         self._nrn_synapses[syn_key] = self.syn_create(seg, **self.synapses[receptor])
             
 
