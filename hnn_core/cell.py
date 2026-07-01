@@ -609,14 +609,15 @@ class Cell:
                         p_mech[attr] = [seg_xs, seg_vals]
         return self.sections
     
-    def _create_synapses(self, synapse_tree,):
-        """Creating synapses from synapse_tree"""
-        for section , section_tree in synapse_tree.items():
-            for seg_x , receptor_list in section_tree.items():
-                seg= self._nrn_sections[section](seg_x)
-                for receptor in receptor_list:
-                    syn_key= f"{section}_{receptor}"
-                    self._nrn_synapses[syn_key]=self.syn_create(seg,**self.synapses[receptor])
+    def _create_synapses(self, syn_tree_gid):
+        """Create synapses."""
+        for source in syn_tree_gid:
+            for sec_name in syn_tree_gid[source]:
+                for segment in syn_tree_gid[source][sec_name]:
+                    for receptor in syn_tree_gid[source][sec_name][segment]:
+                        syn_key = f"{source}_{sec_name}_{segment}_{receptor}"
+                        seg = self._nrn_sections[sec_name](segment)
+                        self._nrn_synapses[syn_key] = self.syn_create(seg, **self.synapses[receptor])
             
 
     def _create_sections(self, sections, cell_tree):
@@ -675,7 +676,7 @@ class Cell:
         # https://nrn.readthedocs.io/en/latest/python/modelspec/programmatic/topology/geometry.html?highlight=pt3dadd#pt3dadd  # noqa
         h.define_shape()
 
-    def build(self, sec_name_apical=None):
+    def build(self, sec_name_apical=None,syn_tree_gid=None):
         
         """Build cell in Neuron and insert dipole if applicable.
 
@@ -687,7 +688,7 @@ class Cell:
             of a pyramidal neuron.
         """
         self._create_sections(self.sections, self.cell_tree)
-        self._create_synapses(self.synapse_tree)
+        self._create_synapses(syn_tree_gid)
         self._set_biophysics(self.sections)
         if sec_name_apical in self._nrn_sections:
             self._insert_dipole(sec_name_apical)

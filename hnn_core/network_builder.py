@@ -267,6 +267,42 @@ def _create_parallel_context(n_cores=None, expose_imem=False):
     if expose_imem:
         _CVODE.use_fast_imem(1)
 
+def build_synapse_tree(net):
+    max_gid = 0
+    for conn in net.connectivity:
+        for target_gid in conn['target_gids']:
+            max_gid = max(max_gid, target_gid)
+    synapse_trees = [dict() for _ in range(max_gid+1)]
+    for conn in net.connectivity:
+        src_type=conn['src_type']
+        target_type=conn['target_type']
+        loc=conn['loc']
+        receptor=conn['receptor']
+        target_cell=net.cell_types[target_type]['cell_object']
+        template=target_cell.synapse_tree
+
+        if loc == 'soma':
+            valid_sections = ['soma']
+        else:
+            valid_sections = target_cell.sect_loc[loc]
+            
+        for target_gid in conn['target_gids']:
+            tree = synapse_trees[target_gid]
+            tree.setdefault(src_type, {})
+
+            for sec_name in valid_sections:
+                if sec_name not in template:
+                    continue
+                for segment, receptors in template[sec_name].items():
+                    if receptor not in receptors:
+                        continue
+                    tree[src_type].setdefault(sec_name, {})
+                    tree[src_type][sec_name].setdefault(segment, [])
+                    if receptor not in tree[src_type][sec_name][segment]:
+                        tree[src_type][sec_name][segment].append(receptor)
+
+    net.synapse_trees = synapse_trees
+    return synapse_trees
 
 class NetworkBuilder(object):
     """The NetworkBuilder class.
@@ -453,7 +489,8 @@ class NetworkBuilder(object):
         These drives are spike SOURCES but cells are also targets.
         External inputs are not targets.
         """
-
+        if not hasattr(self.net, 'synapse_trees'):
+            build_synapse_tree(self.net)
         for gid in self._gid_list:
             _PC.set_gid2node(gid, self._rank)
 
@@ -472,12 +509,11 @@ class NetworkBuilder(object):
                 # instantiate NEURON object
                 # using meta data style
                 src_type_metadata = self.net.cell_types[src_type]["cell_metadata"]
-
+                syn_tree_gid = self.net.synapse_trees[gid]
                 if src_type_metadata.get("measure_dipole", False):
-                    cell.build(sec_name_apical="apical_trunk")
+                    cell.build(syn_tree_gid=syn_tree_gid,sec_name_apical="apical_trunk")
                 else:
-                    cell.build()
-                print(f"GID {cell.gid}: {', '.join(f'{k}@{v.get_segment().x:.3f}' for k, v in cell._nrn_synapses.items())}")  
+                    cell.build(syn_tree_gid=syn_tree_gid)
                 # add tonic biases
                 for bias in self.net.external_biases:
                     if src_type in self.net.external_biases[bias]:
@@ -549,15 +585,14 @@ class NetworkBuilder(object):
                     # NB pos_dict for this drive must include ALL cell types!
                     nc_dict["pos_src"] = net.pos_dict[_long_name(src_type)][pos_idx]
 
-                    # get synapse locations
-                    syn_keys = list()
-                    # Targeting group of sections like proximal or distal
-                    if loc in target_cell.sect_loc:
-                        for sect in target_cell.sect_loc[loc]:
-                            syn_keys.append(f"{sect}_{receptor}")
-                    # Targeting individual section like soma or apical_tuft
-                    else:
-                        syn_keys = [f"{loc}_{receptor}"]
+                    # get synapse locations( now we modify it as we use synapse_tree)
+                    syn_keys = []
+                    syn_tree = self.net.synapse_trees[target_gid]
+                    if src_type in syn_tree:
+                        for sec_name, seg_dict in syn_tree[src_type].items():
+                            for segment, receptors in seg_dict.items():
+                                if receptor in receptors:
+                                    syn_keys.append(f"{src_type}_{sec_name}_{segment}_{receptor}")
 
                     for syn_key in syn_keys:
                         nc = target_cell.parconnect_from_src(

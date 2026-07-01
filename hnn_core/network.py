@@ -490,7 +490,6 @@ class Network:
         self._n_cells = 0  # used in tests and MPIBackend checks
         self.pos_dict = dict()
         self.cell_types = dict()
-
         # set the mesh shape
         _validate_type(mesh_shape, tuple, "mesh_shape")
         _validate_type(mesh_shape[0], int, "mesh_shape[0]")
@@ -1699,6 +1698,7 @@ class Network:
         weight,
         delay,
         lamtha,
+        source,
         threshold=None,
         gain=1.0,
         allow_autapses=True,
@@ -1811,6 +1811,7 @@ class Network:
         conn["target_type"] = target_type
         conn["target_gids"] = target_set
         conn["num_targets"] = len(target_set)
+        conn["source"]=source
 
         if len(target_gids) != len(src_gids):
             raise AssertionError("target_gids must have a list for each src.")
@@ -2324,6 +2325,7 @@ class _Connectivity(dict):
         entr += f"lamtha: {self['nc_dict']['lamtha']}"
         entr += f"threshold: {self['nc_dict']['threshold']}"
         entr += f"gain: {self['nc_dict']['gain']}"
+        entr += f"source: {self['source']}"
         entr += "\n "
 
         return entr
