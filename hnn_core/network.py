@@ -1704,7 +1704,6 @@ class Network:
         allow_autapses=True,
         probability=1.0,
         conn_seed=None,
-        seg_x=0.5
     ):
         """Appends connections to connectivity list
 
@@ -1895,7 +1894,6 @@ class Network:
 
         conn["probability"] = probability
         conn["allow_autapses"] = allow_autapses
-        conn["seg_x"]=seg_x
         self.connectivity.append(deepcopy(conn))
 
     def clear_connectivity(self):
