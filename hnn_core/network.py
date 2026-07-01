@@ -1424,6 +1424,7 @@ class Network:
                         weight=weights,
                         delay=delays,
                         lamtha=space_constant,
+                        source=name,
                         probability=probability,
                         conn_seed=drive["conn_seed"] + seed_increment,
                     )
