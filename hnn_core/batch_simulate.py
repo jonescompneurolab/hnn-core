@@ -92,6 +92,9 @@ class BatchSimulate(object):
     summary_func : func, optional
         A function to calculate summary statistics from the simulation
         results. Default is None.
+    bsl_cor : {"jones", "duecker"}, default="jones"
+        Baseline correction method. For neymotin_2020_model and law_2021_model, use
+        method 'jones' (manual correction). For duecker_ET_model, use method 'duecker'.
 
     Notes
     -----
