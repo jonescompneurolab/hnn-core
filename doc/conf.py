@@ -14,7 +14,6 @@
 #
 import os
 import sys
-from sphinx_gallery.sorting import ExampleTitleSortKey, ExplicitOrder
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -49,19 +48,6 @@ if ("rc" in version) or ("dev" in version):
 else:
     switcher_version_match = version
 
-### Binder version control
-# Resolve binder variable `filepath_prefix` to go in `sphinx_gallery_conf`
-# below. From the docs:
-#   "A prefix to append to the filepath in the Binder links. You should use this
-#    if you will store your built documentation in a sub-folder of a repository,
-#    instead of in the root."
-# We will store dev docs in a `dev` subdirectory and all other docs in a
-# directory "v" + version_str. E.g., "v0.3"
-if ("rc" in version) or ("dev" in version):
-    filepath_prefix = "dev"
-else:
-    filepath_prefix = "v{}".format(version)
-
 # -- General configuration ---------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -75,7 +61,6 @@ extensions = [
     "gh_substitutions",  # custom extension, see ./sphinxext/gh_substitutions.py
     "myst_parser",
     "numpydoc",
-    "sphinx_gallery.gen_gallery",
     "sphinx.ext.viewcode",
     "sphinx.ext.autosummary",
     "sphinx.ext.autodoc",
@@ -256,32 +241,5 @@ linkcheck_ignore = [
     r"(http|https):\/\/localhost:\d+",
     r"(http|https):\/\/github\.com\/jonescompneurolab\/hnn-core\/(issues|pull)\/\d+",
 ]
-
-sphinx_gallery_conf = {
-    "first_notebook_cell": (
-        "import pyvista as pv\n"
-        "from mne.viz import set_3d_backend\n"
-        "set_3d_backend('notebook')\n"
-        "pv.set_jupyter_backend('client')"
-    ),
-    "doc_module": "hnn_core",
-    # path to your examples scripts
-    "examples_dirs": "../examples",
-    # path where to save gallery generated examples
-    "gallery_dirs": "auto_examples",
-    "backreferences_dir": "generated",
-    "reference_url": {"hnn_core": None},
-    "within_subsection_order": ExampleTitleSortKey,
-    "subsection_order": ExplicitOrder(["../examples/workflows/", "../examples/howto/"]),
-    "binder": {
-        "org": "jonescompneurolab",
-        "repo": "hnn-core",
-        "branch": "gh-pages",
-        "binderhub_url": "https://mybinder.org",
-        "filepath_prefix": filepath_prefix,
-        "notebooks_dir": "notebooks",
-        "dependencies": "Dockerfile",
-    },
-}
 
 html_css_files = ["custom.css"]

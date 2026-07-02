@@ -575,7 +575,7 @@ We provide multiple sources of documentation (including websites) for HNN:
    API documentation is *automatically generated* from the [NumPy-style
    docstrings](https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard)
    in our Python code by [`sphinx`](https://www.sphinx-doc.org/en/master/index.html),
-   which creates nice-looking webpages to display the docstrings. This also
+   which creates nice-looking webpages to display the docstrings. TODO rewrite This also
    automatically executes the scripts in our `examples` directory, subsequently and
    automatically creating webpages for the scripts (including executed output) and
    Jupyter notebooks for the scripts (not including executed output). We are currently
