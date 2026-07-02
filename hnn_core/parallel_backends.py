@@ -669,9 +669,10 @@ class JoblibBackend(object):
             The integration time step of h.CVode (ms)
         postproc : bool
             If False, no postprocessing applied to the dipole
-        bsl_cor : str
-            The baseline correction method to use. Options are 'calcium' and
-            'jones'.
+        bsl_cor : {"jones", "duecker"}, default="jones"
+            Baseline correction method. For neymotin_2020_model and law_2021_model, use
+            method 'jones' (manual correction). For duecker_ET_model, use method
+            'duecker'.
 
         Returns
         -------
@@ -1083,9 +1084,10 @@ class MPIBackend(object):
             Number of trials to simulate.
         postproc : bool
             If False, no postprocessing applied to the dipole
-        bsl_cor : str
-            The baseline correction method to use. Options are 'mean' and
-            'jones'.
+        bsl_cor : {"jones", "duecker"}, default="jones"
+            Baseline correction method. For neymotin_2020_model and law_2021_model, use
+            method 'jones' (manual correction). For duecker_ET_model, use method
+            'duecker'.
 
         Returns
         -------

@@ -66,10 +66,9 @@ def simulate_dipole(
         :meth:`~hnn_core.dipole.Dipole.scale` methods instead. Default: False.
     verbose : bool
         If True, print build steps and simulation progress to console. Default: True.
-    bsl_cor : str
-        Baseline correction method. Default: 'jones'
-        For jones_2009_model and law_2021_model, use method 'jones' (manual correction).
-        For duecker_ET_model, use method 'duecker'.
+    bsl_cor : {"jones", "duecker"}, default="jones"
+        Baseline correction method. For neymotin_2020_model and law_2021_model, use
+        method 'jones' (manual correction). For duecker_ET_model, use method 'duecker'.
 
     Returns
     -------
