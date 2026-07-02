@@ -97,7 +97,6 @@ if __name__ == "__main__":
             "pooch<1.9.0",
             "pydata-sphinx-theme",
             "sphinx",
-            "sphinx-gallery",
             "sphinx-copybutton",
             "tdqm",
         ],
