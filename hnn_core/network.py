@@ -1682,7 +1682,7 @@ class Network:
             # turned into the {cell_type: amplitude} dictionary used internally.
             if gid is None:
                 raise ValueError(
-                    "When `amplitude` is a float, `gid` or must be specified so "
+                    "When `amplitude` is a float, `gid` must be specified so "
                     "the cell type(s) of the targeted cells can be inferred. "
                     "To apply a bias to all cells of a type, pass `amplitude` "
                     "as a {cell_type: amplitude} dictionary instead."
