@@ -63,8 +63,12 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
     # sets the default max solver step in ms (purposefully large)
     _PC.set_maxstep(10)
 
-    # initialize cells to -65 mV, after all the NetCon
-    # delays have been specified
+    # If you pass an argument such as `h.finitialize(-65)` DOES change the membrane
+    # potential for all cells. If you do NOT pass an argument, then each cell type
+    # retains its initial membrane potential from `cells_default.py`. Note that LLM
+    # reading of NEURON documentation is unclear about this.
+    #
+    # This is done after all the NetCon delays have been specified
     h.finitialize()
 
     def simulation_time():
@@ -478,10 +482,29 @@ class NetworkBuilder(object):
                     cell.build()
                 # add tonic biases
                 for bias in self.net.external_biases:
-                    if src_type in self.net.external_biases[bias]:
-                        cell.create_tonic_bias(
-                            **self.net.external_biases[bias][src_type]
-                        )
+                    if src_type not in self.net.external_biases[bias]:
+                        continue
+
+                    bias_params = self.net.external_biases[bias][src_type]
+                    target_gids = bias_params["gid"]
+
+                    # Gids are validated against their cell type at bias
+                    # definition time (Network.add_tonic_bias), so here we only
+                    # decide which cells the bias targets.
+                    # Which cells does this bias target?
+                    #   None -> all cells of this type
+                    #   list -> cells whose gid is in the list
+                    #   int  -> the single cell whose gid matches
+                    if target_gids is None:
+                        apply_bias = True
+                    elif isinstance(target_gids, list):
+                        apply_bias = gid in target_gids
+                    else:
+                        apply_bias = gid == target_gids
+
+                    if apply_bias:
+                        cell.create_tonic_bias(**bias_params)
+
                 cell.record(record_vsec, record_isec, record_ca)
 
                 # this call could belong in init of a _Cell (with threshold)?

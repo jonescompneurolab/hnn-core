@@ -10,7 +10,14 @@ import hnn_core
 from hnn_core import read_params
 from .network import Network, _create_cell_coords
 from .params import _short_name
-from .cells_default import pyramidal_ca, pyramidal, basket
+from .cells_default import (
+    basket,
+    pyramidal,
+    pyramidal_ca,
+    pyramidal_humanL5ET,
+    pyramidal_humanL23,
+    human_gen_interneuron,
+)
 from .externals.mne import _validate_type
 
 # Default cell metadata for the standard Jones 2009 network cell types.
@@ -23,6 +30,7 @@ default_cell_metadata = {
         "morpho_type": "basket",
         "electro_type": "inhibitory",
         "layer": "2",
+        "zdist_origin": 0.8,  # distance to origin in percent of layer_separation
         "measure_dipole": False,
         "reference": "https://doi.org/10.7554/eLife.51214",
         "color": "m",
@@ -32,6 +40,7 @@ default_cell_metadata = {
         "morpho_type": "pyramidal",
         "electro_type": "excitatory",
         "layer": "2",
+        "zdist_origin": 1,
         "measure_dipole": True,
         "reference": "https://doi.org/10.7554/eLife.51214",
         "color": "c",
@@ -41,6 +50,7 @@ default_cell_metadata = {
         "morpho_type": "basket",
         "electro_type": "inhibitory",
         "layer": "5",
+        "zdist_origin": 0.2,
         "measure_dipole": False,
         "reference": "https://doi.org/10.7554/eLife.51214",
         "color": "r",
@@ -50,6 +60,7 @@ default_cell_metadata = {
         "morpho_type": "pyramidal",
         "electro_type": "excitatory",
         "layer": "5",
+        "zdist_origin": 0,
         "measure_dipole": True,
         "reference": "https://doi.org/10.7554/eLife.51214",
         "color": "b",
@@ -62,8 +73,6 @@ default_drive_colors = {
     "distal": "g",
     "default": "#8B4513",
 }
-
-# ToDO -> direct _cell_L2Pyr calling
 
 
 def neymotin_2020_model(
@@ -508,6 +517,297 @@ def calcium_model(
     net.cell_types[cell_name]["cell_object"] = pyramidal_ca(
         cell_name=cell_name, pos=pos
     )
+
+    return net
+
+
+def duecker_ET_model(
+    params=None, add_drives_from_params=False, legacy_mode=False, mesh_shape=(10, 10)
+):
+    """ "Initiate like old calcium model and then replace with new cells"""
+
+    hnn_core_root = op.dirname(hnn_core.__file__)
+    params_fname = op.join(hnn_core_root, "param", "default_duecker_ET.json")
+    if params is None:
+        params = read_params(params_fname)
+
+    cell_types = {
+        "L2_inhibitory": {
+            "cell_object": human_gen_interneuron(cell_name="L2Inh", layer=2),
+            "cell_metadata": {
+                "morpho_type": "interneuron",
+                "electro_type": "inhibitory",
+                "layer": "2",
+                "zdist_origin": 0.8,
+                "measure_dipole": False,
+                "reference": "",
+                "color": "#daa69c",
+                "marker": "o",
+            },
+        },
+        "L2_pyramidal": {
+            "cell_object": pyramidal_humanL23(cell_name="L2Pyr"),
+            "cell_metadata": {
+                "morpho_type": "pyramidal",
+                "electro_type": "excitatory",
+                "layer": "2",
+                "zdist_origin": 1,
+                "measure_dipole": True,
+                "reference": "",
+                "color": "#a41e4f",
+                "marker": "^",
+            },
+        },
+        "L5_inhibitory": {
+            "cell_object": human_gen_interneuron(cell_name="L5Inh", layer=5),
+            "cell_metadata": {
+                "morpho_type": "interneuron",
+                "electro_type": "inhibitory",
+                "layer": "5",
+                "zdist_origin": 0.2,
+                "measure_dipole": False,
+                "reference": "",
+                "color": "#77a1bb",
+                "marker": "o",
+            },
+        },
+        "L5_pyramidal": {
+            "cell_object": pyramidal_humanL5ET(cell_name="L5Pyr"),
+            "cell_metadata": {
+                "morpho_type": "pyramidal",
+                "electro_type": "excitatory",
+                "layer": "5",
+                "zdist_origin": 0,
+                "measure_dipole": True,
+                "reference": "",
+                "color": "#5c73b7",
+                "marker": "^",
+            },
+        },
+    }
+
+    # Create layer positions
+    layer_dict = _create_cell_coords(
+        n_pyr_x=mesh_shape[0],
+        n_pyr_y=mesh_shape[1],
+        z_coord=1307.4,  # Default layer separation
+        inplane_distance=1.0,  # in-plane distance appropriate for LFP recordings
+    )
+
+    # Map cell types to layer positions
+    pos_dict = {
+        "L5_pyramidal": layer_dict["L5_bottom"],
+        "L2_pyramidal": layer_dict["L2_bottom"],
+        "L5_inhibitory": layer_dict["L5_mid"],
+        "L2_inhibitory": layer_dict["L2_mid"],
+        "origin": layer_dict["origin"],
+    }
+
+    # Create network with cell types and positions
+    net = Network(
+        params,
+        add_drives_from_params=add_drives_from_params,
+        legacy_mode=legacy_mode,
+        mesh_shape=mesh_shape,
+        pos_dict=pos_dict,
+        cell_types=cell_types,
+    )
+
+    delay = net.delay
+
+    # layer2 Pyr -> layer2 Pyr
+    lamtha = 6.125  # calculated from human data Campganola et al. 2022
+    loc = "proximal"
+    target_cell = "L2_pyramidal"
+    for receptor in ["nmda", "ampa"]:
+        key = f"gbar_{_short_name(target_cell)}_{_short_name(target_cell)}_{receptor}"
+        weight = params[key]
+        net.add_connection(
+            target_cell,
+            target_cell,
+            loc,
+            receptor,
+            weight,
+            delay,
+            lamtha,
+            allow_autapses=False,
+        )
+    # layer5 Pyr -> layer5 Pyr
+    target_cell = "L5_pyramidal"
+    for receptor in ["nmda", "ampa"]:
+        key = f"gbar_{_short_name(target_cell)}_{_short_name(target_cell)}_{receptor}"
+        weight = params[key]
+
+        net.add_connection(
+            target_cell,
+            target_cell,
+            loc,
+            receptor,
+            weight,
+            delay,
+            lamtha,
+            allow_autapses=False,
+        )
+
+    # layer2 inhibitory -> layer2 Pyr
+    src_cell = "L2_inhibitory"
+    target_cell = "L2_pyramidal"
+    lamtha = 6.125  # *0.8  # shorter space constant (Campagnola, 2022, mice data)
+    loc = "soma"
+    receptor = "gabaa"
+    key = f"gbar_{_short_name(src_cell)}_{_short_name(target_cell)}_{receptor}"
+    weight = params[key]
+    net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+
+    # this connection is 0
+    receptor = "gabab"
+    key = f"gbar_{_short_name(src_cell)}_{_short_name(target_cell)}_{receptor}"
+    weight = params[key]
+    net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+
+    # layer5 inhibitory -> layer5 Pyr
+    src_cell = "L5_inhibitory"
+    target_cell = "L5_pyramidal"
+    lamtha = 6.125  # *0.8  # shorter space constant (Campagnola, 2022, mice data)
+    loc = "soma"
+    receptor = "gabaa"
+    key = f"gbar_{_short_name(src_cell)}_{_short_name(target_cell)}_{receptor}"
+    weight = params[key]
+    net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+
+    # this connection is also 0
+    receptor = "gabab"
+    key = f"gbar_{_short_name(src_cell)}_{_short_name(target_cell)}_{receptor}"
+    weight = params[key]
+    net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+
+    # layer2 Pyr -> layer5 Pyr
+    src_cell = "L2_pyramidal"
+    lamtha = 6.125
+    for receptor in ["ampa", "nmda"]:
+        for loc in ["proximal", "apical_2"]:
+            key = f"gbar_{_short_name(src_cell)}_{_short_name(target_cell)}_{receptor}"
+            weight = params[key]
+            net.add_connection(
+                src_cell, target_cell, loc, receptor, weight, delay, lamtha
+            )
+
+    # layer2 inhibitory -> layer5 Pyr
+    src_cell = "L2_inhibitory"
+    receptor = "gabaa_slow"
+    lamtha = 6.125
+    key = f"gbar_{_short_name(src_cell)}_{_short_name(target_cell)}_{receptor}"
+    weight = params[key]
+
+    # add GABAA connection to apical_2 as Martinotti-like inhibition (SST cells)
+    loc = "apical_2"
+    net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+
+    # this connection is set to 0 as we're not simulating NGF cells.
+    loc = "apical_tuft"
+    receptor = "gabab"
+    key = f"gbar_{_short_name(src_cell)}_{_short_name(target_cell)}_{receptor}"
+    weight = params[key]
+    net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+
+    # xx -> layer2 inhibitory
+    src_cell = "L2_pyramidal"
+    target_cell = "L2_inhibitory"
+    lamtha = 6.125 * 0.8  # shorter space constant (Campagnola, 2022, mice data)
+    key = f"gbar_{_short_name(src_cell)}_{_short_name(target_cell)}"
+    weight = params[key]
+    loc = "soma"
+    receptor = "ampa"
+    net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+
+    weight = params[key] * 0.18  # see Koh 1995; Kriener 2022
+    receptor = "nmda"
+    net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+
+    src_cell = "L2_inhibitory"
+    lamtha = 6.125
+    receptor = "gabaa"
+    key = f"gbar_{_short_name(src_cell)}_{_short_name(target_cell)}_{receptor}"
+    weight = params[key]
+    loc = "soma"
+    net.add_connection(
+        src_cell,
+        target_cell,
+        loc,
+        receptor,
+        weight,
+        delay,
+        lamtha,
+        allow_autapses=False,
+    )
+
+    receptor = "gabab"
+    key = f"gbar_{_short_name(src_cell)}_{_short_name(target_cell)}_{receptor}"
+    weight = params[key]
+    loc = "soma"
+    net.add_connection(
+        src_cell,
+        target_cell,
+        loc,
+        receptor,
+        weight,
+        delay,
+        lamtha,
+        allow_autapses=False,
+    )
+
+    # xx -> layer5 Basket
+    src_cell = "L5_inhibitory"
+    target_cell = "L5_inhibitory"
+    lamtha = 6.125
+    loc = "soma"
+    receptor = "gabaa"
+    key = f"gbar_{_short_name(src_cell)}_{_short_name(target_cell)}_{receptor}"
+    weight = params[key]
+    net.add_connection(
+        src_cell,
+        target_cell,
+        loc,
+        receptor,
+        weight,
+        delay,
+        lamtha,
+        allow_autapses=False,
+    )
+
+    receptor = "gabab"
+    key = f"gbar_{_short_name(src_cell)}_{_short_name(target_cell)}_{receptor}"
+    weight = params[key]
+    net.add_connection(
+        src_cell,
+        target_cell,
+        loc,
+        receptor,
+        weight,
+        delay,
+        lamtha,
+        allow_autapses=False,
+    )
+
+    src_cell = "L5_pyramidal"
+    lamtha = 6.125 * 0.8  # shorter space constant (Campagnola, 2022, mice data)
+    key = f"gbar_{_short_name(src_cell)}_{_short_name(target_cell)}"
+    weight = params[key]
+    loc = "soma"
+    receptor = "ampa"
+    net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+
+    weight = params[key] * 0.2  # see Koh 1995; Kriener 2022
+    receptor = "nmda"
+    net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+
+    src_cell = "L2_pyramidal"
+    lamtha = 6.125 * 0.8  # shorter space constant (Campagnola, 2022, mice data)
+    key = f"gbar_{_short_name(src_cell)}_{_short_name(target_cell)}"
+    weight = params[key]
+    loc = "soma"
+    receptor = "ampa"
+    net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     return net
 

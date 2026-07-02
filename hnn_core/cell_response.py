@@ -20,6 +20,10 @@ class CellResponse(object):
     cell_type_names : list
         List of unique cell type names that are explicitly modeled in the
         network.
+    cell_type_metadata : dict, optional
+        Corresponding metadata of the cell types in the Network that spawned this
+        CellResponse, in the dictionary form of metadata available at the top of
+        `network_models.py`.
     spike_times : list (n_trials,) of list (n_spikes,) of float | None
         Each element of the outer list is a trial.
         The inner list contains the time stamps of spikes.
@@ -85,6 +89,7 @@ class CellResponse(object):
     def __init__(
         self,
         cell_type_names,
+        cell_type_metadata=None,
         spike_times=None,
         spike_gids=None,
         spike_types=None,
@@ -129,6 +134,7 @@ class CellResponse(object):
             if not isinstance(times, (list, np.ndarray)):
                 raise TypeError("'times' is an np.ndarray of simulation times")
         self._times = np.array(times)
+        self._cell_type_metadata = cell_type_metadata
         self._cell_type_names = cell_type_names
 
     def __repr__(self):
@@ -569,6 +575,7 @@ def read_spikes(fname, gid_ranges=None):
     )
     cell_response = CellResponse(
         cell_type_names=cell_type_names,
+        cell_type_metadata=None,
         spike_times=spike_times,
         spike_gids=spike_gids,
         spike_types=spike_types,

@@ -1,4 +1,5 @@
 : $Id: gabab.mod,v 1.9 2004/06/17 16:04:05 billl Exp $
+: Taken from Neymotin 2016 https://doi.org/10.1016/j.neuroscience.2015.12.043 :
 
 COMMENT
 -----------------------------------------------------------------------------
@@ -101,7 +102,7 @@ ENDCOMMENT
 INDEPENDENT {t FROM 0 TO 1 WITH 1 (ms)}
 
 NEURON {
-	POINT_PROCESS gabab_destexhe
+	POINT_PROCESS gabab_neymotin2016
 	RANGE R, G, g
 	NONSPECIFIC_CURRENT i
 	GLOBAL Cmax, Cdur

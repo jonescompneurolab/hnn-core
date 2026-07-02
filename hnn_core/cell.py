@@ -757,7 +757,9 @@ class Cell:
             dpp.ztan = seg_lens_z[-1]
         self.dipole = h.Vector().record(self.dpl_ref)
 
-    def create_tonic_bias(self, amplitude, t0, tstop, section="soma", loc=0.5):
+    def create_tonic_bias(
+        self, amplitude, t0, tstop, section="soma", loc=0.5, gid=None
+    ):
         """Create tonic bias at defined section.
 
         Parameters
@@ -901,7 +903,7 @@ class Cell:
                 # This tries to obtain the synapse object as if it is an attribute of
                 # the HOC interpreter as a whole, which all valid synapse mechanisms
                 # should be. In other words, if you have compiled a synapse mechanism
-                # called e.g. 'NMDA_gao', then `h.NMDA_gao` should exist.
+                # called e.g. 'NMDA_gao2021', then `h.NMDA_gao2021` should exist.
                 synapse_class = getattr(h, kwargs["mechname"])
             except AttributeError:
                 raise ValueError(
@@ -927,7 +929,6 @@ class Cell:
                         f"Synapse mechanism '{kwargs['mechname']}' does not have a parameter "
                         f"named '{param_name}'."
                     )
-
         return syn
 
     def setup_source_netcon(self, threshold):

@@ -48,6 +48,9 @@ regenerate-networks:
 	python ./dev_scripts/regenerate_base_network.py
 	python ./hnn_core/tests/regenerate_test_network.py
 
+regenerate-duecker-test-data:
+	python ./hnn_core/tests/script_duecker_simulate_save.py
+
 spell:
 	@if command -v codespell > /dev/null; then \
 		echo "Running codespell"; \

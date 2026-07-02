@@ -109,6 +109,18 @@ def test_network_visualization(setup_net):
         TypeError, match="'ax' to be an instance of Axes3D, but got Axes"
     ):
         plot_cells(net, ax=axes, show=False)
+
+    # Test that colors input works for valid cell types, and does not for invalid cell
+    # types
+    plot_cells(net, show=False, colors={"L2_pyramidal": "y"})
+    with pytest.raises(ValueError, match="does not exist in given Network"):
+        plot_cells(net, show=False, colors={"L3333_pyrdamial": "b"})
+    # Test that markers input works for valid cell types, and does not for invalid cell
+    # types
+    plot_cells(net, show=False, markers={"L2_pyramidal": "+"})
+    with pytest.raises(ValueError, match="does not exist in given Network"):
+        plot_cells(net, show=False, markers={"L3333_pyrdamial": "x"})
+
     cell_type["cell_object"].plot_morphology(pos=(1.0, 2.0, 3.0))
     with pytest.raises(TypeError, match="pos must be"):
         cell_type["cell_object"].plot_morphology(pos=123)
@@ -322,7 +334,7 @@ def test_drive_strength(setup_net):
 class TestCellResponsePlotters:
     """Tests plotting methods of the CellResponse class"""
 
-    @pytest.fixture(scope="class")
+    @pytest.fixture
     def class_setup_net(self):
         """Creates a base network for tests within this class"""
         hnn_core_root = op.dirname(hnn_core.__file__)
@@ -332,8 +344,15 @@ class TestCellResponsePlotters:
 
         return net
 
-    @pytest.fixture(scope="class")
-    def base_simulation_spikes(self, class_setup_net):
+    # AES Had to remove scope=class because we do NOT want only one instance of the
+    # fixture per class anymore
+    @pytest.fixture(
+        params=[
+            None,
+            default_cell_metadata,
+        ],
+    )
+    def base_simulation_spikes(self, class_setup_net, request):
         """Adds drives with spikes for testing of spike visualizations"""
         net = class_setup_net
         weights_ampa = {"L2_pyramidal": 0.1, "L5_pyramidal": 1.0}
@@ -367,6 +386,7 @@ class TestCellResponsePlotters:
         )
         dpls = simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
 
+        net.cell_response._cell_type_metadata = request.param
         return net, dpls
 
     def test_spikes_raster_trial_idx(self, base_simulation_spikes):
@@ -400,16 +420,18 @@ class TestCellResponsePlotters:
             labels = [text.get_text() for text in fig.axes[0].legend_.get_texts()]
             return colors, labels
 
-        # Default colors should come from cell metadata
-        fig = net.cell_response.plot_spikes_raster(trial_idx=0, show=False)
-        colors, labels = _get_line_hex_colors(fig)
-
-        expected_cell_types = sorted(default_cell_metadata.keys())
-        expected_colors = [
-            matplotlib.colors.to_hex(default_cell_metadata[ct]["color"])
-            for ct in expected_cell_types
-        ]
-        assert colors == expected_colors
+        metadata_colors = []
+        if net.cell_response._cell_type_metadata:
+            for cell_type in net.cell_response._cell_type_metadata:
+                metadata_colors.append(
+                    matplotlib.colors.to_hex(
+                        net.cell_response._cell_type_metadata[cell_type]["color"]
+                    )
+                )
+            # Default colors should be from the CellResponse metadata
+            fig = net.cell_response.plot_spikes_raster(trial_idx=0, show=False)
+            colors, _ = _get_line_hex_colors(fig)
+            assert colors == metadata_colors
 
         # Custom hex colors as list
         custom_colors = ["#daf7a6", "#ffc300", "#ff5733", "#c70039"]

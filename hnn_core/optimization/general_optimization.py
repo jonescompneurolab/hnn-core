@@ -11,12 +11,15 @@ import numpy as np
 from scipy.optimize import fmin_cobyla
 
 from .objective_functions import (
-    _rmse_evoked,
     _anticorr_evoked,
-    _maximize_psd,
     _custom_objective_function,
+    _rmse_corr_evoked,
+    _rmse_evoked,
+    _maximize_psd,
 )
 from ..externals.mne import _validate_type
+import os.path as op
+import pickle
 
 
 class Optimizer:
@@ -118,6 +121,9 @@ class Optimizer:
         elif obj_fun == "dipole_corr":
             self.obj_fun = _anticorr_evoked
             self.obj_fun_name = "dipole_corr"
+        elif obj_fun == "dipole_rmse_corr":
+            self.obj_fun = _rmse_corr_evoked
+            self.obj_fun_name = "dipole_rmse_corr"
         elif obj_fun == "custom":
             self.obj_fun = _custom_objective_function
             self.obj_fun_name = "custom"
@@ -171,10 +177,16 @@ class Optimizer:
 
         Parameters
         ----------
-        target : instance of Dipole (Required if obj_fun='dipole_rmse' or 'dipole_corr')
+        target : instance of Dipole (Required if obj_fun='dipole_corr', 'dipole_rmse', or 'dipole_rmse_corr')
             A dipole object with experimental data.
-        n_trials : int (Optional if obj_fun='dipole_rmse' or 'dipole_corr')
+        n_trials : int (Optional if obj_fun='dipole_corr', 'dipole_rmse', or 'dipole_rmse_corr')
             Number of trials to simulate and average.
+        tstart : float (Optional if obj_fun='dipole_corr', 'dipole_rmse', or 'dipole_rmse_corr')
+            Time at beginning of range over which to calculate the objective function
+        weights : array (Optional if obj_fun='dipole_corr', 'dipole_rmse', or 'dipole_rmse_corr')
+            An array of weights to be applied to each point in simulated dpl. Must have
+            length >= dpl.data . If None, weights will be replaced with 1's for typical
+            objective function calculation.
         f_bands : list of tuples (Required if obj_fun='maximize_psd')
             Lower and higher limit for each frequency band in Hz.
         relative_bandpower : list of float | float (Required if obj_fun='maximize_psd')
@@ -206,6 +218,10 @@ class Optimizer:
             The dipole scale factor to use after every optimization iteration before
             data comparison. There is no scaling applied by default, so you must pass a
             value if you want any scaling.
+        bsl_cor : {"jones", "duecker"}, default="jones"
+            Baseline correction method. For neymotin_2020_model and law_2021_model, use
+            method 'jones' (manual correction). For duecker_ET_model, use method
+            'duecker'.
         smooth_window_len : float, optional
             The smooth window length to use after every optimization iteration before
             data comparison. There is no smoothing applied by default, so you must pass
@@ -589,6 +605,12 @@ def _run_opt_cma(
     while not es.stop():
         solutions = es.ask()
         es.tell(solutions, _obj_func(solutions))
+        es.disp()
+        backup_dir = obj_fun_kwargs.get("pth_backup", False)
+        if backup_dir:
+            if es.countiter % 10 == 0:
+                with open(op.join(backup_dir, "cma_checkpoint.pkl"), "wb") as f:
+                    pickle.dump({"es": es, "obj_values": obj_values}, f)
     es.result_pretty()
 
     # get best params

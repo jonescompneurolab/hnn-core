@@ -49,15 +49,14 @@ hnn_core/param/default.param
 hnn_core/param/empty.json
 hnn_core/param/ERPYes100Trials.json
 hnn_core/param/ERPYes100Trials.param
+dipole_duecker_output_new.txt
+spikes_duecker_output_new.txt
 
 
 # Caches, compilations, and other
 *.pyc
 __pycache__
 .cache
-
 .ipynb_checkpoints
-
 *.log
-
 .DS_Store

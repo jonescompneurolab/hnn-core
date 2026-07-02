@@ -32,7 +32,7 @@ def _thread_handler(event, out, queue):
         queue.put(line)
 
 
-def _gather_trial_data(sim_data, net, n_trials, postproc):
+def _gather_trial_data(sim_data, net, n_trials, postproc, bsl_cor="jones"):
     """Arrange data by trial
 
     To be called after simulate(). Returns list of Dipoles, one for each trial,
@@ -40,17 +40,30 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
     """
     dpls = list()
 
-    # Create array of equally sampled time points for simulating currents
+    # create CellResponse object with metadata
+    cell_type_metadata = {
+        name: entry["cell_metadata"] for name, entry in net.cell_types.items()
+    }
     cell_type_names = list(net.cell_types.keys())
     cell_response = CellResponse(
-        cell_type_names=cell_type_names, times=sim_data[0]["times"]
+        cell_type_names=cell_type_names,
+        cell_type_metadata=cell_type_metadata,
+        times=sim_data[0]["times"],
     )
     net.cell_response = cell_response
 
     for idx in range(n_trials):
         # cell response
-        net.cell_response._spike_times.append(sim_data[idx]["spike_times"])
-        net.cell_response._spike_gids.append(sim_data[idx]["spike_gids"])
+
+        spike_times_sorted = []
+        spike_gids_sorted = []
+        pairs = sorted(zip(sim_data[idx]["spike_times"], sim_data[idx]["spike_gids"]))
+        for spike_time, spike_gid in pairs:
+            spike_times_sorted.append(spike_time)
+            spike_gids_sorted.append(spike_gid)
+
+        net.cell_response._spike_times.append(spike_times_sorted)
+        net.cell_response._spike_gids.append(spike_gids_sorted)
         net.cell_response.update_types(net.gid_ranges)
         net.cell_response._vsec.append(sim_data[idx]["vsec"])
         net.cell_response._isec.append(sim_data[idx]["isec"])
@@ -67,8 +80,20 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
 
         N_pyr_x = net._N_pyr_x
         N_pyr_y = net._N_pyr_y
-        dpl._baseline_renormalize(N_pyr_x, N_pyr_y)  # XXX cf. #270
+        if bsl_cor == "jones":
+            if net._verbose:
+                print("Applying Jones baseline correction", flush=True)
+            dpl._baseline_renormalize(N_pyr_x, N_pyr_y)  # XXX cf. #270
+
         dpl._convert_fAm_to_nAm()  # always applied, cf. #264
+
+        # The Duecker baseline correction was made after already converting from fAm to
+        # nAm.
+        if bsl_cor == "duecker":
+            if net._verbose:
+                print("Applying Duecker model baseline correction", flush=True)
+            dpl._baseline_renormalize_dueckerET()
+
         if postproc:
             window_len = net._params["dipole_smooth_win"]  # specified in ms
             fctr = net._params["dipole_scalefctr"]
@@ -628,7 +653,7 @@ class JoblibBackend(object):
 
         _BACKEND = self._old_backend
 
-    def simulate(self, net, tstop, dt, n_trials, postproc=False):
+    def simulate(self, net, tstop, dt, n_trials, postproc=False, bsl_cor="jones"):
         """Simulate the HNN model
 
         Parameters
@@ -644,6 +669,10 @@ class JoblibBackend(object):
             The integration time step of h.CVode (ms)
         postproc : bool
             If False, no postprocessing applied to the dipole
+        bsl_cor : {"jones", "duecker"}, default="jones"
+            Baseline correction method. For neymotin_2020_model and law_2021_model, use
+            method 'jones' (manual correction). For duecker_ET_model, use method
+            'duecker'.
 
         Returns
         -------
@@ -661,7 +690,7 @@ class JoblibBackend(object):
         )
 
         dpls = _gather_trial_data(
-            sim_data, net=net, n_trials=n_trials, postproc=postproc
+            sim_data, net=net, n_trials=n_trials, postproc=postproc, bsl_cor=bsl_cor
         )
 
         return dpls
@@ -1039,7 +1068,7 @@ class MPIBackend(object):
         if self.n_procs > 1:
             kill_proc_name("nrniv")
 
-    def simulate(self, net, tstop, dt, n_trials, postproc=False):
+    def simulate(self, net, tstop, dt, n_trials, postproc=False, bsl_cor="jones"):
         """Simulate the HNN model in parallel on all cores
 
         Parameters
@@ -1055,6 +1084,10 @@ class MPIBackend(object):
             Number of trials to simulate.
         postproc : bool
             If False, no postprocessing applied to the dipole
+        bsl_cor : {"jones", "duecker"}, default="jones"
+            Baseline correction method. For neymotin_2020_model and law_2021_model, use
+            method 'jones' (manual correction). For duecker_ET_model, use method
+            'duecker'.
 
         Returns
         -------
@@ -1069,7 +1102,12 @@ class MPIBackend(object):
                 "simulation to JoblibBackend...."
             )
             return JoblibBackend(n_jobs=1).simulate(
-                net, tstop=tstop, dt=dt, n_trials=n_trials, postproc=postproc
+                net,
+                tstop=tstop,
+                dt=dt,
+                n_trials=n_trials,
+                postproc=postproc,
+                bsl_cor=bsl_cor,
             )
 
         if self.n_procs > net._n_cells:
@@ -1098,7 +1136,7 @@ class MPIBackend(object):
             universal_newlines=True,
         )
 
-        dpls = _gather_trial_data(sim_data, net, n_trials, postproc)
+        dpls = _gather_trial_data(sim_data, net, n_trials, postproc, bsl_cor)
         return dpls
 
     def terminate(self):

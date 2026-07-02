@@ -211,6 +211,12 @@ def test_dipole_simulation():
             record_isec=False,
             record_ca="abc",
         )
+    with pytest.raises(ValueError, match="'bsl_cor' must be"):
+        simulate_dipole(
+            net,
+            tstop=25.0,
+            bsl_cor="GIGAMUNGUS",
+        )
 
     # test Network.copy() returns 'bare' network after simulating
     dpl = simulate_dipole(net, tstop=25.0, n_trials=1)[0]
@@ -372,3 +378,17 @@ def test_dipole_simulation_with_renamed_cells():
     assert isinstance(dpls[0], Dipole)
     assert len(dpls[0].times) > 0
     assert np.any(dpls[0].data["agg"] != 0)  # Check that dipole is not all zeros
+
+
+@requires_mpi4py
+@requires_psutil
+@pytest.mark.uses_mpi
+def test_dipole_bsl_cor(run_hnn_core_fixture):
+    """Test that all values of bsl_cor work in simulate_dipole"""
+    for backend in {"joblib", "mpi"}:
+        for bsl_cor in {"jones", "duecker"}:
+            _, _ = run_hnn_core_fixture(
+                backend=backend,
+                reduced=True,
+                bsl_cor=bsl_cor,
+            )

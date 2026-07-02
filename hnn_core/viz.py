@@ -24,27 +24,6 @@ from scipy.signal import decimate, periodogram
 from .externals.mne import tfr_array_morlet, _validate_type
 
 
-def _get_cell_colors_from_metadata(cell_types_dict):
-    """Get color and marker mappings from cell_metadata.
-
-    Parameters
-    ----------
-    cell_types_dict : dict
-
-    Returns
-    -------
-    colors : dict
-    markers : dict
-    """
-    colors = dict()
-    markers = dict()
-    for cell_name in sorted(cell_types_dict.keys()):
-        meta = cell_types_dict[cell_name].get("cell_metadata", {})
-        colors[cell_name] = meta.get("color", "k")
-        markers[cell_name] = meta.get("marker", "o")
-    return colors, markers
-
-
 def _lighten_color(color, amount=0.5):
     try:
         c = matplotlib.colors.cnames[color]
@@ -508,11 +487,7 @@ def plot_spikes_hist(
     spike_types_mask = {
         s_type: np.isin(spike_types_data, s_type) for s_type in unique_types
     }
-    # fetching the cell types
-    from .network_models import default_cell_metadata
-
-    known_cell_types = set(default_cell_metadata.keys())
-    cell_types = sorted([ct for ct in unique_types if ct in known_cell_types])
+    cell_types = cell_response._cell_type_names
     input_types = np.setdiff1d(unique_types, cell_types)
 
     if isinstance(spike_types, str):
@@ -594,9 +569,6 @@ def plot_spikes_hist(
                     color[spike_label], str, "Dictionary values of color", "str"
                 )
                 spike_color[spike_label] = color[spike_label]
-            elif spike_label in default_cell_metadata.keys():
-                # Overwrite spike colors if the spikes come from true cells
-                spike_color[spike_label] = default_cell_metadata[spike_label]["color"]
             else:
                 spike_color[spike_label] = next(color_cycle)
         spike_type_times[spike_label].extend(spike_times[spike_types_mask[spike_type]])
@@ -736,27 +708,32 @@ def plot_spikes_raster(
     # validate cell types
     if cell_types:
         _validate_type(cell_types, list, "cell_types", "list of str")
-        if not set(cell_types).issubset(set(unique_spike_types)):
+        # allowed are spikes that fired (including drives) and generally cells in network
+        allowed_types = np.unique(
+            cell_response.cell_types + cell_response._cell_type_names
+        )
+        if not set(cell_types).issubset(allowed_types):
             raise ValueError(
                 "Invalid cell types provided. "
-                f"Must be of set {unique_spike_types}. "
+                f"Must be of set {allowed_types}. "
                 f"Got {cell_types}"
             )
     else:
-        from .network_models import default_cell_metadata
+        cell_types = cell_response._cell_type_names
 
-        known_cell_types = set(default_cell_metadata.keys())
-        cell_types = sorted([ct for ct in unique_spike_types if ct in known_cell_types])
-        if not cell_types:
-            cell_types = sorted(list(known_cell_types))
-
-    # default colors from cell metadata
-    from .network_models import default_cell_metadata as _meta
-
-    cell_colors = {cell: _meta.get(cell, {}).get("color", "k") for cell in cell_types}
-
+    cell_type_metadata = getattr(cell_response, "_cell_type_metadata", None)
     # validate colors argument
     _validate_type(colors, (list, dict, None), "color", "list of str, or dict")
+
+    # Set colors
+    if cell_type_metadata is not None and "color" in cell_type_metadata[cell_types[0]]:
+        cell_colors = {cell: meta["color"] for cell, meta in cell_type_metadata.items()}
+    else:
+        default_colors = plt.rcParams["axes.prop_cycle"].by_key()["color"][
+            : len(cell_types)
+        ]
+        cell_colors = {cell: color for cell, color in zip(cell_types, default_colors)}
+
     if colors:
         if isinstance(colors, list):
             if len(colors) != len(cell_types):
@@ -766,7 +743,6 @@ def plot_spikes_raster(
                     f"for {len(cell_types)} cell types."
                 )
             cell_colors = {cell: color for cell, color in zip(cell_types, colors)}
-
         if isinstance(colors, dict):
             # Check valid cell types
             if not set(colors.keys()).issubset(set(unique_spike_types)):
@@ -928,7 +904,7 @@ def plot_spikes_raster(
     return ax.get_figure()
 
 
-def plot_cells(net, ax=None, show=True):
+def plot_cells(net, ax=None, show=True, colors=None, markers=None):
     """Plot the cells using Network.pos_dict.
 
     Parameters
@@ -940,6 +916,17 @@ def plot_cells(net, ax=None, show=True):
         a new figure is created.
     show : bool
         If True, show the figure.
+    colors : dict | None
+        Dictionary mapping cell type names to colors. If None,
+        colors are assigned automatically from the ``Network``'s
+        cell metadata if they exist, else they are taken from the
+        default Matplotlib color cycle.
+    markers : dict | None
+        Dictionary mapping cell type names to markers. If None,
+        markers are assigned based on ``morpho_type`` in cell metadata:
+        ``'pyramidal'`` -> ``'^'``, ``'basket'`` -> ``'x'``,
+        ``'interneuron'`` -> ``'o'``. Unknown morpho types get the first
+        unused marker from the pool.
 
     Returns
     -------
@@ -956,19 +943,50 @@ def plot_cells(net, ax=None, show=True):
             f"Expected 'ax' to be an instance of Axes3D, but got {type(ax).__name__}"
         )
 
-    # colors and markers from cell metadata
-    if net.cell_types:
-        colors, markers = _get_cell_colors_from_metadata(net.cell_types)
-    else:
-        colors = dict()
-        markers = dict()
+    if colors:
+        for color_key in colors.keys():
+            if color_key not in net.cell_types.keys():
+                raise ValueError(
+                    f"Color cell type {color_key} does not exist in given Network"
+                )
+    if markers:
+        for marker_key in markers.keys():
+            if marker_key not in net.cell_types.keys():
+                raise ValueError(
+                    f"Marker cell type {marker_key} does not exist in given Network"
+                )
 
-    for cell_type in sorted(net.cell_types.keys()):
+    default_marker_map = {"pyramidal": "^", "basket": "x", "interneuron": "o"}
+    default_color_cycle = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+
+    for cell_type_index, cell_type in enumerate(net.cell_types):
         x = [pos[0] for pos in net.pos_dict[cell_type]]
         y = [pos[1] for pos in net.pos_dict[cell_type]]
         z = [pos[2] for pos in net.pos_dict[cell_type]]
-        color = colors.get(cell_type, "k")
-        marker = markers.get(cell_type, "o")
+
+        if colors:
+            color = colors.get(
+                cell_type,
+                default_color_cycle[cell_type_index % len(default_color_cycle)],
+            )
+        else:
+            color = net.cell_types[cell_type]["cell_metadata"].get(
+                "color", default_color_cycle[cell_type_index % len(default_color_cycle)]
+            )
+
+        morpho_type = net.cell_types[cell_type]["cell_metadata"].get(
+            "morpho_type", None
+        )
+        if morpho_type:
+            alt_marker = default_marker_map[morpho_type]
+        else:
+            alt_marker = "o"
+
+        if markers:
+            marker = markers.get(cell_type, alt_marker)
+        else:
+            marker = alt_marker
+
         ax.scatter(x, y, z, c=color, s=50, marker=marker, label=cell_type)
 
     if net.rec_arrays:
@@ -1035,6 +1053,12 @@ def plot_tfr_morlet(
         If True (default), adjust figure to include colorbar.
     colorbar_inside: bool, default False
         Put the color inside the heatmap if True.
+    vmin : float | None
+        Minimum value for the color scale. If None, the minimum of the data is
+        used.
+    vmax : float | None
+        Maximum value for the color scale. If None, the maximum of the data is
+        used.
     show : bool
         If True, show the figure
 
@@ -1090,12 +1114,12 @@ def plot_tfr_morlet(
         trial_power.append(power)
 
     power = np.mean(trial_power, axis=0)
-    im = ax.pcolormesh(times, freqs, power[0, 0, ...], cmap=colormap, shading="auto")
-
+    im = ax.pcolormesh(
+        times, freqs, power[0, 0, ...], cmap=colormap, shading="auto", rasterized=True
+    )
     if freqs[0] > freqs[-1]:
         freqs = freqs[::-1]
         ax.invert_yaxis()
-
     ax.set_xlabel("Time (ms)")
     ax.set_ylabel("Frequency (Hz)")
 
@@ -1870,9 +1894,16 @@ def plot_laminar_csd(
         vmax = np.max(np.abs(data))
 
     im = ax.pcolormesh(
-        times, new_depths, data, cmap=cmap, shading="auto", vmin=vmin, vmax=vmax
+        times,
+        new_depths,
+        data,
+        cmap=cmap,
+        shading="auto",
+        vmin=vmin,
+        vmax=vmax,
+        rasterized=True,
     )
-    ax.set_xlabel("time (s)")
+    ax.set_xlabel("time (ms)")
     ax.set_ylabel("electrode depth [µm]")
     if colorbar:
         color_axis = ax.inset_axes([1.05, 0, 0.02, 1], transform=ax.transAxes)
@@ -2028,7 +2059,6 @@ class NetworkPlotter:
         return times, vsec_recorded
 
     def _initialize_plots(self):
-
         # Create figure
         if self.ax is None:
             self.fig = plt.figure()

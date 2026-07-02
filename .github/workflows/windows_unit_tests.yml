@@ -130,10 +130,17 @@ jobs:
         run: |
           pip install --verbose .[opt,parallel,test,gui]
 
+      # # Commented out for now because currently there are no non-MPI Duecker tests,
+      # # and pytest apparently returns an error code if 0 tests are selected.
+      # - name: Test Duecker-only non-MPI, embarrassingly parallel tests with pytest
+      #   shell: cmd
+      #   run: |
+      #     python -m pytest ./hnn_core/tests/ -m "(not uses_mpi) and duecker" -n auto
+
       - name: Test non-MPI, embarrassingly parallel tests with pytest
         shell: cmd
         run: |
-          python -m pytest ./hnn_core/tests/ -m "not uses_mpi" -n auto --cov=hnn_core --cov-report=xml
+          python -m pytest ./hnn_core/tests/ -m "(not uses_mpi) and (not duecker)" -n auto --cov=hnn_core --cov-report=xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5

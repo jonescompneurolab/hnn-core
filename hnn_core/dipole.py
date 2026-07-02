@@ -4,14 +4,18 @@
 #          Sam Neymotin <samnemo@gmail.com>
 
 import os
+import os.path as op
 import warnings
 from copy import deepcopy
 from io import StringIO
+import json
 
 import numpy as np
 from h5io import write_hdf5, read_hdf5
 from scipy import signal
+from scipy.stats import pearsonr
 
+import hnn_core
 from .externals.mne import _check_option
 from .utils import _savgol_filter, smooth_waveform
 from .viz import plot_dipole, plot_psd, plot_tfr_morlet
@@ -27,6 +31,7 @@ def simulate_dipole(
     record_ca=False,
     postproc=False,
     verbose=True,
+    bsl_cor="jones",
 ):
     """Simulate a dipole given the experiment parameters.
 
@@ -61,6 +66,9 @@ def simulate_dipole(
         :meth:`~hnn_core.dipole.Dipole.scale` methods instead. Default: False.
     verbose : bool
         If True, print build steps and simulation progress to console. Default: True.
+    bsl_cor : {"jones", "duecker"}, default="jones"
+        Baseline correction method. For neymotin_2020_model and law_2021_model, use
+        method 'jones' (manual correction). For duecker_ET_model, use method 'duecker'.
 
     Returns
     -------
@@ -105,6 +113,8 @@ def simulate_dipole(
             duration = bias_cell_type["tstop"] - bias_cell_type["t0"]
             if duration < 0.0:
                 raise ValueError("Duration of tonic input cannot be negative")
+    if bsl_cor and (bsl_cor not in {"jones", "duecker"}):
+        raise ValueError("'bsl_cor' must be 'jones' or 'duecker'")
 
     net._instantiate_drives(n_trials=n_trials, tstop=tstop)
     net._reset_rec_arrays()
@@ -135,7 +145,7 @@ def simulate_dipole(
 
     net._verbose = verbose
 
-    dpls = _BACKEND.simulate(net, tstop, dt, n_trials, postproc)
+    dpls = _BACKEND.simulate(net, tstop, dt, n_trials, postproc, bsl_cor)
 
     return dpls
 
@@ -350,8 +360,83 @@ def _rmse(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
     return np.sqrt((weights * ((dpl1 - dpl2) ** 2)).sum() / weights.sum())
 
 
+# # KDTODO very different _rmse, copied here
+# def _rmse(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
+#     """Calculates RMSE between data in dpl and exp_dpl
+#     Parameters
+#     ----------
+#     dpl : instance of Dipole
+#         A dipole object with simulated data
+#     exp_dpl : instance of Dipole
+#         A dipole object with experimental data
+#     tstart : None | float
+#         Time at beginning of range over which to calculate RMSE
+#     tstop : None | float
+#         Time at end of range over which to calculate RMSE
+#     weights : None | array
+#         An array of weights to be applied to each point in
+#         simulated dpl. Must have length >= dpl.data
+#         If None, weights will be replaced with 1's for typical RMSE
+#         calculation.
+
+#     Returns
+#     -------
+#     err : float
+#         Weighted RMSE between data in dpl and exp_dpl
+#     """
+#     from scipy import signal
+
+#     exp_times = exp_dpl.times
+#     sim_times = dpl.times
+
+#     # do tstart and tstop fall within both datasets?
+#     # if not, use the closest data point as the new tstop/tstart
+#     for tseries in [exp_times, sim_times]:
+#         if tstart < tseries[0]:
+#             tstart = tseries[0]
+#         if tstop > tseries[-1]:
+#             tstop = tseries[-1]
+
+#     # make sure start and end times are valid for both dipoles
+#     exp_start_index = (np.abs(exp_times - tstart)).argmin()
+#     exp_end_index = (np.abs(exp_times - tstop)).argmin()
+#     exp_length = exp_end_index - exp_start_index
+
+#     sim_start_index = (np.abs(sim_times - tstart)).argmin()
+#     sim_end_index = (np.abs(sim_times - tstop)).argmin()
+#     sim_length = sim_end_index - sim_start_index
+
+#     if weights is None:
+#         # weighted RMSE with weights of all 1's is equivalent to
+#         # normal RMSE
+#         weights = np.ones(len(sim_times[0:sim_end_index]))
+#     weights = weights[sim_start_index:sim_end_index]
+
+#     dpl1 = dpl.data["agg"][sim_start_index:sim_end_index]
+#     dpl2 = exp_dpl.data["agg"][exp_start_index:exp_end_index]
+#     if sim_length > exp_length:
+#         # downsample simulation timeseries to match exp data
+#         dpl1 = signal.resample(dpl1, exp_length)
+#         weights = signal.resample(weights, exp_length)
+#         indices = np.where(weights < 1e-4)
+#         weights[indices] = 0
+#     elif sim_length < exp_length:
+#         # downsample exp timeseries to match simulation data
+#         dpl2 = signal.resample(dpl2, sim_length)
+
+#     return np.sqrt((weights * ((dpl1 - dpl2) ** 2)).sum() / weights.sum())
+
+
+def exp_decay(t, A, C, b):
+    return ((C - A) * np.exp(-b * (t))) + A
+
+
+# # end of KDTODO
+
+
 def _anticorr(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
     """Calculates Anticorrelation (1 - corr) between data in dpl and exp_dpl
+
     Parameters
     ----------
     dpl : instance of Dipole
@@ -359,13 +444,12 @@ def _anticorr(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
     exp_dpl : instance of Dipole
         A dipole object with experimental data
     tstart : None | float
-        Time at beginning of range over which to calculate RMSE
+        Time at beginning of range over which to calculate Anticorrelation
     tstop : None | float
-        Time at end of range over which to calculate RMSE
+        Time at end of range over which to calculate Anticorrelation
     weights : None | array
         An array of weights to be applied to each point in
-        simulated dpl. Must have length >= dpl.data
-        If None, weights will be replaced with 1's for typical RMSE
+        simulated dpl. Must have length >= dpl.data . If None, weights will be replaced with 1's for typical Anticorrelation
         calculation.
 
     Returns
@@ -381,6 +465,83 @@ def _anticorr(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
         1 - np.corrcoef(dpl1 * weights, dpl2 * weights)[0, 1]
     )  # transform so that 0 is a perfect fit
     return obj
+
+
+def _rmse_corr(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
+    """Calculates correlation-weighted RMSE between data in dpl and exp_dpl
+
+    Penalizes solutions with a low correlation, encouraging the optimizer to find
+    solutions that reproduce the waveform shape rather than regressing to the mean.
+    For small correlations (clipped at 1e-10), rmse will be
+    multiplied by a large positive number and the error is large.
+    For correlations close to 1, the error will be equal to the rmse.
+
+    Parameters
+    ----------
+    dpl : instance of Dipole
+        A dipole object with simulated data
+    exp_dpl : instance of Dipole
+        A dipole object with experimental data
+    tstart : float, default=0.0
+        Time at beginning of range over which to calculate RMSE
+    tstop : float, default=0.0
+        Time at end of range over which to calculate RMSE
+    weights : None | array
+        An array of weights to be applied to each point in simulated dpl. Must have
+        length >= dpl.data . If None, weights will be replaced with 1's for typical RMSE
+        calculation.
+
+    Returns
+    -------
+    err : float
+        Weighted RMSE between data in dpl and exp_dpl
+        err = rmse * (1 - np.log(sig_corr))
+
+    """
+    exp_times = exp_dpl.times
+    sim_times = dpl.times
+
+    for tseries in [exp_times, sim_times]:
+        if tstart < tseries[0]:
+            tstart = tseries[0]
+        if tstop > tseries[-1]:
+            tstop = tseries[-1]
+
+    # make sure start and end times are valid for both dipoles
+    exp_start_index = (np.abs(exp_times - tstart)).argmin()
+    exp_end_index = (np.abs(exp_times - tstop)).argmin()
+    exp_length = exp_end_index - exp_start_index
+
+    sim_start_index = (np.abs(sim_times - tstart)).argmin()
+    sim_end_index = (np.abs(sim_times - tstop)).argmin()
+    sim_length = sim_end_index - sim_start_index
+
+    if weights is None:
+        # weighted RMSE with weights of all 1's is equivalent to
+        # normal RMSE
+        weights = np.ones(len(sim_times[0:sim_end_index]))
+    weights = weights[sim_start_index:sim_end_index]
+
+    dpl1 = dpl.data["agg"][sim_start_index:sim_end_index]
+    dpl2 = exp_dpl.data["agg"][exp_start_index:exp_end_index]
+
+    if sim_length > exp_length:
+        # downsample simulation timeseries to match exp data
+        dpl1 = signal.resample(dpl1, exp_length)
+        weights = signal.resample(weights, exp_length)
+        indices = np.where(weights < 1e-4)
+        weights[indices] = 0
+    elif sim_length < exp_length:
+        # downsample exp timeseries to match simulation data
+        dpl2 = signal.resample(dpl2, sim_length)
+
+    rmse = np.sqrt((weights * (dpl1 - dpl2) ** 2).sum() / weights.sum())
+    sig_corr = pearsonr(dpl1, dpl2)[0]
+    if not np.isfinite(sig_corr):
+        sig_corr = 1e-10
+    sig_corr = np.clip(sig_corr, 1e-10, 1.0)  # avoid negative correlations
+    err = rmse * (1 - np.log(sig_corr))
+    return err if np.isfinite(err) else 1e6
 
 
 class Dipole(object):
@@ -723,6 +884,34 @@ class Dipole(object):
             colorbar_inside=colorbar_inside,
             show=show,
         )
+
+    def _baseline_renormalize_dueckerET(self):
+        """Baseline correction based on calcium model without drives"""
+
+        hnn_core_root = op.dirname(hnn_core.__file__)
+
+        # load the baseline dipole
+        with open(
+            op.join(hnn_core_root, "param", "bsl_corr_duecker_ET.json"), "r"
+        ) as f:
+            bsl_dpl = json.load(f)
+
+        A_L2 = bsl_dpl["L2"][-1]
+        A_L5 = bsl_dpl["L5"][-1]
+
+        C_L2 = bsl_dpl["L2"][1]
+        C_L5 = bsl_dpl["L5"][1]
+
+        popt_l2 = np.array(bsl_dpl["popt_l2"])
+        popt_l5 = np.array(bsl_dpl["popt_l5"])
+
+        exp_fit_l2 = exp_decay(np.array(self.times[1:]), A_L2, C_L2, *popt_l2)
+        exp_fit_l5 = exp_decay(np.array(self.times[1:]), A_L5, C_L5, *popt_l5)
+
+        self.data["L2"][1:] -= exp_fit_l2
+        self.data["L5"][1:] -= exp_fit_l5
+
+        self.data["agg"] = self.data["L2"] + self.data["L5"]
 
     def _baseline_renormalize(self, N_pyr_x, N_pyr_y):
         """Only baseline renormalize if the units are fAm.
