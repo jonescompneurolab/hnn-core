@@ -3,7 +3,14 @@ import pytest
 from neuron import h
 import numpy as np
 
-from hnn_core.cells_default import pyramidal, basket, _exp_g_at_dist, _linear_g_at_dist
+from hnn_core.cells_default import (
+    pyramidal,
+    basket,
+    _exp_g_at_dist,
+    _linear_g_at_dist,
+    _get_syn_props,
+    _get_basket_syn_props,
+)
 from hnn_core.network_builder import load_custom_mechanisms
 
 
@@ -253,7 +260,6 @@ def test_basket_voltage_init():
         "L2_basket": basket(cell_name="L2_basket"),
         "L5_basket": basket(cell_name="L5_basket"),
     }
-
     # Test initial voltages (v0) for basket cells after HNN-Core Cell class creation,
     # but before NEURON cell building
     for _, cell in cells.items():
@@ -263,7 +269,6 @@ def test_basket_voltage_init():
             assert np.isclose(v0, expected_v0), (
                 f"HNN-Core Basket cell {sec_name} v0={v0}, expected {expected_v0}"
             )
-
     # Build NEURON cells and sections, then initialize
     for cell in cells.values():
         cell.build()
@@ -280,24 +285,62 @@ def test_basket_voltage_init():
             )
 
 
+def test_get_syn_props_backwards_compat():
+    """_get_syn_props with no type key in p_all defaults to Exp2Syn.
+
+    In particular, this illustrates that when parameters are only provided for a
+    "syn_type" (of the set {ampa, nmda, gabaa, gabab}), and no "syn_type_mechname" key
+    is present in p_all, the function should still return the synapse properties with
+    the default "mechname" of "Exp2Syn".
+    """
+    # Simulate a p_all dict without any _mechname keys (legacy / backwards-compat case)
+    cell_type = "L2Pyr"
+    syn_types = ["ampa", "nmda", "gabaa", "gabab"]
+    for syn_type in syn_types:
+        p_all = {
+            f"{cell_type}_{syn_type}_e": 0.0,
+            f"{cell_type}_{syn_type}_tau1": 0.5,
+            f"{cell_type}_{syn_type}_tau2": 5.0,
+        }
+        result1 = _get_syn_props(p_all, cell_type, syn_types=[syn_type])
+        for syn_param in ["e", "tau1", "tau2"]:
+            assert (
+                result1[syn_type][syn_param]
+                == p_all[f"{cell_type}_{syn_type}_{syn_param}"]
+            )
+        # Test that type defaults to Exp2Syn when no type key is present
+        assert result1[syn_type]["mechname"] == "Exp2Syn"
+
+        # Add the type key to test that "Exp2Syn" is correctly read when present
+        p_all.update(
+            {
+                f"{cell_type}_{syn_type}_mechname": "Exp2Syn",
+            }
+        )
+        result2 = _get_syn_props(p_all, cell_type, syn_types=[syn_type])
+        # Test that type key and value are correctly present
+        for syn_param in ["e", "tau1", "tau2", "mechname"]:
+            assert (
+                result2[syn_type][syn_param]
+                == p_all[f"{cell_type}_{syn_type}_{syn_param}"]
+            )
+
+
 def test_l2pyr_voltage_init():
     """Test voltage initialization for Layer 2/3 Pyramidal cell type."""
     # Current section initial voltage, for all sections. The original location of this
     # value can be found at
     # https://github.com/jonescompneurolab/hnn-core/blob/8a0fffef8d8803e2404d7237f9adeabecd1285ed/hnn_core/network_builder.py#L667
     expected_l2pyr_v0 = -71.46
-
     # Initial setup
     load_custom_mechanisms()
     l2pyr = pyramidal(cell_name="L2_pyramidal")
-
     # Test initial voltages (v0) for L2Pyr cells after HNN-Core Cell class creation,
     # but before NEURON cell building
     for sec_name, sec in l2pyr.sections.items():
         assert np.isclose(sec.v0, expected_l2pyr_v0), (
             f"HNN-Core L2Pyr {sec_name} v0={sec.v0}, expected {expected_l2pyr_v0}"
         )
-
     # Build NEURON cells and sections, then initialize
     l2pyr.build(sec_name_apical="apical_trunk")
     h.finitialize()
@@ -309,6 +352,66 @@ def test_l2pyr_voltage_init():
         assert np.isclose(v, expected_l2pyr_v0, atol=0.1), (
             f"NEURON-built L2Pyr {sec_name} initial voltage is {v}, expected {expected_l2pyr_v0}"
         )
+
+
+def test_get_syn_props_custom_type():
+    """_get_syn_props with a custom synapse type collects all custom params."""
+    cell_type = "L2Pyr"
+    syn_type = "ampa"
+    p_all = {
+        f"{cell_type}_{syn_type}_mechname": "ExpSyn",
+        f"{cell_type}_{syn_type}_e": 0.0,
+        f"{cell_type}_{syn_type}_tau": 5.0,
+    }
+    result = _get_syn_props(p_all, cell_type, syn_types=[syn_type])
+    for syn_param in ["e", "tau", "mechname"]:
+        assert (
+            result[syn_type][syn_param] == p_all[f"{cell_type}_{syn_type}_{syn_param}"]
+        )
+    # tau1/tau2 should NOT be present since they weren't in p_all
+    assert "tau1" not in result[syn_type]
+    assert "tau2" not in result[syn_type]
+
+
+def test_get_syn_props_NMDA_gao_mechname_params():
+    """_get_syn_props with the new NMDA_gao synapse mechname works for all custom params."""
+    cell_type = "L5Pyr"
+    syn_type = "nmda"
+    p_all = {
+        f"{cell_type}_{syn_type}_mechname": "NMDA_gao",
+        f"{cell_type}_{syn_type}_e": 0.0,
+        f"{cell_type}_{syn_type}_Beta": 5.0,
+        f"{cell_type}_{syn_type}_Cdur": 1.2,
+    }
+    result = _get_syn_props(p_all, cell_type, syn_types=[syn_type])
+    result = _get_syn_props(p_all, cell_type, syn_types=[syn_type])
+    for syn_param in ["e", "Beta", "Cdur", "mechname"]:
+        assert (
+            result[syn_type][syn_param] == p_all[f"{cell_type}_{syn_type}_{syn_param}"]
+        )
+    # tau1/tau2 should NOT be present since they weren't in p_all
+    assert "tau1" not in result[syn_type]
+    assert "tau2" not in result[syn_type]
+
+
+def test_get_syn_props_gabab_destexhe_mechname_params():
+    """_get_syn_props with the new gabab_destexhe synapse mechname works for all custom
+    params."""
+    cell_type = "L5Pyr"
+    syn_type = "gabab_destexhe"
+    p_all = {
+        f"{cell_type}_{syn_type}_mechname": "gabab_destexhe",
+        f"{cell_type}_{syn_type}_g": 1.0,
+    }
+    result = _get_syn_props(p_all, cell_type, syn_types=[syn_type])
+    result = _get_syn_props(p_all, cell_type, syn_types=[syn_type])
+    for syn_param in ["g", "mechname"]:
+        assert (
+            result[syn_type][syn_param] == p_all[f"{cell_type}_{syn_type}_{syn_param}"]
+        )
+    # tau1/tau2 should NOT be present since they are in p_all
+    assert "tau1" not in result[syn_type]
+    assert "tau2" not in result[syn_type]
 
 
 def test_l5pyr_voltage_init():
@@ -340,11 +443,9 @@ def test_l5pyr_voltage_init():
         assert np.isclose(v0, expected_v0), (
             f"HNN-Core L5Pyr {sec_name} v0={v0}, expected {expected_v0}"
         )
-
     # Build NEURON cells and sections, then initialize
     l5pyr.build(sec_name_apical="apical_trunk")
     h.finitialize()
-
     # Test that the initial voltages of the built NEURON sections (at the midpoint)
     # still match our expected values
     for sec_name in l5pyr._nrn_sections:
@@ -353,3 +454,96 @@ def test_l5pyr_voltage_init():
         assert np.isclose(v, expected_v, atol=0.1), (
             f"NEURON-built L5Pyr {sec_name} initial voltage is {v}, expected {expected_v}"
         )
+
+
+def test_get_syn_props_multiple_syn_types():
+    """_get_syn_props returns all requested syn_types, including mixed custom types."""
+    p_all = {
+        "L2Pyr_ampa_e": 0.0,
+        "L2Pyr_ampa_tau1": 0.5,
+        "L2Pyr_ampa_tau2": 5.0,
+        "L2Pyr_gabaa_e": -80.0,
+        "L2Pyr_gabaa_tau1": 0.5,
+        "L2Pyr_gabaa_tau2": 5.0,
+        "L2Pyr_nmda_mechname": "NMDA_gao",
+        "L2Pyr_nmda_e": 0.0,
+        "L2Pyr_nmda_Beta": 5.0,
+        "L2Pyr_nmda_Cdur": 1.2,
+        "L2Pyr_gabab_mechname": "gabab_destexhe",
+        "L2Pyr_gabab_g": 42069.0,
+    }
+    # Test that requesting only ampa returns with just ampa
+    result1 = _get_syn_props(p_all, "L2Pyr", syn_types=["ampa"])
+    assert "ampa" in result1
+    assert result1["ampa"]["e"] == 0.0
+    assert result1["ampa"]["tau1"] == 0.5
+    assert result1["ampa"]["tau2"] == 5.0
+    # Assigned, but not present in original `p_all`
+    assert result1["ampa"]["mechname"] == "Exp2Syn"
+    assert "gabaa" not in result1
+    # Test that requesting only ampa and gaba return the two
+    result2 = _get_syn_props(p_all, "L2Pyr", syn_types=["ampa", "gabaa"])
+    assert set(result2.keys()) == {"ampa", "gabaa"}
+    assert result2["ampa"]["e"] == 0.0
+    assert result2["ampa"]["tau1"] == 0.5
+    assert result2["ampa"]["tau2"] == 5.0
+    # Assigned, but not present in original `p_all`
+    assert result2["ampa"]["mechname"] == "Exp2Syn"
+    assert result2["gabaa"]["e"] == -80.0
+    assert result2["gabaa"]["tau1"] == 0.5
+    assert result2["gabaa"]["tau2"] == 5.0
+    # Assigned, but not present in original `p_all`
+    assert result2["gabaa"]["mechname"] == "Exp2Syn"
+    # Test that requesting only ampa and nmda return the two
+    result3 = _get_syn_props(p_all, "L2Pyr", syn_types=["ampa", "nmda"])
+    assert set(result3.keys()) == {"ampa", "nmda"}
+    assert result3["ampa"]["e"] == 0.0
+    assert result3["ampa"]["tau1"] == 0.5
+    assert result3["ampa"]["tau2"] == 5.0
+    # Assigned, but not present in original `p_all`
+    assert result3["ampa"]["mechname"] == "Exp2Syn"
+    assert result3["nmda"]["e"] == 0.0
+    assert result3["nmda"]["Beta"] == 5.0
+    assert result3["nmda"]["Cdur"] == 1.2
+    assert result3["nmda"]["mechname"] == "NMDA_gao"
+    # Test that requesting only ampa and nmda return the two
+    result4 = _get_syn_props(p_all, "L2Pyr", syn_types=["nmda", "gabab"])
+    assert set(result4.keys()) == {"nmda", "gabab"}
+    assert result4["nmda"]["e"] == 0.0
+    assert result4["nmda"]["Beta"] == 5.0
+    assert result4["nmda"]["Cdur"] == 1.2
+    assert result4["nmda"]["mechname"] == "NMDA_gao"
+    assert result4["gabab"]["g"] == 42069.0
+    assert result4["gabab"]["mechname"] == "gabab_destexhe"
+
+
+def test_get_basket_syn_props_includes_type():
+    """_get_basket_syn_props should include 'type': 'Exp2Syn' for each synapse."""
+    result = _get_basket_syn_props()
+    for syn_name, syn_props in result.items():
+        assert "mechname" in syn_props, (
+            f"Missing 'mechname' key in basket synapse '{syn_name}'"
+        )
+        assert syn_props["mechname"] == "Exp2Syn"
+
+
+def test_pyramidal_synapses_have_type():
+    """Pyramidal cells should have 'type' key in each synapse after construction."""
+    load_custom_mechanisms()
+    for cell_name in ["L2_pyramidal", "L5_pyramidal"]:
+        cell = pyramidal(cell_name=cell_name)
+        for syn_name, syn_props in cell.synapses.items():
+            assert "mechname" in syn_props, (
+                f"Synapse '{syn_name}' on {cell_name} is missing 'mechname' key"
+            )
+
+
+def test_basket_synapses_have_type():
+    """Basket cells should have 'type' key in each synapse after construction."""
+    load_custom_mechanisms()
+    for cell_name in ["L2_basket", "L5_basket"]:
+        cell = basket(cell_name=cell_name)
+        for syn_name, syn_props in cell.synapses.items():
+            assert "mechname" in syn_props, (
+                f"Synapse '{syn_name}' on {cell_name} is missing 'mechname' key"
+            )

@@ -30,11 +30,19 @@ from hnn_core import MPIBackend, simulate_dipole, neymotin_2020_model
 # time with unique randomization.
 net = neymotin_2020_model()
 
-weights_ampa = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
+weights_ampa = {"L2_pyramidal": 5.4e-5, "L5_pyramidal": 5.4e-5}
 net.add_bursty_drive(
-    'bursty', tstart=50., burst_rate=10, burst_std=20., numspikes=2,
-    spike_isi=10, n_drive_cells=10, location='distal',
-    weights_ampa=weights_ampa, event_seed=278)
+    "bursty",
+    tstart=50.0,
+    burst_rate=10,
+    burst_std=20.0,
+    numspikes=2,
+    spike_isi=10,
+    n_drive_cells=10,
+    location="distal",
+    weights_ampa=weights_ampa,
+    event_seed=278,
+)
 
 ###############################################################################
 # Finally, to simulate we use the
@@ -42,8 +50,10 @@ net.add_bursty_drive(
 # start the simulation across the number of processors (cores) specified by
 # ``n_procs`` using MPI. The ``'mpiexec'`` launcher is used from
 # ``openmpi``, which must be installed on the system
-with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
-    dpls = simulate_dipole(net, tstop=310., n_trials=1)
+from hnn_core import MPIBackend
+
+with MPIBackend(n_procs=2, mpi_cmd="mpiexec"):
+    dpls = simulate_dipole(net, tstop=310.0, n_trials=1)
 
 trial_idx = 0
 dpls[trial_idx].plot()
