@@ -13,6 +13,7 @@ from pathlib import Path
 
 from .cell import Cell, Section
 from .cell_response import CellResponse
+from .cells_default import _default_v_init
 from .externals.mne import fill_doc
 
 
@@ -171,7 +172,9 @@ def _read_cell_types(cell_types_data):
                 diam=section_data["diam"],
                 cm=section_data["cm"],
                 Ra=section_data["Ra"],
-                v0=section_data.get("v0", -65),  # for backwards compatibility
+                v0=section_data.get(
+                    "v0", _default_v_init[cell_name][section_name]
+                ),  # for backwards compatibility
                 end_pts=section_data["end_pts"],
             )
             # Set section attributes

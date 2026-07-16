@@ -14,6 +14,37 @@ from .params_default import get_L2Pyr_params_default, get_L5Pyr_params_default
 # Units for gbar: S/cm^2 unless otherwise noted
 # units for taur: ms
 
+# Default initial membrane voltages (v0, in mV) for each section of each cell type.
+_default_v_init = {
+    "L2_pyramidal": {
+        "soma": -71.46,
+        "apical_trunk": -71.46,
+        "apical_1": -71.46,
+        "apical_tuft": -71.46,
+        "apical_oblique": -71.46,
+        "basal_1": -71.46,
+        "basal_2": -71.46,
+        "basal_3": -71.46,
+    },
+    "L5_pyramidal": {
+        "soma": -72.0,
+        "apical_trunk": -72.0,
+        "apical_1": -71.32,
+        "apical_2": -69.08,
+        "apical_tuft": -67.30,
+        "apical_oblique": -72.0,
+        "basal_1": -72.0,
+        "basal_2": -72.0,
+        "basal_3": -72.0,
+    },
+    "L2_basket": {
+        "soma": -64.9737,
+    },
+    "L5_basket": {
+        "soma": -64.9737,
+    },
+}
+
 
 def _get_dends(
     params,
@@ -209,7 +240,7 @@ def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
         p_all = compare_dictionaries(p_all, override_params)
 
     # All sections of this cell type use the same initial membrane voltage:
-    all_v_init = -71.46
+    v_init = _default_v_init["L2_pyramidal"]
 
     section_names = [
         "apical_trunk",
@@ -225,14 +256,12 @@ def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
         p_all,
         cell_type="L2Pyr",
         section_names=section_names,
-        v_init={
-            "all": all_v_init,
-        },
+        v_init=v_init,
     )
     sections["soma"] = _get_pyr_soma(
         p_all,
         "L2Pyr",
-        v_init=all_v_init,
+        v_init=v_init["soma"],
     )
 
     end_pts = {
@@ -363,17 +392,7 @@ def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
     ]
 
     # Different sections of this cell type use different initial membrane voltages:
-    v_init = {
-        "apical_1": -71.32,
-        "apical_2": -69.08,
-        "apical_tuft": -67.30,
-        "apical_trunk": -72,
-        "soma": -72.0,
-        "basal_1": -72,
-        "basal_2": -72,
-        "basal_3": -72,
-        "apical_oblique": -72,
-    }
+    v_init = _default_v_init["L5_pyramidal"]
 
     sections = _get_dends(
         p_all,
@@ -462,7 +481,7 @@ def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
     )
 
 
-def _get_basket_soma(v_init=-64.9737):
+def _get_basket_soma(v_init=_default_v_init["L2_basket"]["soma"]):
     """Create Basket somatic Section objects.
 
     This sets geometric and electrical properties (length, diameter, axial resistance,
@@ -481,7 +500,7 @@ def _get_basket_soma(v_init=-64.9737):
     ----------
     cell_name : ???
         Not actually used.
-    v_init : float, default=-64.9737
+    v_init : float, default=_default_v_init["L2_basket"]["soma"]
         Initial membrane potential in mV.
 
     Returns
@@ -693,7 +712,7 @@ def basket(cell_name, pos=(0, 0, 0), gid=None):
         raise ValueError(f"Unknown basket cell type: {cell_name}")
 
     sections = dict()
-    sections["soma"] = _get_basket_soma()
+    sections["soma"] = _get_basket_soma(v_init=_default_v_init[cell_name]["soma"])
     synapses = _get_basket_syn_props()
     sections["soma"].syns = list(synapses.keys())
     sections["soma"].mechs = {"hh2": dict()}
