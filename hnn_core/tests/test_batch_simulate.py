@@ -302,6 +302,18 @@ def test_parallel_execution(batch_simulate_instance, param_grid):
     end_time = time.perf_counter()
     serial_time = end_time - start_time
 
+    # Run the parallel execution once WITHOUT measuring the time, in order to "warm up"
+    # the parallel pool. This is necessary because there is an approximate 0.5-1.5
+    # second overhead for the first parallel `loky` run of a given parallel
+    # configuration, but the serial case (above) does not have to pay this. Once the
+    # parallel pool is warmed up, we can run the parallel execution again to get its
+    # actual simulation execution time.
+    #
+    # Another solution would have been increasing the amount of compute work done in
+    # each simulation, but that is wasteful.
+    _ = batch_simulate_instance.simulate_batch(
+        param_combinations, n_jobs=2, backend="loky"
+    )
     start_time = time.perf_counter()
     _ = batch_simulate_instance.simulate_batch(
         param_combinations, n_jobs=2, backend="loky"
