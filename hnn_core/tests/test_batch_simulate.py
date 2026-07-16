@@ -51,7 +51,7 @@ def batch_simulate_instance(tmp_path):
     return BatchSimulate(
         net=net,
         set_params=set_params,
-        tstop=10,
+        tstop=30,
         save_folder=tmp_path,
         batch_size=3,
         n_trials=3,
@@ -309,14 +309,17 @@ def test_parallel_execution(batch_simulate_instance, param_grid):
     # parallel pool is warmed up, we can run the parallel execution again to get its
     # actual simulation execution time.
     #
-    # Another solution would have been increasing the amount of compute work done in
-    # each simulation, but that is wasteful.
+    # On older hardware such as Github Actions' macos-intel runners, warming up the
+    # parallel pool is still not enough to ensure that the parallel execution is faster,
+    # so AES has also increased the compute work needed to be done (increasing the
+    # length of the simulation to 30 ms) and also increasing the number of cores used to
+    # 3 since we always have access to at least 3 in Github Actions runners.
     _ = batch_simulate_instance.simulate_batch(
-        param_combinations, n_jobs=2, backend="loky"
+        param_combinations, n_jobs=3, backend="loky"
     )
     start_time = time.perf_counter()
     _ = batch_simulate_instance.simulate_batch(
-        param_combinations, n_jobs=2, backend="loky"
+        param_combinations, n_jobs=3, backend="loky"
     )
     end_time = time.perf_counter()
     parallel_time = end_time - start_time
