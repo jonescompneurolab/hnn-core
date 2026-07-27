@@ -134,13 +134,13 @@ def plot_laminar_lfp(
     contact_labels : list
         Labels associated with the contacts to plot. Passed as-is to
         :func:`~matplotlib.axes.Axes.set_yticklabels`.
-    tmin : float | None, optional
-        Start time of the plot in ms. If None, plots from the start.
-    tmax : float | None, optional
-        End time of the plot in ms. If None, plots to the end.
-    ax : instance of matplotlib figure | None, optional
+    tmin : float, optional
+        Start time of the plot (in ms). If None, plots from the start.
+    tmax : float, optional
+        End time of the plot (in ms). If None, plots to the end.
+    ax : instance of matplotlib figure, optional
         The matplotlib axis.
-    decim : int | list of int | None, optional
+    decim : int | list of int, optional
         Optional (integer) factor by which to decimate the raw dipole traces.
         The SciPy function :func:`~scipy.signal.decimate` is used, which
         recommends values <13. To achieve higher decimation factors, a list of
@@ -151,12 +151,11 @@ def plot_laminar_lfp(
         defined as an RGBA-quadruplet, or an array of RGBA-values (one for each
         electrode contact trace to plot). An instance of
         :class:`~matplotlib.colors.ListedColormap` may also be provided.
-    voltage_offset : float | None, default=50
-        Amount to offset traces by on the voltage-axis. Useful for plotting
+    voltage_offset : float, default=50
+        Amount to offset traces by on the voltage-axis (in uV). Useful for plotting
         laminar arrays.
-    voltage_scalebar : float | None, default=200
-        Height, in units of uV, of a scale bar to plot in the top-left corner
-        of the plot.
+    voltage_scalebar : float, default=200
+        Height (in uV) of a scale bar to plot in the top-left corner of the plot.
     show : bool, default=True
         If True, show the figure.
 
@@ -309,16 +308,16 @@ def plot_dipole(
     ----------
     dpl : instance of Dipole | list of Dipole instances
         The Dipole object.
-    tmin : float | None, optional
-        Start time of the plot in ms. If None, plots from the start.
-    tmax : float | None, optional
-        End time of the plot in ms. If None, plots to the end.
-    ax : instance of matplotlib figure | None, optional
+    tmin : float, optional
+        Start time of the plot (in ms). If None, plots from the start.
+    tmax : float, optional
+        End time of the plot (in ms). If None, plots to the end.
+    ax : instance of matplotlib figure, optional
         The matplotlib axis.
     layer : str, default='agg'
         The layer to plot. Can be one of
         'agg', 'L2', and 'L5'.
-    decim : int | list of int | None, optional
+    decim : int | list of int, optional
         Optional (integer) factor by which to decimate the raw dipole traces.
         The SciPy function :func:`~scipy.signal.decimate` is used, which
         recommends values <13. To achieve higher decimation factors, a list of
@@ -1021,9 +1020,9 @@ def plot_tfr_morlet(
     n_cycles : float or array of float, default 7.0
         Number of cycles. Fixed number or one per frequency.
     tmin : float or None
-        Start time of plot in milliseconds. If None, plot entire simulation.
+        Start time of plot (in ms). If None, plots from the start.
     tmax : float or None
-        End time of plot in milliseconds. If None, plot entire simulation.
+        End time of plot (in ms). If None, plots to the end.
     layer : str, default 'agg'
         The layer to plot. Can be one of 'agg', 'L2', and 'L5'
     decim : int or list of int or None (default)
@@ -1188,9 +1187,9 @@ def plot_psd(
     fmax : float
         Maximum frequency to plot (in Hz). Default: None (plot up to Nyquist)
     tmin : float or None
-        Start time of data to include (in ms). If None, use entire simulation.
+        Start time of data to include (in ms). If None, plots from the start.
     tmax : float or None
-        End time of data to include (in ms). If None, use entire simulation.
+        End time of data to include (in ms). If None, plots to the end.
     layer : str, default 'agg'
         The layer to plot. Can be one of 'agg', 'L2', and 'L5'
     color : str or tuple or None
