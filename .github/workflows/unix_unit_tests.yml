@@ -37,7 +37,7 @@ jobs:
       - name: Install ruff for use before ANY other tests
         shell: bash -el {0}
         run: |
-          pip install --verbose ruff
+          pip install --verbose "ruff<0.16.0"
 
       - name: Check ruff formatting
         shell: bash -el {0}

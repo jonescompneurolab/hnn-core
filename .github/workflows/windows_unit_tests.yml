@@ -39,7 +39,7 @@ jobs:
       - name: Install ruff for use before ANY other tests
         shell: cmd
         run: |
-          pip install --verbose ruff
+          pip install --verbose "ruff<0.16.0"
 
       - name: Check ruff formatting
         shell: cmd
