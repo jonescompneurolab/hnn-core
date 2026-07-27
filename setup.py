@@ -87,7 +87,13 @@ if __name__ == "__main__":
     extras = {
         "opt": ["cma", "scikit-learn"],
         "parallel": ["joblib", "psutil"],
-        "test": ["codespell", "pytest", "pytest-cov", "pytest-xdist", "ruff"],
+        "test": [
+            "codespell",
+            "pytest",
+            "pytest-cov",
+            "pytest-xdist",
+            "ruff<0.16.0",
+        ],
         "docs": [
             "mne",
             "myst-parser",
