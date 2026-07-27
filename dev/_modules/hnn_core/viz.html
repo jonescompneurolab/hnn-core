@@ -648,30 +648,33 @@
 <span class="sd">        Sampling times (in ms).</span>
 <span class="sd">    data : Two-dimensional Numpy array</span>
 <span class="sd">        The extracellular voltages as an (n_contacts, n_times) array.</span>
-<span class="sd">    ax : instance of matplotlib figure | None</span>
-<span class="sd">        The matplotlib axis</span>
-<span class="sd">    decim : int | list of int | None (default)</span>
+<span class="sd">    contact_labels : list</span>
+<span class="sd">        Labels associated with the contacts to plot. Passed as-is to</span>
+<span class="sd">        :func:`~matplotlib.axes.Axes.set_yticklabels`.</span>
+<span class="sd">    tmin : float, optional</span>
+<span class="sd">        Start time of the plot (in ms). If None, plots from the start.</span>
+<span class="sd">    tmax : float, optional</span>
+<span class="sd">        End time of the plot (in ms). If None, plots to the end.</span>
+<span class="sd">    ax : instance of matplotlib figure, optional</span>
+<span class="sd">        The matplotlib axis.</span>
+<span class="sd">    decim : int | list of int, optional</span>
 <span class="sd">        Optional (integer) factor by which to decimate the raw dipole traces.</span>
 <span class="sd">        The SciPy function :func:`~scipy.signal.decimate` is used, which</span>
 <span class="sd">        recommends values &lt;13. To achieve higher decimation factors, a list of</span>
 <span class="sd">        ints can be provided. These are applied successively.</span>
-<span class="sd">    color : str | array of floats | ``matplotlib.colors.ListedColormap``</span>
+<span class="sd">    color : str | array of floats | ``matplotlib.colors.ListedColormap``, default=&#39;cividis&#39;</span>
 <span class="sd">        The colormap to use for plotting. The usual Matplotlib standard</span>
 <span class="sd">        colormap strings may be used (e.g., &#39;jetblue&#39;). A color can also be</span>
 <span class="sd">        defined as an RGBA-quadruplet, or an array of RGBA-values (one for each</span>
 <span class="sd">        electrode contact trace to plot). An instance of</span>
 <span class="sd">        :class:`~matplotlib.colors.ListedColormap` may also be provided.</span>
-<span class="sd">    voltage_offset : float | None (optional)</span>
-<span class="sd">        Amount to offset traces by on the voltage-axis. Useful for plotting</span>
+<span class="sd">    voltage_offset : float, default=50</span>
+<span class="sd">        Amount to offset traces by on the voltage-axis (in uV). Useful for plotting</span>
 <span class="sd">        laminar arrays.</span>
-<span class="sd">    voltage_scalebar : float | None (optional)</span>
-<span class="sd">        Height, in units of uV, of a scale bar to plot in the top-left corner</span>
-<span class="sd">        of the plot.</span>
-<span class="sd">    contact_labels : list</span>
-<span class="sd">        Labels associated with the contacts to plot. Passed as-is to</span>
-<span class="sd">        :func:`~matplotlib.axes.Axes.set_yticklabels`.</span>
-<span class="sd">    show : bool</span>
-<span class="sd">        If True, show the figure</span>
+<span class="sd">    voltage_scalebar : float, default=200</span>
+<span class="sd">        Height (in uV) of a scale bar to plot in the top-left corner of the plot.</span>
+<span class="sd">    show : bool, default=True</span>
+<span class="sd">        If True, show the figure.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -825,24 +828,28 @@
 <span class="sd">    ----------</span>
 <span class="sd">    dpl : instance of Dipole | list of Dipole instances</span>
 <span class="sd">        The Dipole object.</span>
-<span class="sd">    ax : instance of matplotlib figure | None</span>
-<span class="sd">        The matplotlib axis</span>
-<span class="sd">    layer : str</span>
+<span class="sd">    tmin : float, optional</span>
+<span class="sd">        Start time of the plot (in ms). If None, plots from the start.</span>
+<span class="sd">    tmax : float, optional</span>
+<span class="sd">        End time of the plot (in ms). If None, plots to the end.</span>
+<span class="sd">    ax : instance of matplotlib figure, optional</span>
+<span class="sd">        The matplotlib axis.</span>
+<span class="sd">    layer : str, default=&#39;agg&#39;</span>
 <span class="sd">        The layer to plot. Can be one of</span>
-<span class="sd">        &#39;agg&#39;, &#39;L2&#39;, and &#39;L5&#39;</span>
-<span class="sd">    decim : int or list of int or None (default)</span>
+<span class="sd">        &#39;agg&#39;, &#39;L2&#39;, and &#39;L5&#39;.</span>
+<span class="sd">    decim : int | list of int, optional</span>
 <span class="sd">        Optional (integer) factor by which to decimate the raw dipole traces.</span>
 <span class="sd">        The SciPy function :func:`~scipy.signal.decimate` is used, which</span>
 <span class="sd">        recommends values &lt;13. To achieve higher decimation factors, a list of</span>
 <span class="sd">        ints can be provided. These are applied successively.</span>
-<span class="sd">    color : tuple of float | str</span>
-<span class="sd">        RGBA value to use for plotting. By default, &#39;k&#39; (black)</span>
-<span class="sd">    label : str</span>
-<span class="sd">        Dipole label. Enabled when average=True</span>
-<span class="sd">    average : bool</span>
+<span class="sd">    color : tuple of float | str, default=&#39;k&#39;</span>
+<span class="sd">        RGBA value to use for plotting.</span>
+<span class="sd">    label : str, default=&#39;average&#39;</span>
+<span class="sd">        Dipole label. Enabled when average=True.</span>
+<span class="sd">    average : bool, default=False</span>
 <span class="sd">        If True, render the average across all dpls.</span>
-<span class="sd">    show : bool</span>
-<span class="sd">        If True, show the figure</span>
+<span class="sd">    show : bool, default=True</span>
+<span class="sd">        If True, show the figure.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1545,9 +1552,9 @@
 <span class="sd">    n_cycles : float or array of float, default 7.0</span>
 <span class="sd">        Number of cycles. Fixed number or one per frequency.</span>
 <span class="sd">    tmin : float or None</span>
-<span class="sd">        Start time of plot in milliseconds. If None, plot entire simulation.</span>
+<span class="sd">        Start time of plot (in ms). If None, plots from the start.</span>
 <span class="sd">    tmax : float or None</span>
-<span class="sd">        End time of plot in milliseconds. If None, plot entire simulation.</span>
+<span class="sd">        End time of plot (in ms). If None, plots to the end.</span>
 <span class="sd">    layer : str, default &#39;agg&#39;</span>
 <span class="sd">        The layer to plot. Can be one of &#39;agg&#39;, &#39;L2&#39;, and &#39;L5&#39;</span>
 <span class="sd">    decim : int or list of int or None (default)</span>
@@ -1715,9 +1722,9 @@
 <span class="sd">    fmax : float</span>
 <span class="sd">        Maximum frequency to plot (in Hz). Default: None (plot up to Nyquist)</span>
 <span class="sd">    tmin : float or None</span>
-<span class="sd">        Start time of data to include (in ms). If None, use entire simulation.</span>
+<span class="sd">        Start time of data to include (in ms). If None, plots from the start.</span>
 <span class="sd">    tmax : float or None</span>
-<span class="sd">        End time of data to include (in ms). If None, use entire simulation.</span>
+<span class="sd">        End time of data to include (in ms). If None, plots to the end.</span>
 <span class="sd">    layer : str, default &#39;agg&#39;</span>
 <span class="sd">        The layer to plot. Can be one of &#39;agg&#39;, &#39;L2&#39;, and &#39;L5&#39;</span>
 <span class="sd">    color : str or tuple or None</span>
