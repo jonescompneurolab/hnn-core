@@ -60,10 +60,14 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 ### People who contributed to this release:
 
 - [Vaishnavi Baghel][]
+- [Arnesh Banerjee][]
 - [Shivansh Bhageria][]
 - [Camilo Diaz][]
 
 ### Changelog
+
+- Improvements to some visualization documentation,
+  by [Arnesh Banerjee][] in {gh}`1332`.
 
 - Easier optimization custom function usage
   by [Vaishnavi Baghel][] in {gh}`1271`.
@@ -1492,3 +1496,4 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [Percival Villalva]: https://github.com/pervillalva
 [Anna Cattani]: https://github.com/annacatt
 [Shivansh Bhageria]: https://github.com/Shivansh1205
+[Arnesh Banerjee]: https://github.com/ArneshBanerjee
