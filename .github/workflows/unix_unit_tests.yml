@@ -120,6 +120,7 @@ jobs:
       - name: Install HNN-Core with full dependencies
         shell: bash -el {0}
         run: |
+          pip install --upgrade --force-reinstall pip
           pip install --verbose '.[opt, parallel, test, gui]'
 
       - name: Print environment info
