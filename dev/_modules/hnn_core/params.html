@@ -520,7 +520,6 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">fnmatch</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">op</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
 
@@ -603,8 +602,7 @@
 <span class="sd">        Params containing parameter values from file</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">split_fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)</span>
-    <span class="n">ext</span> <span class="o">=</span> <span class="n">split_fname</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span>
 
     <span class="k">if</span> <span class="n">ext</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;.json&quot;</span><span class="p">,</span> <span class="s2">&quot;.param&quot;</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -620,7 +618,7 @@
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">params_dict</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Failed to read parameters from file: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">op</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)</span>
+            <span class="s2">&quot;Failed to read parameters from file: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">Path</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
         <span class="p">)</span>
 
     <span class="n">params</span> <span class="o">=</span> <span class="n">Params</span><span class="p">(</span><span class="n">params_dict</span><span class="p">)</span>

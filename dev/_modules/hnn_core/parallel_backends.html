@@ -529,7 +529,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">subprocess</span><span class="w"> </span><span class="kn">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">PIPE</span><span class="p">,</span> <span class="n">TimeoutExpired</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">queue</span><span class="w"> </span><span class="kn">import</span> <span class="n">Queue</span><span class="p">,</span> <span class="n">Empty</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">threading</span><span class="w"> </span><span class="kn">import</span> <span class="n">Thread</span><span class="p">,</span> <span class="n">Event</span>
-
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.cell_response</span><span class="w"> </span><span class="kn">import</span> <span class="n">CellResponse</span>
@@ -1043,10 +1043,7 @@
     <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">process_iter</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;exe&quot;</span><span class="p">,</span> <span class="s2">&quot;cmdline&quot;</span><span class="p">]):</span>
         <span class="k">if</span> <span class="p">(</span>
             <span class="n">proc_name</span> <span class="o">==</span> <span class="n">p</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
-            <span class="ow">or</span> <span class="p">(</span>
-                <span class="n">p</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;exe&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-                <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;exe&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="n">proc_name</span>
-            <span class="p">)</span>
+            <span class="ow">or</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;exe&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">Path</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;exe&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">proc_name</span><span class="p">)</span>
             <span class="ow">or</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;cmdline&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;cmdline&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">proc_name</span><span class="p">)</span>
         <span class="p">):</span>
             <span class="n">process_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
@@ -1191,7 +1188,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">_determine_cores_hwthreading</span><span class="p">(</span>
     <span class="n">use_hwthreading_if_found</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">sensible_default_cores</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the available core number and if hardware-threading is detected.</span>
 
 <span class="sd">    If the first argument &#39;use_hwthreading_if_found&#39; is &#39;True&#39;, then the</span>
@@ -1536,9 +1533,7 @@
             <span class="s2">&quot; nrniv -python -mpi -nobanner &quot;</span>
             <span class="o">+</span> <span class="n">sys</span><span class="o">.</span><span class="n">executable</span>
             <span class="o">+</span> <span class="s2">&quot; &quot;</span>
-            <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="vm">__name__</span><span class="p">]</span><span class="o">.</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;mpi_child.py&quot;</span>
-            <span class="p">)</span>
+            <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="vm">__name__</span><span class="p">]</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;mpi_child.py&quot;</span><span class="p">)</span>
         <span class="p">)</span>
 
         <span class="c1"># Split the command into shell arguments for passing to Popen</span>
