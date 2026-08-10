@@ -252,6 +252,14 @@ def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
         "basal_3",
     ]
 
+    if set(section_names + ["soma"]) != set(v_init.keys()):
+        raise ValueError(
+            "For L2_pyramidal cells, mismatch between hardcoded 'section_names' and "
+            "_default_v_init's section keys. "
+            f"section_names (excluding 'soma'): {section_names} "
+            f"_default_v_init keys: {list(v_init.keys())}"
+        )
+
     sections = _get_dends(
         p_all,
         cell_type="L2Pyr",
@@ -393,6 +401,14 @@ def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
 
     # Different sections of this cell type use different initial membrane voltages:
     v_init = _default_v_init["L5_pyramidal"]
+
+    if set(section_names + ["soma"]) != set(v_init.keys()):
+        raise ValueError(
+            "For L5_pyramidal cells, mismatch between hardcoded 'section_names' and "
+            "_default_v_init's section keys. "
+            f"section_names (excluding 'soma'): {section_names} "
+            f"_default_v_init keys: {list(v_init.keys())}"
+        )
 
     sections = _get_dends(
         p_all,
