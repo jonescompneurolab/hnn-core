@@ -350,6 +350,43 @@ def test_read_incorrect_format(tmp_path):
         read_network_configuration(file_path)
 
 
+def test_read_configuration_no_default_v0():
+    """Test that the initial voltages of L5Pyr cells are set to correct defaults if read in from a config file with no default v0 (backwards compatibility)."""
+    # Let's only use the L5_pyramidal cells since they have heterogeneous v0's
+
+    # Current section initial voltages. The original location of these values can be
+    # found at
+    # https://github.com/jonescompneurolab/hnn-core/blob/8a0fffef8d8803e2404d7237f9adeabecd1285ed/hnn_core/network_builder.py#L668-L679
+    expected_l5pyr_v0 = {
+        "apical_1": -71.32,
+        "apical_2": -69.08,
+        "apical_tuft": -67.30,
+        "apical_trunk": -72,
+        "soma": -72.0,
+        "basal_1": -72,
+        "basal_2": -72,
+        "basal_3": -72,
+        "apical_oblique": -72,
+    }
+
+    net_no_v0 = read_network_configuration(
+        Path(assets_path, "gamma_L5weak_L2weak_hierarchical.json")
+    )
+    l5pyr_no_v0 = net_no_v0.cell_types["L5_pyramidal"]["cell_object"]
+
+    # Test initial voltages (v0) for L5Pyr cells read from the network configuration,
+    # but before NEURON cell building
+    for sec_name, sec in l5pyr_no_v0.sections.items():
+        v0 = sec.v0
+        expected_v0 = expected_l5pyr_v0[sec_name]
+        assert np.isclose(v0, expected_v0), (
+            f"HNN-Core L5Pyr {sec_name} v0={v0}, expected {expected_v0}"
+        )
+
+    # Test that Network can be simulated without error.
+    _ = simulate_dipole(net_no_v0, tstop=2, n_trials=1, dt=0.5)
+
+
 def test_network_serialization_metadata(jones_2009_network, tmp_path):
     """Test saving and loading a network with the cell_metadata structure."""
     net_original = jones_2009_network
