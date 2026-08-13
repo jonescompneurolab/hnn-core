@@ -249,7 +249,7 @@ def test_gui_smart_gains_upload_connectivity(setup_gui):
     gui.widget_backend_selection.value = "Joblib"
     gui.widget_ntrials.value = 1
     gui.run_button.click()
-    net1 = gui.data["simulation_data"][sim_name]["net"]
+    net1 = gui.run_simulations[sim_name]["net"]
 
     # First, in the case of "uniform gains", let's check that smart gains correctly
     # updates only the GUI global gain values AND resets the network's SINGLE gain
@@ -299,7 +299,7 @@ def test_gui_smart_gains_upload_connectivity(setup_gui):
     gui.widget_backend_selection.value = "Joblib"
     gui.widget_ntrials.value = 1
     gui.run_button.click()
-    net2 = gui.data["simulation_data"][sim_name]["net"]
+    net2 = gui.run_simulations[sim_name]["net"]
 
     with tempfile.TemporaryDirectory() as tmp_dir:
         # Get network from data dictionary and save it to temporary file
@@ -424,7 +424,7 @@ def test_gui_rerun_saved_network_without_n_trials():
     gui.run_button.click()
 
     sim_name = gui.widget_simulation_name.value
-    net = gui.simulation_data[sim_name]["net"]
+    net = gui.run_simulations[sim_name]["net"]
 
     cfg_path = Path("saved_network.json")
     net.write_configuration(cfg_path)
@@ -444,25 +444,25 @@ def test_gui_upload_data():
     _ = gui.compose()
 
     assert len(gui.viz_manager.data["figs"]) == 0
-    assert len(gui.data["simulation_data"]) == 0
+    assert len(gui.loaded_simulations) == 0
 
     file1_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/S1_SupraT.txt"  # noqa
     file2_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/yes_trial_S1_ERP_all_avg.txt"  # noqa
     gui._simulate_upload_data(file1_url)
 
-    assert len(gui.data["simulation_data"]) == 1
-    assert "S1_SupraT" in gui.data["simulation_data"].keys()
-    assert gui.data["simulation_data"]["S1_SupraT"]["net"] is None
-    assert type(gui.data["simulation_data"]["S1_SupraT"]["dpls"]) is list
+    assert len(gui.loaded_simulations) == 1
+    assert "S1_SupraT" in gui.loaded_simulations.keys()
+    assert gui.loaded_simulations["S1_SupraT"]["net"] is None
+    assert type(gui.loaded_simulations["S1_SupraT"]["dpls"]) is list
     assert len(gui.viz_manager.data["figs"]) == 1
     # support uploading multiple external data.
     gui._simulate_upload_data(file2_url)
-    assert len(gui.data["simulation_data"]) == 2
+    assert len(gui.loaded_simulations) == 2
     assert len(gui.viz_manager.data["figs"]) == 2
 
     # make sure no repeated uploading for the same name.
     gui._simulate_upload_data(file1_url)
-    assert len(gui.data["simulation_data"]) == 2
+    assert len(gui.loaded_simulations) == 2
     assert len(gui.viz_manager.data["figs"]) == 2
 
     # No data loading for legacy multi-trial data files.
@@ -471,7 +471,7 @@ def test_gui_upload_data():
         ValueError, match="Data are supposed to have 2 or 4 columns while we have 101."
     ):
         gui._simulate_upload_data(file3_url)
-    assert len(gui.data["simulation_data"]) == 2
+    assert len(gui.loaded_simulations) == 2
     assert len(gui.viz_manager.data["figs"]) == 2
 
     plt.close("all")
@@ -594,8 +594,8 @@ def test_gui_run_simulation_mpi():
     gui.run_button.click()
 
     default_name = gui.widget_simulation_name.value
-    dpls = gui.simulation_data[default_name]["dpls"]
-    assert isinstance(gui.simulation_data[default_name]["net"], Network)
+    dpls = gui.run_simulations[default_name]["dpls"]
+    assert isinstance(gui.run_simulations[default_name]["net"], Network)
     assert isinstance(dpls, list)
     assert len(dpls) > 0
     assert all([isinstance(dpl, Dipole) for dpl in dpls])
@@ -618,9 +618,9 @@ def test_gui_run_simulations(setup_gui):
 
         gui.run_button.click()
         sim_name = gui.widget_simulation_name.value
-        dpls = gui.simulation_data[sim_name]["dpls"]
+        dpls = gui.run_simulations[sim_name]["dpls"]
 
-        assert isinstance(gui.simulation_data[sim_name]["net"], Network)
+        assert isinstance(gui.run_simulations[sim_name]["net"], Network)
         assert isinstance(dpls, list)
         assert all([isinstance(dpl, Dipole) for dpl in dpls])
         assert len(dpls) == val_ntrials
@@ -631,7 +631,7 @@ def test_gui_run_simulations(setup_gui):
 
         sim_count += 1
 
-    assert len(list(gui.simulation_data)) == sim_count
+    assert len(list(gui.run_simulations)) == sim_count
 
 
 def test_simulation_auto_rename_duplicate(setup_gui):
@@ -651,9 +651,9 @@ def test_simulation_auto_rename_duplicate(setup_gui):
 
     # convenience function for all upcoming runs
     def _check_new_name(expected_new_name):
-        assert expected_new_name in gui.simulation_data
-        assert isinstance(gui.simulation_data[expected_new_name]["net"], Network)
-        assert isinstance(gui.simulation_data[expected_new_name]["dpls"], list)
+        assert expected_new_name in gui.run_simulations
+        assert isinstance(gui.run_simulations[expected_new_name]["net"], Network)
+        assert isinstance(gui.run_simulations[expected_new_name]["dpls"], list)
         assert (
             gui._simulation_status_bar.value
             == gui._simulation_status_contents["finished"]
@@ -662,14 +662,14 @@ def test_simulation_auto_rename_duplicate(setup_gui):
 
     expected_new_name = f"{default_sim_name}-2"
     _check_new_name(expected_new_name)
-    assert len(gui.simulation_data) == 2
+    assert len(gui.run_simulations) == 2
 
     # Third run with the same name — should auto-rename to "{sim_name}-3"
     # --------------------------------------------------------------------
     gui.run_button.click()
     expected_new_name = f"{default_sim_name}-3"
     _check_new_name(expected_new_name)
-    assert len(gui.simulation_data) == 3
+    assert len(gui.run_simulations) == 3
 
     # Fourth run with a fresh, non-default name containing hyphens
     # ------------------------------------------------------------
@@ -679,7 +679,7 @@ def test_simulation_auto_rename_duplicate(setup_gui):
 
     expected_new_name = custom_sim_name_1
     _check_new_name(expected_new_name)
-    assert len(gui.simulation_data) == 4
+    assert len(gui.run_simulations) == 4
 
     # Fifth run with an auto-appended fresh, non-default name
     # --------------------------------------------------------
@@ -687,7 +687,7 @@ def test_simulation_auto_rename_duplicate(setup_gui):
 
     expected_new_name = f"{custom_sim_name_1}-2"
     _check_new_name(expected_new_name)
-    assert len(gui.simulation_data) == 5
+    assert len(gui.run_simulations) == 5
 
     # Sixth run with an incremented auto-appended fresh, non-default name
     # -------------------------------------------------------------------
@@ -695,7 +695,7 @@ def test_simulation_auto_rename_duplicate(setup_gui):
 
     expected_new_name = f"{custom_sim_name_1}-3"
     _check_new_name(expected_new_name)
-    assert len(gui.simulation_data) == 6
+    assert len(gui.run_simulations) == 6
 
     # Seventh run with a fresh, non-default name ending in "-{number}"
     # ----------------------------------------------------------------
@@ -705,7 +705,7 @@ def test_simulation_auto_rename_duplicate(setup_gui):
 
     expected_new_name = custom_sim_name_2
     _check_new_name(expected_new_name)
-    assert len(gui.simulation_data) == 7
+    assert len(gui.run_simulations) == 7
 
     # Eighth run with a fresh, non-default name ending in "-{number+1}"
     # ----------------------------------------------------------------
@@ -713,7 +713,7 @@ def test_simulation_auto_rename_duplicate(setup_gui):
 
     expected_new_name = "hjkl-67-qwerty-24"
     _check_new_name(expected_new_name)
-    assert len(gui.simulation_data) == 8
+    assert len(gui.run_simulations) == 8
 
     # Ninth run with a fresh, non-default name ending in "-{number+2}"
     # ----------------------------------------------------------------
@@ -721,7 +721,7 @@ def test_simulation_auto_rename_duplicate(setup_gui):
 
     expected_new_name = "hjkl-67-qwerty-25"
     _check_new_name(expected_new_name)
-    assert len(gui.simulation_data) == 9
+    assert len(gui.run_simulations) == 9
 
     plt.close("all")
 
@@ -1106,6 +1106,7 @@ def test_dipole_data_overlay(setup_gui):
     # Check number of lines
     # 2 trials, 1 average, 2 data (data is over-plotted twice for some reason)
     # But it only appears in the legend once.
+    # Camilo: After my changes, data is plotted only once??
     assert len(ax.lines) == 5
     assert len(ax.legend_.texts) == 2
     assert ax.legend_.texts[0]._text == "default: average"
@@ -1178,7 +1179,7 @@ def test_gui_download_simulation(setup_gui):
     # Run simulation
     gui.run_button.click()
 
-    _, file_extension = serialize_simulation(gui.data, sim_name)
+    _, file_extension = serialize_simulation(gui.run_simulations, sim_name)
     # result is a zip file
     assert file_extension == ".zip"
 
@@ -1191,7 +1192,7 @@ def test_gui_download_simulation(setup_gui):
 
     # Run simulation
     gui.run_button.click()
-    _, file_extension = serialize_simulation(gui.data, sim_name2)
+    _, file_extension = serialize_simulation(gui.run_simulations, sim_name2)
     # result is a single csv file
     assert file_extension == ".csv"
 
@@ -1217,7 +1218,7 @@ def test_gui_upload_csv_simulation(setup_gui):
     gui = setup_gui
 
     assert len(gui.viz_manager.data["figs"]) == 0
-    assert len(gui.data["simulation_data"]) == 0
+    assert len(gui.loaded_simulations) == 0
 
     # Formulate path to the file
     file_path = assets_path / "test_default.csv"
@@ -1233,24 +1234,21 @@ def test_gui_upload_csv_simulation(setup_gui):
 
     # we are loading only 1 trial,
     # assume all the data we need is in the [0] position
-    data_lengh = len(gui.data["simulation_data"]["test_default"]["dpls"][0].times)
+    data_lengh = len(gui.loaded_simulations["test_default"]["dpls"][0].times)
 
-    assert len(gui.data["simulation_data"]) == 1
-    assert "test_default" in gui.data["simulation_data"].keys()
-    assert gui.data["simulation_data"]["test_default"]["net"] is None
-    assert type(gui.data["simulation_data"]["test_default"]["dpls"]) is list
+    assert len(gui.loaded_simulations) == 1
+    assert "test_default" in gui.loaded_simulations.keys()
+    assert gui.loaded_simulations["test_default"]["net"] is None
+    assert type(gui.loaded_simulations["test_default"]["dpls"]) is list
     assert len(gui.viz_manager.data["figs"]) == 1
     assert (
-        len(gui.data["simulation_data"]["test_default"]["dpls"][0].data["agg"])
-        == data_lengh
+        len(gui.loaded_simulations["test_default"]["dpls"][0].data["agg"]) == data_lengh
     )
     assert (
-        len(gui.data["simulation_data"]["test_default"]["dpls"][0].data["L2"])
-        == data_lengh
+        len(gui.loaded_simulations["test_default"]["dpls"][0].data["L2"]) == data_lengh
     )
     assert (
-        len(gui.data["simulation_data"]["test_default"]["dpls"][0].data["L5"])
-        == data_lengh
+        len(gui.loaded_simulations["test_default"]["dpls"][0].data["L5"]) == data_lengh
     )
 
 
@@ -1267,7 +1265,7 @@ def test_gui_download_configuration(setup_gui):
     gui.run_button.click()
 
     # serialize configurations of the simulation
-    configs = serialize_config(gui.data, sim_name)
+    configs = serialize_config(gui.run_simulations, sim_name)
     net_from_buffer = json.loads(configs)
 
     # Load configuration from file
@@ -1770,7 +1768,7 @@ def test_custom_gains_simulate_and_download(setup_gui):
     gui.run_button.click()
 
     # Serialize the configuration
-    configs = serialize_config(gui.data, sim_name)
+    configs = serialize_config(gui.run_simulations, sim_name)
     net_config = json.loads(configs)
 
     # Check that connectivity includes gain values
@@ -1827,7 +1825,7 @@ def test_diff_gui_vs_api_networks_simulations():
     sim_name = "test_gains_gui"
     gui.widget_simulation_name.value = sim_name
     gui.run_button.click()
-    dpls_gui = gui.simulation_data[sim_name]["dpls"]
+    dpls_gui = gui.run_simulations[sim_name]["dpls"]
 
     # Setup and run the API simulation
     # --------------------------------
@@ -2023,8 +2021,8 @@ def test_gui_run_optimization(backend_selection, opt_solver, dt, setup_gui):
     # Perform some basic checks, like that the optimized sim name has changed, there is
     # existing Dipole data, etc.
     new_sim_name_1 = gui.widget_simulation_name.value + "_optimized"
-    dpls = gui.simulation_data[new_sim_name_1]["dpls"]
-    assert isinstance(gui.simulation_data[new_sim_name_1]["net"], Network)
+    dpls = gui.run_simulations[new_sim_name_1]["dpls"]
+    assert isinstance(gui.run_simulations[new_sim_name_1]["net"], Network)
     assert isinstance(dpls, list)
     assert len(dpls) > 0
     assert all([isinstance(dpl, Dipole) for dpl in dpls])
@@ -2055,8 +2053,8 @@ def test_gui_run_optimization(backend_selection, opt_solver, dt, setup_gui):
     # optimization runs.
     new_sim_name_2 = gui.widget_simulation_name.value + "_optimized" + "_1"
     assert new_sim_name_2 == "default_optimized_1"
-    dpls = gui.simulation_data[new_sim_name_2]["dpls"]
-    assert isinstance(gui.simulation_data[new_sim_name_2]["net"], Network)
+    dpls = gui.run_simulations[new_sim_name_2]["dpls"]
+    assert isinstance(gui.run_simulations[new_sim_name_2]["net"], Network)
     assert isinstance(dpls, list)
     assert len(dpls) > 0
     assert all([isinstance(dpl, Dipole) for dpl in dpls])
@@ -2094,8 +2092,8 @@ def test_gui_run_optimization(backend_selection, opt_solver, dt, setup_gui):
     # optimization runs.
     new_sim_name_3 = gui.widget_simulation_name.value + "_optimized" + "_2"
     assert new_sim_name_3 == "default_optimized_2"
-    dpls = gui.simulation_data[new_sim_name_3]["dpls"]
-    assert isinstance(gui.simulation_data[new_sim_name_3]["net"], Network)
+    dpls = gui.run_simulations[new_sim_name_3]["dpls"]
+    assert isinstance(gui.run_simulations[new_sim_name_3]["net"], Network)
     assert isinstance(dpls, list)
     assert len(dpls) > 0
     assert all([isinstance(dpl, Dipole) for dpl in dpls])
@@ -2130,7 +2128,7 @@ def test_gui_optimization_no_constraints(setup_gui):
     )
 
     # Verify that no optimized simulation was created
-    assert "default_optimized" not in gui.simulation_data
+    assert "default_optimized" not in gui.run_simulations
 
     plt.close("all")
 
@@ -2154,7 +2152,7 @@ def test_gui_optimization_no_target_data(setup_gui):
     )
 
     # Verify that no optimized simulation was created
-    assert "default_optimized" not in gui.simulation_data
+    assert "default_optimized" not in gui.run_simulations.keys()
 
     plt.close("all")
 
@@ -2177,8 +2175,8 @@ def test_traceback_logging(setup_gui, monkeypatch):
         gui.widget_dt.value = val_tstep
 
         gui.run_button.click()
-        dpls = gui.simulation_data[sim_name]["dpls"]
-        assert isinstance(gui.simulation_data[sim_name]["net"], Network)
+        dpls = gui.run_simulations[sim_name]["dpls"]
+        assert isinstance(gui.run_simulations[sim_name]["net"], Network)
         assert isinstance(dpls, list)
         assert len(dpls) > 0
         assert all([isinstance(dpl, Dipole) for dpl in dpls])

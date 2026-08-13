@@ -13,8 +13,6 @@ import sys
 import textwrap
 import urllib.parse
 import urllib.request
-import zipfile
-from collections import defaultdict
 from copy import deepcopy
 from datetime import datetime
 from functools import partial
@@ -49,11 +47,15 @@ from ipywidgets.embed import embed_minimal_html
 
 import hnn_core
 from hnn_core import JoblibBackend, MPIBackend, simulate_dipole
-from hnn_core.cells_default import _exp_g_at_dist
 from hnn_core.dipole import _read_dipole_txt, average_dipoles
+from hnn_core.gui._network_builder import _init_network_from_widgets
+from hnn_core.gui._network_builder import global_gain_type_lookup_dict
 from hnn_core.gui._logging import logger
+from hnn_core.gui._simulations_data_store import data_store
+from hnn_core.gui._serialization import serialize_simulation, serialize_config
+from hnn_core.gui._gui_utils import clear_empty_trash_simualtions
 from hnn_core.gui._viz_manager import _idx2figname, _VizManager
-from hnn_core.hnn_io import dict_to_network, write_network_configuration
+from hnn_core.hnn_io import dict_to_network
 from hnn_core.network import pick_connection, _check_global_synaptic_gains_uniformity
 from hnn_core.optimization import Optimizer, generate_opt_history_table
 from hnn_core.parallel_backends import (
@@ -64,6 +66,7 @@ from hnn_core.parallel_backends import (
 from hnn_core.params_default import get_L2Pyr_params_default, get_L5Pyr_params_default
 
 from ..externals.mne import _validate_type
+
 
 hnn_core_root = Path(hnn_core.__file__).parent
 default_network_configuration = hnn_core_root / "param" / "neymotin2020_base.json"
@@ -172,23 +175,9 @@ global_gain_type_display_dict = {
     "i_i": "Inh-to-Inh",
 }
 
-global_gain_type_lookup_dict = {
-    ("L2_pyramidal", "L2_pyramidal"): "e_e",
-    ("L2_pyramidal", "L5_pyramidal"): "e_e",
-    ("L5_pyramidal", "L5_pyramidal"): "e_e",
-    ("L2_pyramidal", "L2_basket"): "e_i",
-    ("L2_pyramidal", "L5_basket"): "e_i",
-    ("L5_pyramidal", "L5_basket"): "e_i",
-    ("L2_basket", "L2_pyramidal"): "i_e",
-    ("L2_basket", "L5_pyramidal"): "i_e",
-    ("L5_basket", "L5_pyramidal"): "i_e",
-    ("L2_basket", "L2_basket"): "i_i",
-    ("L5_basket", "L5_basket"): "i_i",
-}
-
-
 class _OutputWidgetHandler(logging.Handler):
     def __init__(self, output_widget, *args, **kwargs):
+        data_store.reset()
         super(_OutputWidgetHandler, self).__init__(*args, **kwargs)
         self.out = output_widget
 
@@ -711,7 +700,10 @@ class HNNGUI:
         )
 
         # In-memory storage of all simulation and visualization related data
-        self.simulation_data = defaultdict(lambda: dict(net=None, dpls=list()))
+        # self.simulation_data = defaultdict(lambda: dict(net=None, dpls=list()))
+
+        ## Not sure if we need this redirection
+        # self._simulation_store = data_store.run_simulations
 
         # ==================================================
         # Simulation tab
@@ -1121,8 +1113,7 @@ class HNNGUI:
         self._opt_drives_out = Output().add_class("opt-drives-accordion-widgets")
 
         self._log_out = Output()
-
-        self.viz_manager = _VizManager(self.data, self.layout, self.fig_default_params)
+        self.viz_manager = _VizManager(self.layout, self.fig_default_params)
 
         # detailed configuration of backends
         self._backend_config_out = Output().add_class("backend-config-out")
@@ -1259,9 +1250,14 @@ class HNNGUI:
         }
 
     @property
-    def data(self):
-        """Provides easy access to simulation-related data."""
-        return {"simulation_data": self.simulation_data}
+    def run_simulations(self):
+        """Provides easy access to run simulation data."""
+        return data_store.run_simulations
+
+    @property
+    def loaded_simulations(self):
+        """Provides easy access to loaded simulation data."""
+        return data_store.loaded_data
 
     @staticmethod
     def load_parameters(params_fname):
@@ -1323,7 +1319,7 @@ class HNNGUI:
 
         def _on_upload_data(change):
             return on_upload_data_change(
-                change, self.data, self.viz_manager, self._log_out
+                change, self.loaded_simulations, self.viz_manager, self._log_out
             )
 
         def _run_button_clicked(b):
@@ -1331,7 +1327,7 @@ class HNNGUI:
                 self.widget_simulation_name,
                 self._log_out,
                 self.drive_widgets,
-                self.data,
+                self.run_simulations,
                 self.widget_dt,
                 self.widget_tstop,
                 self.fig_default_params,
@@ -1358,12 +1354,11 @@ class HNNGUI:
                 self.widget_simulation_name,
                 self._log_out,
                 self.opt_drive_widgets,
-                self.data,
+                self.run_simulations,
+                self.loaded_simulations,
                 self.widget_dt,
                 self.widget_tstop,
                 self.fig_default_params,
-                self.widget_default_smoothing,
-                self.widget_default_scaling,
                 self.widget_min_frequency,
                 self.widget_max_frequency,
                 self.widget_backend_selection,
@@ -1402,7 +1397,7 @@ class HNNGUI:
         def _simulation_list_change(value):
             # Simulation Data
             _simulation_data, file_extension = _serialize_simulation(
-                self._log_out, self.data, self.simulation_list_widget
+                self._log_out, self.run_simulations, self.simulation_list_widget
             )
 
             self.simulation_list_widget.disabled = False
@@ -1430,7 +1425,7 @@ class HNNGUI:
 
             # Network Configuration
             network_config = _serialize_config(
-                self._log_out, self.data, self.simulation_list_widget
+                self._log_out, self.run_simulations, self.simulation_list_widget
             )
             b64_net = base64.b64encode(network_config.encode())
 
@@ -2359,7 +2354,7 @@ class HNNGUI:
         # The obj_fun="dipole_corr" and "dipole_rmse" cases are very simple
         # ------------------------------------------------------------------------------
         self.opt_target_widgets["target_dipole_data"] = Dropdown(
-            options=self.data["simulation_data"].keys(),
+            options=data_store.run_simulation_names,
             value=prior_target_state.get("target_dipole_data", None),
             description="Target Data:",
             disabled=False,
@@ -2920,7 +2915,7 @@ def _get_connectivity_widgets(conn_data, global_gain_textfields):
     html_tab = "&emsp;"
 
     sliders = list()
-    for receptor_idx, receptor_name in enumerate(conn_data.keys()):
+    for _, receptor_name in enumerate(conn_data.keys()):
         global_gain_type = global_gain_type_lookup_dict[
             (
                 conn_data[receptor_name]["src_gids"],
@@ -4643,20 +4638,20 @@ def get_cell_param_default_value(cell_type_key, param_dict):
     return param_dict[cell_type_key]
 
 
-def on_upload_data_change(change, data, viz_manager, log_out):
+def on_upload_data_change(change, loaded_simulations, viz_manager, log_out):
     if len(change["owner"].value) == 0:
         return
     # Parsing file information from the 'change' object passed in from
     # the upload file widget.
     data_dict = change["new"][0]
     dict_name = data_dict["name"].rsplit(".", 1)
-    data_fname = dict_name[0]
+    data_filename = dict_name[0]
     file_extension = f".{dict_name[1]}"
 
     # If data was already loaded return
-    if data_fname in data["simulation_data"].keys():
+    if loaded_simulations.get(data_filename) is not None:
         with log_out:
-            logger.error(f"Found existing data: {data_fname}.")
+            logger.error(f"Found existing data: {data_filename}.")
         return
 
     # Read the file
@@ -4664,11 +4659,11 @@ def on_upload_data_change(change, data, viz_manager, log_out):
     ext_content = codecs.decode(ext_content, encoding="utf-8")
     with log_out:
         # Write loaded data to data object
-        data["simulation_data"][data_fname] = {
+        loaded_simulations[data_filename] = {
             "net": None,
             "dpls": [_read_dipole_txt(io.StringIO(ext_content), file_extension)],
         }
-        logger.info(f"External data {data_fname} loaded.")
+        logger.info(f"External data {data_filename} loaded.")
 
         # Create a dipole plot
         _template_name = "[Blank] single figure"
@@ -4679,7 +4674,7 @@ def on_upload_data_change(change, data, viz_manager, log_out):
         viz_manager._simulate_edit_figure(
             fig_name,
             ax_name="ax0",
-            simulation_name=data_fname,
+            simulation_name=data_filename,
             plot_type="current dipole",
             preprocessing_config=process_configs,
             operation="plot",
@@ -4688,192 +4683,11 @@ def on_upload_data_change(change, data, viz_manager, log_out):
         change["owner"].value = []
 
 
-def _drive_widget_to_dict(drive, name):
-    """Creates a dict of input widget values
-
-    Input widgets for drive parameters are structured in a nested
-    dictionary. This function recreates the nested dictionary replacing
-    the input widget with its stored value.
-    Parameters
-    ----------
-    drive : dict
-        The drive dictionary containing nested dictionaries for parameters with
-        multiple input widgets.
-    name : str
-        key of the nested dictionary
-
-    Returns : dict
-    -------
-
-    """
-    return {k: v.value for k, v in drive[name].items()}
-
-
-def _init_network_from_widgets(
-    params,
-    dt,
-    tstop,
-    single_simulation_data,
-    drive_widgets,
-    connectivity_textfields,
-    cell_params_vboxes,
-    global_gain_textfields,
-    add_drive=True,
-):
-    """Construct network and add drives."""
-    logger.info("init network")
-    single_simulation_data["net"] = dict_to_network(
-        params, read_drives=False, read_external_biases=False
-    )
-
-    # Update with synaptic gains
-    global_gain_values = {
-        key: widget.value for key, widget in global_gain_textfields.items()
-    }
-
-    # adjust connectivity according to the connectivity_tab
-    for connectivity_slider in connectivity_textfields:
-        for vbox_key in connectivity_slider:
-            conn_indices = pick_connection(
-                net=single_simulation_data["net"],
-                src_gids=vbox_key._belongsto["src_gids"],
-                target_gids=vbox_key._belongsto["target_gids"],
-                loc=vbox_key._belongsto["location"],
-                receptor=vbox_key._belongsto["receptor"],
-            )
-
-            if len(conn_indices) > 0:
-                assert len(conn_indices) == 1
-                conn_idx = conn_indices[0]
-                single_simulation_data["net"].connectivity[conn_idx]["nc_dict"][
-                    "A_weight"
-                ] = vbox_key.children[1].children[0].value
-
-                # 1. identify which case of global_gain_textfield applies to this
-                #    src/target
-                global_gain_type = global_gain_type_lookup_dict[
-                    (
-                        vbox_key._belongsto["src_gids"],
-                        vbox_key._belongsto["target_gids"],
-                    )
-                ]
-                applied_global_gain_value = global_gain_values[global_gain_type]
-
-                # 2. Multiply global by single synapse gain to get total
-                single_simulation_data["net"].connectivity[conn_idx]["nc_dict"][
-                    "gain"
-                ] = (
-                    1
-                    + (applied_global_gain_value - 1)
-                    + (vbox_key.children[2].children[0].value - 1)
-                )
-
-    # Update cell params
-    update_functions = {
-        "L2 Geometry": _update_L2_geometry_cell_params,
-        "L5 Geometry": _update_L5_geometry_cell_params,
-        "Synapses": _update_synapse_cell_params,
-        "L2 Pyramidal_Biophysics": _update_L2_biophysics_cell_params,
-        "L5 Pyramidal_Biophysics": _update_L5_biophysics_cell_params,
-    }
-
-    # Update cell params
-    for vbox_key, cell_param_list in cell_params_vboxes.items():
-        for key, update_function in update_functions.items():
-            if key in vbox_key:
-                cell_type = vbox_key.split()[0]
-                update_function(
-                    single_simulation_data["net"], cell_type, cell_param_list.children
-                )
-                break  # update needed only once per vbox_key
-
-    for cell_type in single_simulation_data["net"].cell_types.keys():
-        single_simulation_data["net"].cell_types[cell_type][
-            "cell_object"
-        ]._update_end_pts()
-        single_simulation_data["net"].cell_types[cell_type][
-            "cell_object"
-        ]._compute_section_mechs()
-
-    if add_drive is False:
-        return
-    # add drives to network
-    for drive in drive_widgets:
-        if drive["type"] in ("Tonic"):
-            weights_amplitudes = _drive_widget_to_dict(drive, "amplitude")
-            single_simulation_data["net"].add_tonic_bias(
-                bias_name=drive["name"],
-                amplitude=weights_amplitudes,
-                t0=drive["t0"].value,
-                tstop=drive["tstop"].value,
-            )
-        else:
-            sync_inputs_kwargs = dict(
-                n_drive_cells=(
-                    "n_cells"
-                    if drive["is_cell_specific"].value
-                    else drive["n_drive_cells"].value
-                ),
-                cell_specific=drive["is_cell_specific"].value,
-            )
-
-            weights_ampa = _drive_widget_to_dict(drive, "weights_ampa")
-            weights_nmda = _drive_widget_to_dict(drive, "weights_nmda")
-            synaptic_delays = _drive_widget_to_dict(drive, "delays")
-            logger.info(f"drive type is {drive['type']}, location={drive['location']}")
-            if drive["type"] == "Poisson":
-                rate_constant = _drive_widget_to_dict(drive, "rate_constant")
-
-                single_simulation_data["net"].add_poisson_drive(
-                    name=drive["name"],
-                    tstart=drive["tstart"].value,
-                    tstop=drive["tstop"].value,
-                    rate_constant=rate_constant,
-                    location=drive["location"],
-                    weights_ampa=weights_ampa,
-                    weights_nmda=weights_nmda,
-                    synaptic_delays=synaptic_delays,
-                    space_constant=100.0,
-                    event_seed=drive["seedcore"].value,
-                    **sync_inputs_kwargs,
-                )
-            elif drive["type"] in ("Evoked", "Gaussian"):
-                single_simulation_data["net"].add_evoked_drive(
-                    name=drive["name"],
-                    mu=drive["mu"].value,
-                    sigma=drive["sigma"].value,
-                    numspikes=drive["numspikes"].value,
-                    location=drive["location"],
-                    weights_ampa=weights_ampa,
-                    weights_nmda=weights_nmda,
-                    synaptic_delays=synaptic_delays,
-                    space_constant=3.0,
-                    event_seed=drive["seedcore"].value,
-                    **sync_inputs_kwargs,
-                )
-            elif drive["type"] in ("Rhythmic", "Bursty"):
-                single_simulation_data["net"].add_bursty_drive(
-                    name=drive["name"],
-                    tstart=drive["tstart"].value,
-                    tstart_std=drive["tstart_std"].value,
-                    tstop=drive["tstop"].value,
-                    location=drive["location"],
-                    burst_rate=drive["burst_rate"].value,
-                    burst_std=drive["burst_std"].value,
-                    numspikes=drive["numspikes"].value,
-                    weights_ampa=weights_ampa,
-                    weights_nmda=weights_nmda,
-                    synaptic_delays=synaptic_delays,
-                    event_seed=drive["seedcore"].value,
-                    **sync_inputs_kwargs,
-                )
-
-
 def run_button_clicked(
     widget_simulation_name,
     log_out,
     drive_widgets,
-    all_data,
+    simulation_data,
     dt,
     tstop,
     fig_default_params,
@@ -4895,13 +4709,11 @@ def run_button_clicked(
     global_gain_textfields,
 ):
     """Run the simulation and plot outputs."""
-    simulation_data = all_data["simulation_data"]
+    # simulation_data = data_store.run_simulations()
     with log_out:
         try:
             # clear empty trash simulations
-            for _name in tuple(simulation_data.keys()):
-                if len(simulation_data[_name]["dpls"]) == 0:
-                    del simulation_data[_name]
+            clear_empty_trash_simualtions(simulation_data)
 
             _sim_name = widget_simulation_name.value
             if (
@@ -4988,7 +4800,9 @@ def run_button_clicked(
                     fig_name, ax_name, _sim_name, plot_type, {}, "plot"
                 )
 
-        except Exception:
+        except Exception as e:
+            print(e)
+            traceback.print_exc()
             simulation_status_bar.value = simulation_status_contents["failed"]
             logger.error(traceback.format_exc())
             return
@@ -5009,206 +4823,10 @@ def _update_cell_params_vbox(
         with cell_type_out:
             display(cell_parameters_list[cell_parameters_key])
 
-
-def _update_L2_geometry_cell_params(net, cell_param_key, param_list):
-    cell_params = param_list
-    cell_type = f"{cell_param_key.split('_')[0]}_pyramidal"
-
-    sections = net.cell_types[cell_type]["cell_object"].sections
-    # Soma
-    sections["soma"]._L = cell_params[0].value
-    sections["soma"]._diam = cell_params[1].value
-    sections["soma"]._cm = cell_params[2].value
-    sections["soma"]._Ra = cell_params[3].value
-
-    # Dendrite common parameters
-    dendrite_cm = cell_params[4].value
-    dendrite_Ra = cell_params[5].value
-
-    dendrite_sections = [name for name in sections.keys() if name != "soma"]
-
-    param_indices = [(6, 7), (8, 9), (10, 11), (12, 13), (14, 15), (16, 17), (18, 19)]
-
-    # Dendrite
-    for section, indices in zip(dendrite_sections, param_indices):
-        sections[section]._L = cell_params[indices[0]].value
-        sections[section]._diam = cell_params[indices[1]].value
-        sections[section]._cm = dendrite_cm
-        sections[section]._Ra = dendrite_Ra
-
-
-def _update_L5_geometry_cell_params(net, cell_param_key, param_list):
-    cell_params = param_list
-    cell_type = f"{cell_param_key.split('_')[0]}_pyramidal"
-
-    sections = net.cell_types[cell_type]["cell_object"].sections
-    # Soma
-    sections["soma"]._L = cell_params[0].value
-    sections["soma"]._diam = cell_params[1].value
-    sections["soma"]._cm = cell_params[2].value
-    sections["soma"]._Ra = cell_params[3].value
-
-    # Dendrite common parameters
-    dendrite_cm = cell_params[4].value
-    dendrite_Ra = cell_params[5].value
-
-    dendrite_sections = [name for name in sections.keys() if name != "soma"]
-
-    param_indices = [
-        (6, 7),
-        (8, 9),
-        (10, 11),
-        (12, 13),
-        (14, 15),
-        (16, 17),
-        (18, 19),
-        (20, 21),
-    ]
-
-    # Dentrite
-    for section, indices in zip(dendrite_sections, param_indices):
-        sections[section]._L = cell_params[indices[0]].value
-        sections[section]._diam = cell_params[indices[1]].value
-        sections[section]._cm = dendrite_cm
-        sections[section]._Ra = dendrite_Ra
-
-
-def _update_synapse_cell_params(net, cell_param_key, param_list):
-    cell_params = param_list
-    cell_type = f"{cell_param_key.split('_')[0]}_pyramidal"
-    network_synapses = net.cell_types[cell_type]["cell_object"].synapses
-    synapse_sections = ["ampa", "nmda", "gabaa", "gabab"]
-
-    param_indices = [(0, 1, 2), (3, 4, 5), (6, 7, 8), (9, 10, 11)]
-
-    # Update Dendrite
-    for section, indices in zip(synapse_sections, param_indices):
-        network_synapses[section]["e"] = cell_params[indices[0]].value
-        network_synapses[section]["tau1"] = cell_params[indices[1]].value
-        network_synapses[section]["tau2"] = cell_params[indices[2]].value
-
-
-def _update_L2_biophysics_cell_params(net, cell_param_key, param_list):
-    cell_type = f"{cell_param_key.split('_')[0]}_pyramidal"
-    sections = net.cell_types[cell_type]["cell_object"].sections
-    # Soma
-    mechs_params = {
-        "hh2": {
-            "gkbar_hh2": param_list[0].value,
-            "gnabar_hh2": param_list[1].value,
-            "el_hh2": param_list[2].value,
-            "gl_hh2": param_list[3].value,
-        },
-        "km": {"gbar_km": param_list[4].value},
-    }
-
-    sections["soma"].mechs.update(mechs_params)
-
-    # dendrites
-    mechs_params["hh2"] = {
-        "gkbar_hh2": param_list[5].value,
-        "gnabar_hh2": param_list[6].value,
-        "el_hh2": param_list[7].value,
-        "gl_hh2": param_list[8].value,
-    }
-    mechs_params["km"] = {"gbar_km": param_list[9].value}
-
-    update_common_dendrite_sections(sections, mechs_params)
-
-
-def _update_L5_biophysics_cell_params(net, cell_param_key, param_list):
-    cell_type = f"{cell_param_key.split('_')[0]}_pyramidal"
-    sections = net.cell_types[cell_type]["cell_object"].sections
-    # Soma
-    mechs_params = {
-        "hh2": {
-            "gkbar_hh2": param_list[0].value,
-            "gnabar_hh2": param_list[1].value,
-            "el_hh2": param_list[2].value,
-            "gl_hh2": param_list[3].value,
-        },
-        "ca": {"gbar_ca": param_list[4].value},
-        "cad": {"taur_cad": param_list[5].value},
-        "kca": {"gbar_kca": param_list[6].value},
-        "km": {"gbar_km": param_list[7].value},
-        "cat": {"gbar_cat": param_list[8].value},
-        "ar": {"gbar_ar": param_list[9].value},
-    }
-
-    sections["soma"].mechs.update(mechs_params)
-
-    # dendrites
-    mechs_params["hh2"] = {
-        "gkbar_hh2": param_list[10].value,
-        "gnabar_hh2": param_list[11].value,
-        "el_hh2": param_list[12].value,
-        "gl_hh2": param_list[13].value,
-    }
-
-    mechs_params["ca"] = {"gbar_ca": param_list[14].value}
-    mechs_params["cad"] = {"taur_cad": param_list[15].value}
-    mechs_params["kca"] = {"gbar_kca": param_list[16].value}
-    mechs_params["km"] = {"gbar_km": param_list[17].value}
-    mechs_params["cat"] = {"gbar_cat": param_list[18].value}
-    mechs_params["ar"] = {
-        "gbar_ar": partial(
-            _exp_g_at_dist, gbar_at_zero=param_list[19].value, exp_term=3e-3, offset=0.0
-        )
-    }
-
-    update_common_dendrite_sections(sections, mechs_params)
-
-
 def update_common_dendrite_sections(sections, mechs_params):
     dendrite_sections = [name for name in sections.keys() if name != "soma"]
     for section in dendrite_sections:
         sections[section].mechs.update(deepcopy(mechs_params))
-
-
-def _serialize_simulation(log_out, sim_data, simulation_list_widget):
-    # Only download if there is at least one simulation
-    sim_name = simulation_list_widget.value
-
-    with log_out:
-        return serialize_simulation(sim_data, sim_name)
-
-
-def serialize_simulation(simulations_data, simulation_name):
-    """Serializes simulation data to CSV.
-
-    Creates a single CSV file or a ZIP file containing multiple CSVs,
-    depending on the number of trials in the simulation.
-
-    """
-    simulation_data = simulations_data["simulation_data"]
-    csv_trials_output = []
-    # CSV file headers
-    headers = "times,agg,L2,L5"
-    fmt = "%f, %f, %f, %f"
-
-    for dpl_trial in simulation_data[simulation_name]["dpls"]:
-        # Combine all data columns at once
-        signals_matrix = np.column_stack(
-            (
-                dpl_trial.times,
-                dpl_trial.data["agg"],
-                dpl_trial.data["L2"],
-                dpl_trial.data["L5"],
-            )
-        )
-
-        # Using StringIO to collect CSV data
-        with io.StringIO() as output:
-            np.savetxt(output, signals_matrix, delimiter=",", header=headers, fmt=fmt)
-            csv_trials_output.append(output.getvalue())
-
-    if len(csv_trials_output) == 1:
-        # Return a single csv file
-        return csv_trials_output[0], ".csv"
-    else:
-        # Create zip file
-        return _create_zip(csv_trials_output, simulation_name), ".zip"
-
 
 def _serialize_config(log_out, sim_data, simulation_list_widget):
     # Only download if there is at least one simulation
@@ -5217,27 +4835,12 @@ def _serialize_config(log_out, sim_data, simulation_list_widget):
     with log_out:
         return serialize_config(sim_data, sim_name)
 
+def _serialize_simulation(log_out, sim_data, simulation_list_widget):
+    # Only download if there is at least one simulation
+    sim_name = simulation_list_widget.value
 
-def serialize_config(simulations_data, simulation_name):
-    """Serializes Network configuration data to json."""
-
-    # Get network from data dictionary
-    net = simulations_data["simulation_data"][simulation_name]["net"]
-
-    # Write to buffer
-    with io.StringIO() as output:
-        write_network_configuration(net, output)
-        return output.getvalue()
-
-
-def _create_zip(csv_data_list, simulation_name):
-    # Zip all files and keep it in memory
-    with io.BytesIO() as zip_buffer:
-        with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zf:
-            for index, csv_data in enumerate(csv_data_list):
-                zf.writestr(f"{simulation_name}_{index + 1}.csv", csv_data)
-        zip_buffer.seek(0)
-        return zip_buffer.read()
+    with log_out:
+        return serialize_simulation(sim_data, sim_name)
 
 
 def handle_backend_change(backend_type, backend_config, mpi_cmd, n_jobs):
@@ -5835,12 +5438,11 @@ def run_opt_button_clicked(
     widget_simulation_name,
     log_out,
     opt_drive_widgets,
-    all_data,
+    simulation_data,
+    loaded_simulations,
     dt,
     tstop,
     fig_default_params,
-    widget_default_smoothing,
-    widget_default_scaling,
     widget_min_frequency,
     widget_max_frequency,
     backend_selection,
@@ -5902,7 +5504,8 @@ def run_opt_button_clicked(
         try:
             # Sim data setup (and related input validation)
             # --------------------------------------------------------------------------
-            simulation_data = all_data["simulation_data"]
+
+            clear_empty_trash_simualtions(simulation_data)
 
             # clear empty trash simulations
             #
@@ -5910,9 +5513,9 @@ def run_opt_button_clicked(
             # all a user does is load an external dipole data file. However, I do not
             # fully understand how VizManager et al. manages the simulation data (I find
             # it very confusing) so I am NOT touching it.
-            for _name in tuple(simulation_data.keys()):
-                if len(simulation_data[_name]["dpls"]) == 0:
-                    del simulation_data[_name]
+            # for _name in tuple(simulation_data.keys()):
+            #     if len(simulation_data[_name]["dpls"]) == 0:
+            #         del simulation_data[_name]
 
             _sim_name = widget_simulation_name.value
 
@@ -5957,9 +5560,14 @@ def run_opt_button_clicked(
                 else:
                     # Extract the actual target data Like everywhere else in the GUI, we
                     # only support usage of single-trial dipole data.
-                    target_dipole = average_dipoles(
-                        simulation_data[opt_rmse_target_data_name]["dpls"]
-                    )
+                    sim_data = simulation_data.get(
+                        opt_rmse_target_data_name
+                    ) or loaded_simulations.get(opt_rmse_target_data_name)
+
+                    if not sim_data:
+                        raise RuntimeError(f"The {sim_data} value is invalid.")
+
+                    target_dipole = average_dipoles(sim_data["dpls"])
             # Input validation
             # --------------------------------------------------------------------------
             # First, let's make a Network of the current state of the GUI, and call it
@@ -6278,7 +5886,7 @@ def run_opt_button_clicked(
             # optimization run
 
             # Return both the optimized config and the optimizer results
-            optimized_config = serialize_config(all_data, new_name)
+            optimized_config = serialize_config(simulation_data, new_name)
             opt_result = {
                 "initial_params": optim.initial_params,
                 "opt_params": optim.opt_params_,
@@ -6301,7 +5909,9 @@ def run_opt_button_clicked(
                 opt_result["psd_relative_bandpower"] = psd_relative_bandpower
             return optimized_config, opt_result
 
-        except Exception:
+        except Exception as e:
+            print(repr(e))
+            traceback.print_exc()
             simulation_status_bar.value = simulation_status_contents["failed"]
             logger.error(traceback.format_exc())
             return
