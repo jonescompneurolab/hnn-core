@@ -240,7 +240,7 @@ def test_dipole_visualization(setup_net):
         plot_psd([dpls[0], dpl_sfreq])
 
     # pytest deprecation warning for tmin and tmax
-    with pytest.deprecated_call():
+    with pytest.warns(FutureWarning, match="tmin and tmax are deprecated"):
         plot_dipole(dpls[0], show=False, tmin=10, tmax=100)
 
     # test cell response plotting

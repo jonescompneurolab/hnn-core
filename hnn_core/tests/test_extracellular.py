@@ -335,7 +335,7 @@ def test_extracellular_viz():
     net.add_electrode_array("arr1", electrode_pos)
     _ = simulate_dipole(net, tstop=5, n_trials=1)
 
-    with pytest.deprecated_call():
+    with pytest.warns(FutureWarning, match="tmin and tmax are deprecated"):
         net.rec_arrays["arr1"].plot_lfp(show=False, tmin=10, tmax=100)
     with pytest.raises(
         RuntimeError,

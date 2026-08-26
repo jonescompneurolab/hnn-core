@@ -237,7 +237,7 @@ def plot_laminar_lfp(
                 "tmin and tmax are deprecated and will be "
                 "removed in future releases of hnn-core. Please"
                 "use matplotlib plt.xlim to set tmin and tmax.",
-                DeprecationWarning,
+                FutureWarning,
             )
 
         else:
@@ -390,7 +390,7 @@ def plot_dipole(
                         "removed in future releases of hnn-core. "
                         "Please use matplotlib plt.xlim to set tmin"
                         " and tmax.",
-                        DeprecationWarning,
+                        FutureWarning,
                     )
                 ax.set_xlim(left=tmin, right=tmax)
             else:

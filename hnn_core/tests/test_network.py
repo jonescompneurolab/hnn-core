@@ -732,7 +732,7 @@ def test_network_drives_legacy():
     )
 
     # Test deprecation warning of legacy mode
-    with pytest.warns(DeprecationWarning, match="Legacy mode"):
+    with pytest.warns(FutureWarning, match="Legacy mode"):
         _ = neymotin_2020_model(legacy_mode=True)
         _ = law_2021_model(legacy_mode=True)
         _ = calcium_model(legacy_mode=True)
@@ -1146,7 +1146,7 @@ def test_tonic_biases():
     # test adding single cell_type - amplitude (old API)
     with pytest.raises(ValueError, match=r"cell_type must be one of .*$"):
         with pytest.warns(
-            DeprecationWarning, match=r"cell_type argument will be deprecated"
+            FutureWarning, match=r"cell_type argument will be deprecated"
         ):
             net.add_tonic_bias(
                 cell_type="name_nonexistent", amplitude=1.0, t0=0.0, tstop=4.0
@@ -1156,7 +1156,7 @@ def test_tonic_biases():
         TypeError, match="amplitude must be an instance of float or int"
     ):
         with pytest.warns(
-            DeprecationWarning, match=r"cell_type argument will be deprecated"
+            FutureWarning, match=r"cell_type argument will be deprecated"
         ):
             net.add_tonic_bias(
                 cell_type="L5_pyramidal",
@@ -1167,7 +1167,7 @@ def test_tonic_biases():
 
     with pytest.raises(ValueError, match="Duration of tonic input cannot be negative"):
         with pytest.warns(
-            DeprecationWarning, match=r"cell_type argument will be deprecated"
+            FutureWarning, match=r"cell_type argument will be deprecated"
         ):
             net.add_tonic_bias(cell_type="L2_pyramidal", amplitude=1, t0=5.0, tstop=4.0)
             simulate_dipole(net, tstop=20.0)
@@ -1175,7 +1175,7 @@ def test_tonic_biases():
 
     with pytest.raises(ValueError, match="End time of tonic input cannot be negative"):
         with pytest.warns(
-            DeprecationWarning, match=r"cell_type argument will be deprecated"
+            FutureWarning, match=r"cell_type argument will be deprecated"
         ):
             net.add_tonic_bias(
                 cell_type="L2_pyramidal", amplitude=1.0, t0=5.0, tstop=-1.0
@@ -2096,9 +2096,7 @@ def test_verbose():
 
 
 def test_deprecated_jones_2009_model():
-    with pytest.warns(
-        DeprecationWarning, match="default model with `jones_2009_model`"
-    ):
+    with pytest.warns(FutureWarning, match="default model with `jones_2009_model`"):
         net = jones_2009_model(add_drives_from_params=True, mesh_shape=(3, 3))
 
     simulate_dipole(net, dt=0.5, tstop=20.0, verbose=True)

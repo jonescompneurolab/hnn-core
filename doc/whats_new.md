@@ -30,6 +30,9 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ### Deprecations
 
+- User-facing deprecation notices now emit `FutureWarning`, making them visible under
+  Python's default warning filters, in {gh}`1339`.
+
 ### New Features
 
 - Users can now specify their own custom objective function in two different ways:

@@ -468,7 +468,7 @@ class Network:
                 "Legacy mode is used solely to maintain compatibility with"
                 ".param files of the old HNN GUI. This feature will be "
                 "deprecrated in future releases.",
-                DeprecationWarning,
+                FutureWarning,
                 stacklevel=1,
             )
 
@@ -1577,7 +1577,7 @@ class Network:
                 "removed in future releases. Use amplitude as a "
                 "cell_type:str,amplitude:float dictionary."
                 "Read the function docustring for more information",
-                DeprecationWarning,
+                FutureWarning,
                 stacklevel=1,
             )
             _validate_type(amplitude, (float, int), "amplitude")

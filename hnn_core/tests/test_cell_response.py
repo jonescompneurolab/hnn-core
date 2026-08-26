@@ -46,7 +46,8 @@ def test_cell_response(tmp_path):
     cell_response.write(tmp_path / "spk_%d.txt")
 
     # Testing reading from txt files
-    assert cell_response == read_spikes(tmp_path / "spk_*.txt")
+    with pytest.warns(FutureWarning, match="Reading cell response"):
+        assert cell_response == read_spikes(tmp_path / "spk_*.txt")
 
     assert "CellResponse | 2 simulation trials" in repr(cell_response)
 
