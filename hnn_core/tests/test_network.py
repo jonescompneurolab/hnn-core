@@ -447,7 +447,6 @@ def test_network_models():
 
     # Check add_default_erp() and input arguments to neymotin_2020_model
     net_default = neymotin_2020_model()
-<<<<<<< HEAD
 
     net_params_str = neymotin_2020_model(params=str(params_fname))
     assert net_default == net_params_str
@@ -458,11 +457,6 @@ def test_network_models():
     net_params_none = neymotin_2020_model(params=None)
     assert net_default == net_params_none
 
-    with pytest.raises(TypeError, match="net must be"):
-        add_erp_drives_to_jones_model(net="invalid_input")
-    with pytest.raises(TypeError, match="tstart must be"):
-        add_erp_drives_to_jones_model(net=net_default, tstart="invalid_input")
-=======
     with pytest.warns(
         FutureWarning, match="add_erp_drives_to_jones_model is deprecated"
     ):
@@ -470,7 +464,6 @@ def test_network_models():
             add_erp_drives_to_jones_model(net="invalid_input")
         with pytest.raises(TypeError, match="tstart must be"):
             add_erp_drives_to_jones_model(net=net_default, tstart="invalid_input")
->>>>>>> befad4e3 (ENH add load_erp_drives to neymotin_2020_model)
     n_conn = len(net_default.connectivity)
     for cell_name in ["L5_pyramidal", "L2_pyramidal"]:
         assert len(net_default.pos_dict[cell_name]) == 100
