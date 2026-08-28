@@ -8,6 +8,7 @@ import warnings
 
 import hnn_core
 from hnn_core import read_params
+from .drives import _load_erp_drives
 from .network import Network, _create_cell_coords
 from .params import _short_name
 from .cells_default import (
@@ -164,6 +165,7 @@ def _validate_params_for_model(
 def neymotin_2020_model(
     params=None,
     add_drives_from_params=False,
+    load_erp_drives=False,
     legacy_mode=False,
     mesh_shape=(10, 10),
 ):
@@ -179,6 +181,11 @@ def neymotin_2020_model(
         If True, add drives as defined in the params-dict. NB this is mainly
         for backward-compatibility with HNN GUI, and will be deprecated in a
         future release. Default: False
+    load_erp_drives : bool
+        If True, add the canonical ERP drives used to reproduce the default
+        event-related potential (ERP) behavior. Drives are loaded from the
+        packaged ``neymotin2020_erp_drives.json`` configuration file. This is
+        the recommended way to add default ERP drives. Default: False
     legacy_mode : bool
         Set to False by default. Enables matching HNN GUI output when drives
         are added suitably. Will be deprecated in a future release.
@@ -215,6 +222,11 @@ def neymotin_2020_model(
            MEG/EEG Data." eLife 9 (January):e51214. https://doi.org/10.7554/eLife.51214
 
     """
+    if load_erp_drives and add_drives_from_params:
+        raise ValueError(
+            "Cannot set both load_erp_drives=True and add_drives_from_params=True."
+        )
+
     hnn_core_root = Path(hnn_core.__file__).parent
     if params is None:
         params_fname = hnn_core_root / "param" / "default.json"
@@ -386,6 +398,9 @@ def neymotin_2020_model(
     loc = "soma"
     receptor = "ampa"
     net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+
+    if load_erp_drives:
+        _load_erp_drives(net)
 
     return net
 
@@ -949,7 +964,16 @@ def add_erp_drives_to_jones_model(net, tstart=0.0):
     The first proximal input arrives at cortex ~20 ms after sensory
     stimulus. The exact delay depends random number generator due to
     random sampling of times from a gaussian.
+
+    .. deprecated:: 0.6.2
+        Use ``neymotin_2020_model(..., load_erp_drives=True)`` instead.
     """
+    warnings.warn(
+        "add_erp_drives_to_jones_model is deprecated and will be removed in a "
+        "future release. Use neymotin_2020_model(..., load_erp_drives=True) "
+        "instead.",
+        FutureWarning,
+    )
     _validate_type(net, Network, "net", "Network")
     _validate_type(tstart, (float, int), "tstart", "float or int")
 
