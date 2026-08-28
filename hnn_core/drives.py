@@ -4,11 +4,20 @@
 #          Sam Neymotin <samnemo@gmail.com>
 #          Christopher Bailey <bailey.cj@gmail.com>
 
+import json
+from pathlib import Path
+
+import hnn_core
 import numpy as np
 
 from .params import (
     _extract_bias_specs_from_hnn_params,
     _extract_drive_specs_from_hnn_params,
+)
+
+CANONICAL_ERP_DRIVE_NAMES = ("evdist1", "evprox1", "evprox2")
+DEFAULT_ERP_DRIVES_FNAME = (
+    Path(hnn_core.__file__).parent / "param" / "neymotin2020_erp_drives.json"
 )
 
 
@@ -515,3 +524,36 @@ def _create_bursty_input(
         t_array = np.ravel([t_array + cycle_events_isi * cyc for cyc in cycle])
 
     return t_array
+
+
+def _load_erp_drives(net, fname=None):
+    """Load canonical ERP drives from a hierarchical JSON file.
+
+    Parameters
+    ----------
+    net : instance of Network
+        Network object that will be updated with ERP drives in place.
+    fname : str | Path | None
+        Path to a JSON file containing canonical ERP drive definitions.
+        If None (default), loads from the packaged
+        ``neymotin2020_erp_drives.json`` file.
+    """
+    from .hnn_io import _read_external_drive
+
+    if fname is None:
+        fname = DEFAULT_ERP_DRIVES_FNAME
+    else:
+        fname = Path(fname)
+
+    with open(fname, "r") as file:
+        drive_data = json.load(file)
+
+    external_drives = drive_data.get("external_drives", drive_data)
+
+    for drive_name in CANONICAL_ERP_DRIVE_NAMES:
+        if drive_name not in external_drives:
+            raise ValueError(
+                f"ERP drive configuration is missing required drive "
+                f"'{drive_name}' in {fname}."
+            )
+        _read_external_drive(net, external_drives[drive_name], read_output=False)

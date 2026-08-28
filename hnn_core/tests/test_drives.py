@@ -9,13 +9,16 @@ import numpy as np
 import hnn_core
 from hnn_core import Network, read_params
 from hnn_core.drives import (
+    CANONICAL_ERP_DRIVE_NAMES,
+    DEFAULT_ERP_DRIVES_FNAME,
     _drive_cell_event_times,
     _get_prng,
     _create_extpois,
     _create_bursty_input,
+    _load_erp_drives,
 )
 from hnn_core.network import pick_connection
-from hnn_core.network_models import neymotin_2020_model
+from hnn_core.network_models import add_erp_drives_to_jones_model, neymotin_2020_model
 from hnn_core import simulate_dipole
 
 hnn_core_root = Path(hnn_core.__file__).parent
@@ -737,3 +740,71 @@ def test_add_poisson_drive(setup_net, rate_constant, cell_specific, n_drive_cell
     )
 
     simulate_dipole(net, tstop=5)
+
+
+def test_load_erp_drives_adds_canonical_drives():
+    """Test load_erp_drives adds the canonical ERP drives."""
+    net = neymotin_2020_model(mesh_shape=(3, 3), load_erp_drives=True)
+
+    assert list(net.external_drives.keys()) == list(CANONICAL_ERP_DRIVE_NAMES)
+    for drive_name in CANONICAL_ERP_DRIVE_NAMES:
+        assert net.external_drives[drive_name]["type"] == "evoked"
+
+
+def test_load_erp_drives_seeds_are_mesh_independent():
+    """Canonical ERP drive seeds should not depend on mesh shape."""
+    net_3x3 = neymotin_2020_model(mesh_shape=(3, 3), load_erp_drives=True)
+    net_10x10 = neymotin_2020_model(mesh_shape=(10, 10), load_erp_drives=True)
+
+    seeds_3x3 = {
+        name: net_3x3.external_drives[name]["event_seed"]
+        for name in CANONICAL_ERP_DRIVE_NAMES
+    }
+    seeds_10x10 = {
+        name: net_10x10.external_drives[name]["event_seed"]
+        for name in CANONICAL_ERP_DRIVE_NAMES
+    }
+    assert seeds_3x3 == seeds_10x10
+    assert seeds_3x3 == {"evdist1": 272, "evprox1": 507, "evprox2": 777}
+
+
+def test_load_erp_drives_matches_json_configuration():
+    """Test packaged JSON matches drives loaded via the public API."""
+    net_api = neymotin_2020_model(mesh_shape=(3, 3), load_erp_drives=True)
+    net_json = neymotin_2020_model(mesh_shape=(3, 3))
+    _load_erp_drives(net_json, fname=DEFAULT_ERP_DRIVES_FNAME)
+
+    for drive_name in CANONICAL_ERP_DRIVE_NAMES:
+        api_drive = net_api.external_drives[drive_name]
+        json_drive = net_json.external_drives[drive_name]
+        assert api_drive["event_seed"] == json_drive["event_seed"]
+        assert api_drive["dynamics"] == json_drive["dynamics"]
+        assert api_drive["weights_ampa"] == json_drive["weights_ampa"]
+        assert api_drive["weights_nmda"] == json_drive["weights_nmda"]
+
+
+def test_load_erp_drives_incompatible_with_add_drives_from_params():
+    """Test mutually exclusive drive-loading options raise."""
+    with pytest.raises(ValueError, match="Cannot set both"):
+        neymotin_2020_model(
+            load_erp_drives=True,
+            add_drives_from_params=True,
+            mesh_shape=(3, 3),
+        )
+
+
+def test_add_erp_drives_to_jones_model_deprecated():
+    """Deprecated helper should warn and still add ERP drives."""
+    net = neymotin_2020_model(mesh_shape=(3, 3))
+    with pytest.warns(
+        FutureWarning, match="add_erp_drives_to_jones_model is deprecated"
+    ):
+        add_erp_drives_to_jones_model(net)
+
+    assert list(net.external_drives.keys()) == list(CANONICAL_ERP_DRIVE_NAMES)
+
+
+def test_add_drives_from_params_deprecated():
+    """Deprecated params-based drive loading should warn."""
+    with pytest.warns(FutureWarning, match="add_drives_from_params=True is deprecated"):
+        neymotin_2020_model(add_drives_from_params=True, mesh_shape=(3, 3))
