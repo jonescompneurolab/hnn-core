@@ -165,9 +165,9 @@ def _validate_params_for_model(
 def neymotin_2020_model(
     params=None,
     add_drives_from_params=False,
-    load_erp_drives=False,
     legacy_mode=False,
     mesh_shape=(10, 10),
+    load_erp_drives=False,
 ):
     """Instantiate the network model described in Neymotin et al. 2020
 
@@ -181,16 +181,16 @@ def neymotin_2020_model(
         If True, add drives as defined in the params-dict. NB this is mainly
         for backward-compatibility with HNN GUI, and will be deprecated in a
         future release. Default: False
-    load_erp_drives : bool
-        If True, add the canonical ERP drives used to reproduce the default
-        event-related potential (ERP) behavior. Drives are loaded from the
-        packaged ``neymotin2020_erp_drives.json`` configuration file. This is
-        the recommended way to add default ERP drives. Default: False
     legacy_mode : bool
         Set to False by default. Enables matching HNN GUI output when drives
         are added suitably. Will be deprecated in a future release.
     mesh_shape : tuple of int (default: (10, 10))
         Defines the (n_x, n_y) shape of the grid of pyramidal cells.
+    load_erp_drives : bool
+        If True, add the canonical ERP drives used to reproduce the default
+        event-related potential (ERP) behavior. Drives are loaded from the
+        packaged ``neymotin2020_erp_drives.json`` configuration file. This is
+        the recommended way to add default ERP drives. Default: False
 
     Returns
     -------
