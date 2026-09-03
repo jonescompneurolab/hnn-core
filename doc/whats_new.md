@@ -357,7 +357,7 @@ here](https://github.com/jonescompneurolab/hnn-core/releases/tag/v0.6.0).
   simulation. This offers a large degree of control over both the data of the spike
   trains and how you want to connect them to your simulation. There is a [new example
   script
-  here](https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/plot_replaying_spike_data_as_input.html#sphx-glr-auto-examples-howto-plot-replaying-spike-data-as-input-py)
+  here](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/replaying_spike_data_as_input.html)
   which illustrates its use.
   By [Maira Usman][] in {gh}`1064`.
 
@@ -397,8 +397,8 @@ here](https://github.com/jonescompneurolab/hnn-core/releases/tag/v0.6.0).
   behavior by setting the `n_trials` parameter in
   {func}`~hnn_core.optimization.Optimizer.fit`. To capture the model's average behavior,
   it is recommended to set `n_trials` > 1, as using `n_trials=1` may identify parameters
-  that work well for one simulation run but perform poorly on average. The optimization
-  example (`examples/howto/optimize_evoked.py`) has also been enhanced with improved
+  that work well for one simulation run but perform poorly on average. The [optimization
+  example](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/optimize_simulated_evoked_response_parameters.html) has also been enhanced with improved
   markdown and updated contents to better illustrate best practices.
   By [Carolina Fernandez Pujol][] in {gh}`1057`.
 
@@ -621,16 +621,16 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 
 - `hnn_core` now includes a fully-tested and robust GUI of its own. The `hnn_core` GUI was present as a prototype in v0.3, but it is now ready for production. New features and visual improvements will still be coming to it in the future, such as the ability to use optimization. See our new [Install page](https://jonescompneurolab.github.io/hnn-core/dev/install.html) for ways to install it, and we have already begun incorporating it into a new, fresh series of tutorials for our upcoming revamp of the HNN website. If you have installed it, you can start the GUI using `hnn-gui` in your terminal/command prompt window.
 
-- The `BatchSimulate` class: Thanks to [Abdul Samad Siddiqui][] and Google Summer of Code 2024, there is now the capability to run "batches" of simulations across multiple parameter sets, enabling easy analysis and simulation of behavior across parameter sweeps. See our [example for more details](https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/plot_batch_simulate.html#sphx-glr-auto-examples-howto-plot-batch-simulate-py). Note that currently, only its `loky` backend is supported, and the `"hnn-core[parallel]"` dependencies must be installed for it to be used.
+- The `BatchSimulate` class: Thanks to [Abdul Samad Siddiqui][] and Google Summer of Code 2024, there is now the capability to run "batches" of simulations across multiple parameter sets, enabling easy analysis and simulation of behavior across parameter sweeps. See our [example for more details](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/batch_simulation.html). Note that currently, only its `loky` backend is supported, and the `"hnn-core[parallel]"` dependencies must be installed for it to be used.
 
-- Significant improvements to the API, documentation, and pedagogical examples [especially for Optimization](https://jonescompneurolab.github.io/hnn-core/stable/auto_examples/howto/optimize_evoked.html#sphx-glr-auto-examples-howto-optimize-evoked-py), among others.
+- Significant improvements to the API, documentation, and pedagogical examples [especially for Optimization](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/optimize_simulated_evoked_response_parameters.html), among others.
 
 - Calcium concentration can now be recorded: recorded calcium concentration from either the soma,
   or all sections, are enabled by setting `record_ca` to `soma` or `all` in
   {func}`~hnn_core.simulate_dipole`. Recordings are accessed through
   {class}`~hnn_core.CellResponse.ca`.
 
-- There is now a new class {class}`~hnn_core.viz.NetworkPlotter` which can be used to visualize an entire network in 3D, including firing animations; [see our example of how to use it here](https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/plot_hnn_animation.html#sphx-glr-auto-examples-howto-plot-hnn-animation-py).
+- There is now a new class {class}`~hnn_core.viz.NetworkPlotter` which can be used to visualize an entire network in 3D, including firing animations; [see our example of how to use it here](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/animating_hnn_simulations.html).
 
 - There is now a new function {func}`~hnn_core.viz.plot_drive_strength` for illustrating the absolute or relative amount of strength that a particular drive provides to different cell types.
 
@@ -652,7 +652,7 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 - New argument to {class}`~hnn_core.Network` initialization: you can now set `mesh_shape` to easily make a grid of different sizes of `Network`s.
 - {class}`~hnn_core.Cell` initialization argument `topology` has had both its name changed to `cell_tree` and its data type significantly changed; see [the API docs of `Cell` for details](https://jonescompneurolab.github.io/hnn-core/dev/generated/hnn_core.Cell.html#hnn_core.Cell).
 - {func}`~hnn_core.jones_2009_model` and other built-in Network Models including {func}`~hnn_core.law_2021_model` and {func}`~hnn_core.calcium_model` all accept the aforementioned `mesh_shape` argument like {class}`~hnn_core.Network`.
-- The API for optimization has changed significantly. Instead of running the function `optimize_evoked` obtained using `from hnn_core.optimization import optimize_evoked`, you should use the new {class}`~hnn_core.Optimizer` class and its methods; [see our example of evoked-response optimization here](https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/optimize_evoked.html#sphx-glr-auto-examples-howto-optimize-evoked-py).
+- The API for optimization has changed significantly. Instead of running the function `optimize_evoked` obtained using `from hnn_core.optimization import optimize_evoked`, you should use the new {class}`~hnn_core.Optimizer` class and its methods; [see our example of evoked-response optimization here](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/optimize_simulated_evoked_response_parameters.html).
 - {func}`~hnn_core.viz.plot_spikes_hist` now accepts more arguments, including `invert_spike_types`, `color`, and any `**kwargs_hist` which can be applied to `matplotlib.axes.Axes.hist`. See the docstring for details.
 - {func}`~hnn_core.viz.plot_spikes_raster` now accepts many more arguments, including `cell_types`, `colors`, `show_legend`, `marker_size`, `dpl`, and `overlay_dipoles`. See the docstring for details.
 - {func}`~hnn_core.viz.plot_cell_morphology` now accepts more arguments, including `color` and several arguments related to its position and viewing window, including `pos`, `xlim`, `ylim`, and `zlim`. See the docstring for details.
@@ -738,7 +738,7 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
   files to new json format, by [George Dang][] in {gh}`772`
 
 - Add
-  [`BatchSimulate`](https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/plot_batch_simulate.html#sphx-glr-auto-examples-howto-plot-batch-simulate-py)
+  [`BatchSimulate`](https://jonescompneurolab.github.io/hnn-core/stable/generated/hnn_core.batch_simulate.BatchSimulate.html#hnn_core.batch_simulate.BatchSimulate)
   class for batch simulation capability, by [Abdul Samad Siddiqui][]
   in {gh}`782`
 
@@ -752,7 +752,7 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
   {gh}`815`
 
 - Refactor and improve documentation for
-  [`BatchSimulate`](https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/plot_batch_simulate.html#sphx-glr-auto-examples-howto-plot-batch-simulate-py), by [Abdul Samad Siddiqui][]
+  [`BatchSimulate`](https://jonescompneurolab.github.io/hnn-core/stable/generated/hnn_core.batch_simulate.BatchSimulate.html#hnn_core.batch_simulate.BatchSimulate), including a [tutorial](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/batch_simulation.html) by [Abdul Samad Siddiqui][]
   in {gh}`830` and {gh}`857`
 
 - Add argument to change colors of `plot_spikes_raster`, shortened line lengths to
@@ -1179,16 +1179,13 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 
 ## Notable Changes
 
-- Local field potentials can now be recorded during simulations {ref}`[Example]
-  <sphx_glr_auto_examples_howto_plot_record_extracellular_potentials.py>`
+- Local field potentials can now be recorded during simulations [Example](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/record_and_plot_extracellular_potentials.html)
 
-- Ability to optimize parameters to reproduce event related potentials from real data
-  {ref}`[Example] <sphx_glr_auto_examples_howto_optimize_evoked.py>`
+- Ability to optimize parameters to reproduce event related potentials from real data [Example](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/optimize_simulated_evoked_response_parameters.html)
 
 - Published models using HNN were added and can be loaded via dedicated functions
 
-- Several improvements enabling easy modification of connectivity and cell properties
-  {ref}`[Example] <sphx_glr_auto_examples_howto_plot_connectivity.py>`
+- Several improvements enabling easy modification of connectivity and cell properties [Example](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/modifying_local_connectivity.html)
 
 - Improved visualization including spectral analysis, connectivity, and cell morphology
 
