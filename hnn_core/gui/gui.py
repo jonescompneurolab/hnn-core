@@ -14,7 +14,6 @@ import textwrap
 import urllib.parse
 import urllib.request
 import zipfile
-from collections import defaultdict
 from copy import deepcopy
 from datetime import datetime
 from functools import partial
@@ -52,7 +51,9 @@ from hnn_core import JoblibBackend, MPIBackend, simulate_dipole
 from hnn_core.cells_default import _exp_g_at_dist
 from hnn_core.dipole import _read_dipole_txt, average_dipoles
 from hnn_core.gui._logging import logger
-from hnn_core.gui._viz_manager import _idx2figname, _VizManager
+from hnn_core.gui._data_store import data_store
+
+from hnn_core.gui._viz_manager import _idx2figname, _VizManager, UiAction
 from hnn_core.hnn_io import dict_to_network, write_network_configuration
 from hnn_core.network import pick_connection, _check_global_synaptic_gains_uniformity
 from hnn_core.optimization import Optimizer, generate_opt_history_table
@@ -64,6 +65,7 @@ from hnn_core.parallel_backends import (
 from hnn_core.params_default import get_L2Pyr_params_default, get_L5Pyr_params_default
 
 from ..externals.mne import _validate_type
+
 
 hnn_core_root = Path(hnn_core.__file__).parent
 default_network_configuration = hnn_core_root / "param" / "neymotin2020_base.json"
@@ -187,8 +189,13 @@ global_gain_type_lookup_dict = {
 }
 
 
+def _status_box_html(css_class, message):
+    return f"<div class='sim-status-box {css_class}'>{message}</div>"
+
+
 class _OutputWidgetHandler(logging.Handler):
     def __init__(self, output_widget, *args, **kwargs):
+        data_store.reset()
         super(_OutputWidgetHandler, self).__init__(*args, **kwargs)
         self.out = output_widget
 
@@ -639,64 +646,28 @@ class HNNGUI:
         # We directly set up the html for the status bar below.
         #   - child of status-bar
         #   - associated html class: sim-status-box
-        # Note: This dict is referenced in _init_ui_components and run_button_clicked:
-        self._simulation_status_contents = {
-            "not_running": """
-                <div
-                class='sim-status-box'
-                style='
-                    background:var(--acs-friendly-background);
-                    padding-left:10px;
-                    color:white;
-                '>
-                    Not running
-                </div>
-            """,
-            "running": """
-                <div
-                class='sim-status-box status-running'
-                style='
-                    background:var(--statusbar-running);
-                    padding-left:10px;
-                    color:black;
-                '>
-                    Running...
-                </div>
-            """,
-            "opt_running": """
-                <div
-                class='sim-status-box status-running'
-                style='
-                    background:var(--statusbar-running);
-                    padding-left:10px;
-                    color:white;
-                '>
-                    Optimization Running, please be patient...
-                </div>
-            """,
-            "finished": """
-                <div
-                class='sim-status-box'
-                style='
-                    background:var(--gentle-green);
-                    padding-left:10px;
-                    color:black;
-                '>
-                    Simulation finished
-                </div>
-            """,
-            "failed": """
-                <div
-                class='sim-status-box'
-                style='
-                    background:var(--gentle-red);
-                    padding-left:10px;
-                    color:black;
-                '>
-                    Simulation failed
-                </div>
-            """,
+        #
+        # Refactor 9/2/2026
+        # _status_box_config maps a status-bar key to both a CSS class defined in 'gui_styles.css'
+        # and to a display message (i.e. .sim-status-box.status-*).
+        # this dict is referenced in _init_ui_components and run_button_clicked.
+        _STATUS_BOX_CONFIG = {
+            "not_running": ("status-not-running", "Not running"),
+            "running": ("status-running", "Running..."),
+            "opt_running": (
+                "status-opt-running",
+                "Optimization Running, please be patient...",
+            ),
+            "finished": ("status-finished", "Simulation finished"),
+            "simulation_failed": ("status-failed", "Simulation failed"),
+            "loading_failed": ("status-failed", "Loading data failed"),
+            "warning": ("status-warning", "Operation Warning"),
+            "loaded": ("status-finished", "Experimental Data Loaded"),
         }
+
+        self._simulation_status_contents = {}
+        for key, (css_class, message) in _STATUS_BOX_CONFIG.items():
+            self._simulation_status_contents[key] = _status_box_html(css_class, message)
 
         # ----------------------------------------------------------------------
         # Set up the GUI widgets and their contents
@@ -709,9 +680,6 @@ class HNNGUI:
             use_hwthreading_if_found=False,
             sensible_default_cores=True,
         )
-
-        # In-memory storage of all simulation and visualization related data
-        self.simulation_data = defaultdict(lambda: dict(net=None, dpls=list()))
 
         # ==================================================
         # Simulation tab
@@ -809,7 +777,7 @@ class HNNGUI:
 
         # simulation tab buttons
         # --------------------------------------------------
-        self.load_data_button = FileUpload(
+        self.load_experimental_data_button = FileUpload(
             accept=".txt,.csv",
             multiple=False,
             style={"button_color": self.layout["theme_color"]},
@@ -1121,8 +1089,7 @@ class HNNGUI:
         self._opt_drives_out = Output().add_class("opt-drives-accordion-widgets")
 
         self._log_out = Output()
-
-        self.viz_manager = _VizManager(self.data, self.layout, self.fig_default_params)
+        self.viz_manager = _VizManager(self.layout, self.fig_default_params)
 
         # detailed configuration of backends
         self._backend_config_out = Output().add_class("backend-config-out")
@@ -1242,7 +1209,7 @@ class HNNGUI:
                     </div>
                 </div>
             """,
-            description="AES TODO",
+            description="HNN GUI Header",
         )
         self._header.add_class("hide-label")
 
@@ -1258,11 +1225,6 @@ class HNNGUI:
             "current_sim_name": self.widget_simulation_name.value,
         }
 
-    @property
-    def data(self):
-        """Provides easy access to simulation-related data."""
-        return {"simulation_data": self.simulation_data}
-
     @staticmethod
     def load_parameters(params_fname):
         """Read parameters from file."""
@@ -1274,7 +1236,7 @@ class HNNGUI:
     def _link_callbacks(self):
         """Link callbacks to UI components."""
 
-        def _handle_backend_change(backend_type):
+        def _handle_backend_change_cb(backend_type):
             return handle_backend_change(
                 backend_type.new,
                 self._backend_config_out,
@@ -1282,7 +1244,7 @@ class HNNGUI:
                 self.widget_n_jobs,
             )
 
-        def _add_drive_button_clicked(b):
+        def _add_drive_button_clicked_cb(b):
             location = self.widget_location_selection.value.lower()
             output = self.add_drive_tab_drive_widget(
                 self.widget_drive_type_selection.value,
@@ -1296,7 +1258,7 @@ class HNNGUI:
             )
             return output
 
-        def _delete_drives_clicked(b):
+        def _delete_drives_clicked_cb(b):
             self._drives_out.clear_output()
             self._opt_drives_out.clear_output()
             # black magic: the following does not work
@@ -1310,28 +1272,39 @@ class HNNGUI:
             while len(self.opt_drive_boxes) > 0:
                 self.opt_drive_boxes.pop()
 
-        def _on_upload_connectivity(change):
+        def _on_upload_connectivity_cb(change):
             new_params = self.on_upload_params_change(
                 change, self.layout["drive_textbox"], load_type="connectivity"
             )
             self.params = new_params
 
-        def _on_upload_drives(change):
+        def _on_upload_drives_cb(change):
             _ = self.on_upload_params_change(
                 change, self.layout["drive_textbox"], load_type="drives"
             )
 
-        def _on_upload_data(change):
-            return on_upload_data_change(
-                change, self.data, self.viz_manager, self._log_out
-            )
+        def _on_upload_experimental_data_cb(change):
+            ## this function should get data and  take care of the state of the widgets
+            # Check state of the widget
+            if not change["owner"].value:
+                return
+            try:
+                self._on_upload_experimental_data(data_dict=change["new"][0])
+            except Exception:
+                self._simulation_status_bar.value = self._simulation_status_contents[
+                    "loading_failed"
+                ]
+                logger.error(traceback.format_exc())
+                return
+            finally:
+                # Reset the load file widget
+                change["owner"].value = []
 
-        def _run_button_clicked(b):
+        def _run_button_clicked_cb(b):
             return run_button_clicked(
                 self.widget_simulation_name,
                 self._log_out,
                 self.drive_widgets,
-                self.data,
                 self.widget_dt,
                 self.widget_tstop,
                 self.fig_default_params,
@@ -1353,17 +1326,14 @@ class HNNGUI:
                 self.global_gain_widgets,
             )
 
-        def _run_opt_button_clicked(b):
+        def _run_opt_button_clicked_cb(b):
             result = run_opt_button_clicked(
                 self.widget_simulation_name,
                 self._log_out,
                 self.opt_drive_widgets,
-                self.data,
                 self.widget_dt,
                 self.widget_tstop,
                 self.fig_default_params,
-                self.widget_default_smoothing,
-                self.widget_default_scaling,
                 self.widget_min_frequency,
                 self.widget_max_frequency,
                 self.widget_backend_selection,
@@ -1385,6 +1355,7 @@ class HNNGUI:
                 self.widget_opt_scaling.value,
                 self.opt_target_widgets,
                 self.opt_solver_widgets,
+                self.opt_target_widgets["target_dipole_data"],
             )
             # Re-load our NEW, optimized drive parameters after an optimization run:
             if result:
@@ -1399,10 +1370,10 @@ class HNNGUI:
                 self._update_opt_history_button()
             return
 
-        def _simulation_list_change(value):
+        def _simulation_list_change_cb(value):
             # Simulation Data
             _simulation_data, file_extension = _serialize_simulation(
-                self._log_out, self.data, self.simulation_list_widget
+                self._log_out, data_store.simulated_data, self.simulation_list_widget
             )
 
             self.simulation_list_widget.disabled = False
@@ -1430,7 +1401,7 @@ class HNNGUI:
 
             # Network Configuration
             network_config = _serialize_config(
-                self._log_out, self.data, self.simulation_list_widget
+                self._log_out, data_store.simulated_data, self.simulation_list_widget
             )
             b64_net = base64.b64encode(network_config.encode())
 
@@ -1447,12 +1418,12 @@ class HNNGUI:
                 mimetype="application/json",
             )
 
-        def _driver_type_change(value):
+        def _driver_type_change_cb(value):
             self.widget_location_selection.disabled = (
                 True if value.new == "Tonic" else False
             )
 
-        def _cell_type_radio_change(value):
+        def _cell_type_radio_change_cb(value):
             _update_cell_params_vbox(
                 self._cell_params_out,
                 self.cell_parameters_widgets,
@@ -1460,7 +1431,7 @@ class HNNGUI:
                 self.cell_layer_radio_buttons.value,
             )
 
-        def _cell_layer_radio_change(value):
+        def _cell_layer_radio_change_cb(value):
             _update_cell_params_vbox(
                 self._cell_params_out,
                 self.cell_parameters_widgets,
@@ -1468,31 +1439,33 @@ class HNNGUI:
                 value.new,
             )
 
-        def _opt_obj_fun_change(value):
+        def _opt_obj_fun_change_cb(value):
             self._update_opt_target_hbox(value.new)
 
-        def _opt_solver_change(value):
+        def _opt_solver_change_cb(value):
             self._update_opt_solver_hbox(value.new)
 
-        self.widget_backend_selection.observe(_handle_backend_change, "value")
-        self.add_drive_button.on_click(_add_drive_button_clicked)
-        self.delete_drive_button.on_click(_delete_drives_clicked)
-        self.load_connectivity_button.observe(_on_upload_connectivity, names="value")
-        self.load_drives_button.observe(_on_upload_drives, names="value")
-        self.run_button.on_click(_run_button_clicked)
-        self.run_opt_button.on_click(_run_opt_button_clicked)
+        self.widget_backend_selection.observe(_handle_backend_change_cb, "value")
+        self.add_drive_button.on_click(_add_drive_button_clicked_cb)
+        self.delete_drive_button.on_click(_delete_drives_clicked_cb)
+        self.load_connectivity_button.observe(_on_upload_connectivity_cb, names="value")
+        self.load_drives_button.observe(_on_upload_drives_cb, names="value")
+        self.run_button.on_click(_run_button_clicked_cb)
+        self.run_opt_button.on_click(_run_opt_button_clicked_cb)
 
-        self.load_data_button.observe(_on_upload_data, names="value")
-        self.simulation_list_widget.observe(_simulation_list_change, "value")
-        self.widget_drive_type_selection.observe(_driver_type_change, "value")
+        self.load_experimental_data_button.observe(
+            _on_upload_experimental_data_cb, names="value"
+        )
+        self.simulation_list_widget.observe(_simulation_list_change_cb, "value")
+        self.widget_drive_type_selection.observe(_driver_type_change_cb, "value")
 
-        self.cell_type_radio_buttons.observe(_cell_type_radio_change, "value")
-        self.cell_layer_radio_buttons.observe(_cell_layer_radio_change, "value")
+        self.cell_type_radio_buttons.observe(_cell_type_radio_change_cb, "value")
+        self.cell_layer_radio_buttons.observe(_cell_layer_radio_change_cb, "value")
 
         # Many Optimization tab observations, including dual-linking widgets with their
         # equivalent in the Run tab:
-        self.widget_opt_obj_fun.observe(_opt_obj_fun_change, "value")
-        self.widget_opt_solver.observe(_opt_solver_change, "value")
+        self.widget_opt_obj_fun.observe(_opt_obj_fun_change_cb, "value")
+        self.widget_opt_solver.observe(_opt_solver_change_cb, "value")
 
         link(
             (self.widget_opt_tstop, "value"),
@@ -1514,6 +1487,99 @@ class HNNGUI:
             (self.widget_default_scaling, "value"),
             (self.widget_opt_scaling, "value"),
         )
+
+    def _on_upload_experimental_data(self, data_dict):
+        # Parsing path into filename and extension
+        dict_name = data_dict["name"].rsplit(".", 1)
+        data_filename = dict_name[0]
+        file_extension = f".{dict_name[1]}"
+
+        if data_store.simulated_data.get(data_filename) is not None:
+            logger.error(
+                textwrap.dedent(f"""
+                Cannot load external data named '{data_filename}': a simulation
+                with the same name already exists. Please rename the data file
+                to avoid naming conflicts.
+                """)
+                .replace("\n", " ")
+                .strip()
+            )
+            self._simulation_status_bar.value = self._simulation_status_contents[
+                "loading_failed"
+            ]
+            return
+
+        # Decision from
+        # https://github.com/jonescompneurolab/hnn-core/pull/1328#issuecomment-5444471136
+        # In the case where a user wants to upload an experimental data file
+        # that is of the same name of an existing experimental data file, then:
+        # - The new data should overwrite the prior data of the same name
+        # - The GUI status bar at the bottom should switch to state that looks yellow
+        #   (indicating "warning")
+        # - The log should have a warning that the user has OVERWRITTEN the data of that
+        #   name, and so will need to redo any existing visualizations or optimizations
+        #   using the new version of the data, since the prior results may no longer be
+        #   accurate.
+        is_overwrite = data_store.experimental_data.get(data_filename) is not None
+        if is_overwrite:
+            logger.warning(f""" External data {data_filename} has been overwritten. \
+                           User will need to redo any existing visualizations or \
+                           optimizations using the new version of the data, \
+                           since the prior results may no longer be accurate.""")
+            self._simulation_status_bar.value = self._simulation_status_contents[
+                "warning"
+            ]
+
+        # Read the file
+        ext_content = data_dict["content"]
+        ext_content = codecs.decode(ext_content, encoding="utf-8")
+        with self._log_out:
+            # Write loaded data to data object
+            # If the key already exists, defaultdic will overwrite it
+            data_store.experimental_data[data_filename] = {
+                "net": None,
+                "dpls": [_read_dipole_txt(io.StringIO(ext_content), file_extension)],
+            }
+            logger.info(f"External data {data_filename} loaded.")
+
+            # Create a dipole plot
+            _template_name = "[Blank] single figure"
+
+            # Keep track of this action
+            self.viz_manager.last_action = UiAction.UPLOAD_EXPERIMENTAL_DATA
+
+            # there is no pointer to gui on this function.
+            # so we can't update the gui.opt_target_widgets["target_dipole_data"]
+            # widget directly using HNNGUI.
+            # I assume the workaround was done using _viz_manager
+            self.viz_manager.reset_fig_config_tabs(template_name=_template_name)
+            self._update_target_dipole_data_widget()
+
+            self.viz_manager.add_figure()
+            fig_name = _idx2figname(self.viz_manager.data["fig_idx"]["idx"] - 1)
+            process_configs = {"dipole_smooth": 0, "dipole_scaling": 1}
+            self.viz_manager._simulate_edit_figure(
+                fig_name,
+                ax_name="ax0",
+                simulation_name=data_filename,
+                plot_type="current dipole",
+                preprocessing_config=process_configs,
+                operation="plot",
+            )
+            self.viz_manager.last_action = UiAction.NONE
+            if not is_overwrite:
+                self._simulation_status_bar.value = self._simulation_status_contents[
+                    "loaded"
+                ]
+
+    def _update_target_dipole_data_widget(self):
+        """refresh gui.opt_target_widgets["target_dipole_data"] dropdown using data_store"""
+        all_experimental_data_names = list(data_store.experimental_data)
+        prior_value = self.opt_target_widgets["target_dipole_data"].value
+        self.opt_target_widgets[
+            "target_dipole_data"
+        ].options = all_experimental_data_names
+        self.opt_target_widgets["target_dipole_data"].value = prior_value
 
     def _delete_single_drive(self, b):
         index = self.drive_accordion.selected_index
@@ -1593,7 +1659,7 @@ class HNNGUI:
                         HBox(
                             [
                                 self.run_button,
-                                self.load_data_button,
+                                self.load_experimental_data_button,
                             ]
                         ),
                         HBox(
@@ -2025,9 +2091,9 @@ class HNNGUI:
         return js_string
 
     # below are a series of methods that are used to manipulate the GUI in testing only
-    def _simulate_upload_data(self, file_url):
+    def _simulate_upload_experimental_data(self, file_url):
         uploaded_value = _simulate_prepare_upload_file(file_url)
-        self.load_data_button.set_trait("value", uploaded_value)
+        self.load_experimental_data_button.set_trait("value", uploaded_value)
 
     def _simulate_upload_connectivity(self, file_url):
         uploaded_value = _simulate_prepare_upload_file(file_url)
@@ -2359,7 +2425,7 @@ class HNNGUI:
         # The obj_fun="dipole_corr" and "dipole_rmse" cases are very simple
         # ------------------------------------------------------------------------------
         self.opt_target_widgets["target_dipole_data"] = Dropdown(
-            options=self.data["simulation_data"].keys(),
+            options=data_store.simulated_data_names,
             value=prior_target_state.get("target_dipole_data", None),
             description="Target Data:",
             disabled=False,
@@ -2369,11 +2435,6 @@ class HNNGUI:
         # Set `_external_data_widget` to `opt_target_widgets["target_dipole_data"]` when
         # simulation data changes or upon initial GUI creation.
         #
-        # Note: this is what first creates the `VizManager` object's
-        # `_external_data_widget` attribute!
-        self.viz_manager._external_data_widget = self.opt_target_widgets[
-            "target_dipole_data"
-        ]
 
         self.opt_target_widgets["n_trials"] = BoundedIntText(
             value=prior_target_state.get("n_trials", 1),
@@ -4643,51 +4704,6 @@ def get_cell_param_default_value(cell_type_key, param_dict):
     return param_dict[cell_type_key]
 
 
-def on_upload_data_change(change, data, viz_manager, log_out):
-    if len(change["owner"].value) == 0:
-        return
-    # Parsing file information from the 'change' object passed in from
-    # the upload file widget.
-    data_dict = change["new"][0]
-    dict_name = data_dict["name"].rsplit(".", 1)
-    data_fname = dict_name[0]
-    file_extension = f".{dict_name[1]}"
-
-    # If data was already loaded return
-    if data_fname in data["simulation_data"].keys():
-        with log_out:
-            logger.error(f"Found existing data: {data_fname}.")
-        return
-
-    # Read the file
-    ext_content = data_dict["content"]
-    ext_content = codecs.decode(ext_content, encoding="utf-8")
-    with log_out:
-        # Write loaded data to data object
-        data["simulation_data"][data_fname] = {
-            "net": None,
-            "dpls": [_read_dipole_txt(io.StringIO(ext_content), file_extension)],
-        }
-        logger.info(f"External data {data_fname} loaded.")
-
-        # Create a dipole plot
-        _template_name = "[Blank] single figure"
-        viz_manager.reset_fig_config_tabs(template_name=_template_name)
-        viz_manager.add_figure()
-        fig_name = _idx2figname(viz_manager.data["fig_idx"]["idx"] - 1)
-        process_configs = {"dipole_smooth": 0, "dipole_scaling": 1}
-        viz_manager._simulate_edit_figure(
-            fig_name,
-            ax_name="ax0",
-            simulation_name=data_fname,
-            plot_type="current dipole",
-            preprocessing_config=process_configs,
-            operation="plot",
-        )
-        # Reset the load file widget
-        change["owner"].value = []
-
-
 def _drive_widget_to_dict(drive, name):
     """Creates a dict of input widget values
 
@@ -4873,7 +4889,6 @@ def run_button_clicked(
     widget_simulation_name,
     log_out,
     drive_widgets,
-    all_data,
     dt,
     tstop,
     fig_default_params,
@@ -4895,15 +4910,26 @@ def run_button_clicked(
     global_gain_textfields,
 ):
     """Run the simulation and plot outputs."""
-    simulation_data = all_data["simulation_data"]
+
+    _sim_name = widget_simulation_name.value
+    simulation_data = data_store.simulated_data
+
+    if data_store.experimental_data.get(_sim_name) is not None:
+        logger.error(
+            textwrap.dedent(f"""
+            Cannot run simulation named '{_sim_name}': a experimental data
+            with the same name already exists. Please rename the simulation to
+            avoid naming conflicts.
+            """)
+            .replace("\n", " ")
+            .strip()
+        )
+
+        simulation_status_bar.value = simulation_status_contents["simulation_failed"]
+        return
+
     with log_out:
         try:
-            # clear empty trash simulations
-            for _name in tuple(simulation_data.keys()):
-                if len(simulation_data[_name]["dpls"]) == 0:
-                    del simulation_data[_name]
-
-            _sim_name = widget_simulation_name.value
             if (
                 _sim_name in simulation_data
                 and simulation_data[_sim_name]["net"] is not None
@@ -4968,6 +4994,7 @@ def run_button_clicked(
                 simulations_list_widget.options = sim_names
                 simulations_list_widget.value = sim_names[0]
 
+            viz_manager.last_action = UiAction.RUN_SIMULATION
             viz_manager.reset_fig_config_tabs()
 
             # update default visualization params in gui based on widget
@@ -4981,6 +5008,9 @@ def run_button_clicked(
                 viz_manager.fig_default_params[widget] = value
 
             viz_manager.add_figure()
+            # By default the value in fig_templates dropdown is fig_templates[0]
+            # So  viz_manager.add_figure() is not aware it needs to draw sim data
+            # This code forces it to draw the dipole data
             fig_name = _idx2figname(viz_manager.data["fig_idx"]["idx"] - 1)
             ax_plots = [("ax0", "input histogram"), ("ax1", "current dipole")]
             for ax_name, plot_type in ax_plots:
@@ -4989,9 +5019,13 @@ def run_button_clicked(
                 )
 
         except Exception:
-            simulation_status_bar.value = simulation_status_contents["failed"]
+            simulation_status_bar.value = simulation_status_contents[
+                "simulation_failed"
+            ]
             logger.error(traceback.format_exc())
             return
+        finally:
+            viz_manager.last_action = UiAction.NONE
 
 
 def _update_cell_params_vbox(
@@ -5173,20 +5207,21 @@ def _serialize_simulation(log_out, sim_data, simulation_list_widget):
         return serialize_simulation(sim_data, sim_name)
 
 
-def serialize_simulation(simulations_data, simulation_name):
+def serialize_simulation(all_simulation_data, simulation_name):
     """Serializes simulation data to CSV.
 
     Creates a single CSV file or a ZIP file containing multiple CSVs,
     depending on the number of trials in the simulation.
 
     """
-    simulation_data = simulations_data["simulation_data"]
     csv_trials_output = []
     # CSV file headers
     headers = "times,agg,L2,L5"
     fmt = "%f, %f, %f, %f"
 
-    for dpl_trial in simulation_data[simulation_name]["dpls"]:
+    ## retrieve simulation by name
+    simulation_data = all_simulation_data[simulation_name]
+    for dpl_trial in simulation_data["dpls"]:
         # Combine all data columns at once
         signals_matrix = np.column_stack(
             (
@@ -5222,7 +5257,7 @@ def serialize_config(simulations_data, simulation_name):
     """Serializes Network configuration data to json."""
 
     # Get network from data dictionary
-    net = simulations_data["simulation_data"][simulation_name]["net"]
+    net = simulations_data[simulation_name]["net"]
 
     # Write to buffer
     with io.StringIO() as output:
@@ -5835,12 +5870,9 @@ def run_opt_button_clicked(
     widget_simulation_name,
     log_out,
     opt_drive_widgets,
-    all_data,
     dt,
     tstop,
     fig_default_params,
-    widget_default_smoothing,
-    widget_default_scaling,
     widget_min_frequency,
     widget_max_frequency,
     backend_selection,
@@ -5862,6 +5894,7 @@ def run_opt_button_clicked(
     opt_scaling,
     opt_target_widgets,
     opt_solver_widgets,
+    target_dipole_data_widget,
 ):
     """Run an Optimization, then re-run its final simulation and plot its outputs.
 
@@ -5899,21 +5932,11 @@ def run_opt_button_clicked(
     This was built based off of `run_button_clicked`.
     """
     with log_out:
+        simulation_data = data_store.simulated_data
+        experimental_data = data_store.experimental_data
         try:
             # Sim data setup (and related input validation)
             # --------------------------------------------------------------------------
-            simulation_data = all_data["simulation_data"]
-
-            # clear empty trash simulations
-            #
-            # AES: a "trash" simulation appears to be created (named "default") even if
-            # all a user does is load an external dipole data file. However, I do not
-            # fully understand how VizManager et al. manages the simulation data (I find
-            # it very confusing) so I am NOT touching it.
-            for _name in tuple(simulation_data.keys()):
-                if len(simulation_data[_name]["dpls"]) == 0:
-                    del simulation_data[_name]
-
             _sim_name = widget_simulation_name.value
 
             # RMSE Target data extraction (and related input validation)
@@ -5932,7 +5955,9 @@ def run_opt_button_clicked(
                         optimize towards.
                         """).replace("\n", " ")
                     )
-                    simulation_status_bar.value = simulation_status_contents["failed"]
+                    simulation_status_bar.value = simulation_status_contents[
+                        "simulation_failed"
+                    ]
                     return None
                 elif (opt_rmse_target_data_name == "default") and (
                     not simulation_data["default"]["dpls"]
@@ -5952,14 +5977,21 @@ def run_opt_button_clicked(
                         simulation.
                         """).replace("\n", " ")
                     )
-                    simulation_status_bar.value = simulation_status_contents["failed"]
+                    simulation_status_bar.value = simulation_status_contents[
+                        "simulation_failed"
+                    ]
                     return None
                 else:
                     # Extract the actual target data Like everywhere else in the GUI, we
                     # only support usage of single-trial dipole data.
-                    target_dipole = average_dipoles(
-                        simulation_data[opt_rmse_target_data_name]["dpls"]
-                    )
+                    sim_data = simulation_data.get(
+                        opt_rmse_target_data_name
+                    ) or experimental_data.get(opt_rmse_target_data_name)
+
+                    if not sim_data:
+                        raise RuntimeError(f"The {sim_data} value is invalid.")
+
+                    target_dipole = average_dipoles(sim_data["dpls"])
             # Input validation
             # --------------------------------------------------------------------------
             # First, let's make a Network of the current state of the GUI, and call it
@@ -6013,7 +6045,9 @@ def run_opt_button_clicked(
                     and try again.
                     """).replace("\n", " ")
                 )
-                simulation_status_bar.value = simulation_status_contents["failed"]
+                simulation_status_bar.value = simulation_status_contents[
+                    "simulation_failed"
+                ]
                 return None
 
             # Instantiate our Optimizer object
@@ -6112,7 +6146,9 @@ def run_opt_button_clicked(
                         f"Optimization fitting failed due to exception: '{e}'",
                         exc_info=True,
                     )
-                    simulation_status_bar.value = simulation_status_contents["failed"]
+                    simulation_status_bar.value = simulation_status_contents[
+                        "simulation_failed"
+                    ]
                     raise
 
                 # ----------------------------------------------------------------------
@@ -6184,7 +6220,9 @@ def run_opt_button_clicked(
                         iterations in order to start converging.
                         """).replace("\n", " ")
                     )
-                    simulation_status_bar.value = simulation_status_contents["failed"]
+                    simulation_status_bar.value = simulation_status_contents[
+                        "simulation_failed"
+                    ]
                 else:
                     simulation_status_bar.value = simulation_status_contents["finished"]
 
@@ -6278,7 +6316,7 @@ def run_opt_button_clicked(
             # optimization run
 
             # Return both the optimized config and the optimizer results
-            optimized_config = serialize_config(all_data, new_name)
+            optimized_config = serialize_config(simulation_data, new_name)
             opt_result = {
                 "initial_params": optim.initial_params,
                 "opt_params": optim.opt_params_,
@@ -6302,7 +6340,9 @@ def run_opt_button_clicked(
             return optimized_config, opt_result
 
         except Exception:
-            simulation_status_bar.value = simulation_status_contents["failed"]
+            simulation_status_bar.value = simulation_status_contents[
+                "simulation_failed"
+            ]
             logger.error(traceback.format_exc())
             return
 
