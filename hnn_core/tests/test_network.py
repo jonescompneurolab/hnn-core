@@ -1,9 +1,11 @@
 # Authors: Mainak Jas <mainakjas@gmail.com>
 
 from contextlib import redirect_stdout
+from copy import deepcopy
 import io
 from pathlib import Path
 import tempfile
+import warnings
 
 import numpy as np
 from numpy.testing import assert_allclose
@@ -15,6 +17,7 @@ from hnn_core import (
     CellResponse,
     Network,
     calcium_model,
+    duecker_ET_model,
     neymotin_2020_model,
     jones_2009_model,
     law_2021_model,
@@ -124,7 +127,7 @@ def test_create_cell_coords():
     assert len(layer_dict["L5_bottom"]) == 9
 
 
-@pytest.mark.parametrize("mesh_shape", [(2, 2), (2, 3)])
+@pytest.mark.parametrize("mesh_shape", [(1, 1), (2, 2), (2, 3)])
 def test_custom_network_coords(mesh_shape):
     params = read_params(params_fname)
 
@@ -136,6 +139,7 @@ def test_custom_network_coords(mesh_shape):
                 "morpho_type": "pyramidal",
                 "electro_type": "excitatory",
                 "layer": "2",
+                "zdist_origin": 1,
                 "measure_dipole": True,
                 "reference": "https://doi.org/10.7554/eLife.51214",
             },
@@ -146,6 +150,7 @@ def test_custom_network_coords(mesh_shape):
                 "morpho_type": "pyramidal",
                 "electro_type": "excitatory",
                 "layer": "5",
+                "zdist_origin": 0,
                 "measure_dipole": True,
                 "reference": "https://doi.org/10.7554/eLife.51214",
             },
@@ -162,7 +167,22 @@ def test_custom_network_coords(mesh_shape):
         "L5_pyramidal": custom_layer_dict["L5_bottom"],
         "origin": custom_layer_dict["origin"],
     }
-    custom_net = Network(params, pos_dict=custom_pos_dict, cell_types=custom_cell_types)
+    if mesh_shape == (1, 1):
+        with pytest.warns(
+            UserWarning,
+            match="Zero distance between cells of type 'L2_pyramidal' in the X",
+        ):
+            with pytest.warns(
+                UserWarning,
+                match="Zero distance between cells of type 'L2_pyramidal' in the Y",
+            ):
+                custom_net = Network(
+                    params, pos_dict=custom_pos_dict, cell_types=custom_cell_types
+                )
+    else:
+        custom_net = Network(
+            params, pos_dict=custom_pos_dict, cell_types=custom_cell_types
+        )
     assert "L2_pyramidal" in custom_net.cell_types
     assert "L5_pyramidal" in custom_net.cell_types
     total_mesh_size = mesh_shape[0] * mesh_shape[1]
@@ -263,6 +283,149 @@ def test_custom_network_coords(mesh_shape):
     assert np.all(np.isfinite(dipole_custom[0].data["agg"]))
 
 
+def test_custom_network_coords_degenerate_dimension():
+    """Test warning/fallback when pos_dict has no spread in X and/or Y"""
+    params = read_params(params_fname)
+
+    custom_cell_types = {
+        "L2_pyramidal": {
+            "cell_object": pyramidal(cell_name="L2_pyramidal"),
+            "cell_metadata": {
+                "morpho_type": "pyramidal",
+                "electro_type": "excitatory",
+                "layer": "2",
+                "zdist_origin": 1,
+                "measure_dipole": True,
+                "reference": "https://doi.org/10.7554/eLife.51214",
+            },
+        },
+    }
+
+    # Single cell: no spread in either X or Y -> both dimensions warn, and
+    # in-plane distance falls back to the mean of the two overridden 1.0 values
+    single_cell_pos_dict = {
+        "L2_pyramidal": [(0.0, 0.0, 0.0)],
+        "origin": (0.0, 0.0, 0.0),
+    }
+    with pytest.warns(
+        UserWarning, match="Zero distance between cells of type 'L2_pyramidal' in the X"
+    ):
+        with pytest.warns(
+            UserWarning,
+            match="Zero distance between cells of type 'L2_pyramidal' in the Y",
+        ):
+            net = Network(
+                params,
+                pos_dict=single_cell_pos_dict,
+                cell_types=custom_cell_types,
+            )
+    assert np.isclose(net._inplane_distance, 1.0)
+
+    # Cells in a line along Y only: X has no spread, Y does -> only X warns,
+    # and the resulting in-plane distance takes the Y spacing into account
+    line_pos_dict = {
+        "L2_pyramidal": [(0.0, 0.0, 0.0), (0.0, 3.0, 0.0), (0.0, 6.0, 0.0)],
+        "origin": (0.0, 0.0, 0.0),
+    }
+    with pytest.warns(
+        UserWarning, match="Zero distance between cells of type 'L2_pyramidal' in the X"
+    ):
+        net_line = Network(
+            params,
+            pos_dict=line_pos_dict,
+            cell_types=custom_cell_types,
+        )
+    # mean of overridden X diff (1.0) and actual Y diffs (3.0, 3.0)
+    assert np.isclose(net_line._inplane_distance, np.mean([1.0, 3.0, 3.0]))
+
+    # Well-formed grid: no warnings should be raised
+    grid_pos_dict = {
+        "L2_pyramidal": [
+            (0.0, 0.0, 0.0),
+            (2.0, 0.0, 0.0),
+            (0.0, 2.0, 0.0),
+            (2.0, 2.0, 0.0),
+        ],
+        "origin": (0.0, 0.0, 0.0),
+    }
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        net_grid = Network(
+            params,
+            pos_dict=grid_pos_dict,
+            cell_types=custom_cell_types,
+        )
+    assert np.isclose(net_grid._inplane_distance, 2.0)
+
+
+def test_custom_network_coords_validation():
+    """Test input validation of custom pos_dict/cell_types in Network"""
+    params = read_params(params_fname)
+
+    custom_cell_types = {
+        "L2_pyramidal": {
+            "cell_object": pyramidal(cell_name="L2_pyramidal"),
+            "cell_metadata": {
+                "morpho_type": "pyramidal",
+                "electro_type": "excitatory",
+                "zdist_origin": 1,
+                "layer": "2",
+                "measure_dipole": True,
+                "reference": "https://doi.org/10.7554/eLife.51214",
+            },
+        },
+    }
+    custom_layer_dict = _create_cell_coords(
+        n_pyr_x=2, n_pyr_y=2, z_coord=1307.4, inplane_distance=1.0
+    )
+    custom_pos_dict = {
+        "L2_pyramidal": custom_layer_dict["L2_bottom"],
+        "origin": custom_layer_dict["origin"],
+    }
+
+    # cell_types provided without pos_dict
+    with pytest.raises(ValueError, match="you must also provide a custom 'pos_dict'"):
+        Network(params, cell_types=custom_cell_types)
+
+    # pos_dict provided without cell_types
+    with pytest.raises(ValueError, match="you must also provide custom 'cell_types'"):
+        Network(params, pos_dict=custom_pos_dict)
+
+    with pytest.raises(ValueError, match="Origin must be defined"):
+        custom_pos_dict_no_origin = {
+            "L2_pyramidal": custom_layer_dict["L2_bottom"],
+        }
+        Network(
+            params, pos_dict=custom_pos_dict_no_origin, cell_types=custom_cell_types
+        )
+
+    # cell_types has a key not present in pos_dict
+    cell_types_extra_key = deepcopy(custom_cell_types)
+    cell_types_extra_key["L5_pyramidal"] = deepcopy(custom_cell_types["L2_pyramidal"])
+    with pytest.raises(
+        ValueError, match="All keys of 'pos_dict' must be present in 'cell_types'"
+    ):
+        Network(params, pos_dict=custom_pos_dict, cell_types=cell_types_extra_key)
+
+    with pytest.raises(ValueError, match="zdist_origin must be defined"):
+        cell_types_no_zdist = {
+            "L2_pyramidal": {
+                "cell_object": pyramidal(cell_name="L2_pyramidal"),
+                "cell_metadata": {
+                    "morpho_type": "pyramidal",
+                    "electro_type": "excitatory",
+                    "layer": "2",
+                    "measure_dipole": True,
+                    "reference": "https://doi.org/10.7554/eLife.51214",
+                },
+            },
+        }
+        Network(params, pos_dict=custom_pos_dict, cell_types=cell_types_no_zdist)
+
+    # Test successful run
+    Network(params, pos_dict=custom_pos_dict, cell_types=custom_cell_types)
+
+
 def test_network_models():
     """ "Test instantiations of the network object"""
     # Make sure critical biophysics for Law model are updated
@@ -338,48 +501,429 @@ def test_network_models():
         assert np.all(np.diff(k_gbar, n=2) > 0)  # positive 2nd derivative
 
 
-def test_network_cell_positions():
+def test_model_variant_read_from_params():
+    """Test that 'model_variant' survives read_params"""
+    duecker_params_fname = hnn_core_root / "param" / "default_duecker_ET.json"
+    params = read_params(duecker_params_fname)
+    assert params["model_variant"] == "duecker_ET_model"
+
+    # param files of models that predate 'model_variant' don't define it
+    assert "model_variant" not in read_params(params_fname)
+
+
+def test_model_variant_matches_network():
+    """Test that a mismatch between param file and network model is caught"""
+    duecker_params_fname = hnn_core_root / "param" / "default_duecker_ET.json"
+    duecker_params = read_params(duecker_params_fname)
+    neymo_params = read_params(params_fname)
+    mesh_shape = (3, 3)
+
+    # default call assigns model_variant correctly
+    net_duecker = duecker_ET_model(mesh_shape=mesh_shape)
+    assert net_duecker._model_variant == "duecker_ET_model"
+
+    net_neymotin = neymotin_2020_model(mesh_shape=mesh_shape)
+    assert net_neymotin._model_variant == "neymotin_2020_model"
+
+    # duecker_ET_model parameters used for neymotin_2020_model
+    with pytest.raises(ValueError, match="used for neymotin_2020_model"):
+        neymotin_2020_model(params=duecker_params, mesh_shape=mesh_shape)
+
+    # if user uses parameters that explicitly define model_variant as neymotin_2020_model
+    params = neymo_params.copy()
+    params["model_variant"] = "neymotin_2020_model"
+    with pytest.raises(ValueError, match="used for duecker_ET_model"):
+        duecker_ET_model(params=params, mesh_shape=mesh_shape)
+
+    # a random model_variant name is rejected
+    params = neymo_params.copy()
+    params["model_variant"] = "model"
+    with pytest.raises(ValueError, match="used for neymotin_2020_model"):
+        neymotin_2020_model(params=params, mesh_shape=mesh_shape)
+
+    # if user uses a json file that has the right model variant,
+    # but cell types mismatch
+    params = neymo_params.copy()
+    params["model_variant"] = "duecker_ET_model"  # pretend it's a duecker_ET_model
+    with pytest.raises(ValueError, match="used for neymotin_2020_model"):
+        neymotin_2020_model(params=params, mesh_shape=mesh_shape)
+
+    # if creating duecker_ET_model without model_variant
+    params = duecker_params.copy()
+    del params["model_variant"]
+    with pytest.raises(ValueError, match="'model_variant' is required"):
+        duecker_ET_model(params=params, mesh_shape=mesh_shape)
+
+    # models that predate 'model_variant' still build without it
+    assert (
+        neymotin_2020_model(
+            params=read_params(params_fname), mesh_shape=mesh_shape
+        )._model_variant
+        == "neymotin_2020_model"
+    )
+    assert (
+        calcium_model(
+            params=read_params(params_fname), mesh_shape=mesh_shape
+        )._model_variant
+        == "calcium_model"
+    )
+    assert (
+        law_2021_model(
+            params=read_params(params_fname), mesh_shape=mesh_shape
+        )._model_variant
+        == "law_2021_model"
+    )
+
+
+@pytest.mark.parametrize(
+    "network_model",
+    [neymotin_2020_model, law_2021_model, calcium_model],
+)
+def test_network_models_cell_params(network_model):
+    """Test that the network models check the cell types defined in params"""
+    default_params = read_params(params_fname)
+    mesh_shape = (3, 3)
+
+    # law_2021_model and calcium_model inherit the check from the
+    # neymotin_2020_model network they are built on
+    for cell_name in ["L2Pyr", "L5Pyr", "L2Basket", "L5Basket"]:
+        params = default_params.copy()
+        for key in [key for key in params if cell_name in key]:
+            del params[key]
+        with pytest.raises(ValueError, match="No parameters found for"):
+            network_model(params=params, mesh_shape=mesh_shape)
+
+
+def test_duecker_ET_model_cell_params():
+    """Test that duecker_ET_model checks the cell types defined in params"""
+    duecker_params_fname = hnn_core_root / "param" / "default_duecker_ET.json"
+    duecker_params = read_params(duecker_params_fname)
+    mesh_shape = (3, 3)
+
+    # parameters are needed for the pyramidal cells and the interneurons
+    for cell_name in ["L2Pyr", "L5Pyr", "L2Inh", "L5Inh"]:
+        params = duecker_params.copy()
+        for key in [key for key in params if cell_name in key]:
+            del params[key]
+        with pytest.raises(ValueError, match="No parameters found for"):
+            duecker_ET_model(params=params, mesh_shape=mesh_shape)
+
+    # basket cells are replaced by interneurons in this network
+    for cell_name in ["L2Basket", "L5Basket"]:
+        params = duecker_params.copy()
+        params[f"gbar_{cell_name}_L2Pyr_gabaa"] = 0.0
+        with pytest.raises(ValueError, match="Parameters found for"):
+            duecker_ET_model(params=params, mesh_shape=mesh_shape)
+
+
+@pytest.mark.parametrize("mesh_shape", [(1, 1), (3, 3), (10, 10)])
+def test_network_cell_positions(mesh_shape):
     """ "Test manipulation of cell positions in the network object"""
 
-    net = neymotin_2020_model()
-    assert np.isclose(net._inplane_distance, 1.0)  # default
-    assert np.isclose(net._layer_separation, 1307.4)  # default
+    # Setup our network, default params, and expected post-change params
+    # ----------------------------------------------------------------------------------
+    net = neymotin_2020_model(add_drives_from_params=True, mesh_shape=mesh_shape)
+    default_inplane_distance = 1.0  # default
+    default_layer_separation = 1307.4  # default
+    assert np.isclose(net._inplane_distance, default_inplane_distance)  # check default
+    assert np.isclose(net._layer_separation, default_layer_separation)  # check default
 
-    # change both from their default values
-    net.set_cell_positions(inplane_distance=2.0)
-    assert np.isclose(net._layer_separation, 1307.4)  # still the default
-    net.set_cell_positions(layer_separation=1000.0)
-    assert np.isclose(net._inplane_distance, 2.0)  # mustn't change
+    initial_origin = net.pos_dict["origin"]
+    # capture pre-reset X/Y positions of both cell types and drives, so that we
+    # can later confirm they are scaled
+    initial_cell_xy = {
+        cell_type: np.array(net.pos_dict[cell_type])[:, :2]
+        for cell_type in net.cell_types
+    }
+    initial_drive_xy = {
+        drive_name: np.array(net.pos_dict[drive_name])[:, :2]
+        for drive_name in net.external_drives
+    }
 
-    # check that in-plane distance is now 2. for the default 10 x 10 grid
-    assert np.allclose(  # x-coordinate jumps every 10th gid
-        np.diff(np.array(net.pos_dict["L5_pyramidal"])[9::10, 0], axis=0), 2.0
+    # setup new main parameter values
+    new_inplane_distance = 2.1
+    new_layer_separation = 1138.0
+
+    # precompute the XY scaling and our newly expected values
+    xy_scaling = new_inplane_distance / default_inplane_distance
+    expected_origin = (
+        initial_origin[0] * xy_scaling,
+        initial_origin[1] * xy_scaling,
+        initial_origin[2],
     )
-    assert np.allclose(  # test first 10 y-coordinates
-        np.diff(np.array(net.pos_dict["L5_pyramidal"])[:9, 1], axis=0), 2.0
-    )
 
-    # check that layer separation has changed (L5 is zero) tp 1000.
-    assert np.isclose(net.pos_dict["L2_pyramidal"][0][2], 1000.0)
+    # Apply changes, and test that everything comes out as expected
+    # ----------------------------------------------------------------------------------
+    # check that in-plane distance changes, but layer separation does NOT change
+    net.update_cell_positions(inplane_distance=new_inplane_distance)
+    assert np.isclose(net._inplane_distance, new_inplane_distance)
+    assert np.isclose(net._layer_separation, default_layer_separation)
 
-    with pytest.raises(ValueError, match="In-plane distance must be positive"):
-        net.set_cell_positions(inplane_distance=0.0)
-    with pytest.raises(ValueError, match="Layer separation must be positive"):
-        net.set_cell_positions(layer_separation=0.0)
+    # check that now, both have changed
+    net.update_cell_positions(layer_separation=new_layer_separation)
+    assert np.isclose(net._inplane_distance, new_inplane_distance)
+    assert np.isclose(net._layer_separation, new_layer_separation)
 
-    # Check that the origin of the drive cells matches the new 'origin'
-    # when set_cell_positions is called after adding drives.
+    # check origin: X/Y scale by the same ratio as the cell grid, Z is unchanged
+    assert np.allclose(net.pos_dict["origin"], expected_origin)
+
+    # check that each cell type's X/Y positions scale by the same ratio as the
+    # origin, and that Z follows its own zdist_origin metadata, not a single
+    # shared value
+    for cell_type in net.cell_types.keys():
+        expected_cell_xy = initial_cell_xy[cell_type] * xy_scaling
+        actual_cell_xy = np.array(net.pos_dict[cell_type])[:, :2]
+        assert np.allclose(actual_cell_xy, expected_cell_xy)
+
+        expected_cell_z = (
+            net.cell_types[cell_type]["cell_metadata"]["zdist_origin"]
+            * new_layer_separation
+        )
+        actual_cell_z = np.array(net.pos_dict[cell_type])[:, 2]
+        assert np.allclose(actual_cell_z, expected_cell_z)
+
+    # Check that drive cells' X/Y positions are likewise updated: since drives
+    # always sit at the network origin, their new X/Y must match the new origin.
+    #
     # As the network dimensions increase, so does the center-of-mass of the
     # grid points, which is where all hnn drives should be located. The lamtha-
     # dependent weights and delays of the drives are calculated with respect to
     # this origin.
-    add_erp_drives_to_jones_model(net)
-    net.set_cell_positions(inplane_distance=20.0)
-    for drive_name, drive in net.external_drives.items():
-        assert len(net.pos_dict[drive_name]) == drive["n_drive_cells"]
-        # just test the 0th index, assume all others then fine too
-        for idx in range(3):  # x,y,z coords
-            assert net.pos_dict[drive_name][0][idx] == net.pos_dict["origin"][idx]
+    for drive_name in net.external_drives:
+        actual_drive_cells_xy = np.array(net.pos_dict[drive_name])[:, :2]
+        # every drive cell's X/Y must match the origin's X/Y exactly
+        for drive_cell_xy in actual_drive_cells_xy:
+            assert np.allclose(drive_cell_xy, expected_origin[:2])
+
+        if not mesh_shape == (1, 1):
+            # and confirm they actually moved from their pre-reset positions
+            assert not np.allclose(actual_drive_cells_xy, initial_drive_xy[drive_name])
+
+    # Input validation
+    # ------------------------------------------------------------------------------
+    with pytest.raises(ValueError, match="At least one of inplane_distance"):
+        net.update_cell_positions()
+
+    with pytest.raises(ValueError, match="In-plane distance must be positive"):
+        net.update_cell_positions(inplane_distance=0.0)
+    with pytest.raises(ValueError, match="Layer separation must be positive"):
+        net.update_cell_positions(layer_separation=0.0)
+
+    with pytest.raises(TypeError, match="inplane_distance must be an instance of"):
+        net.update_cell_positions(inplane_distance=f"{new_inplane_distance}")
+    with pytest.raises(TypeError, match="layer_separation must be an instance of"):
+        net.update_cell_positions(layer_separation=[new_layer_separation])
+
+    # A NaN or zero current in-plane distance means the network is in a bad
+    # state and update_cell_positions should refuse to guess a scaling factor
+    net_bad = neymotin_2020_model(mesh_shape=mesh_shape)
+    net_bad._inplane_distance = np.nan
+    with pytest.raises(ValueError, match="Cannot reset cell positions"):
+        net_bad.update_cell_positions(inplane_distance=new_inplane_distance)
+    net_bad._inplane_distance = 0.0
+    with pytest.raises(ValueError, match="Cannot reset cell positions"):
+        net_bad.update_cell_positions(inplane_distance=new_inplane_distance)
+
+    # Sequential relative resets must compose the same as a single direct
+    # reset from the original network, since update_cell_positions always
+    # scales relative to the *current* net._inplane_distance
+    # ------------------------------------------------------------------------------
+    net_direct = neymotin_2020_model(add_drives_from_params=True, mesh_shape=mesh_shape)
+    net_direct.update_cell_positions(inplane_distance=8.0, layer_separation=3000.0)
+
+    net_sequential = neymotin_2020_model(
+        add_drives_from_params=True, mesh_shape=mesh_shape
+    )
+    net_sequential.update_cell_positions(inplane_distance=4.1, layer_separation=1531.0)
+    net_sequential.update_cell_positions(inplane_distance=8.0, layer_separation=3000.0)
+
+    # Check cell types
+    for cell_type in net_direct.cell_types:
+        assert_allclose(
+            np.array(net_sequential.pos_dict[cell_type]),
+            np.array(net_direct.pos_dict[cell_type]),
+        )
+    # Check origin
+    assert_allclose(
+        np.array(net_sequential.pos_dict["origin"]),
+        np.array(net_direct.pos_dict["origin"]),
+    )
+    # Check drives
+    for drive_name in net_direct.external_drives:
+        assert_allclose(
+            np.array(net_sequential.pos_dict[drive_name]),
+            np.array(net_direct.pos_dict[drive_name]),
+        )
+
+
+@pytest.mark.parametrize(
+    "model_name", ["neymotin_2020_model", "duecker_ET_model", "custom_pos_dict"]
+)
+@pytest.mark.parametrize("mesh_shape", [(3, 3), (10, 10)])
+def test_network_reset_to_original_cell_positions(model_name, mesh_shape):
+    """Test that Network._reset_to_original_cell_positions restores positions.
+
+    ``neymotin_2020_model`` exercises the default-network branch of the Network
+    constructor (hard-coded in-plane distance and layer separation), while
+    ``duecker_ET_model`` and the hand-built network exercise the custom
+    ``pos_dict``/``cell_types`` branch, where those quantities are instead derived
+    from the provided positions.
+    """
+    # Setup
+    # ----------------------------------------------------------------------------------
+    if model_name == "neymotin_2020_model":
+        # default-network branch, with drives created at construction time
+        net = neymotin_2020_model(add_drives_from_params=True, mesh_shape=mesh_shape)
+        expected_inplane_distance = 1.0
+        expected_layer_separation = 1307.4
+    elif model_name == "duecker_ET_model":
+        # custom pos_dict branch; this model has no drives of its own, so add a
+        # simple proximal evoked drive targeting every one of its cell types
+        net = duecker_ET_model(mesh_shape=mesh_shape)
+        net.add_evoked_drive(
+            "evprox_test",
+            mu=20.0,
+            sigma=3.0,
+            numspikes=1,
+            location="proximal",
+            weights_ampa={cell_type: 0.01 for cell_type in net.cell_types},
+            synaptic_delays={cell_type: 0.1 for cell_type in net.cell_types},
+        )
+        expected_inplane_distance = 1.0
+        expected_layer_separation = 1307.4
+    else:
+        # custom pos_dict branch, with a non-default grid, so that the values which
+        # get restored are demonstrably the *derived* ones and not the hard-coded
+        # Network defaults
+        expected_inplane_distance = 2.5
+        expected_layer_separation = 900.0
+        layer_dict = _create_cell_coords(
+            n_pyr_x=mesh_shape[0],
+            n_pyr_y=mesh_shape[1],
+            z_coord=expected_layer_separation,
+            inplane_distance=expected_inplane_distance,
+        )
+        custom_cell_types = {
+            "L2_pyramidal": {
+                "cell_object": pyramidal(cell_name="L2_pyramidal"),
+                "cell_metadata": {
+                    "morpho_type": "pyramidal",
+                    "electro_type": "excitatory",
+                    "zdist_origin": 1,
+                    "layer": "2",
+                    "measure_dipole": True,
+                    "reference": "https://doi.org/10.7554/eLife.51214",
+                },
+            },
+        }
+        custom_pos_dict = {
+            "L2_pyramidal": layer_dict["L2_bottom"],
+            "origin": layer_dict["origin"],
+        }
+        net = Network(
+            read_params(params_fname),
+            pos_dict=custom_pos_dict,
+            cell_types=custom_cell_types,
+        )
+        net.add_evoked_drive(
+            "evprox_test",
+            mu=20.0,
+            sigma=3.0,
+            numspikes=1,
+            location="proximal",
+            weights_ampa={cell_type: 0.01 for cell_type in net.cell_types},
+            synaptic_delays={cell_type: 0.1 for cell_type in net.cell_types},
+        )
+
+    # The snapshot taken at construction time must match the network's live state
+    assert np.isclose(net._original_inplane_distance, expected_inplane_distance)
+    assert np.isclose(net._original_layer_separation, expected_layer_separation)
+    assert np.isclose(net._inplane_distance, expected_inplane_distance)
+    assert np.isclose(net._layer_separation, expected_layer_separation)
+
+    original_pos_dict = deepcopy(net.pos_dict)
+
+    # A single update-then-reset round trip restores everything
+    # ----------------------------------------------------------------------------------
+    net.update_cell_positions(
+        inplane_distance=expected_inplane_distance * 3.7,
+        layer_separation=expected_layer_separation * 0.6,
+    )
+    assert not np.isclose(net._inplane_distance, expected_inplane_distance)
+    assert not np.isclose(net._layer_separation, expected_layer_separation)
+
+    net._reset_to_original_cell_positions()
+    assert np.isclose(net._inplane_distance, expected_inplane_distance)
+    assert np.isclose(net._layer_separation, expected_layer_separation)
+    assert set(net.pos_dict.keys()) == set(original_pos_dict.keys())
+    for key in original_pos_dict:
+        assert_allclose(np.array(net.pos_dict[key]), np.array(original_pos_dict[key]))
+
+    # Repeated resets are idempotent, and resetting works after several updates
+    # ----------------------------------------------------------------------------------
+    net._reset_to_original_cell_positions()
+    assert set(net.pos_dict.keys()) == set(original_pos_dict.keys())
+    for key in original_pos_dict:
+        assert_allclose(np.array(net.pos_dict[key]), np.array(original_pos_dict[key]))
+
+    net.update_cell_positions(inplane_distance=7.0)
+    net.update_cell_positions(layer_separation=2000.0)
+    net.update_cell_positions(inplane_distance=0.5, layer_separation=42.0)
+    net._reset_to_original_cell_positions()
+    assert np.isclose(net._inplane_distance, expected_inplane_distance)
+    assert np.isclose(net._layer_separation, expected_layer_separation)
+    assert set(net.pos_dict.keys()) == set(original_pos_dict.keys())
+    for key in original_pos_dict:
+        assert_allclose(np.array(net.pos_dict[key]), np.array(original_pos_dict[key]))
+
+    # Test that drives are repositioned correctly by _reset_to_original_cell_positions.
+    # ----------------------------------------------------------------------------------
+    assert len(net.external_drives) > 0
+
+    original_origin = deepcopy(net.pos_dict["origin"])
+    original_drive_pos = {
+        drive_name: deepcopy(net.pos_dict[drive_name])
+        for drive_name in net.external_drives
+    }
+
+    net.update_cell_positions(inplane_distance=5.0, layer_separation=500.0)
+    # drives sit at the origin, so they must have moved along with it
+    for drive_name in net.external_drives:
+        assert not np.allclose(
+            np.array(net.pos_dict[drive_name]), np.array(original_drive_pos[drive_name])
+        )
+
+    net._reset_to_original_cell_positions()
+    assert_allclose(np.array(net.pos_dict["origin"]), np.array(original_origin))
+    for drive_name in net.external_drives:
+        assert_allclose(
+            np.array(net.pos_dict[drive_name]),
+            np.array(original_drive_pos[drive_name]),
+        )
+        # every drive cell must sit exactly at the restored origin
+        for drive_cell_pos in net.pos_dict[drive_name]:
+            assert_allclose(np.array(drive_cell_pos), np.array(original_origin))
+
+    # A drive added *after* construction is not in the original snapshot, but must
+    # still be present and repositioned to the restored origin after a reset
+    net.update_cell_positions(inplane_distance=9.0)
+    net.add_evoked_drive(
+        "evprox_late",
+        mu=20.0,
+        sigma=3.0,
+        numspikes=1,
+        location="proximal",
+        weights_ampa={cell_type: 0.01 for cell_type in net.cell_types},
+        synaptic_delays={cell_type: 0.1 for cell_type in net.cell_types},
+    )
+    net._reset_to_original_cell_positions()
+    assert "evprox_late" in net.pos_dict
+    assert (
+        len(net.pos_dict["evprox_late"])
+        == net.external_drives["evprox_late"]["n_drive_cells"]
+    )
+    for drive_cell_pos in net.pos_dict["evprox_late"]:
+        assert_allclose(np.array(drive_cell_pos), np.array(original_origin))
 
 
 def test_network_drives():
@@ -662,6 +1206,7 @@ def test_network_drives():
     with pytest.raises(TypeError, match="'times' is an np.ndarray of simulation times"):
         _ = CellResponse(
             cell_type_names=["L2_basket", "L2_pyramidal", "L5_basket", "L5_pyramidal"],
+            cell_type_metadata=None,
             times="blah",
         )
 
@@ -869,6 +1414,7 @@ def test_network_drives_legacy():
     with pytest.raises(TypeError, match="'times' is an np.ndarray of simulation times"):
         _ = CellResponse(
             cell_type_names=["L2_basket", "L2_pyramidal", "L5_basket", "L5_pyramidal"],
+            cell_type_metadata=None,
             times="blah",
         )
 
@@ -1093,8 +1639,72 @@ def test_add_cell_type():
     assert nc.syn().tau1 == tau1
 
 
-def test_tonic_biases():
-    """Test tonic biases."""
+def test_tonic_biases_non_gid():
+    """Test that tonic biases work and simulate correctly (excluding gid argument)."""
+    net = neymotin_2020_model()
+    tonic_bias_1 = {"L2_pyramidal": 1.0}
+    net.add_tonic_bias(amplitude=tonic_bias_1, t0=0.0, tstop=4.0)
+    assert net.external_biases["tonic"]["L2_pyramidal"] is not None
+
+    # Reset biases to create them anew
+    net.external_biases = dict()
+    tonic_bias_2 = {"L2_pyramidal": 1.0, "L5_basket": 0.5}
+
+    net.add_tonic_bias(amplitude=tonic_bias_2, bias_name="tonic_2", t0=100)
+    assert "tonic_2" in net.external_biases
+    assert np.isclose(net.external_biases["tonic_2"]["L2_pyramidal"]["t0"], 100)
+
+    # Taken from first example of `Network.add_tonic_bias` docstring
+    net = neymotin_2020_model()
+    net.add_tonic_bias(amplitude={"L2_pyramidal": 1.0, "L5_pyramidal": 2.0})
+    assert np.isclose(net.external_biases["tonic"]["L2_pyramidal"]["amplitude"], 1.0)
+    assert np.isclose(net.external_biases["tonic"]["L5_pyramidal"]["amplitude"], 2.0)
+    assert net.external_biases["tonic"]["L2_pyramidal"]["gid"] == list(
+        net.gid_ranges["L2_pyramidal"]
+    )
+    assert net.external_biases["tonic"]["L5_pyramidal"]["gid"] == list(
+        net.gid_ranges["L5_pyramidal"]
+    )
+
+    # Reset and test that the deprecated `cell_type` argument still works
+    net.external_biases = dict()
+    with pytest.warns(DeprecationWarning, match=r"cell_type argument will be"):
+        net.add_tonic_bias(amplitude=1.0, cell_type="L2_pyramidal")
+    assert np.isclose(net.external_biases["tonic"]["L2_pyramidal"]["amplitude"], 1.0)
+    assert net.external_biases["tonic"]["L2_pyramidal"]["gid"] == list(
+        net.gid_ranges["L2_pyramidal"]
+    )
+
+    # Reset and test that remaining non-gid arguments work as expected
+    net = neymotin_2020_model()
+    net.add_tonic_bias(
+        amplitude={"L2_basket": 1.0, "L5_pyramidal": 2.0},
+        bias_name="tonic_soma",
+        section="soma",
+        t0=0.0,
+        tstop=10.0,
+    )
+    assert "tonic_soma" in net.external_biases
+    assert np.isclose(net.external_biases["tonic_soma"]["L2_basket"]["amplitude"], 1.0)
+    assert np.isclose(
+        net.external_biases["tonic_soma"]["L5_pyramidal"]["amplitude"], 2.0
+    )
+    assert net.external_biases["tonic_soma"]["L2_basket"]["gid"] == list(
+        net.gid_ranges["L2_basket"]
+    )
+    assert net.external_biases["tonic_soma"]["L5_pyramidal"]["gid"] == list(
+        net.gid_ranges["L5_pyramidal"]
+    )
+    assert net.external_biases["tonic_soma"]["L2_basket"]["section"] == "soma"
+    assert net.external_biases["tonic_soma"]["L5_pyramidal"]["section"] == "soma"
+    assert np.isclose(net.external_biases["tonic_soma"]["L2_basket"]["t0"], 0.0)
+    assert np.isclose(net.external_biases["tonic_soma"]["L5_pyramidal"]["t0"], 0.0)
+    assert np.isclose(net.external_biases["tonic_soma"]["L2_basket"]["tstop"], 10.0)
+    assert np.isclose(net.external_biases["tonic_soma"]["L5_pyramidal"]["tstop"], 10.0)
+
+
+def test_tonic_biases_legacy_params_api():
+    """Test that the legacy 'params' API for tonic biases is still functional."""
     hnn_core_root = Path(hnn_core.__file__).parent
 
     # default params
@@ -1112,75 +1722,9 @@ def test_tonic_biases():
         delay=1.0,
         lamtha=3.0,
     )
-
-    tonic_bias_1 = {"L2_pyramidal": 1.0, "name_nonexistent": 1.0}
-
-    with pytest.raises(ValueError, match=r"cell_type must be one of .*$"):
-        net.add_tonic_bias(amplitude=tonic_bias_1, t0=0.0, tstop=4.0)
-
-    # The previous test only adds L2_pyramidal and ignores name_nonexistent
-    # Testing the fist bias was added
-    assert net.external_biases["tonic"]["L2_pyramidal"] is not None
-    net.external_biases = dict()
-
-    with pytest.raises(TypeError, match="amplitude must be an instance of dict"):
-        net.add_tonic_bias(amplitude=0.1, t0=5.0, tstop=-1.0)
-
-    tonic_bias_2 = {"L2_pyramidal": 1.0, "L5_basket": 0.5}
-
-    with pytest.raises(ValueError, match="Duration of tonic input cannot be negative"):
-        net.add_tonic_bias(amplitude=tonic_bias_2, t0=5.0, tstop=4.0)
-        simulate_dipole(net, tstop=20.0)
-    net.external_biases = dict()
-
-    with pytest.raises(ValueError, match="End time of tonic input cannot be negative"):
-        net.add_tonic_bias(amplitude=tonic_bias_2, t0=5.0, tstop=-1.0)
-        simulate_dipole(net, tstop=5.0)
-    net.external_biases = dict()
-
     with pytest.raises(ValueError, match="parameter may be missing"):
         params["Itonic_T_L2Pyr_soma"] = 5.0
         net = Network(params, add_drives_from_params=True)
-    net.external_biases = dict()
-
-    # test adding single cell_type - amplitude (old API)
-    with pytest.raises(ValueError, match=r"cell_type must be one of .*$"):
-        with pytest.warns(
-            FutureWarning, match=r"cell_type argument will be deprecated"
-        ):
-            net.add_tonic_bias(
-                cell_type="name_nonexistent", amplitude=1.0, t0=0.0, tstop=4.0
-            )
-
-    with pytest.raises(
-        TypeError, match="amplitude must be an instance of float or int"
-    ):
-        with pytest.warns(
-            FutureWarning, match=r"cell_type argument will be deprecated"
-        ):
-            net.add_tonic_bias(
-                cell_type="L5_pyramidal",
-                amplitude={"L2_pyramidal": 0.1},
-                t0=5.0,
-                tstop=-1.0,
-            )
-
-    with pytest.raises(ValueError, match="Duration of tonic input cannot be negative"):
-        with pytest.warns(
-            FutureWarning, match=r"cell_type argument will be deprecated"
-        ):
-            net.add_tonic_bias(cell_type="L2_pyramidal", amplitude=1, t0=5.0, tstop=4.0)
-            simulate_dipole(net, tstop=20.0)
-    net.external_biases = dict()
-
-    with pytest.raises(ValueError, match="End time of tonic input cannot be negative"):
-        with pytest.warns(
-            FutureWarning, match=r"cell_type argument will be deprecated"
-        ):
-            net.add_tonic_bias(
-                cell_type="L2_pyramidal", amplitude=1.0, t0=5.0, tstop=-1.0
-            )
-            simulate_dipole(net, tstop=5.0)
 
     params.update(
         {
@@ -1204,33 +1748,506 @@ def test_tonic_biases():
 
     # new API
     net = Network(params)
-    net.add_tonic_bias(amplitude=tonic_bias_2)
+    good_amplitude = {"L2_pyramidal": 1.0, "L5_basket": 0.5}
+    net.add_tonic_bias(amplitude=good_amplitude)
+
     assert "tonic" in net.external_biases
     assert "L5_pyramidal" not in net.external_biases["tonic"]
-    assert net.external_biases["tonic"]["L2_pyramidal"]["t0"] == 0
+    assert np.isclose(net.external_biases["tonic"]["L2_pyramidal"]["t0"], 0)
     with pytest.raises(
         ValueError,
-        match=r"Bias named tonic already defined "
-        r"for.*$",
+        match=r"Bias named tonic already defined for",
     ):
-        net.add_tonic_bias(amplitude=tonic_bias_2)
+        net.add_tonic_bias(amplitude=good_amplitude)
 
+
+def test_tonic_biases_gid_routing():
+    """Test routing and simulation of gids to cell types when biasing multiple cell types."""
+
+    def _test_and_simulate_gid_case(
+        gid_inputs,
+        amplitude_inputs,
+        expected_spiking_gid_list: list,
+        cell_types,
+    ):
+        """Helper function to test that gid and amplitude variants route and simulate correctly."""
+        for gid_input, amplitude_input in zip(gid_inputs, amplitude_inputs):
+            net = neymotin_2020_model()
+            net.clear_connectivity()
+
+            net.add_tonic_bias(
+                gid=gid_input,
+                bias_name="tonic_soma",
+                amplitude=amplitude_input,
+                t0=10,
+                tstop=15,
+            )
+            # Needed for the multiple cell type case
+            all_biased_gids = []
+            for cell_type in cell_types:
+                all_biased_gids.extend(
+                    net.external_biases["tonic_soma"][cell_type]["gid"]
+                )
+            # Check if input GID(s) stored correctly -- these should always be lists
+            assert all_biased_gids == expected_spiking_gid_list
+            # Simulate
+            dpl = simulate_dipole(net, tstop=20)
+            # Check that only the target gid spiked
+            only_spiking_gids = np.unique(
+                np.array(net.cell_response.spike_gids, dtype=int)
+            )
+            assert set(only_spiking_gids) == set(expected_spiking_gid_list)
+            del net, dpl, only_spiking_gids
+
+    # Test that in an empty network, adding a bias for a single GID both creates the
+    # bias correctly and, when simulated, only that GID spikes.
+    # ----------------------------------------------------------------------------------
+    # We will test for all styles of `gid` input that produce this same routing
     net = neymotin_2020_model()
-    net.add_tonic_bias(amplitude=tonic_bias_2, bias_name="tonic_2", t0=100)
-    assert "tonic_2" in net.external_biases
-    assert net.external_biases["tonic_2"]["L2_pyramidal"]["t0"] == 100
+    target_gid = 35
+    cell_type = "L2_pyramidal"
+    # Pre-check that GID is Correct type
+    assert target_gid in net.gid_ranges[cell_type]
 
-    # non-existent section
-    net.external_biases = dict()
+    gid_inputs = [
+        target_gid,  # single gid
+        [target_gid],  # single gid in a list
+        {cell_type: target_gid},  # single gid in a dict
+        {cell_type: [target_gid]},  # single gid in a list in a dict
+    ]
+    amplitude_inputs = [
+        3,  # single amplitude
+        {cell_type: 3},  # single amplitude in a dict
+    ]
+    _test_and_simulate_gid_case(
+        gid_inputs=gid_inputs,
+        amplitude_inputs=amplitude_inputs,
+        expected_spiking_gid_list=[target_gid],
+        cell_types=[cell_type],
+    )
 
+    # Test that in an empty network, adding a bias for a list of GIDs both creates the
+    # bias correctly and, when simulated, only those GIDs spikes.
+    # ----------------------------------------------------------------------------------
+    net = neymotin_2020_model()
+    net.clear_connectivity()
+    target_gids = [56, 67]
+    cell_type = "L2_pyramidal"
+    # Pre-check that GID is Correct type
+    for target_gid in target_gids:
+        assert target_gid in net.gid_ranges[cell_type]
+
+    gid_inputs = [
+        target_gids,  # gid list
+        {cell_type: target_gids},  # gid list in a dict
+    ]
+    amplitude_inputs = [
+        3,  # single amplitude
+        {cell_type: 3},  # single amplitude in a dict
+    ]
+    _test_and_simulate_gid_case(
+        gid_inputs=gid_inputs,
+        amplitude_inputs=amplitude_inputs,
+        expected_spiking_gid_list=target_gids,
+        cell_types=[cell_type],
+    )
+
+    # Test that in an empty network, adding a bias for a list of GIDs of multiple cell
+    # types creates the bias correctly and, when simulated, only those GIDs spikes.
+    # ----------------------------------------------------------------------------------
+    net = neymotin_2020_model()
+    net.clear_connectivity()
+    target_gids = [56, 67, 173]
+    cell_types = ["L2_pyramidal", "L5_pyramidal"]
+
+    # Pre-check that GID is Correct type
+    for target_gid in [target_gids[0], target_gids[1]]:
+        assert target_gid in net.gid_ranges["L2_pyramidal"]
+    for target_gid in [target_gids[2]]:
+        assert target_gid in net.gid_ranges["L5_pyramidal"]
+
+    gid_inputs = [
+        target_gids,  # gid list
+        {  # gid lists in a dict
+            "L2_pyramidal": [target_gids[0], target_gids[1]],
+            "L5_pyramidal": [target_gids[2]],
+        },
+        {  # gid lists and single gid in a dict
+            "L2_pyramidal": [target_gids[0], target_gids[1]],
+            "L5_pyramidal": target_gids[2],
+        },
+    ]
+    amplitude_inputs = [
+        3,  # single amplitude
+        {"L2_pyramidal": 3, "L5_pyramidal": 3},  # amplitudes in a dict
+    ]
+    _test_and_simulate_gid_case(
+        gid_inputs=gid_inputs,
+        amplitude_inputs=amplitude_inputs,
+        expected_spiking_gid_list=target_gids,
+        cell_types=cell_types,
+    )
+
+    # Test that in an empty network, adding a bias for a list of some GIDs of one cell
+    # type and ALL GIDs of another cell type creates the bias correctly and, when
+    # simulated, only those GIDs spikes.
+    # ----------------------------------------------------------------------------------
+    net = neymotin_2020_model()
+    net.clear_connectivity()
+    target_gids = [56, 67]
+    target_gids.extend(list(net.gid_ranges["L5_pyramidal"]))
+    cell_types = ["L2_pyramidal", "L5_pyramidal"]
+
+    # Pre-check that GID is Correct type
+    for target_gid in [target_gids[0], target_gids[1]]:
+        assert target_gid in net.gid_ranges["L2_pyramidal"]
+    for target_gid in target_gids[2:]:
+        assert target_gid in net.gid_ranges["L5_pyramidal"]
+
+    gid_inputs = [
+        target_gids,  # gid list
+        {  # gid lists in a dict
+            "L2_pyramidal": [target_gids[0], target_gids[1]],
+            "L5_pyramidal": target_gids[2:],
+        },
+        {  # gid lists and "all"
+            "L2_pyramidal": [target_gids[0], target_gids[1]],
+            "L5_pyramidal": "all",
+        },
+    ]
+    amplitude_inputs = [
+        3,  # single amplitude
+        {"L2_pyramidal": 3, "L5_pyramidal": 3},  # amplitudes in a dict
+    ]
+    _test_and_simulate_gid_case(
+        gid_inputs=gid_inputs,
+        amplitude_inputs=amplitude_inputs,
+        expected_spiking_gid_list=target_gids,
+        cell_types=cell_types,
+    )
+
+    # If no target gid given, bias applied to all cells of a particular cell type. For
+    # this test, remove all connections and ensure that ONLY cells of that particular
+    # type spike. Do this for both the deprecated arg cell_type (backwards
+    # compatibility), amplitude by itself, and our new gid argument.
+    # ----------------------------------------------------------------------------------
+    net = neymotin_2020_model()
+    for cell_type in net.cell_types.keys():
+        net = neymotin_2020_model()
+        kwargs_inputs = [
+            {
+                "amplitude": 3,
+                "cell_type": cell_type,
+                "bias_name": "tonic_soma",
+                "t0": 10,
+                "tstop": 15,
+            },
+            {
+                "amplitude": 3,
+                "gid": list(net.gid_ranges[cell_type]),
+                "bias_name": "tonic_soma",
+                "t0": 10,
+                "tstop": 15,
+            },
+            {
+                "amplitude": 3,
+                "gid": {cell_type: "all"},
+                "bias_name": "tonic_soma",
+                "t0": 10,
+                "tstop": 15,
+            },
+            {
+                "amplitude": {cell_type: 3},
+                "bias_name": "tonic_soma",
+                "t0": 10,
+                "tstop": 15,
+            },
+            {
+                "amplitude": {cell_type: 3},
+                "gid": list(net.gid_ranges[cell_type]),
+                "bias_name": "tonic_soma",
+                "t0": 10,
+                "tstop": 15,
+            },
+            {
+                "amplitude": {cell_type: 3},
+                "gid": {cell_type: "all"},
+                "bias_name": "tonic_soma",
+                "t0": 10,
+                "tstop": 15,
+            },
+        ]
+
+        for kwargs in kwargs_inputs:
+            net = neymotin_2020_model()
+            net.clear_connectivity()
+            net.add_tonic_bias(**kwargs)
+            # Check that the bias is applied to all gids of that cell type
+            assert net.external_biases["tonic_soma"][cell_type]["gid"] == list(
+                net.gid_ranges[cell_type]
+            )
+            # Simulate
+            dpl = simulate_dipole(net, tstop=20)
+            # Check that only this cell type spiked
+            assert (
+                np.unique(np.array(net.cell_response.spike_gids))
+                == net.gid_ranges[cell_type]
+            ).all()
+            del net, dpl
+
+
+def test_tonic_biases_docstring_examples():
+    """Test each example call given in the Network.add_tonic_bias docstring."""
+    # Example 1: dict amplitude, no gid -- applies to all cells of both types
+    net = neymotin_2020_model()
+    net.add_tonic_bias(amplitude={"L2_pyramidal": 1.0, "L5_pyramidal": 2.0})
+    assert net.external_biases["tonic"]["L2_pyramidal"]["amplitude"] == 1.0
+    assert net.external_biases["tonic"]["L5_pyramidal"]["amplitude"] == 2.0
+    assert net.external_biases["tonic"]["L2_pyramidal"]["gid"] == list(
+        net.gid_ranges["L2_pyramidal"]
+    )
+    assert net.external_biases["tonic"]["L5_pyramidal"]["gid"] == list(
+        net.gid_ranges["L5_pyramidal"]
+    )
+
+    # Example 2: float amplitude, single gid (int)
+    net = neymotin_2020_model()
+    single_gid = list(net.gid_ranges["L2_pyramidal"])[0]
+    net.add_tonic_bias(amplitude=1.0, gid=single_gid)
+    assert net.external_biases["tonic"]["L2_pyramidal"]["amplitude"] == 1.0
+    assert net.external_biases["tonic"]["L2_pyramidal"]["gid"] == [single_gid]
+
+    # Example 3: float amplitude, gid as a flat list spanning multiple cell types
+    net = neymotin_2020_model()
+    l2_gids = list(net.gid_ranges["L2_pyramidal"])[:2]
+    l5_gid = list(net.gid_ranges["L5_pyramidal"])[0]
+    net.add_tonic_bias(amplitude=1.0, gid=l2_gids + [l5_gid])
+    assert net.external_biases["tonic"]["L2_pyramidal"]["amplitude"] == 1.0
+    assert net.external_biases["tonic"]["L5_pyramidal"]["amplitude"] == 1.0
+    assert net.external_biases["tonic"]["L2_pyramidal"]["gid"] == sorted(l2_gids)
+    assert net.external_biases["tonic"]["L5_pyramidal"]["gid"] == [l5_gid]
+
+    # Example 4: float amplitude, gid as a {cell_type: gid(s)} dictionary
+    net = neymotin_2020_model()
+    l2_gids = list(net.gid_ranges["L2_pyramidal"])[:2]
+    l5_gid = list(net.gid_ranges["L5_pyramidal"])[0]
+    net.add_tonic_bias(
+        amplitude=1.0,
+        gid={"L2_pyramidal": l2_gids, "L5_pyramidal": l5_gid},
+    )
+    assert net.external_biases["tonic"]["L2_pyramidal"]["amplitude"] == 1.0
+    assert net.external_biases["tonic"]["L5_pyramidal"]["amplitude"] == 1.0
+    assert net.external_biases["tonic"]["L2_pyramidal"]["gid"] == l2_gids
+    assert net.external_biases["tonic"]["L5_pyramidal"]["gid"] == [l5_gid]
+
+    # Example 5: dict amplitude, gid as a matching {cell_type: gid(s)} dictionary
+    net = neymotin_2020_model()
+    l2_gids = list(net.gid_ranges["L2_pyramidal"])[:2]
+    l5_gid = list(net.gid_ranges["L5_pyramidal"])[0]
+    net.add_tonic_bias(
+        amplitude={"L2_pyramidal": 1.0, "L5_pyramidal": 2.0},
+        gid={"L2_pyramidal": l2_gids, "L5_pyramidal": l5_gid},
+    )
+    assert net.external_biases["tonic"]["L2_pyramidal"]["amplitude"] == 1.0
+    assert net.external_biases["tonic"]["L5_pyramidal"]["amplitude"] == 2.0
+    assert net.external_biases["tonic"]["L2_pyramidal"]["gid"] == l2_gids
+    assert net.external_biases["tonic"]["L5_pyramidal"]["gid"] == [l5_gid]
+
+    # Example 6: dict amplitude, gid dictionary using the string 'all' for one
+    # cell type and an explicit gid for the other
+    net = neymotin_2020_model()
+    l5_gid = list(net.gid_ranges["L5_pyramidal"])[0]
+    net.add_tonic_bias(
+        amplitude={"L2_pyramidal": 1.0, "L5_pyramidal": 2.0},
+        gid={"L2_pyramidal": "all", "L5_pyramidal": l5_gid},
+    )
+    assert net.external_biases["tonic"]["L2_pyramidal"]["amplitude"] == 1.0
+    assert net.external_biases["tonic"]["L5_pyramidal"]["amplitude"] == 2.0
+    assert net.external_biases["tonic"]["L2_pyramidal"]["gid"] == list(
+        net.gid_ranges["L2_pyramidal"]
+    )
+    assert net.external_biases["tonic"]["L5_pyramidal"]["gid"] == [l5_gid]
+
+
+def test_tonic_biases_validation():
+    """Test that erroneous inputs to tonic biases are caught."""
+    net = neymotin_2020_model()
+    good_amplitude = {"L2_pyramidal": 0.5, "L5_pyramidal": 1.0}
+
+    # Test that the rules about input LOGIC and types are enforced
+    # ----------------------------------------------------------------------------------
+    # This section is intended to check that our validation that arguments are formatted
+    # correctly, typed correctly, and that the logical relationships BETWEEN arguments
+    # are enforced (in all their many variants). The next section will check that the
+    # values of arguments are valid with respect to the network.
+    #
+    # Check amplitude argument
+    with pytest.raises(
+        TypeError, match="amplitude must be an instance of int, float, or dict"
+    ):
+        net.add_tonic_bias(amplitude="foo", gid=35)
+
+    # Check time arguments
+    with pytest.raises(ValueError, match="Duration of tonic input cannot be negative"):
+        net.add_tonic_bias(amplitude=good_amplitude, t0=5.0, tstop=4.0)
+    with pytest.raises(ValueError, match="End time of tonic input cannot be negative"):
+        net.add_tonic_bias(amplitude=good_amplitude, t0=5.0, tstop=-1.0)
+
+    # Check gid argument for logic and type rules
+    # If amplitude is a float, either gid or cell_type (deprecated) are now required
+    with pytest.raises(ValueError, match="`gid` must be specified"):
+        net.add_tonic_bias(amplitude=0.1, t0=5.0, tstop=6.0)
+    with pytest.raises(
+        TypeError, match="gid must be an instance of int, list, or dict"
+    ):
+        net.add_tonic_bias(amplitude={"L2_pyramidal": 0.5}, gid="foo")
+
+    # When 'gid' is a single int, an 'amplitude' dict may only have one entry.
+    with pytest.raises(
+        ValueError,
+        match="When `amplitude` is a dictionary and `gid` is an int, "
+        "the dictionary must contain only one key-value pair",
+    ):
+        net.add_tonic_bias(amplitude=good_amplitude, gid=35)
+    # When both 'amplitude' and 'gid' are dicts, their keys must match.
+    with pytest.raises(ValueError, match="the keys of both dictionaries must match"):
+        net.add_tonic_bias(amplitude={"L2_pyramidal": 0.5}, gid={"L5_pyramidal": [170]})
+
+    # A gid dict value that is a string must be exactly 'all'.
+    with pytest.raises(ValueError, match="the only valid option is 'all'"):
+        net.add_tonic_bias(amplitude={"L2_pyramidal": 0.5}, gid={"L2_pyramidal": "foo"})
+
+    # A gid dict value must be an int, list, or the string 'all'.
+    with pytest.raises(
+        TypeError, match=r"gid.values\(\) must be an instance of int, list, or str"
+    ):
+        net.add_tonic_bias(amplitude={"L2_pyramidal": 0.5}, gid={"L2_pyramidal": 1.5})
+
+    # An empty 'gid' list raises an error that no biases can be defined.
+    with pytest.raises(
+        ValueError,
+        match="The provided 'gid' argument is empty, therefore no biases",
+    ):
+        net.add_tonic_bias(amplitude={"L2_pyramidal": 0.5}, gid=[])
+
+    # An empty gid list for a cell type in a 'gid' dict warns that no biases have been
+    # defined for that cell type.
     with pytest.raises(
         ValueError,
         match=(
-            r"section must be one of .*"
-            " Got apical_4."
+            "The provided 'gid' argument for cell type 'L2_pyramidal' is empty, "
+            "therefore no biases"
         ),
     ):
+        net.add_tonic_bias(amplitude={"L2_pyramidal": 0.5}, gid={"L2_pyramidal": []})
+
+    # Related tests for the deprecated cell_type argument
+    # -----------------------------------
+    with pytest.raises(
+        ValueError,
+        match=("When using the deprecated 'cell_type' argument, the 'gid'"),
+    ):
+        with pytest.warns(DeprecationWarning, match="cell_type argument will be"):
+            net.add_tonic_bias(
+                cell_type="L2_pyramidal",
+                gid=35,
+                bias_name="tonic_soma",
+                amplitude=3,
+                t0=10,
+                tstop=15,
+            )
+
+    with pytest.raises(
+        TypeError, match="amplitude must be an instance of float or int"
+    ):
+        with pytest.warns(DeprecationWarning, match="cell_type argument will be"):
+            net.add_tonic_bias(
+                cell_type="L5_pyramidal",
+                amplitude={"L2_pyramidal": 0.1},
+                t0=5.0,
+                tstop=6.0,
+            )
+
+    with pytest.raises(ValueError, match="Duration of tonic input cannot be negative"):
+        with pytest.warns(DeprecationWarning, match="cell_type argument will be"):
+            net.add_tonic_bias(cell_type="L2_pyramidal", amplitude=1, t0=5.0, tstop=4.0)
+
+    with pytest.raises(ValueError, match="End time of tonic input cannot be negative"):
+        with pytest.warns(DeprecationWarning, match="cell_type argument will be"):
+            net.add_tonic_bias(
+                cell_type="L2_pyramidal", amplitude=1.0, t0=5.0, tstop=-1.0
+            )
+
+    # Test that the checks of input VALUES are enforced
+    # ----------------------------------------------------------------------------------
+    # This section is intended to check that the values of arguments are valid with
+    # respect to the network.
+    #
+    # Test that the checks of bias_name are enforced
+    net_repeat = neymotin_2020_model()
+    net_repeat.add_tonic_bias(amplitude={"L2_pyramidal": 0.5}, bias_name="tonic")
+    with pytest.raises(
+        ValueError, match="Bias named tonic already defined for L2_pyramidal"
+    ):
+        net_repeat.add_tonic_bias(amplitude={"L2_pyramidal": 0.5}, bias_name="tonic")
+
+    # Test that the checks of section are enforced
+    with pytest.raises(ValueError, match="section 'apical_4' does not exist. Section"):
         net.add_tonic_bias(amplitude={"L2_pyramidal": 0.5}, section="apical_4")
+
+    # Test that the checks of cell type names are enforced
+    with pytest.raises(ValueError, match=r"Provided cell type must be one of"):
+        net.add_tonic_bias(amplitude={"name_nonexistent": 1.0}, t0=0.0, tstop=4.0)
+
+    with pytest.raises(ValueError, match=r"Provided cell type must be one of"):
+        with pytest.warns(DeprecationWarning, match=r"cell_type argument will be"):
+            net.add_tonic_bias(
+                cell_type="name_nonexistent", amplitude=1.0, t0=0.0, tstop=4.0
+            )
+    with pytest.raises(ValueError, match=r"Provided cell type must be one of"):
+        net.add_tonic_bias(
+            amplitude=1.0, gid={"name_nonexistent": [26]}, t0=0.0, tstop=4.0
+        )
+
+    # Test that the checks of gid input are enforced
+    # -----------------------------------------
+    # In the default network, gids 35, 36 are L2_pyramidal and gid 170 is L5_pyramidal.
+    #
+    # A gid outside the network's gid ranges is rejected.
+    with pytest.raises(
+        ValueError, match="Invalid gid '999', not found in Network.gid_ranges"
+    ):
+        net.add_tonic_bias(amplitude={"L2_pyramidal": 0.5}, gid={"L2_pyramidal": 999})
+
+    # An int gid whose cell type is absent from the 'amplitude' dict is rejected.
+    with pytest.raises(
+        ValueError,
+        match=(
+            "GID '170' is of cell type 'L5_pyramidal', but this cell type is not "
+            "present in the 'amplitude' dictionary."
+        ),
+    ):
+        net.add_tonic_bias(amplitude={"L2_pyramidal": 0.5}, gid=170)
+
+    # A gid must belong to the cell type it is keyed under in the 'gid' dict; gid 170
+    # is L5_pyramidal, not L2_pyramidal.
+    with pytest.raises(
+        ValueError,
+        match=(
+            "GID '170' belongs to cell type 'L5_pyramidal' instead of the "
+            "argument-provided cell type for this gid: 'L2_pyramidal'."
+        ),
+    ):
+        net.add_tonic_bias(amplitude=0.5, gid={"L2_pyramidal": 170})
+
+    # An 'amplitude' dict cannot name a cell type that no provided gid belongs to;
+    # here gids 35 and 36 are both L2_pyramidal, but 'amplitude' also names
+    # L5_pyramidal.
+    with pytest.raises(
+        ValueError,
+        match="'amplitude' dictionary contains cell types that are not present",
+    ):
+        net.add_tonic_bias(amplitude=good_amplitude, gid=[35, 36])
 
 
 def test_network_mesh():
@@ -1717,6 +2734,7 @@ def test_spike_train_drive_formats_and_simulation():
             spike_gids=spike_gids,
             spike_types=spike_types,
             cell_type_names=cell_types,
+            cell_type_metadata=None,
         )
 
         # Write spike data to file

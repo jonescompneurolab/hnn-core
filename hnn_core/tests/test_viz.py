@@ -1,3 +1,5 @@
+import os.path as op
+import tempfile
 from pathlib import Path
 
 import matplotlib
@@ -10,7 +12,7 @@ from numpy.testing import assert_allclose
 import pytest
 
 import hnn_core
-from hnn_core import read_params, neymotin_2020_model
+from hnn_core import read_params, neymotin_2020_model, read_spikes
 from hnn_core.dipole import simulate_dipole
 from hnn_core.network_models import default_cell_metadata
 from hnn_core.viz import (
@@ -109,6 +111,18 @@ def test_network_visualization(setup_net):
         TypeError, match="'ax' to be an instance of Axes3D, but got Axes"
     ):
         plot_cells(net, ax=axes, show=False)
+
+    # Test that colors input works for valid cell types, and does not for invalid cell
+    # types
+    plot_cells(net, show=False, colors={"L2_pyramidal": "y"})
+    with pytest.raises(ValueError, match="does not exist in given Network"):
+        plot_cells(net, show=False, colors={"L3333_pyrdamial": "b"})
+    # Test that markers input works for valid cell types, and does not for invalid cell
+    # types
+    plot_cells(net, show=False, markers={"L2_pyramidal": "+"})
+    with pytest.raises(ValueError, match="does not exist in given Network"):
+        plot_cells(net, show=False, markers={"L3333_pyrdamial": "x"})
+
     cell_type["cell_object"].plot_morphology(pos=(1.0, 2.0, 3.0))
     with pytest.raises(TypeError, match="pos must be"):
         cell_type["cell_object"].plot_morphology(pos=123)
@@ -322,7 +336,7 @@ def test_drive_strength(setup_net):
 class TestCellResponsePlotters:
     """Tests plotting methods of the CellResponse class"""
 
-    @pytest.fixture(scope="class")
+    @pytest.fixture
     def class_setup_net(self):
         """Creates a base network for tests within this class"""
         hnn_core_root = Path(hnn_core.__file__).parent
@@ -332,8 +346,15 @@ class TestCellResponsePlotters:
 
         return net
 
-    @pytest.fixture(scope="class")
-    def base_simulation_spikes(self, class_setup_net):
+    # AES Had to remove scope=class because we do NOT want only one instance of the
+    # fixture per class anymore
+    @pytest.fixture(
+        params=[
+            None,
+            default_cell_metadata,
+        ],
+    )
+    def base_simulation_spikes(self, class_setup_net, request):
         """Adds drives with spikes for testing of spike visualizations"""
         net = class_setup_net
         weights_ampa = {"L2_pyramidal": 0.1, "L5_pyramidal": 1.0}
@@ -367,6 +388,7 @@ class TestCellResponsePlotters:
         )
         dpls = simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
 
+        net.cell_response._cell_type_metadata = request.param
         return net, dpls
 
     def test_spikes_raster_trial_idx(self, base_simulation_spikes):
@@ -400,16 +422,18 @@ class TestCellResponsePlotters:
             labels = [text.get_text() for text in fig.axes[0].legend_.get_texts()]
             return colors, labels
 
-        # Default colors should come from cell metadata
-        fig = net.cell_response.plot_spikes_raster(trial_idx=0, show=False)
-        colors, labels = _get_line_hex_colors(fig)
-
-        expected_cell_types = sorted(default_cell_metadata.keys())
-        expected_colors = [
-            matplotlib.colors.to_hex(default_cell_metadata[ct]["color"])
-            for ct in expected_cell_types
-        ]
-        assert colors == expected_colors
+        metadata_colors = []
+        if net.cell_response._cell_type_metadata:
+            for cell_type in net.cell_response._cell_type_metadata:
+                metadata_colors.append(
+                    matplotlib.colors.to_hex(
+                        net.cell_response._cell_type_metadata[cell_type]["color"]
+                    )
+                )
+            # Default colors should be from the CellResponse metadata
+            fig = net.cell_response.plot_spikes_raster(trial_idx=0, show=False)
+            colors, _ = _get_line_hex_colors(fig)
+            assert colors == metadata_colors
 
         # Custom hex colors as list
         custom_colors = ["#daf7a6", "#ffc300", "#ff5733", "#c70039"]
@@ -465,6 +489,136 @@ class TestCellResponsePlotters:
                 trial_idx=0, show=False, colors=dict_mapping
             )
 
+    def test_firing_rate_time_colors(self, base_simulation_spikes):
+        """Plotting firing rates over time with different color arguments"""
+        net, _ = base_simulation_spikes
+        cell_response = net.cell_response
+        cell_types = cell_response._cell_type_names
+
+        def _get_line_hex_colors(axes):
+            """Return the legend line color and label from each subplot axis."""
+            colors, labels = [], []
+            for ax in np.atleast_1d(axes):
+                for line in ax.get_legend().get_lines():
+                    colors.append(matplotlib.colors.to_hex(line.get_color()))
+                    labels.append(line.get_label())
+            return colors, labels
+
+        # Default colors should come from the CellResponse metadata (if present)
+        if cell_response._cell_type_metadata:
+            metadata_colors = [
+                matplotlib.colors.to_hex(
+                    cell_response._cell_type_metadata[cell_type]["color"]
+                )
+                for cell_type in cell_types
+            ]
+            axes = cell_response.plot_firing_rate_time(window_length=10, show=False)
+            colors, labels = _get_line_hex_colors(axes)
+            assert labels == cell_types
+            assert colors == metadata_colors
+
+        # Custom hex colors as a list, one per cell type
+        custom_colors = ["#daf7a6", "#ffc300", "#ff5733", "#c70039"]
+        axes = cell_response.plot_firing_rate_time(
+            window_length=10, show=False, colors=custom_colors
+        )
+        colors, _ = _get_line_hex_colors(axes)
+        assert colors == custom_colors
+
+        # Custom named colors as a list
+        custom_colors = ["skyblue", "maroon", "gold", "hotpink"]
+        color_map = matplotlib.colors.get_named_colors_mapping()
+        axes = cell_response.plot_firing_rate_time(
+            window_length=10, show=False, colors=custom_colors
+        )
+        colors, _ = _get_line_hex_colors(axes)
+        assert colors == [color_map[color].lower() for color in custom_colors]
+
+        # Colors as a dict mapping every cell type
+        dict_mapping = {
+            "L2_basket": "#daf7a6",
+            "L2_pyramidal": "#ffc300",
+            "L5_basket": "#ff5733",
+            "L5_pyramidal": "#c70039",
+        }
+        axes = cell_response.plot_firing_rate_time(
+            window_length=10, show=False, colors=dict_mapping
+        )
+        colors, labels = _get_line_hex_colors(axes)
+        assert colors == [dict_mapping[label] for label in labels]
+
+        # Changing the color of only one cell type leaves the others untouched
+        default_axes = cell_response.plot_firing_rate_time(window_length=10, show=False)
+        default_colors, _ = _get_line_hex_colors(default_axes)
+        axes = cell_response.plot_firing_rate_time(
+            window_length=10, show=False, colors={"L2_pyramidal": "#daf7a6"}
+        )
+        colors, labels = _get_line_hex_colors(axes)
+        assert colors[labels.index("L2_pyramidal")] == "#daf7a6"
+        for i, label in enumerate(labels):
+            if label != "L2_pyramidal":
+                assert colors[i] == default_colors[i]
+
+    def test_firing_rate_time_errors(self, base_simulation_spikes):
+        """ValueErrors/TypeErrors are raised for invalid arguments"""
+        net, _ = base_simulation_spikes
+        cell_response = net.cell_response
+
+        # Invalid trial_idx type raises a TypeError
+        with pytest.raises(TypeError, match="trial_idx must be an instance of"):
+            cell_response.plot_firing_rate_time(
+                window_length=10, trial_idx="blah", show=False
+            )
+
+        # Invalid trial_idx value raises a ValueError
+        with pytest.raises(
+            ValueError, match="'trial_idx' must be a non-negative integer"
+        ):
+            cell_response.plot_firing_rate_time(
+                window_length=10, trial_idx=-1, show=False
+            )
+
+        # Unknown cell type raises a ValueError
+        with pytest.raises(ValueError, match="Invalid cell type provided"):
+            cell_response.plot_firing_rate_time(
+                window_length=10, cell_types=["bad_cell_type"], show=False
+            )
+
+        # Invalid colors type raises a TypeError
+        with pytest.raises(TypeError, match="color must be an instance of"):
+            cell_response.plot_firing_rate_time(
+                window_length=10, colors="blue", show=False
+            )
+
+        # Wrong number of colors as a list raises a ValueError
+        too_few = ["r", "g", "b"]
+        too_many = ["r", "g", "b", "y", "k"]
+        for colors in [too_few, too_many]:
+            with pytest.raises(ValueError, match="Number of colors must be equal to"):
+                cell_response.plot_firing_rate_time(
+                    window_length=10, show=False, colors=colors
+                )
+
+        # An unknown cell type in a colors dict raises a ValueError
+        with pytest.raises(ValueError, match="Invalid cell type provided"):
+            cell_response.plot_firing_rate_time(
+                window_length=10, show=False, colors={"bad_cell_type": "#daf7a6"}
+            )
+
+        # A single axis cannot hold multiple cell types
+        _, ax = plt.subplots(1, 1)
+        with pytest.raises(
+            ValueError, match="ax and cell_types must have the same len"
+        ):
+            cell_response.plot_firing_rate_time(window_length=10, ax=ax, show=False)
+
+        # An array of axes must match the number of cell types
+        _, axes = plt.subplots(2, 1)
+        with pytest.raises(
+            ValueError, match="ax and cell_types must have the same len"
+        ):
+            cell_response.plot_firing_rate_time(window_length=10, ax=axes, show=False)
+
     def test_spikes_raster_dipole_overlay(self, base_simulation_spikes):
         net, dpls = base_simulation_spikes
 
@@ -505,6 +659,68 @@ class TestCellResponsePlotters:
         )
 
         assert updated_raster_yrange <= initial_raster_yrange
+
+    # smoke test for raster plot input arguments
+    def test_spikes_raster_input_args(self, base_simulation_spikes):
+        net, _ = base_simulation_spikes
+        net.cell_response.plot_spikes_raster(xticks=np.arange(5), yticks=np.arange(5))
+        net.cell_response.plot_spikes_raster(xticks=[1, 2, 3], yticks=[1, 2, 3])
+        net.cell_response.plot_spikes_raster(
+            xlabel="time", ylabel="cells ID", title="spikes raster"
+        )
+
+    def test_spikes_from_read_spikes(self, base_simulation_spikes):
+        """Test hist and raster plots on a CellResponse loaded via read_spikes"""
+        net, dpls = base_simulation_spikes
+        with tempfile.TemporaryDirectory() as tmp_dir_name:
+            net.cell_response.write(op.join(tmp_dir_name, "spk_%d.txt"))
+            cell_response = read_spikes(op.join(tmp_dir_name, "spk_*.txt"))
+
+        cell_type_names = ["L2_basket", "L2_pyramidal", "L5_basket", "L5_pyramidal"]
+        n_cell_spikes = sum(
+            sum(1 for spike_type in trial if spike_type in cell_type_names)
+            for trial in cell_response.spike_types
+        )
+        n_drive_spikes = sum(
+            sum(1 for spike_type in trial if spike_type not in cell_type_names)
+            for trial in cell_response.spike_types
+        )
+
+        # By default, if any drive (input) spike types are present, the
+        # histogram plots only those, not the real cell spikes
+        fig_hist = cell_response.plot_spikes_hist(show=False)
+        n_plotted_hist = sum(
+            patch.get_height() for ax in fig_hist.axes for patch in ax.patches
+        )
+        assert n_plotted_hist == n_drive_spikes, (
+            f"Expected {n_drive_spikes} spikes plotted in histogram, "
+            f"got {n_plotted_hist}"
+        )
+
+        # By default, the raster plots the real cell spikes, not drive spikes
+        fig_raster = cell_response.plot_spikes_raster(show=False)
+        n_plotted_raster = sum(
+            len(collection.get_positions())
+            for collection in fig_raster.axes[0].collections
+        )
+        assert n_plotted_raster == n_cell_spikes, (
+            f"Expected {n_cell_spikes} spikes plotted in raster, got {n_plotted_raster}"
+        )
+
+        # By default, the raster plots the real cell spikes, not drive spikes
+        fig_raster_overlay = cell_response.plot_spikes_raster(
+            show=False,
+            overlay_dipoles=True,
+            dpl=dpls,
+        )
+        n_plotted_raster_overlay = sum(
+            len(collection.get_positions())
+            for collection in fig_raster_overlay.axes[0].collections
+        )
+        assert n_plotted_raster_overlay == n_cell_spikes, (
+            f"Expected {n_cell_spikes} spikes plotted in raster, got "
+            f"{n_plotted_raster_overlay}"
+        )
 
 
 def test_network_plotter_init(setup_net):

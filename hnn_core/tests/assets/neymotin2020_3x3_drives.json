@@ -83,6 +83,7 @@
                 "morpho_type": "basket",
                 "electro_type": "inhibitory",
                 "layer": "2",
+                "zdist_origin": 0.8,
                 "measure_dipole": false,
                 "reference": "https://doi.org/10.7554/eLife.51214",
                 "color": "m",
@@ -481,6 +482,7 @@
                 "morpho_type": "pyramidal",
                 "electro_type": "excitatory",
                 "layer": "2",
+                "zdist_origin": 1,
                 "measure_dipole": true,
                 "reference": "https://doi.org/10.7554/eLife.51214",
                 "color": "c",
@@ -563,6 +565,7 @@
                 "morpho_type": "basket",
                 "electro_type": "inhibitory",
                 "layer": "5",
+                "zdist_origin": 0.2,
                 "measure_dipole": false,
                 "reference": "https://doi.org/10.7554/eLife.51214",
                 "color": "r",
@@ -1287,6 +1290,7 @@
                 "morpho_type": "pyramidal",
                 "electro_type": "excitatory",
                 "layer": "5",
+                "zdist_origin": 0,
                 "measure_dipole": true,
                 "reference": "https://doi.org/10.7554/eLife.51214",
                 "color": "b",
@@ -2206,25 +2210,57 @@
                 "amplitude": 1.0,
                 "t0": 0,
                 "tstop": null,
-                "section": "soma"
+                "section": "soma",
+                "gid": [
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9,
+                    10,
+                    11
+                ]
             },
             "L5_pyramidal": {
                 "amplitude": 0.0,
                 "t0": 0,
                 "tstop": null,
-                "section": "soma"
+                "section": "soma",
+                "gid": [
+                    15,
+                    16,
+                    17,
+                    18,
+                    19,
+                    20,
+                    21,
+                    22,
+                    23
+                ]
             },
             "L2_basket": {
                 "amplitude": 0.0,
                 "t0": 0,
                 "tstop": null,
-                "section": "soma"
+                "section": "soma",
+                "gid": [
+                    0,
+                    1,
+                    2
+                ]
             },
             "L5_basket": {
                 "amplitude": 0.0,
                 "t0": 0,
                 "tstop": null,
-                "section": "soma"
+                "section": "soma",
+                "gid": [
+                    12,
+                    13,
+                    14
+                ]
             }
         }
     },

@@ -9,7 +9,7 @@ import numpy as np
 from scipy.signal import periodogram
 
 from hnn_core import simulate_dipole
-from ..dipole import _rmse, _anticorr, average_dipoles
+from ..dipole import _anticorr, _rmse, _rmse_corr, average_dipoles
 from ..batch_simulate import BatchSimulate
 
 
@@ -80,7 +80,8 @@ def _calculate_obj_fun(
     ----------
     obj_fun_lambda : callable
         The objective function that you want to apply. It must take a single ``Dipole``
-        object as its argument. It can be a lambda that includes usage of other functions (see the lambdas of the functions that call this for examples).
+        object as its argument. It can be a lambda that includes usage of other
+        functions (see the lambdas of the functions that call this for examples).
     initial_net : instance of Network
         The network object.
     initial_params : dict
@@ -104,6 +105,9 @@ def _calculate_obj_fun(
             Required. A dipole object with experimental data.
         n_trials : int, default=1
             Number of trials to simulate and average.
+        bsl_cor : {"jones", "duecker"}, default="jones"
+            Baseline correction method. For neymotin_2020_model and law_2021_model, use
+            method 'jones' (manual correction). For duecker_ET_model, use method 'duecker'.
 
     best : dict, optional
         Dictionary with keys "obj" and "params" to store the best objective value and
@@ -142,6 +146,7 @@ def _calculate_obj_fun(
             tstop=tstop,
             overwrite=False,
             clear_cache=False,
+            bsl_cor=obj_fun_kwargs.get("bsl_cor", None),
         )
 
         res = batch_simulation.run(
@@ -175,6 +180,7 @@ def _calculate_obj_fun(
             tstop=tstop,
             dt=obj_fun_kwargs.get("dt", 0.025),
             n_trials=obj_fun_kwargs.get("n_trials", 1),
+            bsl_cor=obj_fun_kwargs.get("bsl_cor", None),
         )
 
         # smooth & scale all dipoles
@@ -208,7 +214,7 @@ def _rmse_evoked(
     obj_fun_kwargs,
     best=None,
 ):
-    """The objective function for evoked responses.
+    """The objective function for RMSE of evoked responses.
 
     Parameters
     ----------
@@ -233,7 +239,13 @@ def _rmse_evoked(
 
         target : instance of Dipole (Required)
             A dipole object with experimental data.
-        n_trials : int, optional
+        tstart : float, default=0.0
+            Time at beginning of range over which to calculate objective function
+        weights : array, optional
+            An array of weights to be applied to each point in simulated dpl. Must have
+            length >= dpl.data . If None, weights will be replaced with 1's for typical
+            objective function calculation.
+        n_trials : int, default=1
             Number of trials to simulate and average.
         verbose : bool, optional
             If True, print build steps and simulation progress to console. Default: True.
@@ -252,7 +264,13 @@ def _rmse_evoked(
         Normalized RMSE between recorded and simulated dipole.
     """
     obj = _calculate_obj_fun(
-        lambda dpl: _rmse(dpl, obj_fun_kwargs["target"], tstop=tstop),
+        lambda dpl: _rmse(
+            dpl,
+            obj_fun_kwargs["target"],
+            tstart=obj_fun_kwargs.get("tstart", 0),
+            tstop=tstop,
+            weights=obj_fun_kwargs.get("weights", None),
+        ),
         initial_net,
         initial_params,
         set_params,
@@ -358,7 +376,7 @@ def _anticorr_evoked(
     obj_fun_kwargs,
     best=None,
 ):
-    """The objective function for evoked responses.
+    """The objective function for anticorrelation of evoked responses.
 
     Parameters
     ----------
@@ -384,6 +402,12 @@ def _anticorr_evoked(
 
         target : instance of Dipole (Required)
             A dipole object with experimental data.
+        tstart : float, default=0.0
+            Time at beginning of range over which to calculate objective function
+        weights : array, optional
+            An array of weights to be applied to each point in simulated dpl. Must have
+            length >= dpl.data . If None, weights will be replaced with 1's for typical
+            objective function calculation.
         n_trials : int, default=1
             Number of trials to simulate and average.
         verbose : bool, optional
@@ -403,7 +427,95 @@ def _anticorr_evoked(
         Anticorrelation between recorded and simulated dipole.
     """
     obj = _calculate_obj_fun(
-        lambda dpl: _anticorr(dpl, obj_fun_kwargs["target"], tstop=tstop),
+        lambda dpl: _anticorr(
+            dpl,
+            obj_fun_kwargs["target"],
+            tstart=obj_fun_kwargs.get("tstart", 0),
+            tstop=tstop,
+            weights=obj_fun_kwargs.get("weights", None),
+        ),
+        initial_net,
+        initial_params,
+        set_params,
+        predicted_params,
+        update_params,
+        tstop,
+        obj_values,
+        obj_fun_kwargs,
+        best,
+    )
+    obj_values.append(obj)
+    return obj
+
+
+def _rmse_corr_evoked(
+    initial_net,
+    initial_params,
+    set_params,
+    predicted_params,
+    update_params,
+    obj_values,
+    tstop,
+    obj_fun_kwargs,
+    best=None,
+):
+    """The objective function for correlation-weighted RMSE of evoked responses.
+
+    Parameters
+    ----------
+    initial_net : instance of Network
+        The network object.
+    initial_params : dict
+        Keys are parameter names, values are initial parameters.
+    set_params : func
+        User-defined function that sets network drives and parameters.
+    predicted_params : list
+        Parameters selected by the optimizer.
+    update_params : func
+        Function to update params.
+    obj_values : list
+        List of objective values for each epoch (aka iteration) during optimization.
+        Updated as a side effect of evaluating the objective function.
+    tstop : float
+        The simulated dipole's duration.
+    obj_fun_kwargs : dict
+        Additional arguments along with their respective values to be passed
+        to the objective function (see ``Optimizer.fit`` for more details):
+
+        target : instance of Dipole (Required)
+            A dipole object with experimental data.
+        tstart : float, default=0.0
+            Time at beginning of range over which to calculate objective function
+        weights : array, optional
+            An array of weights to be applied to each point in simulated dpl. Must have
+            length >= dpl.data . If None, weights will be replaced with 1's for typical
+            objective function calculation.
+        n_trials : int, default=1
+            Number of trials to simulate and average.
+        verbose : bool, optional
+            If True, print build steps and simulation progress to console. Default: True.
+
+    best : dict, optional
+        Dictionary with keys "obj" and "params" to store the best objective value and
+        corresponding parameters. Note that `best` will be updated as a "side-effect"
+        (similar to "pass-by-reference"), and is not returned by the function; this is
+        necessary because the optimization routines in `scipy.optimize` require the
+        objective functions to return a single scalar value. Only used if the solver is
+        set to "cobyla" or "cma".
+
+    Returns
+    -------
+    obj : float
+        Normalized correlation-weighted RMSE between recorded and simulated dipole.
+    """
+    obj = _calculate_obj_fun(
+        lambda dpl: _rmse_corr(
+            dpl,
+            obj_fun_kwargs["target"],
+            tstart=obj_fun_kwargs.get("tstart", 0),
+            tstop=tstop,
+            weights=obj_fun_kwargs.get("weights", None),
+        ),
         initial_net,
         initial_params,
         set_params,

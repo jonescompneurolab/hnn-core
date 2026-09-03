@@ -24,27 +24,6 @@ from scipy.signal import decimate, periodogram
 from .externals.mne import tfr_array_morlet, _validate_type
 
 
-def _get_cell_colors_from_metadata(cell_types_dict):
-    """Get color and marker mappings from cell_metadata.
-
-    Parameters
-    ----------
-    cell_types_dict : dict
-
-    Returns
-    -------
-    colors : dict
-    markers : dict
-    """
-    colors = dict()
-    markers = dict()
-    for cell_name in sorted(cell_types_dict.keys()):
-        meta = cell_types_dict[cell_name].get("cell_metadata", {})
-        colors[cell_name] = meta.get("color", "k")
-        markers[cell_name] = meta.get("marker", "o")
-    return colors, markers
-
-
 def _lighten_color(color, amount=0.5):
     try:
         c = matplotlib.colors.cnames[color]
@@ -515,11 +494,7 @@ def plot_spikes_hist(
     spike_types_mask = {
         s_type: np.isin(spike_types_data, s_type) for s_type in unique_types
     }
-    # fetching the cell types
-    from .network_models import default_cell_metadata
-
-    known_cell_types = set(default_cell_metadata.keys())
-    cell_types = sorted([ct for ct in unique_types if ct in known_cell_types])
+    cell_types = cell_response._cell_type_names
     input_types = np.setdiff1d(unique_types, cell_types)
 
     if isinstance(spike_types, str):
@@ -601,9 +576,6 @@ def plot_spikes_hist(
                     color[spike_label], str, "Dictionary values of color", "str"
                 )
                 spike_color[spike_label] = color[spike_label]
-            elif spike_label in default_cell_metadata.keys():
-                # Overwrite spike colors if the spikes come from true cells
-                spike_color[spike_label] = default_cell_metadata[spike_label]["color"]
             else:
                 spike_color[spike_label] = next(color_cycle)
         spike_type_times[spike_label].extend(spike_times[spike_types_mask[spike_type]])
@@ -691,6 +663,11 @@ def plot_spikes_raster(
     marker_size=1.0,
     dpl=None,
     overlay_dipoles=False,
+    xticks=None,
+    yticks=None,
+    xlabel="Time (ms)",
+    ylabel="Neuron index",
+    title=None,
 ):
     """Plot the aggregate spiking activity according to cell type.
 
@@ -720,6 +697,16 @@ def plot_spikes_raster(
     overlay_dipoles : bool
         If True, overlay the layer-specific dipole data on the
         raster plot
+    xticks : list | np.array | None
+        Ticks on x-axis. If None, ticks are created by matplotlib.
+    yticks : list | np.array | None
+        Ticks on y-axis,  If None, ticks are created by matplotlib.
+    xlabel : str, default: "Time (ms)"
+        The matplotlib x-axis label
+    ylabel : str, default: "Neuron index"
+        The matplotlib y-axis label
+    title : str | None
+        The matplotlib figure title
 
     Returns
     -------
@@ -743,27 +730,32 @@ def plot_spikes_raster(
     # validate cell types
     if cell_types:
         _validate_type(cell_types, list, "cell_types", "list of str")
-        if not set(cell_types).issubset(set(unique_spike_types)):
+        # allowed are spikes that fired (including drives) and generally cells in network
+        allowed_types = np.unique(
+            cell_response.cell_types + cell_response._cell_type_names
+        )
+        if not set(cell_types).issubset(allowed_types):
             raise ValueError(
                 "Invalid cell types provided. "
-                f"Must be of set {unique_spike_types}. "
+                f"Must be of set {allowed_types}. "
                 f"Got {cell_types}"
             )
     else:
-        from .network_models import default_cell_metadata
+        cell_types = cell_response._cell_type_names
 
-        known_cell_types = set(default_cell_metadata.keys())
-        cell_types = sorted([ct for ct in unique_spike_types if ct in known_cell_types])
-        if not cell_types:
-            cell_types = sorted(list(known_cell_types))
-
-    # default colors from cell metadata
-    from .network_models import default_cell_metadata as _meta
-
-    cell_colors = {cell: _meta.get(cell, {}).get("color", "k") for cell in cell_types}
-
+    cell_type_metadata = getattr(cell_response, "_cell_type_metadata", None)
     # validate colors argument
     _validate_type(colors, (list, dict, None), "color", "list of str, or dict")
+
+    # Set colors
+    if cell_type_metadata is not None and "color" in cell_type_metadata[cell_types[0]]:
+        cell_colors = {cell: meta["color"] for cell, meta in cell_type_metadata.items()}
+    else:
+        default_colors = plt.rcParams["axes.prop_cycle"].by_key()["color"][
+            : len(cell_types)
+        ]
+        cell_colors = {cell: color for cell, color in zip(cell_types, default_colors)}
+
     if colors:
         if isinstance(colors, list):
             if len(colors) != len(cell_types):
@@ -773,7 +765,6 @@ def plot_spikes_raster(
                     f"for {len(cell_types)} cell types."
                 )
             cell_colors = {cell: color for cell, color in zip(cell_types, colors)}
-
         if isinstance(colors, dict):
             # Check valid cell types
             if not set(colors.keys()).issubset(set(unique_spike_types)):
@@ -816,7 +807,7 @@ def plot_spikes_raster(
         for gid in cell_type_gids:
             gid_time = spike_times[spike_gids == gid]
             cell_type_times.append(gid_time)
-            cell_type_ypos.append(-gid)
+            cell_type_ypos.append(gid)
 
         if cell_type_times:
             events.append(
@@ -835,6 +826,9 @@ def plot_spikes_raster(
                     [-1], lineoffsets=[-1], color=color, label=cell_type, linelengths=1
                 )
             )
+
+    # invert y axis
+    ax.invert_yaxis()
 
     # Overlay dipoles on raster plot
     if overlay_dipoles:
@@ -856,21 +850,35 @@ def plot_spikes_raster(
         dipole_times = dpl[0].times
 
         # Scale dipole to fit the spike raster plot
-        raster_yrange = ax.get_yticks()
-        raster_min = min(raster_yrange)
-        raster_midpoint = round((raster_min / 2), 0)
-        raster_quarterpoint = round((raster_min / 4), 0)
+        raster_max = max(cell_type_gids)
+        raster_midpoint = round((raster_max / 2), 0)
+        raster_quarterpoint = round((raster_max / 4), 0)
 
         # Scale down by .95 until the dipoles fit within the appropriate area
-        while (
-            max(max(l5_dipole), max(l2_dipole)) - min(min(l5_dipole), min(l2_dipole))
-        ) > abs(raster_midpoint):
+        # separately for L5 and L2
+        while (max(l5_dipole) - min(l5_dipole)) > abs(raster_midpoint):
             l5_dipole = l5_dipole * 0.95
+
+        while (max(l2_dipole) - min(l2_dipole)) > abs(raster_midpoint):
             l2_dipole = l2_dipole * 0.95
 
+        # dipoles with a moment << number of cells (270) will present as flat lines
+        # scale dipole such that waveform can be inspected properly alongside spiking
+        amp_max = max(max(l5_dipole), max(l2_dipole))
+        amp_min = min(min(l5_dipole), min(l5_dipole))
+        scale_fact = (10 ** np.floor(np.log10(raster_max))) / (amp_max - amp_min)
+
+        l2_dipole *= scale_fact
+        l5_dipole *= scale_fact
+
         # Shift the dipole positions to overlay the correct cell types
-        l2_dipole = l2_dipole - abs(raster_midpoint) + abs(raster_quarterpoint)
-        l5_dipole = l5_dipole - abs(raster_midpoint) - abs(raster_quarterpoint)
+        l2_dipole = -l2_dipole + abs(raster_quarterpoint)
+        l5_dipole = (
+            -l5_dipole
+            + abs(raster_midpoint)
+            + np.mean(l5_dipole)
+            + abs(raster_quarterpoint)
+        )
 
         # Draw the dipole plots
         (l2_line,) = ax.plot(
@@ -911,19 +919,18 @@ def plot_spikes_raster(
     else:
         ax.add_artist(spike_legend)
 
-    # set axis labels
-    ax.set_xlabel("Time (ms)")
-    ax.set_ylabel("Cell ID")
+    # set y-axis ticks and tick labels
+    if yticks is not None:
+        ax.set_yticks(yticks)
+        ax.set_yticklabels(yticks)
+    else:
+        ax.tick_params(axis="y", length=0)
 
-    # hide y-axis ticks and tick labels
-    ax.set_yticklabels([])
-    ax.tick_params(axis="y", length=0)
+    ax.set_ylabel(ylabel)
+    ax.set_xlabel(xlabel)
 
     # add title
-    if overlay_dipoles:
-        ax.set_title("Raster Plot with Layer-Specific Dipole Overlays")
-    else:
-        ax.set_title("Raster Plot")
+    ax.set_title(title)
 
     if len(cell_response.times) > 0:
         ax.set_xlim(left=0, right=cell_response.times[-1])
@@ -931,11 +938,218 @@ def plot_spikes_raster(
         ax.set_xlim(left=0)
     ax.set_xlim(left=0)
 
+    if xticks is not None:
+        ax.set_xticks(xticks)
     plt_show(show)
     return ax.get_figure()
 
 
-def plot_cells(net, ax=None, show=True):
+def plot_firing_rate_time(
+    cell_response,
+    window_length,
+    trial_idx=None,
+    ax=None,
+    show=True,
+    cell_types=None,
+    colors=None,
+    show_legend=True,
+    sharex=False,
+    sharey=False,
+    xticks=None,
+    yticks=None,
+    xlim=None,
+    ylim=None,
+    xlabel="time (ms)",
+    ylabel="firing rate (Hz)",
+):
+    """Plot time course of firing rates
+
+    Parameters
+    ----------
+    window_length : int | float
+        Length of the sliding window over which mean rates are calculated, in ms.
+    trial_idx : int | list of int | None
+        Trial index (or list of indices) to be plotted. If None (the default), mean rate
+        over all trials is plotted, and standard deviation is indicated by shading.
+    ax : instance of matplotlib axis | None
+        An axis object from matplotlib. If None, a new figure is created.
+    show : bool
+        If True, show the figure.
+    cell_types : list of str | None
+        List of cell types to plot. If None, all cell types are plotted.
+    colors : list of str | None
+        Optional custom colors to plot. Default will use the colors defined in cell metadata.
+    show_legend : bool
+        If True, show the legend with colors for cell types
+    sharex : bool
+        If True, subplot x-axes will be shared. Only used when creating a new
+        figure (i.e., when `ax` is None).
+    sharey : bool
+        If True, subplot y-axes will be shared. Only used when creating a new
+        figure (i.e., when `ax` is None).
+    xticks : array-like | None
+        Custom x-axis tick locations. If None, matplotlib's default is used.
+    yticks : array-like | None
+        Custom y-axis tick locations. If None, matplotlib's default is used.
+    xlim : tuple of (float, float) | None
+        Custom x-axis limits. If None, defaults to the full time range.
+    ylim : tuple of (float, float) | None
+        Custom y-axis limits. If None, matplotlib's default is used.
+    xlabel : str
+        Label for the x-axis.
+    ylabel : str
+        Label for the y-axis.
+
+    Returns
+    -------
+    fig : instance of matplotlib Figure
+        The matplotlib figure object.
+    """
+    # Calculate firing rates and validate some arguments
+    # ----------------------------------------------------------------------------------
+    # This may seem strange to calculate our firing rates before we've validated any
+    # input arguments, but this allows us to use the extensive validation of
+    # 'window_length', 'cell_types', and 'trial_idx' that is already implemented in
+    # CellResponse.rate_over_time (via `CellResponse._preprocess_rate_over_time_args`)
+    fr_cell_types = cell_response.rate_over_time(
+        window_length=window_length,
+        cell_types=cell_types,
+        trial_idx=trial_idx,
+    )
+
+    # CellResponse's Times have already been validated above.
+    times = cell_response.times
+    # We still need to preprocess the cell_types argument into its standard form, since
+    # it is used later in the function to set colors and labels, but it has already been
+    # validated above. This control flow block is taken from
+    # CellResponse._preprocess_rate_over_time_args.
+    if cell_types is None:
+        cell_types = cell_response._cell_type_names
+    elif isinstance(cell_types, str):
+        cell_types = [cell_types]
+    elif isinstance(cell_types, list):
+        pass
+
+    # Validate/Process the rest of our arguments (except for colors, which is later)
+    # ----------------------------------------------------------------------------------
+    cell_type_metadata = getattr(cell_response, "_cell_type_metadata", None)
+    _validate_type(colors, (list, dict, None), "color", "list of str, or dict")
+
+    # create ax if it doesn't exist
+    if ax is None:
+        _, ax = plt.subplots(
+            len(fr_cell_types), 1, constrained_layout=True, sharey=sharey, sharex=sharex
+        )
+
+    # if ax is subplot axis
+    if type(ax) is matplotlib.axes._axes.Axes and len(fr_cell_types) == 1:
+        ax = [ax]
+    elif type(ax) is matplotlib.axes._axes.Axes and len(fr_cell_types) > 1:
+        raise ValueError(
+            f"ax and cell_types must have the same len but have len 1 and {len(fr_cell_types)}."
+            " Hint: Define one subplot panel per cell type."
+        )
+
+    # if ax is multiple subplot axes
+    elif type(ax) is np.ndarray and len(ax) != len(fr_cell_types):
+        if ax.size == len(fr_cell_types):
+            raise ValueError(
+                f"ax and fr_cell_types must have the same len but have len {len(ax)} and {len(fr_cell_types)}."
+                " Use ax.flatten() to plot each cell type in one subplot."
+            )
+        else:
+            raise ValueError(
+                f"ax and cell_types must have the same len but have len {len(ax)} and {len(fr_cell_types)}."
+                " Hint: Define one subplot panel per cell type."
+            )
+
+    if xlim is None:
+        xlim = (times[0], times[-1])
+    _validate_type(show_legend, bool, "show_legend", "bool")
+    _validate_type(sharex, bool, "sharex", "bool")
+    _validate_type(sharey, bool, "sharey", "bool")
+    _validate_type(
+        xticks, (list, np.ndarray, None), "xticks", "list, np.ndarray, or None"
+    )
+    _validate_type(
+        yticks, (list, np.ndarray, None), "yticks", "list, np.ndarray, or None"
+    )
+    _validate_type(xlim, (tuple, list, None), "xlim", "tuple, list, or None")
+    _validate_type(ylim, (tuple, list, None), "ylim", "tuple, list, or None")
+    _validate_type(xlabel, str, "xlabel", "str")
+    _validate_type(ylabel, str, "ylabel", "str")
+
+    # Set colors, which requires some input validation AND the fact that we have already
+    # calculated of the firing rates:
+    # ----------------------------------------------------------------------------------
+    if cell_type_metadata is not None and "color" in cell_type_metadata[cell_types[0]]:
+        cell_colors = {cell: meta["color"] for cell, meta in cell_type_metadata.items()}
+    else:
+        default_colors = plt.rcParams["axes.prop_cycle"].by_key()["color"][
+            : len(cell_types)
+        ]
+        cell_colors = {cell: color for cell, color in zip(cell_types, default_colors)}
+
+    if colors:
+        if isinstance(colors, list):
+            if len(colors) != len(cell_types):
+                raise ValueError(
+                    f"Number of colors must be equal to number of "
+                    f"cell types. {len(colors)} colors provided "
+                    f"for {len(cell_types)} cell types."
+                )
+            cell_colors = {cell: color for cell, color in zip(cell_types, colors)}
+        if isinstance(colors, dict):
+            # Check valid cell types
+            if not set(colors.keys()).issubset(set(fr_cell_types.keys())):
+                raise ValueError(
+                    "Invalid cell type provided. "
+                    f"Must be of set {fr_cell_types.keys()}. "
+                    f"Got {colors.keys()}"
+                )
+            cell_colors.update(colors)
+
+    # Plotting
+    # ----------------------------------------------------------------------------------
+    for c, cell_type in enumerate(fr_cell_types):
+        ax[c].plot(
+            times,
+            np.mean(fr_cell_types[cell_type], axis=0),
+            color=cell_colors[cell_type],
+            label=cell_type,
+        )
+        ax[c].fill_between(
+            times,
+            np.mean(fr_cell_types[cell_type], axis=0)
+            - np.std(fr_cell_types[cell_type], axis=0),
+            np.mean(fr_cell_types[cell_type], axis=0)
+            + np.std(fr_cell_types[cell_type], axis=0),
+            color=cell_colors[cell_type],
+            alpha=0.4,
+            rasterized=True,
+        )
+        ax[c].set_xlim(xlim)
+
+        if xticks is not None:
+            ax[c].set_xticks(xticks)
+
+        ax[c].set_ylim(ylim)
+        if yticks is not None:
+            ax[c].set_yticks(yticks)
+        ax[c].spines["top"].set_visible(False)
+        ax[c].spines["right"].set_visible(False)
+        if show_legend:
+            ax[c].legend(loc="upper right")
+
+    ax[c].set_ylabel(ylabel)
+    ax[c].set_xlabel(xlabel)
+
+    plt_show(show)
+
+    return ax
+
+
+def plot_cells(net, ax=None, show=True, colors=None, markers=None):
     """Plot the cells using Network.pos_dict.
 
     Parameters
@@ -947,6 +1161,17 @@ def plot_cells(net, ax=None, show=True):
         a new figure is created.
     show : bool
         If True, show the figure.
+    colors : dict | None
+        Dictionary mapping cell type names to colors. If None,
+        colors are assigned automatically from the ``Network``'s
+        cell metadata if they exist, else they are taken from the
+        default Matplotlib color cycle.
+    markers : dict | None
+        Dictionary mapping cell type names to markers. If None,
+        markers are assigned based on ``morpho_type`` in cell metadata:
+        ``'pyramidal'`` -> ``'^'``, ``'basket'`` -> ``'x'``,
+        ``'interneuron'`` -> ``'o'``. Unknown morpho types get the first
+        unused marker from the pool.
 
     Returns
     -------
@@ -963,19 +1188,50 @@ def plot_cells(net, ax=None, show=True):
             f"Expected 'ax' to be an instance of Axes3D, but got {type(ax).__name__}"
         )
 
-    # colors and markers from cell metadata
-    if net.cell_types:
-        colors, markers = _get_cell_colors_from_metadata(net.cell_types)
-    else:
-        colors = dict()
-        markers = dict()
+    if colors:
+        for color_key in colors.keys():
+            if color_key not in net.cell_types.keys():
+                raise ValueError(
+                    f"Color cell type {color_key} does not exist in given Network"
+                )
+    if markers:
+        for marker_key in markers.keys():
+            if marker_key not in net.cell_types.keys():
+                raise ValueError(
+                    f"Marker cell type {marker_key} does not exist in given Network"
+                )
 
-    for cell_type in sorted(net.cell_types.keys()):
+    default_marker_map = {"pyramidal": "^", "basket": "x", "interneuron": "o"}
+    default_color_cycle = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+
+    for cell_type_index, cell_type in enumerate(net.cell_types):
         x = [pos[0] for pos in net.pos_dict[cell_type]]
         y = [pos[1] for pos in net.pos_dict[cell_type]]
         z = [pos[2] for pos in net.pos_dict[cell_type]]
-        color = colors.get(cell_type, "k")
-        marker = markers.get(cell_type, "o")
+
+        if colors:
+            color = colors.get(
+                cell_type,
+                default_color_cycle[cell_type_index % len(default_color_cycle)],
+            )
+        else:
+            color = net.cell_types[cell_type]["cell_metadata"].get(
+                "color", default_color_cycle[cell_type_index % len(default_color_cycle)]
+            )
+
+        morpho_type = net.cell_types[cell_type]["cell_metadata"].get(
+            "morpho_type", None
+        )
+        if morpho_type:
+            alt_marker = default_marker_map[morpho_type]
+        else:
+            alt_marker = "o"
+
+        if markers:
+            marker = markers.get(cell_type, alt_marker)
+        else:
+            marker = alt_marker
+
         ax.scatter(x, y, z, c=color, s=50, marker=marker, label=cell_type)
 
     if net.rec_arrays:
@@ -1097,12 +1353,12 @@ def plot_tfr_morlet(
         trial_power.append(power)
 
     power = np.mean(trial_power, axis=0)
-    im = ax.pcolormesh(times, freqs, power[0, 0, ...], cmap=colormap, shading="auto")
-
+    im = ax.pcolormesh(
+        times, freqs, power[0, 0, ...], cmap=colormap, shading="auto", rasterized=True
+    )
     if freqs[0] > freqs[-1]:
         freqs = freqs[::-1]
         ax.invert_yaxis()
-
     ax.set_xlabel("Time (ms)")
     ax.set_ylabel("Frequency (Hz)")
 
@@ -1877,9 +2133,16 @@ def plot_laminar_csd(
         vmax = np.max(np.abs(data))
 
     im = ax.pcolormesh(
-        times, new_depths, data, cmap=cmap, shading="auto", vmin=vmin, vmax=vmax
+        times,
+        new_depths,
+        data,
+        cmap=cmap,
+        shading="auto",
+        vmin=vmin,
+        vmax=vmax,
+        rasterized=True,
     )
-    ax.set_xlabel("time (s)")
+    ax.set_xlabel("time (ms)")
     ax.set_ylabel("electrode depth [µm]")
     if colorbar:
         color_axis = ax.inset_axes([1.05, 0, 0.02, 1], transform=ax.transAxes)
@@ -2035,7 +2298,6 @@ class NetworkPlotter:
         return times, vsec_recorded
 
     def _initialize_plots(self):
-
         # Create figure
         if self.ax is None:
             self.fig = plt.figure()

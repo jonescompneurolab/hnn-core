@@ -289,45 +289,45 @@ def test_create_synapses_builtin():
         _helper_create_cell_and_run_synapse_checks(custom_synapse_config)
 
 
-def test_create_synapses_NMDA_gao():
-    """Test custom `NMDA_gao` synapse creation with various configurations
+def test_create_synapses_NMDA_gao2021():
+    """Test custom `NMDA_gao2021` synapse creation with various configurations
 
     This requires the following synapse mechanisms to be present and compiled by `nrnivmodl`:
-    - hnn_core/mod/NMDA_gao.mod
+    - hnn_core/mod/NMDA_gao2021.mod
 
     This uses `Cell.build` to test both `Cell._create_synapses` and `Cell.syn_create`.
     """
-    # Test syn_create with new synapse mechname 'NMDA_gao'.
-    custom_synapse_config = dict(mechname="NMDA_gao")
+    # Test syn_create with new synapse mechname 'NMDA_gao2021'.
+    custom_synapse_config = dict(mechname="NMDA_gao2021")
     _helper_create_cell_and_run_synapse_checks(custom_synapse_config)
 
     # syn_create with valid custom 'mechname' kwarg should create the specified synapse.
-    custom_synapse_config = dict(e=50.0, Beta=0.02, Cdur=1.5, mechname="NMDA_gao")
+    custom_synapse_config = dict(e=50.0, Beta=0.02, Cdur=1.5, mechname="NMDA_gao2021")
     _helper_create_cell_and_run_synapse_checks(custom_synapse_config)
 
     # syn_create with invalid parameter for custom 'mechname' should raise an error.
-    custom_synapse_config = dict(tau=1.0, mechname="NMDA_gao")
+    custom_synapse_config = dict(tau=1.0, mechname="NMDA_gao2021")
     with pytest.raises(ValueError, match="does not have a parameter named"):
         _helper_create_cell_and_run_synapse_checks(custom_synapse_config)
 
 
-def test_create_synapses_gabab_destexhe():
-    """Test custom `gabab_destexhe` synapse creation with various configurations
+def test_create_synapses_gabab_neymotin2016():
+    """Test custom `gabab_neymotin2016` synapse creation with various configurations
 
     This requires the following synapse mechanisms to be present and compiled by `nrnivmodl`:
-    - hnn_core/mod/gabab_destexhe.mod
+    - hnn_core/mod/gabab_neymotin2016.mod
 
     This uses `Cell.build` to test both `Cell._create_synapses` and `Cell.syn_create`.
     """
-    # Test syn_create with new synapse mechname 'gabab_destexhe'.
-    custom_synapse_config = dict(mechname="gabab_destexhe")
+    # Test syn_create with new synapse mechname 'gabab_neymotin2016'.
+    custom_synapse_config = dict(mechname="gabab_neymotin2016")
     _helper_create_cell_and_run_synapse_checks(custom_synapse_config)
 
     # syn_create with valid custom 'mechname' kwarg should create the specified synapse.
-    custom_synapse_config = dict(g=1.0, mechname="gabab_destexhe")
+    custom_synapse_config = dict(g=1.0, mechname="gabab_neymotin2016")
     _helper_create_cell_and_run_synapse_checks(custom_synapse_config)
 
     # syn_create with invalid parameter for custom 'mechname' should raise an error.
-    custom_synapse_config = dict(Beta=1.0, mechname="gabab_destexhe")
+    custom_synapse_config = dict(Beta=1.0, mechname="gabab_neymotin2016")
     with pytest.raises(ValueError, match="does not have a parameter named"):
         _helper_create_cell_and_run_synapse_checks(custom_synapse_config)
