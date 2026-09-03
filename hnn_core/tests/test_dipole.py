@@ -163,7 +163,7 @@ def test_dipole(tmp_path, run_hnn_core_fixture):
         record_ca="soma",
     )
     # test deprecation of postproc
-    with pytest.warns(DeprecationWarning, match="The postproc-argument is deprecated"):
+    with pytest.warns(FutureWarning, match="The postproc-argument is deprecated"):
         dpls, _ = run_hnn_core_fixture(
             backend="joblib",
             n_jobs=1,
