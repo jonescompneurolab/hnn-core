@@ -91,7 +91,7 @@ def _gather_trial_data(sim_data, net, n_trials, postproc, bsl_cor="jones"):
                 warnings.warn(
                     "bsl_cor='jones' deprecated as the model has been renamed to neymotin_2020_model."
                     "Please use bsl_cor='neymotin'.",
-                    DeprecationWarning,
+                    FutureWarning,
                 )
 
         dpl._convert_fAm_to_nAm()  # always applied, cf. #264

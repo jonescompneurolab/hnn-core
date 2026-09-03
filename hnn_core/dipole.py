@@ -145,7 +145,7 @@ def simulate_dipole(
             "The postproc-argument is deprecated and will be removed"
             " in a future release of hnn-core. Please define "
             "smoothing and scaling explicitly using Dipole methods.",
-            DeprecationWarning,
+            FutureWarning,
         )
 
     net._verbose = verbose

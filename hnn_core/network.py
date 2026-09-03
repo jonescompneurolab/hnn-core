@@ -471,7 +471,7 @@ class Network:
                 "Legacy mode is used solely to maintain compatibility with"
                 ".param files of the old HNN GUI. This feature will be "
                 "deprecrated in future releases.",
-                DeprecationWarning,
+                FutureWarning,
                 stacklevel=1,
             )
 
@@ -1858,7 +1858,7 @@ class Network:
                 "cell_type argument will be deprecated and removed in future releases. "
                 "Instead, see the documentation for arguments 'amplitude' and 'gid' "
                 "as a replacement.",
-                DeprecationWarning,
+                FutureWarning,
                 stacklevel=1,
             )
             if gid is not None:

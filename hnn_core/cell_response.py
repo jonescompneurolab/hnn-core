@@ -862,7 +862,7 @@ def read_spikes(fname, gid_ranges=None):
         "Reading cell response from txt files is deprecated "
         "and will be removed in future versions. Please load "
         "cell response along with simulated network",
-        DeprecationWarning,
+        FutureWarning,
         stacklevel=2,
     )
     spike_times = list()
