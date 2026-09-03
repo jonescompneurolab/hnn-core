@@ -556,4 +556,5 @@ def _load_erp_drives(net, fname=None):
                 f"ERP drive configuration is missing required drive "
                 f"'{drive_name}' in {fname}."
             )
+        # Adds drive to network using `net.add_<drive_type>()` method
         _read_external_drive(net, external_drives[drive_name], read_output=False)
