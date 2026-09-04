@@ -23,6 +23,65 @@ import pickle
 
 
 class Optimizer:
+    """Parameter optimization.
+
+    Parameters
+    ----------
+    initial_net : instance of Network
+        The network object.
+    tstop : float
+        The simulated dipole's duration.
+    constraints : dict
+        The user-defined constraints.
+    set_params : func
+        User-defined function that sets parameters in network drives.
+
+            ``set_params(net, params) -> None``
+
+        where ``net`` is a Network object and ``params`` is a dictionary of the
+        parameters that will be set inside the function.
+    initial_params : dict, optional
+        Initial parameters for the objective function. Keys are parameter names,
+        values are initial parameters. The default is None. If None, the parameters
+        will be set to the midpoints of parameter ranges.
+    solver : str
+        The optimizer, 'bayesian', 'cobyla', or 'cma'.
+    obj_fun : str | func
+        The objective function to be minimized. Can be 'dipole_rmse',
+        'maximize_psd', 'dipole_corr', 'custom', or a user-defined function. See the
+        docstring for ``Optimizer.fit`` to view the required and optional arguments
+        for each of these cases. If a user-defined function is provided, it must
+        have the same function signature as the existing objective functions
+        (i.e. `_rmse_evoked` and `_maximize_psd` in objective_functions.py).The
+        default is 'dipole_rmse'.
+    max_iter : int, optional
+        The max number of calls to the objective function. The default is 200.
+
+    Attributes
+    ----------
+    constraints : dict
+        The user-defined constraints.
+    initial_params : dict, None
+        Initial parameters for the objective function. If None, initial_params
+        is set to the midpoint of upper/lower bounds defined in constraints.
+    max_iter : int
+        The max number of calls to the objective function.
+    solver : func
+        The optimization function.
+    obj_fun : func
+        The objective function to be minimized.
+    obj_fun_name : str
+        The name of the template objective function.
+    tstop : float
+        The simulated dipole's duration.
+    net_ : instance of Network
+        The network object with optimized drives.
+    obj_ : list
+        The objective function values.
+    opt_params_ : list
+        The list of optimized parameter values.
+    """
+
     def __init__(
         self,
         initial_net,
@@ -34,64 +93,6 @@ class Optimizer:
         obj_fun="dipole_rmse",
         max_iter=200,
     ):
-        """Parameter optimization.
-
-        Parameters
-        ----------
-        initial_net : instance of Network
-            The network object.
-        tstop : float
-            The simulated dipole's duration.
-        constraints : dict
-            The user-defined constraints.
-        set_params : func
-            User-defined function that sets parameters in network drives.
-
-                ``set_params(net, params) -> None``
-
-            where ``net`` is a Network object and ``params`` is a dictionary of the
-            parameters that will be set inside the function.
-        initial_params : dict, optional
-            Initial parameters for the objective function. Keys are parameter names,
-            values are initial parameters. The default is None. If None, the parameters
-            will be set to the midpoints of parameter ranges.
-        solver : str
-            The optimizer, 'bayesian', 'cobyla', or 'cma'.
-        obj_fun : str | func
-            The objective function to be minimized. Can be 'dipole_rmse',
-            'maximize_psd', 'dipole_corr', 'custom', or a user-defined function. See the
-            docstring for ``Optimizer.fit`` to view the required and optional arguments
-            for each of these cases. If a user-defined function is provided, it must
-            have the same function signature as the existing objective functions
-            (i.e. `_rmse_evoked` and `_maximize_psd` in objective_functions.py).The
-            default is 'dipole_rmse'.
-        max_iter : int, optional
-            The max number of calls to the objective function. The default is 200.
-
-        Attributes
-        ----------
-        constraints : dict
-            The user-defined constraints.
-        initial_params : dict, None
-            Initial parameters for the objective function. If None, initial_params
-            is set to the midpoint of upper/lower bounds defined in constraints.
-        max_iter : int
-            The max number of calls to the objective function.
-        solver : func
-            The optimization function.
-        obj_fun : func
-            The objective function to be minimized.
-        obj_fun_name : str
-            The name of the template objective function.
-        tstop : float
-            The simulated dipole's duration.
-        net_ : instance of Network
-            The network object with optimized drives.
-        obj_ : list
-            The objective function values.
-        opt_params_ : list
-            The list of optimized parameter values.
-        """
         self._initial_net = initial_net
         self.constraints = constraints
         self._set_params = set_params
