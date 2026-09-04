@@ -18,10 +18,7 @@ without the need to install and configure MPI.
 
 ###############################################################################
 # Let us import hnn_core
-import os.path as op
-
-import hnn_core
-from hnn_core import simulate_dipole, neymotin_2020_model
+from hnn_core import MPIBackend, simulate_dipole, neymotin_2020_model
 
 ###############################################################################
 # Following :ref:`the alpha example

@@ -29,9 +29,13 @@ studies [1]_, [2]_.
 import os.path as op
 import matplotlib.pyplot as plt
 
-import mne
-from mne.datasets import somato
-from mne.minimum_norm import apply_inverse, make_inverse_operator
+try:
+    import mne
+    from mne.datasets import somato
+    from mne.minimum_norm import apply_inverse, make_inverse_operator
+except ImportError:
+    print("MNE not installed. Run the following command: ")
+    print("pip install mne nibabel")
 
 ###############################################################################
 # Now we set the the path of the ``somato`` dataset for subject ``'01'``.

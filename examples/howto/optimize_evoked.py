@@ -12,13 +12,6 @@ of the model simulation to match an experimental dipole waveform.
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
-from hnn_core.optimization import Optimizer
-from urllib.request import urlretrieve
-import os.path as op
-
-import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
-
 ###############################################################################
 # 1. Import libraries and set up environment
 # ------------------------------------------
@@ -26,9 +19,16 @@ from matplotlib.lines import Line2D
 # We'll start by importing the necessary `hnn_core` modules and other libraries
 # required for this tutorial.
 
+from urllib.request import urlretrieve
+import os.path as op
+
+import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+
 import hnn_core
 from hnn_core import (MPIBackend, neymotin_2020_model, simulate_dipole,
                       read_dipole)
+from hnn_core.optimization import Optimizer
 from hnn_core.viz import plot_dipole
 
 hnn_core_root = op.join(op.dirname(hnn_core.__file__))

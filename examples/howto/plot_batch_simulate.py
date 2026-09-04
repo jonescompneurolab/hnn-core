@@ -5,7 +5,8 @@
 
 This example shows how to do batch simulations in HNN-core, allowing users to
 efficiently run multiple simulations with different parameters
-for comprehensive analysis.
+for comprehensive analysis. The BatchSimulate class permits embarrassingly parallel
+simulations over multiple CPU cores.
 """
 
 ###############################################################################
@@ -112,21 +113,6 @@ def summary_func(results):
     return summary_stats
 
 ###############################################################################
-# Run the batch simulation and collect the results.
-
-
-# Initialize the network model and run the batch simulation.
-net = neymotin_2020_model(mesh_shape=(3, 3))
-batch_simulation = BatchSimulate(net=net,
-                                 set_params=set_params,
-                                 summary_func=summary_func)
-simulation_results = batch_simulation.run(param_grid,
-                                          n_jobs=n_jobs,
-                                          combinations=False,
-                                          backend='loky')
-
-print("Simulation results:", simulation_results)
-###############################################################################
 # This plot shows an overlay of all smoothed dipole waveforms from the
 # batch simulation. Each line represents a different set of synaptic strength
 # parameters (`weight_basket`), allowing us to visualize the range of responses
@@ -146,50 +132,67 @@ print("Simulation results:", simulation_results)
 #
 # Stronger synaptic connections (yellow lines) generally show larger
 # amplitude responses and more pronounced features throughout the simulation.
+def plot_results(simulation_results):
+    dpl_waveforms, param_values = [], []
+    for data_list in simulation_results['simulated_data']:
+        for data in data_list:
+            dpl_smooth = data['dpl'][0].copy().smooth(window_len=30)
+            dpl_waveforms.append(dpl_smooth.data['agg'])
+            param_values.append(data['param_values']['weight_basket'])
 
-dpl_waveforms, param_values = [], []
-for data_list in simulation_results['simulated_data']:
-    for data in data_list:
-        dpl_smooth = data['dpl'][0].copy().smooth(window_len=30)
-        dpl_waveforms.append(dpl_smooth.data['agg'])
-        param_values.append(data['param_values']['weight_basket'])
+    plt.figure(figsize=(10, 6))
+    cmap = plt.get_cmap('viridis')
+    log_param_values = np.log10(param_values)
+    norm = plt.Normalize(log_param_values.min(), log_param_values.max())
 
-plt.figure(figsize=(10, 6))
-cmap = plt.get_cmap('viridis')
-log_param_values = np.log10(param_values)
-norm = plt.Normalize(log_param_values.min(), log_param_values.max())
+    for waveform, log_param in zip(dpl_waveforms, log_param_values):
+        color = cmap(norm(log_param))
+        plt.plot(waveform, color=color, alpha=0.7, linewidth=2)
+    plt.title('Overlay of Dipole Waveforms')
+    plt.xlabel('Time (ms)')
+    plt.ylabel('Dipole Amplitude (nAm)')
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+    ###############################################################################
+    # This plot displays the minimum and maximum dipole peaks across
+    # different synaptic strengths. This allows us to see how the range of
+    # dipole activity changes as we vary the synaptic strength parameter.
 
-for waveform, log_param in zip(dpl_waveforms, log_param_values):
-    color = cmap(norm(log_param))
-    plt.plot(waveform, color=color, alpha=0.7, linewidth=2)
-plt.title('Overlay of Dipole Waveforms')
-plt.xlabel('Time (ms)')
-plt.ylabel('Dipole Amplitude (nAm)')
-plt.grid(True)
-plt.tight_layout()
-plt.show()
+    min_peaks, max_peaks, param_values = [], [], []
+    for summary_list, data_list in zip(simulation_results['summary_statistics'],
+                                    simulation_results['simulated_data']):
+        for summary, data in zip(summary_list, data_list):
+            min_peaks.append(summary['min_peak'])
+            max_peaks.append(summary['max_peak'])
+            param_values.append(data['param_values']['weight_basket'])
+
+    # Plotting
+    plt.figure(figsize=(10, 6))
+    plt.plot(param_values, min_peaks, label='Min Dipole Peak')
+    plt.plot(param_values, max_peaks, label='Max Dipole Peak')
+    plt.xlabel('Synaptic Strength (nS)')
+    plt.ylabel('Dipole Peak Magnitude')
+    plt.title('Min and Max Dipole Peaks across Simulations')
+    plt.legend()
+    plt.grid(True)
+    plt.xscale('log')
+    plt.tight_layout()
+    plt.show()
+
 ###############################################################################
-# This plot displays the minimum and maximum dipole peaks across
-# different synaptic strengths. This allows us to see how the range of
-# dipole activity changes as we vary the synaptic strength parameter.
+# Run the batch simulation and collect the results.
 
-min_peaks, max_peaks, param_values = [], [], []
-for summary_list, data_list in zip(simulation_results['summary_statistics'],
-                                   simulation_results['simulated_data']):
-    for summary, data in zip(summary_list, data_list):
-        min_peaks.append(summary['min_peak'])
-        max_peaks.append(summary['max_peak'])
-        param_values.append(data['param_values']['weight_basket'])
 
-# Plotting
-plt.figure(figsize=(10, 6))
-plt.plot(param_values, min_peaks, label='Min Dipole Peak')
-plt.plot(param_values, max_peaks, label='Max Dipole Peak')
-plt.xlabel('Synaptic Strength (nS)')
-plt.ylabel('Dipole Peak Magnitude')
-plt.title('Min and Max Dipole Peaks across Simulations')
-plt.legend()
-plt.grid(True)
-plt.xscale('log')
-plt.tight_layout()
-plt.show()
+# Initialize the network model and run the batch simulation.
+net = neymotin_2020_model(mesh_shape=(3, 3))
+batch_simulation = BatchSimulate(net=net,
+                                 set_params=set_params,
+                                 summary_func=summary_func)
+simulation_results = batch_simulation.run(param_grid,
+                                          n_jobs=n_jobs,
+                                          combinations=False,
+                                          backend='loky')
+
+print("Simulation results:", simulation_results)
+plot_results(simulation_results)
