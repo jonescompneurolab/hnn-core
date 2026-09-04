@@ -10,19 +10,19 @@
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
+# documentation root, use Path.resolve() to make it absolute, like shown here.
 #
-import os
 import sys
+from pathlib import Path
 from sphinx_gallery.sorting import ExampleTitleSortKey, ExplicitOrder
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-curdir = os.path.dirname(__file__)
-sys.path.append(os.path.abspath(os.path.join(curdir, "..", "hnn_core")))
-sys.path.append(os.path.abspath(os.path.join(curdir, "..")))
-sys.path.append(os.path.abspath(os.path.join(curdir, "sphinxext")))
+# documentation root, use Path.resolve() to make it absolute, like shown here.
+curdir = Path(__file__).parent
+sys.path.append(str((curdir / ".." / "hnn_core").resolve()))
+sys.path.append(str((curdir / "..").resolve()))
+sys.path.append(str((curdir / "sphinxext").resolve()))
 
 # -- Project information -----------------------------------------------------
 

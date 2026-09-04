@@ -5,12 +5,12 @@
 
 import json
 import fnmatch
-import os.path as op
 from pathlib import Path
 from copy import deepcopy
 
-from .params_default import get_params_default
 from .externals.mne import _validate_type
+
+from .params_default import get_params_default
 
 
 # return number of evoked inputs (proximal, distal)
@@ -86,8 +86,7 @@ def read_params(params_fname, file_contents=None):
         Params containing parameter values from file
     """
 
-    split_fname = op.splitext(params_fname)
-    ext = split_fname[1]
+    ext = Path(params_fname).suffix
 
     if ext not in [".json", ".param"]:
         raise ValueError(
@@ -103,7 +102,7 @@ def read_params(params_fname, file_contents=None):
 
     if len(params_dict) == 0:
         raise ValueError(
-            "Failed to read parameters from file: %s" % op.normpath(params_fname)
+            "Failed to read parameters from file: %s" % Path(params_fname).resolve()
         )
 
     params = Params(params_dict)
@@ -129,6 +128,8 @@ def _short_name(short_name):
         L5_basket="L5Basket",
         L2_pyramidal="L2Pyr",
         L5_pyramidal="L5Pyr",
+        L2_inhibitory="L2Inh",
+        L5_inhibitory="L5Inh",
     )
     if short_name in long_name:
         return long_name[short_name]
@@ -325,14 +326,22 @@ class Params(dict):
 
         if isinstance(params_input, dict):
             nprox, ndist = _count_evoked_inputs(params_input)
-            # create default params templated from params_input
-            params_default = get_params_default(nprox, ndist)
 
-            for key in params_default.keys():
-                if key in params_input:
+            params_default = get_params_default(nprox, ndist)
+            # don't use any default values for duecker_ET_model.
+            if "duecker_ET_model" in (params_input.get("model_variant"),):
+                for key in params_input.keys():
                     self[key] = params_input[key]
-                else:
-                    self[key] = params_default[key]
+            else:
+                for key in params_default.keys():
+                    if key in params_input:
+                        self[key] = params_input[key]
+                    else:
+                        self[key] = params_default[key]
+                # 'model_variant' is not part of the legacy defaults, but must
+                # survive so the network models can validate the param file
+                if "model_variant" in params_input:
+                    self["model_variant"] = params_input["model_variant"]
         else:
             raise ValueError(
                 "params_input must be dict or None. Got %s" % type(params_input)

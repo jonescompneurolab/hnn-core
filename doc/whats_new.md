@@ -30,6 +30,10 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ### Deprecations
 
+- User-facing deprecation notices now emit `FutureWarning`, making them visible under
+  Python's default warning filters,
+  by [William Kang][] in {gh}`1339`. This was their first PR, thanks William!
+
 ### New Features
 
 - Users can now specify their own custom objective function in two different ways:
@@ -60,10 +64,15 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 ### People who contributed to this release:
 
 - [Vaishnavi Baghel][]
+- [Arnesh Banerjee][]
 - [Shivansh Bhageria][]
 - [Camilo Diaz][]
+- [William Kang][]
 
 ### Changelog
+
+- Improvements to some visualization documentation,
+  by [Arnesh Banerjee][] in {gh}`1332`.
 
 - Easier optimization custom function usage
   by [Vaishnavi Baghel][] in {gh}`1271`.
@@ -1492,3 +1501,5 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [Percival Villalva]: https://github.com/pervillalva
 [Anna Cattani]: https://github.com/annacatt
 [Shivansh Bhageria]: https://github.com/Shivansh1205
+[Arnesh Banerjee]: https://github.com/ArneshBanerjee
+[William Kang]: https://github.com/WilliamK112

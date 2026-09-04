@@ -1,4 +1,3 @@
-import os.path as op
 from urllib.request import urlretrieve
 from pathlib import Path
 
@@ -21,8 +20,8 @@ matplotlib.use("agg")
 
 def test_dipole(tmp_path, run_hnn_core_fixture):
     """Test dipole object."""
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, "param", "default.json")
+    hnn_core_root = Path(hnn_core.__file__).parent
+    params_fname = hnn_core_root / "param" / "default.json"
     dpl_out_fname = tmp_path / "dpl1.txt"
     dpl_out_hdf5_fname = tmp_path / "dpl.hdf5"
     params = read_params(params_fname)
@@ -164,7 +163,7 @@ def test_dipole(tmp_path, run_hnn_core_fixture):
         record_ca="soma",
     )
     # test deprecation of postproc
-    with pytest.warns(DeprecationWarning, match="The postproc-argument is deprecated"):
+    with pytest.warns(FutureWarning, match="The postproc-argument is deprecated"):
         dpls, _ = run_hnn_core_fixture(
             backend="joblib",
             n_jobs=1,
@@ -187,8 +186,8 @@ def test_dipole(tmp_path, run_hnn_core_fixture):
 
 def test_dipole_simulation():
     """Test data produced from simulate_dipole() call."""
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, "param", "default.json")
+    hnn_core_root = Path(hnn_core.__file__).parent
+    params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
     params.update(
         {"dipole_smooth_win": 5, "t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20}
@@ -210,6 +209,12 @@ def test_dipole_simulation():
             record_vsec=False,
             record_isec=False,
             record_ca="abc",
+        )
+    with pytest.raises(ValueError, match="'bsl_cor' must be"):
+        simulate_dipole(
+            net,
+            tstop=25.0,
+            bsl_cor="GIGAMUNGUS",
         )
 
     # test Network.copy() returns 'bare' network after simulating
@@ -320,7 +325,7 @@ def test_rmse():
         "https://raw.githubusercontent.com/jonescompneurolab/hnn/"
         "master/data/MEG_detection_data/yes_trial_S1_ERP_all_avg.txt"
     )
-    if not op.exists("yes_trial_S1_ERP_all_avg.txt"):
+    if not Path("yes_trial_S1_ERP_all_avg.txt").exists():
         urlretrieve(data_url, "yes_trial_S1_ERP_all_avg.txt")
     extdata = np.loadtxt("yes_trial_S1_ERP_all_avg.txt")
 
@@ -328,8 +333,8 @@ def test_rmse():
         times=extdata[:, 0], data=np.c_[extdata[:, 1], extdata[:, 1], extdata[:, 1]]
     )
 
-    hnn_core_root = op.join(op.dirname(hnn_core.__file__))
-    params_fname = op.join(hnn_core_root, "param", "default.json")
+    hnn_core_root = Path(hnn_core.__file__).parent
+    params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
 
     expected_rmse = 0.1
@@ -372,3 +377,17 @@ def test_dipole_simulation_with_renamed_cells():
     assert isinstance(dpls[0], Dipole)
     assert len(dpls[0].times) > 0
     assert np.any(dpls[0].data["agg"] != 0)  # Check that dipole is not all zeros
+
+
+@requires_mpi4py
+@requires_psutil
+@pytest.mark.uses_mpi
+def test_dipole_bsl_cor(run_hnn_core_fixture):
+    """Test that all values of bsl_cor work in simulate_dipole"""
+    for backend in {"joblib", "mpi"}:
+        for bsl_cor in {"jones", "duecker"}:
+            _, _ = run_hnn_core_fixture(
+                backend=backend,
+                reduced=True,
+                bsl_cor=bsl_cor,
+            )

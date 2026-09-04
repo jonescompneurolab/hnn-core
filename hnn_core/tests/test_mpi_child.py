@@ -1,4 +1,4 @@
-import os.path as op
+from pathlib import Path
 import io
 from contextlib import redirect_stdout, redirect_stderr
 from queue import Queue
@@ -85,10 +85,10 @@ def test_extract_data_length():
 def test_str_to_net():
     """Test reading the network via a string"""
 
-    hnn_core_root = op.dirname(hnn_core.__file__)
+    hnn_core_root = Path(hnn_core.__file__).parent
 
     # prepare network
-    params_fname = op.join(hnn_core_root, "param", "default.json")
+    params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
     net = neymotin_2020_model(params, add_drives_from_params=True)
 
@@ -122,10 +122,10 @@ def test_str_to_net():
 def test_child_run():
     """Test running the child process without MPI"""
 
-    hnn_core_root = op.dirname(hnn_core.__file__)
+    hnn_core_root = Path(hnn_core.__file__).parent
 
     # prepare params
-    params_fname = op.join(hnn_core_root, "param", "default.json")
+    params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
     params_reduced = params.copy()
     params_reduced.update({"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20})
@@ -157,8 +157,11 @@ def test_child_run():
         sim_data = _process_child_data(data_path, data_len)
         n_trials = 1
         postproc = False
-        dpls = _gather_trial_data(sim_data, net_reduced, n_trials, postproc)
-        assert len(dpls) == 1
+        for bsl_cor in {"jones", "duecker"}:
+            dpls = _gather_trial_data(
+                sim_data, net_reduced, n_trials, postproc, bsl_cor
+            )
+            assert len(dpls) == 1
 
 
 def test_empty_data():

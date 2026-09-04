@@ -5,9 +5,8 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
-import os
 from itertools import product
-
+from pathlib import Path
 import numpy as np
 from joblib import Parallel, delayed, parallel_config
 
@@ -92,6 +91,9 @@ class BatchSimulate(object):
     summary_func : func, optional
         A function to calculate summary statistics from the simulation
         results. Default is None.
+    bsl_cor : {"jones", "duecker"}, default="jones"
+        Baseline correction method. For neymotin_2020_model and law_2021_model, use
+        method 'jones' (manual correction). For duecker_ET_model, use method 'duecker'.
 
     Notes
     -----
@@ -126,6 +128,7 @@ class BatchSimulate(object):
         postproc=False,
         clear_cache=False,
         summary_func=None,
+        bsl_cor="jones",
     ):
         _validate_type(net, Network, "net", "Network")
         _validate_type(tstop, types="numeric", item_name="tstop")
@@ -171,6 +174,7 @@ class BatchSimulate(object):
         self.clear_cache = clear_cache
         self.summary_func = summary_func
         self._verbose = True
+        self.bsl_cor = bsl_cor
 
     def run(
         self,
@@ -337,6 +341,7 @@ class BatchSimulate(object):
                 record_isec=self.record_isec,
                 postproc=self.postproc,
                 verbose=self._verbose,
+                bsl_cor=self.bsl_cor,
             )
             results["dpl"] = dpl
 
@@ -406,9 +411,8 @@ class BatchSimulate(object):
         _validate_type(start_idx, types="int", item_name="start_idx")
         _validate_type(end_idx, types="int", item_name="end_idx")
 
-        if not os.path.exists(self.save_folder):
-            os.makedirs(self.save_folder)
-
+        save_folder = Path(self.save_folder)
+        save_folder.mkdir(parents=True, exist_ok=True)
         save_data = {"param_values": [result["param_values"] for result in results]}
 
         attributes_to_save = [
@@ -431,13 +435,13 @@ class BatchSimulate(object):
         }
         save_data["metadata"] = metadata
 
-        file_name = os.path.join(self.save_folder, f"sim_run_{start_idx}-{end_idx}.npz")
-        if os.path.exists(file_name) and not self.overwrite:
+        file_path = save_folder / f"sim_run_{start_idx}-{end_idx}.npz"
+        if file_path.exists() and not self.overwrite:
             raise FileExistsError(
-                f"File {file_name} already exists and overwrite is set to False."
+                f"File {file_path} already exists and overwrite is set to False."
             )
 
-        np.savez(file_name, **save_data)
+        np.savez(file_path, **save_data)
 
     def load_results(self, file_path, return_data=None):
         """Load simulation results from a file.
@@ -487,9 +491,8 @@ class BatchSimulate(object):
             List of dictionaries containing all loaded simulation results.
         """
         all_results = []
-        for file_name in os.listdir(self.save_folder):
-            if file_name.startswith("sim_run_") and file_name.endswith(".npz"):
-                file_path = os.path.join(self.save_folder, file_name)
-                results = self.load_results(file_path)
-                all_results.append(results)
+        save_folder = Path(self.save_folder)
+        for file_path in save_folder.glob("sim_run_*.npz"):
+            results = self.load_results(file_path)
+            all_results.append(results)
         return all_results

@@ -1,6 +1,6 @@
 # Authors: Mainak Jas <mainakjas@gmail.com>
 
-import os.path as op
+from pathlib import Path
 import numpy as np
 import pytest
 
@@ -90,8 +90,8 @@ def test_split_by_evinput():
 
 def test_optimize_evoked():
     """Test running the full routine in a reduced network."""
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, "param", "default.json")
+    hnn_core_root = Path(hnn_core.__file__).parent
+    params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
 
     tstop = 10.0

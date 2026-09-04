@@ -2,7 +2,7 @@
 #          Rajat Partani <rajatpartani@gmail.com>
 
 import json
-import os.path as op
+from copy import deepcopy
 from pathlib import Path
 from time import sleep
 from urllib.request import urlretrieve
@@ -14,9 +14,11 @@ from hnn_core import (
     simulate_dipole,
     read_params,
     calcium_model,
+    duecker_ET_model,
 )
 
 from hnn_core.hnn_io import (
+    write_network_configuration,
     _cell_response_to_dict,
     _rec_array_to_dict,
     _external_drive_to_dict,
@@ -387,6 +389,51 @@ def test_read_configuration_no_default_v0():
     _ = simulate_dipole(net_no_v0, tstop=2, n_trials=1, dt=0.5)
 
 
+def test_read_model_variant_cell_types(tmp_path):
+    """Test that cell types not matching the model variant raise an error."""
+    net = duecker_ET_model(mesh_shape=(3, 3))
+    file_path = tmp_path / "duecker_net.json"
+    write_network_configuration(net, file_path)
+
+    # the network written by duecker_ET_model reads back without error
+    read_network_configuration(file_path)
+
+    with open(file_path, "r") as file:
+        net_data = json.load(file)
+
+    def _write_and_read(net_data):
+        modified_path = tmp_path / "modified_net.json"
+        with open(modified_path, "w") as file:
+            json.dump(net_data, file)
+        read_network_configuration(modified_path)
+
+    # Raise error if there is a discrepancy between expected cell types and actual cell types in model
+    # e.g. here: neymotin_2020_model with human inhibitory interneurons instead of basket cells.
+    neymotin_data = deepcopy(net_data)
+    neymotin_data["cell_types"]["L2_basket"] = neymotin_data["cell_types"].pop(
+        "L2_inhibitory"
+    )
+    neymotin_data["cell_types"]["L5_basket"] = neymotin_data["cell_types"].pop(
+        "L5_inhibitory"
+    )
+    with pytest.raises(
+        ValueError, match="likely trying to create a duecker_ET_model with"
+    ):
+        _write_and_read(neymotin_data)
+
+    # a missing cell type is reported without the basket cell hint
+    for cell_name in [
+        "L2_pyramidal",
+        "L5_pyramidal",
+        "L2_inhibitory",
+        "L5_inhibitory",
+    ]:
+        missing_data = deepcopy(net_data)
+        del missing_data["cell_types"][cell_name]
+        with pytest.raises(ValueError, match=f"no {cell_name} found."):
+            _write_and_read(missing_data)
+
+
 def test_network_serialization_metadata(jones_2009_network, tmp_path):
     """Test saving and loading a network with the cell_metadata structure."""
     net_original = jones_2009_network
@@ -421,8 +468,8 @@ def test_read_run_tutorial_json():
         "hnn-data/refs/heads/main/"
         "network-configurations/ERPYes100Trials.json"
     )
-    net_fname = op.join(hnn_core_root, "param", "ERPYes100Trials.json")
-    if not op.exists(net_fname):
+    net_fname = hnn_core_root / "param" / "ERPYes100Trials.json"
+    if not net_fname.exists():
         urlretrieve(net_url, net_fname)
 
     # Test that Network can be created without error.

@@ -5,9 +5,8 @@
 #          Blake Caldwell <blake_caldwell@brown.edu>
 
 import os
-import os.path as op
 from copy import deepcopy
-
+from pathlib import Path
 import numpy as np
 from neuron import h
 
@@ -63,8 +62,12 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
     # sets the default max solver step in ms (purposefully large)
     _PC.set_maxstep(10)
 
-    # initialize cells to -65 mV, after all the NetCon
-    # delays have been specified
+    # If you pass an argument such as `h.finitialize(-65)` DOES change the membrane
+    # potential for all cells. If you do NOT pass an argument, then each cell type
+    # retains its initial membrane potential from `cells_default.py`. Note that LLM
+    # reading of NEURON documentation is unclear about this.
+    #
+    # This is done after all the NetCon delays have been specified
     h.finitialize()
 
     def simulation_time():
@@ -184,11 +187,11 @@ def load_custom_mechanisms(net_verbose=True):
 
     # recursively find the .so / .dll library
     mech_fname = list()
-    mod_dir = op.join(op.dirname(__file__), "mod")
+    mod_dir = Path(__file__).parent / "mod"
     for root, dirnames, filenames in os.walk(mod_dir):
         for filename in filenames:
             if filename.endswith((".so", ".dll")):
-                mech_fname.append(os.path.join(root, filename))
+                mech_fname.append(str(Path(root) / filename))
                 break
 
     if len(mech_fname) == 0:
@@ -478,10 +481,20 @@ class NetworkBuilder(object):
                     cell.build()
                 # add tonic biases
                 for bias in self.net.external_biases:
-                    if src_type in self.net.external_biases[bias]:
-                        cell.create_tonic_bias(
-                            **self.net.external_biases[bias][src_type]
-                        )
+                    if src_type not in self.net.external_biases[bias]:
+                        continue
+
+                    bias_params = self.net.external_biases[bias][src_type]
+                    # Note that bias_params["gid"] is a list of gids that need a tonic
+                    # bias connection, not a single gid. This hails from the 'gid'
+                    # argument of `Network.add_tonic_bias`. Also note that 'gid' in this
+                    # case is only used for detection of whether or not we need to
+                    # create a bias for this gid. The actual 'gid' is not used inside
+                    # cell._create_tonic_bias, but it is passed as a keyword argument to
+                    # be concise.
+                    if gid in bias_params["gid"]:
+                        cell._create_tonic_bias(**bias_params)
+
                 cell.record(record_vsec, record_isec, record_ca)
 
                 # this call could belong in init of a _Cell (with threshold)?
