@@ -16,7 +16,7 @@ from hnn_core import (
     calcium_model,
     duecker_ET_model,
 )
-
+from hnn_core.cells_default import _default_v_init
 from hnn_core.hnn_io import (
     write_network_configuration,
     _cell_response_to_dict,
@@ -359,17 +359,7 @@ def test_read_configuration_no_default_v0():
     # Current section initial voltages. The original location of these values can be
     # found at
     # https://github.com/jonescompneurolab/hnn-core/blob/8a0fffef8d8803e2404d7237f9adeabecd1285ed/hnn_core/network_builder.py#L668-L679
-    expected_l5pyr_v0 = {
-        "apical_1": -71.32,
-        "apical_2": -69.08,
-        "apical_tuft": -67.30,
-        "apical_trunk": -72,
-        "soma": -72.0,
-        "basal_1": -72,
-        "basal_2": -72,
-        "basal_3": -72,
-        "apical_oblique": -72,
-    }
+    expected_l5pyr_v0 = deepcopy(_default_v_init["L5_pyramidal"])
 
     net_no_v0 = read_network_configuration(
         Path(assets_path, "gamma_L5weak_L2weak_hierarchical.json")
