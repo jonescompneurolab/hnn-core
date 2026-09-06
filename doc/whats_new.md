@@ -43,7 +43,9 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 - `neymotin_2020_model(..., load_erp_drives=True)` loads canonical ERP drives
   from the packaged ``neymotin2020_erp_drives.json`` configuration file. This
-  provides a single, reproducible way to add default ERP drives.
+  provides a single, reproducible way to add default ERP drives. Canonical ERP
+  tutorials and tests now use this flag instead of
+  ``add_drives_from_params=True``.
 - Users can now specify their own custom objective function in two different ways:
     1. Passing a `obj_fun='custom'` to `Optimizer`. If passing `custom`, then users can
       provide a function that simply accepts a single `Dipole` object and accepts
