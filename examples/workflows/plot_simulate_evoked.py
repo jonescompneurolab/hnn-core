@@ -34,55 +34,16 @@ from hnn_core import simulate_dipole, neymotin_2020_model
 from hnn_core.viz import plot_dipole
 
 ###############################################################################
-# Let us first create our default network and visualize the cells
-# inside it.
-net = neymotin_2020_model()
+# Let us first create our default network with the canonical ERP drives and
+# visualize the cells inside it. ``load_erp_drives=True`` loads the same
+# distal and proximal evoked drives used by the GUI and textbook ERP
+# tutorials. Custom drives can still be added with
+# :meth:`hnn_core.Network.add_evoked_drive`,
+# :meth:`hnn_core.Network.add_poisson_drive`, and
+# :meth:`hnn_core.Network.add_bursty_drive`.
+net = neymotin_2020_model(load_erp_drives=True)
 net.plot_cells()
 net.cell_types['L5_pyramidal']['cell_object'].plot_morphology()
-
-###############################################################################
-# The network of cells is now defined, to which we add external drives as
-# required. Weights are prescribed separately for AMPA and NMDA receptors
-# (receptors that are not used can be omitted or set to zero). The possible
-# drive types include the following (click on the links for documentation):
-#
-# - :meth:`hnn_core.Network.add_evoked_drive`
-# - :meth:`hnn_core.Network.add_poisson_drive`
-# - :meth:`hnn_core.Network.add_bursty_drive`
-
-###############################################################################
-# First, we add a distal evoked drive
-weights_ampa_d1 = {'L2_basket': 0.006562, 'L2_pyramidal': .000007,
-                   'L5_pyramidal': 0.142300}
-weights_nmda_d1 = {'L2_basket': 0.019482, 'L2_pyramidal': 0.004317,
-                   'L5_pyramidal': 0.080074}
-synaptic_delays_d1 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
-                      'L5_pyramidal': 0.1}
-net.add_evoked_drive(
-    'evdist1', mu=63.53, sigma=3.85, numspikes=1, weights_ampa=weights_ampa_d1,
-    weights_nmda=weights_nmda_d1, location='distal',
-    synaptic_delays=synaptic_delays_d1, event_seed=274)
-
-###############################################################################
-# Then, we add two proximal drives
-weights_ampa_p1 = {'L2_basket': 0.08831, 'L2_pyramidal': 0.01525,
-                   'L5_basket': 0.19934, 'L5_pyramidal': 0.00865}
-synaptic_delays_prox = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
-                        'L5_basket': 1., 'L5_pyramidal': 1.}
-# all NMDA weights are zero; pass None explicitly
-net.add_evoked_drive(
-    'evprox1', mu=26.61, sigma=2.47, numspikes=1, weights_ampa=weights_ampa_p1,
-    weights_nmda=None, location='proximal',
-    synaptic_delays=synaptic_delays_prox, event_seed=544)
-
-# Second proximal evoked drive. NB: only AMPA weights differ from first
-weights_ampa_p2 = {'L2_basket': 0.000003, 'L2_pyramidal': 1.438840,
-                   'L5_basket': 0.008958, 'L5_pyramidal': 0.684013}
-# all NMDA weights are zero; omit weights_nmda (defaults to None)
-net.add_evoked_drive(
-    'evprox2', mu=137.12, sigma=8.33, numspikes=1,
-    weights_ampa=weights_ampa_p2, location='proximal',
-    synaptic_delays=synaptic_delays_prox, event_seed=814)
 
 ###############################################################################
 # Now let's simulate the dipole, running 2 trials with the
@@ -125,6 +86,20 @@ plot_dipole(dpls, average=False, layer=['L2', 'L5', 'agg'], show=False)
 # Now, let us try to make the exogenous driving inputs to the cells
 # synchronous and see what happens. This is achieved by setting
 # ``n_drive_cells=1`` and ``cell_specific=False`` when adding each drive.
+# The synaptic weights match the canonical ERP drives loaded above.
+
+weights_ampa_d1 = {'L2_basket': 0.006562, 'L2_pyramidal': .000007,
+                   'L5_pyramidal': 0.142300}
+weights_nmda_d1 = {'L2_basket': 0.019482, 'L2_pyramidal': 0.004317,
+                   'L5_pyramidal': 0.080074}
+synaptic_delays_d1 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
+                      'L5_pyramidal': 0.1}
+weights_ampa_p1 = {'L2_basket': 0.08831, 'L2_pyramidal': 0.01525,
+                   'L5_basket': 0.19934, 'L5_pyramidal': 0.00865}
+synaptic_delays_prox = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
+                        'L5_basket': 1., 'L5_pyramidal': 1.}
+weights_ampa_p2 = {'L2_basket': 0.000003, 'L2_pyramidal': 1.438840,
+                   'L5_basket': 0.008958, 'L5_pyramidal': 0.684013}
 
 net_sync = neymotin_2020_model()
 
@@ -134,17 +109,17 @@ cell_specific=False
 net_sync.add_evoked_drive(
     'evdist1', mu=63.53, sigma=3.85, numspikes=1, weights_ampa=weights_ampa_d1,
     weights_nmda=weights_nmda_d1, location='distal', n_drive_cells=n_drive_cells,
-    cell_specific=cell_specific, synaptic_delays=synaptic_delays_d1, event_seed=274)
+    cell_specific=cell_specific, synaptic_delays=synaptic_delays_d1, event_seed=272)
 
 net_sync.add_evoked_drive(
     'evprox1', mu=26.61, sigma=2.47, numspikes=1, weights_ampa=weights_ampa_p1,
     weights_nmda=None, location='proximal', n_drive_cells=n_drive_cells,
-    cell_specific=cell_specific, synaptic_delays=synaptic_delays_prox, event_seed=544)
+    cell_specific=cell_specific, synaptic_delays=synaptic_delays_prox, event_seed=507)
 
 net_sync.add_evoked_drive(
     'evprox2', mu=137.12, sigma=8.33, numspikes=1,
     weights_ampa=weights_ampa_p2, location='proximal', n_drive_cells=n_drive_cells,
-    cell_specific=cell_specific, synaptic_delays=synaptic_delays_prox, event_seed=814)
+    cell_specific=cell_specific, synaptic_delays=synaptic_delays_prox, event_seed=777)
 
 ###############################################################################
 # You may interrogate current values defining the spike event time dynamics by

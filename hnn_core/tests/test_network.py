@@ -628,7 +628,7 @@ def test_network_cell_positions(mesh_shape):
 
     # Setup our network, default params, and expected post-change params
     # ----------------------------------------------------------------------------------
-    net = neymotin_2020_model(add_drives_from_params=True, mesh_shape=mesh_shape)
+    net = neymotin_2020_model(load_erp_drives=True, mesh_shape=mesh_shape)
     default_inplane_distance = 1.0  # default
     default_layer_separation = 1307.4  # default
     assert np.isclose(net._inplane_distance, default_inplane_distance)  # check default
@@ -734,11 +734,11 @@ def test_network_cell_positions(mesh_shape):
     # reset from the original network, since update_cell_positions always
     # scales relative to the *current* net._inplane_distance
     # ------------------------------------------------------------------------------
-    net_direct = neymotin_2020_model(add_drives_from_params=True, mesh_shape=mesh_shape)
+    net_direct = neymotin_2020_model(load_erp_drives=True, mesh_shape=mesh_shape)
     net_direct.update_cell_positions(inplane_distance=8.0, layer_separation=3000.0)
 
     net_sequential = neymotin_2020_model(
-        add_drives_from_params=True, mesh_shape=mesh_shape
+        load_erp_drives=True, mesh_shape=mesh_shape
     )
     net_sequential.update_cell_positions(inplane_distance=4.1, layer_separation=1531.0)
     net_sequential.update_cell_positions(inplane_distance=8.0, layer_separation=3000.0)
@@ -779,7 +779,7 @@ def test_network_reset_to_original_cell_positions(model_name, mesh_shape):
     # ----------------------------------------------------------------------------------
     if model_name == "neymotin_2020_model":
         # default-network branch, with drives created at construction time
-        net = neymotin_2020_model(add_drives_from_params=True, mesh_shape=mesh_shape)
+        net = neymotin_2020_model(load_erp_drives=True, mesh_shape=mesh_shape)
         expected_inplane_distance = 1.0
         expected_layer_separation = 1307.4
     elif model_name == "duecker_ET_model":

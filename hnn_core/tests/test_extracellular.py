@@ -26,7 +26,7 @@ params = read_params(params_fname)
 
 def test_extracellular_api():
     """Test extracellular recording API."""
-    net = neymotin_2020_model(deepcopy(params), add_drives_from_params=True)
+    net = neymotin_2020_model(deepcopy(params), load_erp_drives=True)
 
     # Test LFP electrodes
     electrode_pos = (1, 2, 3)
