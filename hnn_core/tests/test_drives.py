@@ -783,6 +783,15 @@ def test_load_erp_drives_matches_json_configuration():
         assert api_drive["weights_nmda"] == json_drive["weights_nmda"]
 
 
+def test_load_erp_drives_missing_drive_raises(tmp_path):
+    """Test missing required drive in JSON raises."""
+    bad_json = tmp_path / "bad_erp_drives.json"
+    bad_json.write_text('{"external_drives": {}}')
+    net = neymotin_2020_model(mesh_shape=(3, 3))
+    with pytest.raises(ValueError, match="missing required drive 'evdist1'"):
+        _load_erp_drives(net, fname=bad_json)
+
+
 def test_load_erp_drives_incompatible_with_add_drives_from_params():
     """Test mutually exclusive drive-loading options raise."""
     with pytest.raises(ValueError, match="Cannot set both"):
