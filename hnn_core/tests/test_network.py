@@ -737,9 +737,7 @@ def test_network_cell_positions(mesh_shape):
     net_direct = neymotin_2020_model(load_erp_drives=True, mesh_shape=mesh_shape)
     net_direct.update_cell_positions(inplane_distance=8.0, layer_separation=3000.0)
 
-    net_sequential = neymotin_2020_model(
-        load_erp_drives=True, mesh_shape=mesh_shape
-    )
+    net_sequential = neymotin_2020_model(load_erp_drives=True, mesh_shape=mesh_shape)
     net_sequential.update_cell_positions(inplane_distance=4.1, layer_separation=1531.0)
     net_sequential.update_cell_positions(inplane_distance=8.0, layer_separation=3000.0)
 
