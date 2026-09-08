@@ -156,15 +156,98 @@ def test_network_visualization(setup_net):
     plt.close("all")
 
 
-def test_dipole_visualization(setup_net):
+def test_dipole_viz_decimation_options(setup_net):
     """Test dipole visualisations."""
     net = setup_net
+    dpls = simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
+    fig = dpls[0].plot()  # plot the first dipole alone
+    axes = fig.get_axes()[0]
+    dpls[0].copy().smooth(window_len=10).plot(ax=axes)  # add smoothed versions
+    dpls[0].copy().savgol_filter(h_freq=30).plot(ax=axes)  # on top
 
-    # Test plotting of simulations with no spiking
-    dpls = simulate_dipole(net, tstop=100.0, n_trials=1)
+    # test decimation options
+    plot_dipole(dpls[0], decim=2, show=False)
+    for dec in [-1, [2, 2.0]]:
+        with pytest.raises(
+            ValueError, match="each decimation factor must be a positive"
+        ):
+            plot_dipole(dpls[0], decim=dec, show=False)
+
+
+def test_dipole_viz_dipole_mutiple_layers(setup_net):
+    net = setup_net
+    dpls = simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
+    # test plotting multiple dipoles as overlay
+    plot_dipole(dpls, show=False)
+
+    # test plotting multiple dipoles with average
+    plot_dipole(dpls, average=True, show=False)
+    plt.close("all")
+
+    # test plotting dipoles with multiple layers
+    _, ax = plt.subplots()
+    _ = plot_dipole(dpls, show=False, ax=[ax], layer=["L2"])
+    _ = plot_dipole(dpls, show=False, layer=["L2", "L5", "agg"])
+    _, axes = plt.subplots(nrows=3, ncols=1)
+    _ = plot_dipole(dpls, show=False, ax=axes, layer=["L2", "L5", "agg"])
+    _, axes = plt.subplots(nrows=3, ncols=1)
+    _ = plot_dipole(
+        dpls, show=False, ax=[axes[0], axes[1], axes[2]], layer=["L2", "L5", "agg"]
+    )
+
+    plt.close("all")
+
+    with pytest.raises(AssertionError, match="ax and layer should have the same size"):
+        _, axes = plt.subplots(nrows=3, ncols=1)
+        _ = plot_dipole(dpls, show=False, ax=axes, layer=["L2", "L5"])
+
+
+def test_dipole_viz_multiple_tfr(setup_net):
+    net = setup_net
+    dpls = simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
+    # multiple TFRs get averaged
+    fig = plot_tfr_morlet(dpls, freqs=np.arange(23, 26, 1.0), n_cycles=3, show=False)
+    # when min_freq > max_freq (y-axis inversion)
+    fig = plot_tfr_morlet(dpls, freqs=np.array([30, 20, 10]), n_cycles=3, show=False)
+    ax = fig.get_axes()[0]
+    y_limits = ax.get_ylim()
+    assert y_limits[0] > y_limits[1], (
+        "Y-axis should be inverted when min_freq > max_freq"
+    )
+
+    with pytest.raises(RuntimeError, match="All dipoles must be scaled equally!"):
+        plot_dipole([dpls[0].copy().scale(10), dpls[1].copy().scale(20)])
+    with pytest.raises(RuntimeError, match="All dipoles must be scaled equally!"):
+        plot_psd([dpls[0].copy().scale(10), dpls[1].copy().scale(20)])
+    with pytest.raises(RuntimeError, match="All dipoles must be sampled equally!"):
+        dpl_sfreq = dpls[0].copy()
+        dpl_sfreq.sfreq /= 10
+        plot_psd([dpls[0], dpl_sfreq])
+
+    # pytest deprecation warning for tmin and tmax
+    with pytest.warns(FutureWarning, match="tmin and tmax are deprecated"):
+        plot_dipole(dpls[0], show=False, tmin=10, tmax=100)
+
+
+def test_dipole_viz_no_data_in_raster_plt(setup_net):
+    net = setup_net
+    simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
     net.cell_response.plot_spikes_raster()
-    net.cell_response.plot_spikes_hist()
+    # test cell response plotting
+    with pytest.raises(TypeError, match="trial_idx must be an instance of"):
+        net.cell_response.plot_spikes_raster(trial_idx="blah", show=False)
+    net.cell_response.plot_spikes_raster(trial_idx=0, show=False)
+    fig = net.cell_response.plot_spikes_raster(trial_idx=[0, 1], show=False)
+    assert len(fig.axes[0].collections) > 0, "No data plotted in raster plot"
 
+
+def test_dipole_viz_cell_response_plot_spikes_hist(setup_net):
+    net = setup_net
+
+    # simulation first run
+    simulate_dipole(net, tstop=100.0, n_trials=1)
+
+    net.cell_response.plot_spikes_hist()
     weights_ampa = {"L2_pyramidal": 5.4e-5, "L5_pyramidal": 5.4e-5}
     syn_delays = {"L2_pyramidal": 0.1, "L5_pyramidal": 1.0}
 
@@ -196,73 +279,8 @@ def test_dipole_visualization(setup_net):
         event_seed=14,
     )
 
-    dpls = simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
-    fig = dpls[0].plot()  # plot the first dipole alone
-    axes = fig.get_axes()[0]
-    dpls[0].copy().smooth(window_len=10).plot(ax=axes)  # add smoothed versions
-    dpls[0].copy().savgol_filter(h_freq=30).plot(ax=axes)  # on top
-
-    # test decimation options
-    plot_dipole(dpls[0], decim=2, show=False)
-    for dec in [-1, [2, 2.0]]:
-        with pytest.raises(
-            ValueError, match="each decimation factor must be a positive"
-        ):
-            plot_dipole(dpls[0], decim=dec, show=False)
-
-    # test plotting multiple dipoles as overlay
-    fig = plot_dipole(dpls, show=False)
-
-    # test plotting multiple dipoles with average
-    fig = plot_dipole(dpls, average=True, show=False)
-    plt.close("all")
-
-    # test plotting dipoles with multiple layers
-    fig, ax = plt.subplots()
-    fig = plot_dipole(dpls, show=False, ax=[ax], layer=["L2"])
-    fig = plot_dipole(dpls, show=False, layer=["L2", "L5", "agg"])
-    fig, axes = plt.subplots(nrows=3, ncols=1)
-    fig = plot_dipole(dpls, show=False, ax=axes, layer=["L2", "L5", "agg"])
-    fig, axes = plt.subplots(nrows=3, ncols=1)
-    fig = plot_dipole(
-        dpls, show=False, ax=[axes[0], axes[1], axes[2]], layer=["L2", "L5", "agg"]
-    )
-
-    plt.close("all")
-
-    with pytest.raises(AssertionError, match="ax and layer should have the same size"):
-        fig, axes = plt.subplots(nrows=3, ncols=1)
-        fig = plot_dipole(dpls, show=False, ax=axes, layer=["L2", "L5"])
-
-    # multiple TFRs get averaged
-    fig = plot_tfr_morlet(dpls, freqs=np.arange(23, 26, 1.0), n_cycles=3, show=False)
-    # when min_freq > max_freq (y-axis inversion)
-    fig = plot_tfr_morlet(dpls, freqs=np.array([30, 20, 10]), n_cycles=3, show=False)
-    ax = fig.get_axes()[0]
-    y_limits = ax.get_ylim()
-    assert y_limits[0] > y_limits[1], (
-        "Y-axis should be inverted when min_freq > max_freq"
-    )
-
-    with pytest.raises(RuntimeError, match="All dipoles must be scaled equally!"):
-        plot_dipole([dpls[0].copy().scale(10), dpls[1].copy().scale(20)])
-    with pytest.raises(RuntimeError, match="All dipoles must be scaled equally!"):
-        plot_psd([dpls[0].copy().scale(10), dpls[1].copy().scale(20)])
-    with pytest.raises(RuntimeError, match="All dipoles must be sampled equally!"):
-        dpl_sfreq = dpls[0].copy()
-        dpl_sfreq.sfreq /= 10
-        plot_psd([dpls[0], dpl_sfreq])
-
-    # pytest deprecation warning for tmin and tmax
-    with pytest.warns(FutureWarning, match="tmin and tmax are deprecated"):
-        plot_dipole(dpls[0], show=False, tmin=10, tmax=100)
-
-    # test cell response plotting
-    with pytest.raises(TypeError, match="trial_idx must be an instance of"):
-        net.cell_response.plot_spikes_raster(trial_idx="blah", show=False)
-    net.cell_response.plot_spikes_raster(trial_idx=0, show=False)
-    fig = net.cell_response.plot_spikes_raster(trial_idx=[0, 1], show=False)
-    assert len(fig.axes[0].collections) > 0, "No data plotted in raster plot"
+    # simulation second run
+    simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
 
     with pytest.raises(TypeError, match="trial_idx must be an instance of"):
         net.cell_response.plot_spikes_hist(trial_idx="blah")
