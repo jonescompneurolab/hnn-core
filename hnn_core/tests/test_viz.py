@@ -175,6 +175,7 @@ def test_dipole_viz_decimation_options(setup_net):
 
 
 def test_dipole_viz_dipole_mutiple_layers(setup_net):
+    """Test plotting dipoles across multiple layers (L2, L5, agg) with matching axes."""
     net = setup_net
     dpls = simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
     # test plotting multiple dipoles as overlay
@@ -203,6 +204,7 @@ def test_dipole_viz_dipole_mutiple_layers(setup_net):
 
 
 def test_dipole_viz_multiple_tfr(setup_net):
+    """Test TFR plotting of multiple dipoles and related scaling/sampling checks."""
     net = setup_net
     dpls = simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
     # multiple TFRs get averaged
@@ -230,6 +232,7 @@ def test_dipole_viz_multiple_tfr(setup_net):
 
 
 def test_dipole_viz_no_data_in_raster_plt(setup_net):
+    """Test that the raster plot contains data for various trial_idx inputs."""
     net = setup_net
     simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
     net.cell_response.plot_spikes_raster()
@@ -242,6 +245,7 @@ def test_dipole_viz_no_data_in_raster_plt(setup_net):
 
 
 def test_dipole_viz_cell_response_plot_spikes_hist(setup_net):
+    """Test spike histogram plotting with trial_idx and color argument variations."""
     net = setup_net
 
     # simulation first run
