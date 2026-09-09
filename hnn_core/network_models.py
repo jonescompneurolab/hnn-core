@@ -456,7 +456,7 @@ def jones_2009_model(
         for the model. `jones_2009_model` will still be made available for
         backwards-compatilibity purposes.
         """,
-        DeprecationWarning,
+        FutureWarning,
     )
 
     net = neymotin_2020_model(params, add_drives_from_params, legacy_mode, mesh_shape)
