@@ -606,8 +606,10 @@ def read_network_configuration(fname, read_drives=True, read_external_biases=Tru
         )
 
     # ensure the cell types match the model variant
+    # TODO: AES delete this block after we ensure that all users of Duecker model are
+    # updated to use the latest code upon version 0.7 release.
     check_var = net_data.get("model_variant", None)
-    if check_var is not None and check_var == "duecker_ET_model":
+    if check_var is not None and "duecker_ET_model".startswith(check_var):
         missing_cells = [
             cell_name
             for cell_name in [

@@ -450,7 +450,33 @@ class Network:
         # Save the parameters used to create the Network
         _validate_type(params, dict, "params")
         self._params = params
+
+        # The `model_variant` attribute is currently used to distinguish Duecker-style
+        # networks from all other networks. Duecker-style networks are fundamentally
+        # different from classic Neymotin (aka Jones) -style networks, in terms of cell
+        # types, cell type names, baseline correction values for dipoles, etc. As of
+        # `master` branch's following commit (on 2026-09-02):
+        # https://github.com/jonescompneurolab/hnn-core/commit/49f210fb41481ab859537e9b3e32a74117ae95fc
+        # `model_variant` can have any of the following values, based on the
+        # corresponding functions of `network_models.py`:
+        #
+        # - `duecker_ET_model` -> Duecker-style network
+        # - {`neymotin_2020_model`, `jones_2009_model`, `law_2021_model`, `calcium_model`} -> Jones-style network
+        # - `None` -> Jones-style network (default)
+        #
+        # The case of `None` can arise in two ways: (1) the user is using a (probably
+        # old) script that creates a raw `Network` object from scratch, or (2) the user
+        # is loading a network from a JSON file that was created before the
+        # `model_variant` attribute was added to the `Network` class. In either case,
+        # the default behavior is to treat the network as a Jones-style network.
+        #
+        # TODO: AES The only exception to this is users who are CURRENTLY using an BETA
+        # version of the Duecker model off of an old branch from before `model_variant`
+        # was introduced. Soon, these users will be forced to migrate to the latest
+        # version of the Duecker model code, and this relevant backwards-compatible code
+        # will be deleted.
         self._model_variant = params.get("model_variant", None)
+
         # Initialise a dictionary of cell ID's, which get used when the
         # network is constructed ('built') in NetworkBuilder
         # We want it to remain in each Network object, so that the user can
