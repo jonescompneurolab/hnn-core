@@ -207,7 +207,7 @@ class Optimizer:
         n_jobs : int (Only used if solver='cma')
             The number of jobs to start in parallel. If None, then 1 trial will be
             started without parallelism.
-        seed : int, optional (Only used if solver='cma')
+        seed : int, optional (Only used if solver='bayesian' or solver='cma')
             Optional seed for random number generator of optimizer.
         tolfun : float (Only used if solver='cma')
             Termination criteria. Stops if the range of the best objective function
@@ -497,6 +497,7 @@ def _run_opt_bayesian(
         cons=constraints,
         acquisition=expected_improvement,
         maxfun=max_iter,
+        random_state=obj_fun_kwargs.get("seed"),
     )
 
     # get optimized params
