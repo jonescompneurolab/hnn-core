@@ -46,6 +46,44 @@ def setup_net():
     return net
 
 
+@pytest.fixture
+def run_simulation(setup_net):
+    net = setup_net
+    weights_ampa = {"L2_pyramidal": 5.4e-5, "L5_pyramidal": 5.4e-5}
+    syn_delays = {"L2_pyramidal": 0.1, "L5_pyramidal": 1.0}
+
+    net.add_bursty_drive(
+        "beta_prox",
+        tstart=0.0,
+        burst_rate=25,
+        burst_std=5,
+        numspikes=1,
+        spike_isi=0,
+        n_drive_cells=11,
+        location="proximal",
+        weights_ampa=weights_ampa,
+        synaptic_delays=syn_delays,
+        event_seed=14,
+    )
+
+    net.add_bursty_drive(
+        "beta_dist",
+        tstart=0.0,
+        burst_rate=25,
+        burst_std=5,
+        numspikes=1,
+        spike_isi=0,
+        n_drive_cells=11,
+        location="distal",
+        weights_ampa=weights_ampa,
+        synaptic_delays=syn_delays,
+        event_seed=14,
+    )
+
+    dpl = simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
+    return net, dpl
+
+
 def _fake_click(fig, ax, point, button=1):
     """Fake a click at a point within axes."""
     x, y = ax.transData.transform_point(point)
@@ -156,10 +194,9 @@ def test_network_visualization(setup_net):
     plt.close("all")
 
 
-def test_dipole_viz_decimation_options(setup_net):
+def test_dipole_viz_decimation_options(run_simulation):
     """Test dipole visualisations."""
-    net = setup_net
-    dpls = simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
+    _, dpls = run_simulation
     fig = dpls[0].plot()  # plot the first dipole alone
     axes = fig.get_axes()[0]
     dpls[0].copy().smooth(window_len=10).plot(ax=axes)  # add smoothed versions
@@ -174,143 +211,113 @@ def test_dipole_viz_decimation_options(setup_net):
             plot_dipole(dpls[0], decim=dec, show=False)
 
 
-def test_dipole_viz_dipole_mutiple_layers(setup_net):
-    """Test plotting dipoles across multiple layers (L2, L5, agg) with matching axes."""
-    net = setup_net
-    dpls = simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
-    # test plotting multiple dipoles as overlay
-    plot_dipole(dpls, show=False)
+class TestDipoleViz:
+    def test_dipole_viz_dipole_mutiple_layers(self, run_simulation):
+        """Test plotting dipoles across multiple layers (L2, L5, agg) with matching axes."""
+        _, dpls = run_simulation
+        # test plotting multiple dipoles as overlay
+        plot_dipole(dpls, show=False)
 
-    # test plotting multiple dipoles with average
-    plot_dipole(dpls, average=True, show=False)
-    plt.close("all")
+        # test plotting multiple dipoles with average
+        plot_dipole(dpls, average=True, show=False)
+        plt.close("all")
 
-    # test plotting dipoles with multiple layers
-    _, ax = plt.subplots()
-    _ = plot_dipole(dpls, show=False, ax=[ax], layer=["L2"])
-    _ = plot_dipole(dpls, show=False, layer=["L2", "L5", "agg"])
-    _, axes = plt.subplots(nrows=3, ncols=1)
-    _ = plot_dipole(dpls, show=False, ax=axes, layer=["L2", "L5", "agg"])
-    _, axes = plt.subplots(nrows=3, ncols=1)
-    _ = plot_dipole(
-        dpls, show=False, ax=[axes[0], axes[1], axes[2]], layer=["L2", "L5", "agg"]
-    )
-
-    plt.close("all")
-
-    with pytest.raises(AssertionError, match="ax and layer should have the same size"):
+        # test plotting dipoles with multiple layers
+        _, ax = plt.subplots()
+        _ = plot_dipole(dpls, show=False, ax=[ax], layer=["L2"])
+        _ = plot_dipole(dpls, show=False, layer=["L2", "L5", "agg"])
         _, axes = plt.subplots(nrows=3, ncols=1)
-        _ = plot_dipole(dpls, show=False, ax=axes, layer=["L2", "L5"])
+        _ = plot_dipole(dpls, show=False, ax=axes, layer=["L2", "L5", "agg"])
+        _, axes = plt.subplots(nrows=3, ncols=1)
+        _ = plot_dipole(
+            dpls, show=False, ax=[axes[0], axes[1], axes[2]], layer=["L2", "L5", "agg"]
+        )
 
+        plt.close("all")
 
-def test_dipole_viz_multiple_tfr(setup_net):
-    """Test TFR plotting of multiple dipoles and related scaling/sampling checks."""
-    net = setup_net
-    dpls = simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
-    # multiple TFRs get averaged
-    fig = plot_tfr_morlet(dpls, freqs=np.arange(23, 26, 1.0), n_cycles=3, show=False)
-    # when min_freq > max_freq (y-axis inversion)
-    fig = plot_tfr_morlet(dpls, freqs=np.array([30, 20, 10]), n_cycles=3, show=False)
-    ax = fig.get_axes()[0]
-    y_limits = ax.get_ylim()
-    assert y_limits[0] > y_limits[1], (
-        "Y-axis should be inverted when min_freq > max_freq"
-    )
+        with pytest.raises(
+            AssertionError, match="ax and layer should have the same size"
+        ):
+            _, axes = plt.subplots(nrows=3, ncols=1)
+            _ = plot_dipole(dpls, show=False, ax=axes, layer=["L2", "L5"])
 
-    with pytest.raises(RuntimeError, match="All dipoles must be scaled equally!"):
-        plot_dipole([dpls[0].copy().scale(10), dpls[1].copy().scale(20)])
-    with pytest.raises(RuntimeError, match="All dipoles must be scaled equally!"):
-        plot_psd([dpls[0].copy().scale(10), dpls[1].copy().scale(20)])
-    with pytest.raises(RuntimeError, match="All dipoles must be sampled equally!"):
-        dpl_sfreq = dpls[0].copy()
-        dpl_sfreq.sfreq /= 10
-        plot_psd([dpls[0], dpl_sfreq])
+    def test_dipole_viz_multiple_tfr(self, run_simulation):
+        """Test TFR plotting of multiple dipoles and related scaling/sampling checks."""
+        _, dpls = run_simulation
+        # multiple TFRs get averaged
+        fig = plot_tfr_morlet(
+            dpls, freqs=np.arange(23, 26, 1.0), n_cycles=3, show=False
+        )
+        # when min_freq > max_freq (y-axis inversion)
+        fig = plot_tfr_morlet(
+            dpls, freqs=np.array([30, 20, 10]), n_cycles=3, show=False
+        )
+        ax = fig.get_axes()[0]
+        y_limits = ax.get_ylim()
+        assert y_limits[0] > y_limits[1], (
+            "Y-axis should be inverted when min_freq > max_freq"
+        )
 
-    # pytest deprecation warning for tmin and tmax
-    with pytest.warns(FutureWarning, match="tmin and tmax are deprecated"):
-        plot_dipole(dpls[0], show=False, tmin=10, tmax=100)
+        with pytest.raises(RuntimeError, match="All dipoles must be scaled equally!"):
+            plot_dipole([dpls[0].copy().scale(10), dpls[1].copy().scale(20)])
+        with pytest.raises(RuntimeError, match="All dipoles must be scaled equally!"):
+            plot_psd([dpls[0].copy().scale(10), dpls[1].copy().scale(20)])
+        with pytest.raises(RuntimeError, match="All dipoles must be sampled equally!"):
+            dpl_sfreq = dpls[0].copy()
+            dpl_sfreq.sfreq /= 10
+            plot_psd([dpls[0], dpl_sfreq])
 
+        # pytest deprecation warning for tmin and tmax
+        with pytest.warns(FutureWarning, match="tmin and tmax are deprecated"):
+            plot_dipole(dpls[0], show=False, tmin=10, tmax=100)
 
-def test_dipole_viz_no_data_in_raster_plt(setup_net):
-    """Test that the raster plot contains data for various trial_idx inputs."""
-    net = setup_net
-    simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
-    net.cell_response.plot_spikes_raster()
-    # test cell response plotting
-    with pytest.raises(TypeError, match="trial_idx must be an instance of"):
-        net.cell_response.plot_spikes_raster(trial_idx="blah", show=False)
-    net.cell_response.plot_spikes_raster(trial_idx=0, show=False)
-    fig = net.cell_response.plot_spikes_raster(trial_idx=[0, 1], show=False)
-    assert len(fig.axes[0].collections) > 0, "No data plotted in raster plot"
+    def test_dipole_viz_no_data_in_raster_plt(self, run_simulation):
+        """Test that the raster plot contains data for various trial_idx inputs."""
+        net, _ = run_simulation
+        net.cell_response.plot_spikes_raster()
+        # test cell response plotting
+        with pytest.raises(TypeError, match="trial_idx must be an instance of"):
+            net.cell_response.plot_spikes_raster(trial_idx="blah", show=False)
+        net.cell_response.plot_spikes_raster(trial_idx=0, show=False)
+        fig = net.cell_response.plot_spikes_raster(trial_idx=[0, 1], show=False)
+        assert len(fig.axes[0].collections) > 0, "No data plotted in raster plot"
 
+    def test_dipole_viz_cell_response_plot_spikes_hist(self, run_simulation):
+        """Test spike histogram plotting with trial_idx and color argument variations."""
+        net, _ = run_simulation
+        net.cell_response.plot_spikes_hist()
+        # simulation second run. first one it's in the run_simulation definition
+        simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
 
-def test_dipole_viz_cell_response_plot_spikes_hist(setup_net):
-    """Test spike histogram plotting with trial_idx and color argument variations."""
-    net = setup_net
+        with pytest.raises(TypeError, match="trial_idx must be an instance of"):
+            net.cell_response.plot_spikes_hist(trial_idx="blah")
+        net.cell_response.plot_spikes_hist(trial_idx=0, show=False)
+        net.cell_response.plot_spikes_hist(trial_idx=[0, 1], show=False)
+        net.cell_response.plot_spikes_hist(color="r")
+        net.cell_response.plot_spikes_hist(color=["C0", "C1"])
+        net.cell_response.plot_spikes_hist(color={"beta_prox": "r", "beta_dist": "g"})
+        net.cell_response.plot_spikes_hist(
+            spike_types={"group1": ["beta_prox", "beta_dist"]}, color={"group1": "r"}
+        )
+        net.cell_response.plot_spikes_hist(
+            spike_types={"group1": ["beta"]}, color={"group1": "r"}
+        )
 
-    # simulation first run
-    simulate_dipole(net, tstop=100.0, n_trials=1)
-
-    net.cell_response.plot_spikes_hist()
-    weights_ampa = {"L2_pyramidal": 5.4e-5, "L5_pyramidal": 5.4e-5}
-    syn_delays = {"L2_pyramidal": 0.1, "L5_pyramidal": 1.0}
-
-    net.add_bursty_drive(
-        "beta_prox",
-        tstart=0.0,
-        burst_rate=25,
-        burst_std=5,
-        numspikes=1,
-        spike_isi=0,
-        n_drive_cells=11,
-        location="proximal",
-        weights_ampa=weights_ampa,
-        synaptic_delays=syn_delays,
-        event_seed=14,
-    )
-
-    net.add_bursty_drive(
-        "beta_dist",
-        tstart=0.0,
-        burst_rate=25,
-        burst_std=5,
-        numspikes=1,
-        spike_isi=0,
-        n_drive_cells=11,
-        location="distal",
-        weights_ampa=weights_ampa,
-        synaptic_delays=syn_delays,
-        event_seed=14,
-    )
-
-    # simulation second run
-    simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
-
-    with pytest.raises(TypeError, match="trial_idx must be an instance of"):
-        net.cell_response.plot_spikes_hist(trial_idx="blah")
-    net.cell_response.plot_spikes_hist(trial_idx=0, show=False)
-    net.cell_response.plot_spikes_hist(trial_idx=[0, 1], show=False)
-    net.cell_response.plot_spikes_hist(color="r")
-    net.cell_response.plot_spikes_hist(color=["C0", "C1"])
-    net.cell_response.plot_spikes_hist(color={"beta_prox": "r", "beta_dist": "g"})
-    net.cell_response.plot_spikes_hist(
-        spike_types={"group1": ["beta_prox", "beta_dist"]}, color={"group1": "r"}
-    )
-    net.cell_response.plot_spikes_hist(
-        spike_types={"group1": ["beta"]}, color={"group1": "r"}
-    )
-
-    with pytest.raises(TypeError, match="color must be an instance of"):
-        net.cell_response.plot_spikes_hist(color=123)
-    with pytest.raises(ValueError):
-        net.cell_response.plot_spikes_hist(color="z")
-    with pytest.raises(ValueError):
-        net.cell_response.plot_spikes_hist(color={"beta_prox": "z", "beta_dist": "g"})
-    with pytest.raises(TypeError, match="Dictionary values of color must"):
-        net.cell_response.plot_spikes_hist(color={"beta_prox": 123, "beta_dist": "g"})
-    with pytest.raises(ValueError, match="'beta_dist' must be"):
-        net.cell_response.plot_spikes_hist(color={"beta_prox": "r"})
-    plt.close("all")
+        with pytest.raises(TypeError, match="color must be an instance of"):
+            net.cell_response.plot_spikes_hist(color=123)
+        with pytest.raises(ValueError):
+            net.cell_response.plot_spikes_hist(color="z")
+        with pytest.raises(ValueError):
+            net.cell_response.plot_spikes_hist(
+                color={"beta_prox": "z", "beta_dist": "g"}
+            )
+        with pytest.raises(TypeError, match="Dictionary values of color must"):
+            net.cell_response.plot_spikes_hist(
+                color={"beta_prox": 123, "beta_dist": "g"}
+            )
+        with pytest.raises(ValueError, match="'beta_dist' must be"):
+            net.cell_response.plot_spikes_hist(color={"beta_prox": "r"})
+        plt.close("all")
 
 
 def test_drive_strength(setup_net):
