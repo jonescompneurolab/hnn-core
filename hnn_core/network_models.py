@@ -5,7 +5,6 @@
 from pathlib import Path
 from copy import deepcopy
 import warnings
-
 import hnn_core
 from hnn_core import read_params
 from .network import Network, _create_cell_coords
@@ -19,6 +18,7 @@ from .cells_default import (
     human_gen_interneuron,
 )
 from .externals.mne import _validate_type
+from .dipole import _baseline_renormalize_dueckerET, _baseline_renormalize_neymotin2020
 
 # Default cell metadata for the standard Jones 2009 network cell types.
 # Defined here at module level so that other code (e.g. JSON
@@ -273,8 +273,10 @@ def neymotin_2020_model(
     # Ensure model_variant and params' cell types match current model
     net._model_variant = _validate_params_for_model(net, params, "neymotin_2020_model")
 
-    # source of synapse is always at soma
+    # baseline normalization
+    net._baseline_renormalize = _baseline_renormalize_neymotin2020
 
+    # source of synapse is always at soma
     # layer2 Pyr -> layer2 Pyr
     # layer5 Pyr -> layer5 Pyr
     lamtha = 3.0
@@ -728,6 +730,7 @@ def duecker_ET_model(
     )
 
     delay = net.delay
+    net._baseline_renormalize = _baseline_renormalize_dueckerET
 
     # layer2 Pyr -> layer2 Pyr
     lamtha = 6.125  # calculated from human data Campganola et al. 2022
