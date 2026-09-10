@@ -61,5 +61,5 @@ spell:
 	fi;
 
 test: format-check lint spell
-	pytest ./hnn_core/tests/ -m "not uses_mpi" -n auto
-	pytest ./hnn_core/tests/ -m "uses_mpi"
+	pytest ./hnn_core/tests/ -m "not uses_mpi" -n auto --cov=hnn_core --cov-report=xml
+	pytest ./hnn_core/tests/ -m "uses_mpi" --cov=hnn_core --cov-report=xml --cov-append
