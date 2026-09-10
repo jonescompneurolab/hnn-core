@@ -1127,6 +1127,7 @@ def test_network_drives():
         drive_src_list.extend(sorted(src_set))
     assert np.array_equal(drive_src_list, sorted(drive_src_list))
 
+    drive_src_list_df = list()
     for target_type in net.cell_types:
         conn_idxs = pick_connection_from_dataframe(net, src_gids="evprox1", target_gids=target_type)
         src_set = set(
@@ -1134,8 +1135,11 @@ def test_network_drives():
                 net.connectivity_df["counter"].isin(conn_idxs), "src_gid"
             ]
         )
-        drive_src_list.extend(sorted(src_set))
-    assert np.array_equal(drive_src_list, sorted(drive_src_list))
+        drive_src_list_df.extend(sorted(src_set))
+    assert np.array_equal(drive_src_list_df, sorted(drive_src_list_df))
+
+    # cross-check: list-based and dataframe-based pick_connection agree
+    assert drive_src_list == drive_src_list_df
 
     # Check drive dict structure for each external drive
     for drive_idx, drive in enumerate(net.external_drives.values()):
@@ -1184,51 +1188,16 @@ def test_network_drives():
                 )
             )
             assert len(drive["events"][0][0]) == n_events  # 4
-    #dataframe
+
+    # dataframe: check that connectivity sources correspond to gid_ranges
     for drive_idx, drive in enumerate(net.external_drives.values()):
-        # Check that connectivity sources correspond to gid_ranges
         conn_idxs = pick_connection_from_dataframe(net, src_gids=drive["name"])
         this_src_gids = set(
             net.connectivity_df.loc[
                 net.connectivity_df["counter"].isin(conn_idxs), "src_gid"
             ]
-        )  # NB set: globals
+        )
         assert sorted(this_src_gids) == list(net.gid_ranges[drive["name"]])
-        # Check type-specific dynamics and events
-        n_drive_cells = drive["n_drive_cells"]
-        if n_drive_cells_list[drive_idx] != "n_cells":
-            assert n_drive_cells_list[drive_idx] == n_drive_cells
-        assert len(drive["events"]) == 1  # single trial simulated
-        if drive["type"] == "evoked":
-            for kw in ["mu", "sigma", "numspikes"]:
-                assert kw in drive["dynamics"].keys()
-            assert len(drive["events"][0]) == n_drive_cells
-            # this also implicitly tests that events are always a list
-            assert len(drive["events"][0][0]) == drive["dynamics"]["numspikes"]
-        elif drive["type"] == "poisson":
-            for kw in ["tstart", "tstop", "rate_constant"]:
-                assert kw in drive["dynamics"].keys()
-            assert len(drive["events"][0]) == n_drive_cells
-        elif drive["type"] == "bursty":
-            for kw in [
-                "tstart",
-                "tstart_std",
-                "tstop",
-                "burst_rate",
-                "burst_std",
-                "numspikes",
-            ]:
-                assert kw in drive["dynamics"].keys()
-            assert len(drive["events"][0]) == n_drive_cells
-            n_events = (
-                drive["dynamics"]["numspikes"]  # 2
-                * (
-                    1
-                    + (drive["dynamics"]["tstop"] - drive["dynamics"]["tstart"] - 1)
-                    // (1000.0 / drive["dynamics"]["burst_rate"])
-                )
-            )
-            assert len(drive["events"][0][0]) == n_events  # 4
 
     # make sure the PRNGs are consistent.
     target_times = {
@@ -1345,7 +1314,6 @@ def test_network_drives():
     assert len(network_builder.ncs["evdist1_L2Basket_nmda"]) == n_connections
     nc = network_builder.ncs["evdist1_L2Basket_nmda"][0]
     assert nc.threshold == params["threshold"]
-
 
 def test_network_drives_legacy():
     """Test manipulation of drives in the network object under legacy mode."""
