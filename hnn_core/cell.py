@@ -411,7 +411,6 @@ class Cell:
 
         # Store the tree representation of the cell
         self.cell_tree = cell_tree
-
         self._update_end_pts()  # New implementation
 
         self._compute_section_mechs()  # Set mech values of all sections
@@ -608,13 +607,37 @@ class Cell:
                         p_mech[attr] = [seg_xs, seg_vals]
         return self.sections
 
-    def _create_synapses(self, sections, synapses):
+    def create_synapses_original(self, sections, synapses):
         """Create synapses."""
         for sec_name in sections:
             for receptor in sections[sec_name].syns:
                 syn_key = f"{sec_name}_{receptor}"
                 seg = self._nrn_sections[sec_name](0.5)
                 self._nrn_synapses[syn_key] = self.syn_create(seg, **synapses[receptor])
+
+    def create_synapses_using_connectivity_dataframe(self, target_df):
+        """
+            Create synapses for a target cell using connectivity information.
+
+        Unique combinations of the target GID, section, and seg_x are identified
+        to ensure that connections targeting the same location are grouped
+        together and do not create duplicate synapses.
+
+        Connections are grouped based on their target cell and target location.
+        """
+        for _, row in target_df.iterrows():
+            target = row["target_type"]
+            sec_name = row["actual_section"]
+            receptor = row["receptor"]
+            segX = row["segX"]
+            seg = self._nrn_sections[sec_name](segX)
+            syn = self.syn_create(seg, **self.synapses[receptor])
+            # we can read from NEURON and add the actual segment location like
+            # we have done above in create_synapses_using_synapse_trees.
+            # we were currently having 0.5 everywhere so didn't do it.
+            # as it will always be 0.5 then
+            syn_key = f"{target}_{sec_name}_{receptor}_{segX}"
+            self._nrn_synapses[syn_key] = syn
 
     def _create_sections(self, sections, cell_tree):
         """Create soma and set geometry.
@@ -672,7 +695,7 @@ class Cell:
         # https://nrn.readthedocs.io/en/latest/python/modelspec/programmatic/topology/geometry.html?highlight=pt3dadd#pt3dadd  # noqa
         h.define_shape()
 
-    def build(self, sec_name_apical=None):
+    def build(self, sec_name_apical=None, target_df=None):
         """Build cell in Neuron and insert dipole if applicable.
 
         Parameters
@@ -683,7 +706,10 @@ class Cell:
             of a pyramidal neuron.
         """
         self._create_sections(self.sections, self.cell_tree)
-        self._create_synapses(self.sections, self.synapses)
+        if target_df is None:
+            self.create_synapses_original(self.sections, self.synapses)
+        else:
+            self.create_synapses_using_connectivity_dataframe(target_df)
         self._set_biophysics(self.sections)
         if sec_name_apical in self._nrn_sections:
             self._insert_dipole(sec_name_apical)

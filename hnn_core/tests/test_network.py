@@ -30,6 +30,7 @@ from hnn_core.network import (
     _create_cell_coords,
     _get_cell_index_by_synapse_type,
     pick_connection,
+    pick_connection_from_dataframe,
 )
 from hnn_core.network_builder import NetworkBuilder
 from hnn_core.network_models import add_erp_drives_to_jones_model
@@ -269,6 +270,8 @@ def test_custom_network_coords(mesh_shape):
 
     # Pick_connection check in custom_net
     conn_indices = pick_connection(net=custom_net, src_gids="test_drive")
+    #dataframe
+    conn_indices_df = pick_connection_from_dataframe(net=custom_net, src_gids="test_drive")
     assert len(conn_indices) > 0
 
     # checking drives and check events
@@ -452,6 +455,10 @@ def test_network_models():
     with pytest.raises(TypeError, match="tstart must be"):
         add_erp_drives_to_jones_model(net=net_default, tstart="invalid_input")
     n_conn = len(net_default.connectivity)
+    #df testing
+    n_conn_df = net_default.connectivity_df["counter"].nunique()
+    
+
     for cell_name in ["L5_pyramidal", "L2_pyramidal"]:
         assert len(net_default.pos_dict[cell_name]) == 100
     add_erp_drives_to_jones_model(net_default)
@@ -460,6 +467,8 @@ def test_network_models():
     # 14 drive connections are added as follows: evdist1: 3 ampa + 3 nmda,
     # evprox1: 4 ampa, evprox2: 4 ampa
     assert len(net_default.connectivity) == n_conn + 14
+    #df testing
+    assert net_default.connectivity_df["counter"].nunique() == n_conn_df +14
 
     # Ensure distant dependent calcium gbar
     net_calcium = calcium_model()
@@ -1118,6 +1127,20 @@ def test_network_drives():
         drive_src_list.extend(sorted(src_set))
     assert np.array_equal(drive_src_list, sorted(drive_src_list))
 
+    drive_src_list_df = list()
+    for target_type in net.cell_types:
+        conn_idxs = pick_connection_from_dataframe(net, src_gids="evprox1", target_gids=target_type)
+        src_set = set(
+            net.connectivity_df.loc[
+                net.connectivity_df["counter"].isin(conn_idxs), "src_gid"
+            ]
+        )
+        drive_src_list_df.extend(sorted(src_set))
+    assert np.array_equal(drive_src_list_df, sorted(drive_src_list_df))
+
+    # cross-check: list-based and dataframe-based pick_connection agree
+    assert drive_src_list == drive_src_list_df
+
     # Check drive dict structure for each external drive
     for drive_idx, drive in enumerate(net.external_drives.values()):
         # Check that connectivity sources correspond to gid_ranges
@@ -1166,6 +1189,16 @@ def test_network_drives():
             )
             assert len(drive["events"][0][0]) == n_events  # 4
 
+    # dataframe: check that connectivity sources correspond to gid_ranges
+    for drive_idx, drive in enumerate(net.external_drives.values()):
+        conn_idxs = pick_connection_from_dataframe(net, src_gids=drive["name"])
+        this_src_gids = set(
+            net.connectivity_df.loc[
+                net.connectivity_df["counter"].isin(conn_idxs), "src_gid"
+            ]
+        )
+        assert sorted(this_src_gids) == list(net.gid_ranges[drive["name"]])
+
     # make sure the PRNGs are consistent.
     target_times = {
         "evdist1": [66.30498327062551, 66.33129889343446],
@@ -1197,6 +1230,28 @@ def test_network_drives():
                 # delays
                 assert_allclose(
                     drive_conn["nc_dict"]["A_delay"],
+                    drive_delays[drive_name][target_type],
+                    rtol=1e-12,
+                )
+
+    for drive_name in drive_weights:
+        for target_type in drive_weights[drive_name]:
+            conn_idxs = pick_connection_from_dataframe(
+                net, src_gids=drive_name, target_gids=target_type
+            )
+            for conn_idx in conn_idxs:
+                drive_conn = net.connectivity_df[
+                    net.connectivity_df["counter"] == conn_idx
+                ]
+                # weights
+                assert_allclose(
+                    drive_conn["weight"],
+                    drive_weights[drive_name][target_type],
+                    rtol=1e-12,
+                )
+                # delays
+                assert_allclose(
+                    drive_conn["delay"],
                     drive_delays[drive_name][target_type],
                     rtol=1e-12,
                 )
@@ -1259,7 +1314,6 @@ def test_network_drives():
     assert len(network_builder.ncs["evdist1_L2Basket_nmda"]) == n_connections
     nc = network_builder.ncs["evdist1_L2Basket_nmda"][0]
     assert nc.threshold == params["threshold"]
-
 
 def test_network_drives_legacy():
     """Test manipulation of drives in the network object under legacy mode."""
@@ -1355,6 +1409,53 @@ def test_network_drives_legacy():
             )
             assert len(drive["events"][0][0]) == n_events  # 4
 
+    # dataframe: check that connectivity sources correspond to gid_ranges
+    for drive in net.external_drives.values():
+        conn_idxs = pick_connection_from_dataframe(net, src_gids=drive["name"])
+        this_src_gids = set(
+            net.connectivity_df.loc[
+                net.connectivity_df["counter"].isin(conn_idxs), "src_gid"
+            ]
+        )  # NB set: globals
+        assert sorted(this_src_gids) == list(net.gid_ranges[drive["name"]])
+        # Check type-specific dynamics and events
+        n_drive_cells = drive["n_drive_cells"]
+        assert len(drive["events"]) == 1  # single trial simulated
+        if drive["type"] == "evoked":
+            for kw in ["mu", "sigma", "numspikes"]:
+                assert kw in drive["dynamics"].keys()
+            assert len(drive["events"][0]) == n_drive_cells
+            # this also implicitly tests that events are always a list
+            assert len(drive["events"][0][0]) == drive["dynamics"]["numspikes"]
+        elif drive["type"] == "gaussian":
+            for kw in ["mu", "sigma", "numspikes"]:
+                assert kw in drive["dynamics"].keys()
+            assert len(drive["events"][0]) == n_drive_cells
+        elif drive["type"] == "poisson":
+            for kw in ["tstart", "tstop", "rate_constant"]:
+                assert kw in drive["dynamics"].keys()
+            assert len(drive["events"][0]) == n_drive_cells
+        elif drive["type"] == "bursty":
+            for kw in [
+                "tstart",
+                "tstart_std",
+                "tstop",
+                "burst_rate",
+                "burst_std",
+                "numspikes",
+            ]:
+                assert kw in drive["dynamics"].keys()
+            assert len(drive["events"][0]) == n_drive_cells
+            n_events = (
+                drive["dynamics"]["numspikes"]  # 2
+                * (
+                    1
+                    + (drive["dynamics"]["tstop"] - drive["dynamics"]["tstart"] - 1)
+                    // (1000.0 / drive["dynamics"]["burst_rate"])
+                )
+            )
+            assert len(drive["events"][0][0]) == n_events  # 4
+
     # make sure the PRNGs are consistent.
     target_times = {
         "evdist1": [66.30498327062551, 61.54362532343694],
@@ -1389,6 +1490,20 @@ def test_network_drives_legacy():
                     target_weights[drive_name][target_type],
                     rtol=1e-12,
                 )
+    for drive_name in target_weights:
+        for target_type in target_weights[drive_name]:
+            conn_idxs = pick_connection_from_dataframe(
+                net, src_gids=drive_name, target_gids=target_type, receptor="ampa"
+            )
+            for conn_idx in conn_idxs:
+                drive_conn = net.connectivity_df[
+                    net.connectivity_df["counter"] == conn_idx
+                ]
+                assert_allclose(
+                    drive_conn["weight"],
+                    target_weights[drive_name][target_type],
+                    rtol=1e-12,
+                )
 
     # check select synaptic delays
     target_delays = {
@@ -1408,7 +1523,20 @@ def test_network_drives_legacy():
                     target_delays[drive_name][target_type],
                     rtol=1e-12,
                 )
-
+    for drive_name in target_delays:
+        for target_type in target_delays[drive_name]:
+            conn_idxs = pick_connection_from_dataframe(
+                net, src_gids=drive_name, target_gids=target_type, receptor="ampa"
+            )
+            for conn_idx in conn_idxs:
+                drive_conn = net.connectivity_df[
+                    net.connectivity_df["counter"] == conn_idx
+                ]
+                assert_allclose(
+                    drive_conn["delay"],
+                    target_delays[drive_name][target_type],
+                    rtol=1e-12,
+                )
     # array of simulation times is created in Network.__init__, but passed
     # to CellResponse-constructor for storage (Network is agnostic of time)
     with pytest.raises(TypeError, match="'times' is an np.ndarray of simulation times"):
@@ -1595,8 +1723,10 @@ def test_network_connectivity(base_network):
     # Needs to be updated if number of drives change in preceding tests
     net.clear_connectivity()
     assert len(net.connectivity) == 4  # 2 drives x 2 target cell types
+    assert net.connectivity_df["counter"].nunique() == 4
     net.clear_drives()
     assert len(net.connectivity) == 0
+    assert len(net.connectivity_df) == 0
 
     with pytest.warns(UserWarning, match="No connections"):
         simulate_dipole(net, tstop=10)
@@ -2948,6 +3078,16 @@ def test_update_weights_metadata():
             # Assert that all other gains remain unchanged
             assert conn["nc_dict"]["gain"] == 1.0
 
+    for conn_idx in net.connectivity_df["counter"].unique():
+        drive_conn = net.connectivity_df[net.connectivity_df["counter"] == conn_idx]
+        src_type = drive_conn["src_type"].iloc[0]
+        target_type = drive_conn["target_type"].iloc[0]
+        is_e_to_i = src_type in e_cell_names and target_type in i_cell_names
+        if is_e_to_i:
+            assert (drive_conn["gain"] == 2.0).all()
+        else:
+            assert (drive_conn["gain"] == 1.0).all()
+
 
 def test_get_global_synaptic_gains():
     """Test synaptic gains getter."""
@@ -2986,6 +3126,12 @@ def test_add_connection_threshold_and_gain():
     )[-1]
     assert net.connectivity[conn_idx]["nc_dict"]["threshold"] == custom_threshold
 
+    conn_idx = pick_connection_from_dataframe(
+        net, src_gids="L2_pyramidal", target_gids="L2_basket", receptor="ampa"
+    )[-1]
+    drive_conn = net.connectivity_df[net.connectivity_df["counter"] == conn_idx]
+    assert (drive_conn["threshold"] == custom_threshold).all()
+
     # Add connection with custom gain
     custom_gain = 2.5
     net.add_connection(
@@ -2998,12 +3144,17 @@ def test_add_connection_threshold_and_gain():
         lamtha=3.0,
         gain=custom_gain,
     )
-
     # Check that the gain was set correctly
     conn_idx = pick_connection(
         net, src_gids="L5_pyramidal", target_gids="L5_basket", receptor="ampa"
     )[-1]
     assert net.connectivity[conn_idx]["nc_dict"]["gain"] == custom_gain
+
+    conn_idx = pick_connection_from_dataframe(
+        net, src_gids="L5_pyramidal", target_gids="L5_basket", receptor="ampa"
+    )[-1]
+    drive_conn = net.connectivity_df[net.connectivity_df["counter"] == conn_idx]
+    assert (drive_conn["gain"] == custom_gain).all()
 
     # Add connection with both custom threshold and gain
     net.add_connection(
@@ -3025,6 +3176,13 @@ def test_add_connection_threshold_and_gain():
     assert net.connectivity[conn_idx]["nc_dict"]["threshold"] == custom_threshold
     assert net.connectivity[conn_idx]["nc_dict"]["gain"] == custom_gain
 
+    conn_idx = pick_connection_from_dataframe(
+        net, src_gids="L2_basket", target_gids="L2_pyramidal", receptor="gabaa"
+    )[-1]
+    drive_conn = net.connectivity_df[net.connectivity_df["counter"] == conn_idx]
+    assert (drive_conn["threshold"] == custom_threshold).all()
+    assert (drive_conn["gain"] == custom_gain).all()
+
     # Test that default threshold is inherited from network when threshold=None
     net.add_connection(
         src_gids="L5_basket",
@@ -3043,6 +3201,15 @@ def test_add_connection_threshold_and_gain():
     )[-1]
     assert net.connectivity[conn_idx]["nc_dict"]["threshold"] == net.threshold
     assert net.connectivity[conn_idx]["nc_dict"]["gain"] == 1.5
+
+    conn_idx = pick_connection_from_dataframe(
+        net, src_gids="L5_basket", target_gids="L5_pyramidal", receptor="gabaa"
+    )[-1]
+    drive_conn = net.connectivity_df[net.connectivity_df["counter"] == conn_idx]
+    assert (drive_conn["threshold"] == net.threshold).all()
+    assert (drive_conn["gain"] == 1.5).all()
+     
+    
 
 
 def test_get_cell_index_by_synapse_type():

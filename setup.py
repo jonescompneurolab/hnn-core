@@ -158,6 +158,7 @@ if __name__ == "__main__":
             "matplotlib>=3.5.3",
             "scipy",
             "h5io",
+            "pandas",
         ],
         extras_require=extras,
         python_requires=">=3.9, <3.14",

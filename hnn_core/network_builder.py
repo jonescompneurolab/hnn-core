@@ -326,7 +326,6 @@ class NetworkBuilder(object):
         # the NEURON hoc objects and the corresponding python references
         # initialized by _ArtificialCell()
         self._drive_cells = list()
-
         self.ncs = dict()
         self._nrn_dipoles = dict()
 
@@ -343,7 +342,6 @@ class NetworkBuilder(object):
             self._expose_imem = True
 
         self._rank = 0
-
         self._build()
 
     def _build(self):
@@ -387,7 +385,10 @@ class NetworkBuilder(object):
         self._all_spike_gids = h.Vector()
 
         self._record_spikes()
-        self._connect_celltypes()
+        if not self.net.use_dataframe:
+            self._connect_celltypes()
+        else:
+            self._connect_celltypes_using_dataframe()
 
         if len(self.net.rec_arrays) > 0:
             self._record_extracellular()
@@ -421,15 +422,24 @@ class NetworkBuilder(object):
                 # only assign drive gids that have a target cell gid already
                 # assigned to this rank
                 for src_gid in self.net.gid_ranges[drive["name"]]:
-                    conn_idxs = pick_connection(self.net, src_gids=src_gid)
-                    target_gids = set()
-                    for conn_idx in conn_idxs:
-                        gid_pairs = self.net.connectivity[conn_idx]["gid_pairs"]
-                        if src_gid in gid_pairs:
-                            target_gids.update(
-                                self.net.connectivity[conn_idx]["gid_pairs"][src_gid]
-                            )
-
+                    if self.net.use_dataframe:
+                        target_gids = set(
+                            self.net.connectivity_df.loc[
+                                self.net.connectivity_df["src_gid"] == src_gid,
+                                "target_gid",
+                            ]
+                        )
+                    else:
+                        conn_idxs = pick_connection(self.net, src_gids=src_gid)
+                        target_gids = set()
+                        for conn_idx in conn_idxs:
+                            gid_pairs = self.net.connectivity[conn_idx]["gid_pairs"]
+                            if src_gid in gid_pairs:
+                                target_gids.update(
+                                    self.net.connectivity[conn_idx]["gid_pairs"][
+                                        src_gid
+                                    ]
+                                )
                     for target_gid in target_gids:
                         if (
                             target_gid in self._gid_list
@@ -456,7 +466,6 @@ class NetworkBuilder(object):
         These drives are spike SOURCES but cells are also targets.
         External inputs are not targets.
         """
-
         for gid in self._gid_list:
             _PC.set_gid2node(gid, self._rank)
 
@@ -475,10 +484,16 @@ class NetworkBuilder(object):
                 # instantiate NEURON object
                 # using meta data style
                 src_type_metadata = self.net.cell_types[src_type]["cell_metadata"]
+                target_df = None
+                if self.net.use_dataframe:
+                    target_df = self.net.connectivity_df.loc[
+                        self.net.connectivity_df["target_gid"] == gid,
+                        ["target_type", "actual_section", "segX", "receptor"],
+                    ].drop_duplicates()
                 if src_type_metadata.get("measure_dipole", False):
-                    cell.build(sec_name_apical="apical_trunk")
+                    cell.build(target_df=target_df, sec_name_apical="apical_trunk")
                 else:
-                    cell.build()
+                    cell.build(target_df=target_df)
                 # add tonic biases
                 for bias in self.net.external_biases:
                     if src_type not in self.net.external_biases[bias]:
@@ -559,7 +574,6 @@ class NetworkBuilder(object):
                     pos_idx = src_gid - net.gid_ranges[_long_name(src_type)][0]
                     # NB pos_dict for this drive must include ALL cell types!
                     nc_dict["pos_src"] = net.pos_dict[_long_name(src_type)][pos_idx]
-
                     # get synapse locations
                     syn_keys = list()
                     # Targeting group of sections like proximal or distal
@@ -569,7 +583,6 @@ class NetworkBuilder(object):
                     # Targeting individual section like soma or apical_tuft
                     else:
                         syn_keys = [f"{loc}_{receptor}"]
-
                     for syn_key in syn_keys:
                         nc = target_cell.parconnect_from_src(
                             src_gid,
@@ -578,6 +591,63 @@ class NetworkBuilder(object):
                             net._inplane_distance,
                         )
                         self.ncs[connection_name].append(nc)
+
+    def _connect_celltypes_using_dataframe(self):
+        """
+        Create synaptic connections between cell types using the connectivity DataFrame.
+
+        Each row of the DataFrame represents a connection and contains the
+        information required to identify the source and target cell types and
+        configure the corresponding synapse.
+        """
+        net = self.net
+        df = net.connectivity_df
+
+        assert len(self._cells) == len(self._gid_list) - len(self._drive_cells)
+
+        # local gid -> index in self._cells, for cells on this rank
+        gid_to_idx = {gid: idx for idx, gid in enumerate(self._gid_list)}
+
+        for row in df.itertuples(index=False):
+            target_gid = row.target_gid
+            if not _PC.gid_exists(target_gid):
+                continue
+
+            src_gid = row.src_gid
+            src_type = row.src_type
+            target_type = row.target_type
+            receptor = row.receptor
+            sec_name = row.actual_section
+            segX = row.segX
+
+            target_cell = self._cells[gid_to_idx[target_gid]]
+
+            connection_name = (
+                f"{_short_name(src_type)}_{_short_name(target_type)}_{receptor}"
+            )
+            if connection_name not in self.ncs:
+                self.ncs[connection_name] = list()
+
+            pos_idx = src_gid - net.gid_ranges[_long_name(src_type)][0]
+            # these lines from 624 to 631 have also been copied from original connect_celltypes
+            nc_dict = {
+                "A_weight": row.weight * row.gain,
+                "A_delay": row.delay,
+                "lamtha": row.lamtha,
+                "threshold": row.threshold,
+                "gain": row.gain,
+                "pos_src": net.pos_dict[_long_name(src_type)][pos_idx],
+            }
+
+            syn_key = f"{target_type}_{sec_name}_{receptor}_{segX}"
+
+            nc = target_cell.parconnect_from_src(
+                src_gid,
+                nc_dict,
+                target_cell._nrn_synapses[syn_key],
+                net._inplane_distance,
+            )
+            self.ncs[connection_name].append(nc)
 
     def _record_extracellular(self):
         for arr_name, arr in self.net.rec_arrays.items():
