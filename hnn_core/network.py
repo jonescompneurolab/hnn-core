@@ -354,8 +354,8 @@ def pick_connection_from_dataframe(net, src_gids=None, target_gids=None, loc=Non
     if not any_search_applied:
         return list()
 
-    #counter behaves same as index in the connectivity list
-    return sorted(conn_df["conn_idx"].unique().tolist())
+    # KD: I propose to actually return the df not just the indices
+    return conn_df 
 
 def _get_cell_index_by_synapse_type(net):
     """Returns the indices of excitatory and inhibitory cells in the Network.
@@ -2840,9 +2840,10 @@ class Network:
         values = {}
         for conn_type, (src_idxs, target_idxs) in conn_types.items():
             picks = pick_connection_from_dataframe(self, src_gids=src_idxs, target_gids=target_idxs)
-            if picks:
-                # Extract the gain from the first connection
-                values[conn_type] = self.connectivity[picks[0]]["nc_dict"]["gain"]
+            # KD: we can now use the actual information from the df
+            if not picks.empty:
+                # Extract maximum gain
+                values[conn_type] = picks["gain"].max() 
 
         # This writes the warning to stdout
         _check_global_synaptic_gains_uniformity(self)
