@@ -222,11 +222,16 @@ def neymotin_2020_model(
 
     """
     hnn_core_root = Path(hnn_core.__file__).parent
+    _validate_type(
+        params, (str, Path, dict, type(None)), "params", "str | Path | dict | None"
+    )
     if params is None:
         params_fname = hnn_core_root / "param" / "default.json"
         params = read_params(params_fname)
     elif isinstance(params, str) or isinstance(params, Path):
         params = read_params(params)
+    # If the user has provided params as a dict, then we don't need to load it from
+    # file, and its correctness will be checked later inside the `Network` initializer.
 
     # Define cell types for Jones 2009 model
     # data is here in metaData format
