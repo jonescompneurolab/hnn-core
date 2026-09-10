@@ -171,15 +171,21 @@ def neymotin_2020_model(
 
     Parameters
     ----------
-    params : str | dict | None
-        The path to the parameter file for constructing the network.
-        If None, parameters loaded from default.json
-        Default: None
-    add_drives_from_params : bool
+    params : str | Path | dict | None, default=None
+        Custom Network parameters to use, if any. If string or Path, it is assumed to be
+        a path to a legacy "flat" JSON file containing the parameters in the style of
+        `hnn_core/param/default.json` (NOT a modern "hierarchical" JSON file like
+        `hnn_core/param/neymotin2020_base.json`). If dict, it is assumed to be a
+        dictionary of parameters in the "flat" JSON style. If None (the default), the
+        default parameters are used from `hnn_core/param/default.json`. Note that if you
+        have drive parameters included, but you ALSO set the deprecated
+        `add_drives_from_params` to True, the drives will be added twice if the drive
+        names are the same.
+    add_drives_from_params : bool, default=False
         If True, add drives as defined in the params-dict. NB this is mainly
         for backward-compatibility with HNN GUI, and will be deprecated in a
         future release. Default: False
-    legacy_mode : bool
+    legacy_mode : bool, default=False
         Set to False by default. Enables matching HNN GUI output when drives
         are added suitably. Will be deprecated in a future release.
     mesh_shape : tuple of int (default: (10, 10))
@@ -219,6 +225,8 @@ def neymotin_2020_model(
     if params is None:
         params_fname = hnn_core_root / "param" / "default.json"
         params = read_params(params_fname)
+    elif isinstance(params, str) or isinstance(params, Path):
+        params = read_params(params)
 
     # Define cell types for Jones 2009 model
     # data is here in metaData format
@@ -405,16 +413,23 @@ def jones_2009_model(
 
     Parameters
     ----------
-    params : str | dict | None
-        The path to the parameter file for constructing the network. If None, parameters
-        loaded from default.json Default: None
-    add_drives_from_params : bool
-        If True, add drives as defined in the params-dict. NB this is mainly for
-        backward-compatibility with HNN GUI, and will be deprecated in a future release.
-        Default: False
-    legacy_mode : bool
-        Set to False by default. Enables matching HNN GUI output when drives are added
-        suitably. Will be deprecated in a future release.
+    params : str | Path | dict | None, default=None
+        Custom Network parameters to use, if any. If string or Path, it is assumed to be
+        a path to a legacy "flat" JSON file containing the parameters in the style of
+        `hnn_core/param/default.json` (NOT a modern "hierarchical" JSON file like
+        `hnn_core/param/neymotin2020_base.json`). If dict, it is assumed to be a
+        dictionary of parameters in the "flat" JSON style. If None (the default), the
+        default parameters are used from `hnn_core/param/default.json`. Note that if you
+        have drive parameters included, but you ALSO set the deprecated
+        `add_drives_from_params` to True, the drives will be added twice if the drive
+        names are the same.
+    add_drives_from_params : bool, default=False
+        If True, add drives as defined in the params-dict. NB this is mainly
+        for backward-compatibility with HNN GUI, and will be deprecated in a
+        future release. Default: False
+    legacy_mode : bool, default=False
+        Set to False by default. Enables matching HNN GUI output when drives
+        are added suitably. Will be deprecated in a future release.
     mesh_shape : tuple of int (default: (10, 10))
         Defines the (n_x, n_y) shape of the grid of pyramidal cells.
 
@@ -467,9 +482,32 @@ def law_2021_model(
     legacy_mode=False,
     mesh_shape=(10, 10),
 ):
-    """Instantiate the expansion of Jones 2009 model to study beta
-    modulated ERPs as described in
-    Law et al. Cereb. Cortex 2021 [1]_
+    """Instantiate the network model described in Law et al., 2021.
+
+    This creates a network that is the expansion of Jones 2009 model to study beta
+    modulated ERPs as described in Law et al. Cereb. Cortex 2021 [1]_ .
+
+    Parameters
+    ----------
+    params : str | Path | dict | None, default=None
+        Custom Network parameters to use, if any. If string or Path, it is assumed to be
+        a path to a legacy "flat" JSON file containing the parameters in the style of
+        `hnn_core/param/default.json` (NOT a modern "hierarchical" JSON file like
+        `hnn_core/param/neymotin2020_base.json`). If dict, it is assumed to be a
+        dictionary of parameters in the "flat" JSON style. If None (the default), the
+        default parameters are used from `hnn_core/param/default.json`. Note that if you
+        have drive parameters included, but you ALSO set the deprecated
+        `add_drives_from_params` to True, the drives will be added twice if the drive
+        names are the same.
+    add_drives_from_params : bool, default=False
+        If True, add drives as defined in the params-dict. NB this is mainly
+        for backward-compatibility with HNN GUI, and will be deprecated in a
+        future release. Default: False
+    legacy_mode : bool, default=False
+        Set to False by default. Enables matching HNN GUI output when drives
+        are added suitably. Will be deprecated in a future release.
+    mesh_shape : tuple of int (default: (10, 10))
+        Defines the (n_x, n_y) shape of the grid of pyramidal cells.
 
     Returns
     -------
@@ -504,6 +542,8 @@ def law_2021_model(
     if params is None:
         params_fname = hnn_core_root / "param" / "default.json"
         params = read_params(params_fname)
+    elif isinstance(params, str) or isinstance(params, Path):
+        params = read_params(params)
 
     net = neymotin_2020_model(
         params,
@@ -571,6 +611,28 @@ def calcium_model(
     L5 pyramidal neurons. For more details on changes to calcium dynamics
     see Kohl et al. Brain Topragr 2022 [1]_
 
+    Parameters
+    ----------
+    params : str | Path | dict | None, default=None
+        Custom Network parameters to use, if any. If string or Path, it is assumed to be
+        a path to a legacy "flat" JSON file containing the parameters in the style of
+        `hnn_core/param/default.json` (NOT a modern "hierarchical" JSON file like
+        `hnn_core/param/neymotin2020_base.json`). If dict, it is assumed to be a
+        dictionary of parameters in the "flat" JSON style. If None (the default), the
+        default parameters are used from `hnn_core/param/default.json`. Note that if you
+        have drive parameters included, but you ALSO set the deprecated
+        `add_drives_from_params` to True, the drives will be added twice if the drive
+        names are the same.
+    add_drives_from_params : bool, default=False
+        If True, add drives as defined in the params-dict. NB this is mainly
+        for backward-compatibility with HNN GUI, and will be deprecated in a
+        future release. Default: False
+    legacy_mode : bool, default=False
+        Set to False by default. Enables matching HNN GUI output when drives
+        are added suitably. Will be deprecated in a future release.
+    mesh_shape : tuple of int (default: (10, 10))
+        Defines the (n_x, n_y) shape of the grid of pyramidal cells.
+
     Returns
     -------
     net : Instance of Network object
@@ -599,6 +661,8 @@ def calcium_model(
     if params is None:
         params_fname = hnn_core_root / "param" / "default.json"
         params = read_params(params_fname)
+    elif isinstance(params, str) or isinstance(params, Path):
+        params = read_params(params)
 
     net = jones_2009_model(
         params,
@@ -622,14 +686,47 @@ def calcium_model(
 
 
 def duecker_ET_model(
-    params=None, add_drives_from_params=False, legacy_mode=False, mesh_shape=(10, 10)
+    params=None,
+    add_drives_from_params=False,
+    legacy_mode=False,
+    mesh_shape=(10, 10),
 ):
-    """ "Initiate like old calcium model and then replace with new cells"""
+    """Initiate the Duecker model (like old calcium model and then replace with new cells)
+
+    Parameters
+    ----------
+    params : str | Path | dict | None, default=None
+        Custom Network parameters to use, if any. If string or Path, it is assumed to be
+        a path to a legacy "flat" JSON file containing the parameters in the style of
+        `hnn_core/param/default.json` (NOT a modern "hierarchical" JSON file like
+        `hnn_core/param/neymotin2020_base.json`). If dict, it is assumed to be a
+        dictionary of parameters in the "flat" JSON style. If None (the default), the
+        default parameters are used from `hnn_core/param/default.json`. Note that if you
+        have drive parameters included, but you ALSO set the deprecated
+        `add_drives_from_params` to True, the drives will be added twice if the drive
+        names are the same.
+    add_drives_from_params : bool, default=False
+        If True, add drives as defined in the params-dict. NB this is mainly
+        for backward-compatibility with HNN GUI, and will be deprecated in a
+        future release. Default: False
+    legacy_mode : bool, default=False
+        Set to False by default. Enables matching HNN GUI output when drives
+        are added suitably. Will be deprecated in a future release.
+    mesh_shape : tuple of int (default: (10, 10))
+        Defines the (n_x, n_y) shape of the grid of pyramidal cells.
+
+    Returns
+    -------
+    net : Instance of Network object
+        Network object used to store
+    """
 
     hnn_core_root = Path(hnn_core.__file__).parent
     if params is None:
         params_fname = hnn_core_root / "param" / "default_duecker_ET.json"
         params = read_params(params_fname)
+    elif isinstance(params, str) or isinstance(params, Path):
+        params = read_params(params)
 
     cell_types = {
         "L2_inhibitory": {
