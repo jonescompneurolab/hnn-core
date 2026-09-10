@@ -355,7 +355,7 @@ def pick_connection_from_dataframe(net, src_gids=None, target_gids=None, loc=Non
         return list()
 
     #counter behaves same as index in the connectivity list
-    return sorted(conn_df["counter"].unique().tolist())
+    return sorted(conn_df["conn_idx"].unique().tolist())
 
 def _get_cell_index_by_synapse_type(net):
     """Returns the indices of excitatory and inhibitory cells in the Network.
@@ -537,7 +537,7 @@ class Network:
         # simulation-time params
         self._tstop = None
         self._dt = None
-        self._counter=0
+        self._conn_idx=0
 
         # contents of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
@@ -1712,10 +1712,11 @@ class Network:
                         conn_seed=drive["conn_seed"] + seed_increment,
                     )
                     # Ensure that AMPA/NMDA connections target the same gids
-                    if receptor_idx > 0:
-                        self.connectivity[-1]["src_gids"] = self.connectivity[-2][
-                            "src_gids"
-                        ]
+                    # KD: remove assuming this isn't important
+                    # if receptor_idx > 0:
+                    #     self.connectivity[-1]["src_gids"] = self.connectivity[-2][
+                    #         "src_gids"
+                    #     ]
 
             else:
                 for receptor_idx, receptor in enumerate(
@@ -1735,10 +1736,10 @@ class Network:
                     )
                     # Ensure that AMPA/NMDA connections target the same gids
                     # when probability < 1
-                    if receptor_idx > 0:
-                        self.connectivity[-1]["src_gids"] = self.connectivity[-2][
-                            "src_gids"
-                        ]
+                    # if receptor_idx > 0:
+                    #     self.connectivity[-1]["src_gids"] = self.connectivity[-2][
+                    #         "src_gids"
+                    #     ]
 
     def _reset_drives(self):
         # reset every time called again, e.g., from dipole.py or in self.copy()
@@ -1781,7 +1782,7 @@ class Network:
                             conn_idxs = pick_connection_from_dataframe(self, src_gids=drive_cell_gid)
                             target_types = set(
                                 self.connectivity_df.loc[
-                                    self.connectivity_df["counter"].isin(conn_idxs),
+                                    self.connectivity_df["conn_idx"].isin(conn_idxs),
                                     "target_type",
                                 ]
                             )
@@ -2633,7 +2634,7 @@ class Network:
                     nc_dict = conn["nc_dict"]
                     rows.append(
                         {   
-                            "counter":self._counter,
+                            "conn_idx":self._conn_idx,
                             "src_gid": src_gid,
                             "target_gid": target_gid,
                             "src_type": self.gid_to_type(src_gids[0]),
@@ -2652,7 +2653,7 @@ class Network:
         self.connectivity_df = pd.concat(
             [self.connectivity_df, pd.DataFrame(rows)], ignore_index=True
         )
-        self._counter+=1
+        self._conn_idx+=1
 
     def clear_connectivity(self):
         """Remove all connections defined in Network.connectivity"""
@@ -2838,8 +2839,7 @@ class Network:
         # Retrieve the gain value for each connection type
         values = {}
         for conn_type, (src_idxs, target_idxs) in conn_types.items():
-            picks = pick_connection(self, src_gids=src_idxs, target_gids=target_idxs)
-
+            picks = pick_connection_from_dataframe(self, src_gids=src_idxs, target_gids=target_idxs)
             if picks:
                 # Extract the gain from the first connection
                 values[conn_type] = self.connectivity[picks[0]]["nc_dict"]["gain"]
@@ -3124,8 +3124,8 @@ class ConnectivityList(list):
         return super().__getitem__(key)
 
     def __repr__(self):
-        return """net.connectivity is deprecated - connection data now
-            lives in net.connectivity_df. """ + super().__repr__()
+        return """net.connectivity is deprecated - data on recurrent connections now
+            lives in net.recurrent_connectivity_df, and external connections (drive) now live in net.external_drive_connectivity_df. """ + super().__repr__()
 
 
 class _NetworkDrive(dict):
