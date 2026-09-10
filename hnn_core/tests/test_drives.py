@@ -14,7 +14,7 @@ from hnn_core.drives import (
     _create_extpois,
     _create_bursty_input,
 )
-from hnn_core.network import pick_connection
+from hnn_core.network import pick_connection , pick_connection_from_dataframe
 from hnn_core.network_models import neymotin_2020_model
 from hnn_core import simulate_dipole
 
@@ -247,6 +247,12 @@ def test_add_drives():
         target_type = drive_conn["target_type"]
         assert drive_conn["nc_dict"]["A_weight"] == weights_ampa[target_type]
         assert drive_conn["nc_dict"]["A_delay"] == syn_delays[target_type]
+    conn_idxs = pick_connection_from_dataframe(net, src_gids="bursty")
+    for conn_idx in conn_idxs:
+        drive_conn = net.connectivity_df[net.connectivity_df["counter"] == conn_idx]
+        target_type = drive_conn["target_type"].iloc[0]
+        assert (drive_conn["weight"] == weights_ampa[target_type]).all()
+        assert (drive_conn["delay"] == syn_delays[target_type]).all()
         
     n_drive_cells = "n_cells"  # default for evoked drive
     cell_specific = True
@@ -271,6 +277,13 @@ def test_add_drives():
         assert drive_conn["nc_dict"]["A_weight"] == weights_ampa[target_type]
         assert drive_conn["nc_dict"]["A_delay"] == syn_delays[target_type]
 
+    conn_idxs = pick_connection_from_dataframe(net, src_gids="evoked_dist")
+    for conn_idx in conn_idxs:
+        drive_connn = net.connectivity_df[net.connectivity_df["counter"]==conn_idx]
+        target_type = drive_conn["target_type"]
+        assert drive_conn["nc_dict"]["A_weight"] == weights_ampa[target_type]
+        assert drive_conn["nc_dict"]["A_delay"] == syn_delays[target_type]
+
     n_drive_cells = "n_cells"  # default for poisson drive
     cell_specific = True
     net.add_poisson_drive(
@@ -291,6 +304,12 @@ def test_add_drives():
         target_type = drive_conn["target_type"]
         assert drive_conn["nc_dict"]["A_weight"] == weights_ampa[target_type]
         assert drive_conn["nc_dict"]["A_delay"] == syn_delays[target_type]
+    conn_idxs = pick_connection_from_dataframe(net, src_gids="poisson")
+    for conn_idx in conn_idxs:
+        drive_conn = net.connectivity_df(net.connectivity_df["counter"]==conn_idx)
+        target_type = drive_conn["target_type"]
+        assert drive_conn["nc_dict"]["A_weight"] == weights_ampa[target_type]
+        assert drive_conn["nc_dict"]["A_delay"] == syn_delays[target_type]
 
     # Test drive targeting specific section
     # Section present on all cells indicated
@@ -307,6 +326,10 @@ def test_add_drives():
     )
     assert net.connectivity[-1]["loc"] == location
 
+    conn_idx = pick_connection_from_dataframe(net, src_gids="bursty_tuft")[-1]
+    drive_conn = net.connectivity_df[net.connectivity_df["counter"] == conn_idx]
+    assert (drive_conn["template_loc"] == location).all()
+    
     # Section not present on cells indicated
     location = "apical_tuft"
     weights_ampa_no_tuft = {"L2_pyramidal": 1.0, "L5_basket": 2.0}
@@ -351,6 +374,30 @@ def test_add_drives():
                 len(net.gid_ranges[cell_type]) * n_drive_cells * probability
             ).astype(int)
 
+    for cell_type in weights_ampa.keys():
+        conn_idxs = pick_connection_from_dataframe(
+            net, src_gids="bursty_prob", target_gids=cell_type
+        )
+        comparison_pairs = net.connectivity_df.loc[
+            net.connectivity_df["counter"] == conn_idxs[0], ["src_gid", "target_gid"]
+        ].drop_duplicates()
+        gid_pairs_comparison = (
+            comparison_pairs.groupby("target_gid")["src_gid"].apply(list).to_dict()
+        )
+        for conn_idx in conn_idxs:
+            conn_pairs = net.connectivity_df.loc[
+                net.connectivity_df["counter"] == conn_idx, ["src_gid", "target_gid"]
+            ].drop_duplicates()
+            gid_pairs = conn_pairs.groupby("target_gid")["src_gid"].apply(list).to_dict()
+            num_connections = len(conn_pairs)
+            # Ensures that AMPA and NMDA connections target the same gids.
+            # Necessary when weights of both are non-zero.
+            assert gid_pairs_comparison == gid_pairs
+            assert num_connections == np.around(
+                len(net.gid_ranges[cell_type]) * n_drive_cells * probability
+            ).astype(int)
+    
+
     # drives with cell_specific=True
     probability = {"L2_basket": 0.1, "L2_pyramidal": 0.25, "L5_pyramidal": 0.5}
     net.add_evoked_drive(
@@ -369,6 +416,22 @@ def test_add_drives():
     for cell_type in weights_ampa.keys():
         conn_idxs = pick_connection(net, src_gids="evoked_prob", target_gids=cell_type)
         gid_pairs_comparison = net.connectivity[conn_idxs[0]]["gid_pairs"]
+        for conn_idx in conn_idxs:
+            conn = net.connectivity[conn_idx]
+            num_connections = np.sum([len(gids) for gids in conn["gid_pairs"].values()])
+            assert gid_pairs_comparison == conn["gid_pairs"]
+            assert num_connections == np.around(
+                len(net.gid_ranges[cell_type]) * probability[cell_type]
+            ).astype(int)
+
+    for cell_type in weights_ampa.keys():
+        conn_idxs = pick_connection_from_dataframe(net, src_gids="evoked_prob", target_gids=cell_type)
+        comparison_pairs = net.connectivity_df.loc[
+            net.connectivity_df["counter"] == conn_idxs[0], ["src_gid", "target_gid"]
+        ].drop_duplicates()
+        gid_pairs_comparison = (
+            comparison_pairs.groupby("target_gid")["src_gid"].apply(list).to_dict()
+            )
         for conn_idx in conn_idxs:
             conn = net.connectivity[conn_idx]
             num_connections = np.sum([len(gids) for gids in conn["gid_pairs"].values()])

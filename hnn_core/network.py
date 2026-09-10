@@ -1778,9 +1778,10 @@ class Network:
                     trial_seed_offset = self._n_gids
                     if drive["cell_specific"]:
                         if self.use_dataframe:
+                            conn_idxs = pick_connection_from_dataframe(self, src_gids=drive_cell_gid)
                             target_types = set(
                                 self.connectivity_df.loc[
-                                    self.connectivity_df["src_gid"] == drive_cell_gid,
+                                    self.connectivity_df["counter"].isin(conn_idxs),
                                     "target_type",
                                 ]
                             )
