@@ -247,7 +247,6 @@ def test_add_drives():
         target_type = drive_conn["target_type"]
         assert drive_conn["nc_dict"]["A_weight"] == weights_ampa[target_type]
         assert drive_conn["nc_dict"]["A_delay"] == syn_delays[target_type]
-
     n_drive_cells = "n_cells"  # default for evoked drive
     cell_specific = True
     net.add_evoked_drive(

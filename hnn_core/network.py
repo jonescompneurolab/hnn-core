@@ -30,7 +30,6 @@ from .utils import _replace_dict_identifier
 import pandas as pd
 import inspect
 
-
 def _create_cell_coords(n_pyr_x, n_pyr_y, z_coord, inplane_distance):
     """Creates coordinate grid and place cells in it.
 
@@ -313,6 +312,50 @@ def pick_connection(net, src_gids=None, target_gids=None, loc=None, receptor=Non
 
     return sorted(conn_set)
 
+def pick_connection_from_dataframe(net, src_gids=None, target_gids=None, loc=None, receptor=None):
+    valid_srcs = list(net.gid_ranges.keys())  # includes drives as srcs
+    valid_targets = list(net.cell_types.keys())
+    src_gids_checked = _check_gids(
+        src_gids, net.gid_ranges, valid_srcs, "src_gids", same_type=False
+    )
+    target_gids_checked = _check_gids(
+        target_gids, net.gid_ranges, valid_targets, "target_gids", same_type=False
+    )
+
+    _validate_type(loc, (str, list, None), "loc", "str, list, or None")
+    _validate_type(receptor, (str, list, None), "receptor", "str, list, or None")
+
+    valid_loc = ["proximal", "distal", "soma"]
+    valid_receptor = ["ampa", "nmda", "gabaa", "gabab"]
+
+    # Convert receptor and loc to list
+    loc_list = _string_input_to_list(loc, valid_loc, "loc")
+    receptor_list = _string_input_to_list(receptor, valid_receptor, "receptor")
+
+    conn_df = net.connectivity_df
+    any_search_applied = False
+
+    if src_gids_checked: #get a list of source gids
+        conn_df = conn_df[conn_df["src_gid"].isin(src_gids_checked)]
+        any_search_applied = True
+
+    if target_gids_checked:# we get a list of target gids
+        conn_df = conn_df[conn_df["target_gid"].isin(target_gids_checked)]
+        any_search_applied = True
+
+    if loc_list:# location list
+        conn_df = conn_df[conn_df["template_loc"].isin(loc_list)]
+        any_search_applied = True
+
+    if receptor_list: # receptor list
+        conn_df = conn_df[conn_df["receptor"].isin(receptor_list)]
+        any_search_applied = True
+
+    if not any_search_applied:
+        return list()
+
+    #counter behaves same as index in the connectivity list
+    return sorted(conn_df["counter"].unique().tolist())
 
 def _get_cell_index_by_synapse_type(net):
     """Returns the indices of excitatory and inhibitory cells in the Network.
@@ -494,6 +537,7 @@ class Network:
         # simulation-time params
         self._tstop = None
         self._dt = None
+        self._counter=0
 
         # contents of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
@@ -2370,7 +2414,6 @@ class Network:
     def gid_to_type(self, gid):
         """Reverse lookup of gid to type."""
         return _gid_to_type(gid, self.gid_ranges)
-
     def add_connection(
         self,
         src_gids,
@@ -2588,7 +2631,8 @@ class Network:
                 for section in valid_sections:
                     nc_dict = conn["nc_dict"]
                     rows.append(
-                        {
+                        {   
+                            "counter":self._counter,
                             "src_gid": src_gid,
                             "target_gid": target_gid,
                             "src_type": self.gid_to_type(src_gids[0]),
@@ -2607,22 +2651,37 @@ class Network:
         self.connectivity_df = pd.concat(
             [self.connectivity_df, pd.DataFrame(rows)], ignore_index=True
         )
+        self._counter+=1
 
     def clear_connectivity(self):
         """Remove all connections defined in Network.connectivity"""
+
         connectivity = list()
+
         for conn in self.connectivity:
             if conn["src_type"] in self.external_drives.keys():
                 connectivity.append(conn)
+
         self.connectivity = connectivity
 
+        # Keep only drive connections in connectivity_df
+        self.connectivity_df = self.connectivity_df[
+            self.connectivity_df["src_type"].isin(self.external_drives.keys())
+        ].reset_index(drop=True)
+
     def clear_drives(self):
-        """Remove all drives defined in Network.connectivity"""
+        """Remove all drives defined in Network.connectivity and Network.Connectivity"""
+
         self.connectivity = [
             conn
             for conn in self.connectivity
             if conn["src_type"] not in self.external_drives.keys()
         ]
+
+        #Removing drive connections from connectivity DataFrame
+        self.connectivity_df = self.connectivity_df[
+            ~self.connectivity_df["src_type"].isin(self.external_drives.keys())
+        ].reset_index(drop=True)
 
         for cell_name in list(self.gid_ranges.keys()):
             if cell_name in self.external_drives:
