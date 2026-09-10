@@ -23,9 +23,9 @@ from hnn_core import neymotin_2020_model, simulate_dipole
 # the evoked response from the
 # :ref:`evoked example <sphx_glr_auto_examples_plot_simulate_evoked.py>`, and
 # explore how it changes with new connections. We first instantiate the
-# network. (Note: Setting ``add_drives_from_params=True`` loads a set of
-# predefined drives without the drives API shown previously).
-net_erp = neymotin_2020_model(add_drives_from_params=True)
+# network. (Note: Setting ``load_erp_drives=True`` loads the canonical ERP
+# drives without the drives API shown previously).
+net_erp = neymotin_2020_model(load_erp_drives=True)
 
 ###############################################################################
 # Instantiating the network comes with a predefined set of connections that
@@ -71,7 +71,7 @@ net_erp.cell_response.plot_spikes_raster()
 # connections to be specified with either cell names, or the cell IDs (gids)
 # directly.
 def get_network(probability=1.0):
-    net = neymotin_2020_model(add_drives_from_params=True)
+    net = neymotin_2020_model(load_erp_drives=True)
     net.clear_connectivity()
 
     # Pyramidal cell connections

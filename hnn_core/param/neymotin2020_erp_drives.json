@@ -1,0 +1,122 @@
+{
+    "object_type": "ERP_Drives",
+    "description": "Canonical ERP drives for neymotin_2020_model. Extracted from neymotin2020_base.json.",
+    "external_drives": {
+        "evdist1": {
+            "type": "evoked",
+            "location": "distal",
+            "n_drive_cells": 235,
+            "event_seed": 272,
+            "conn_seed": 3,
+            "dynamics": {
+                "mu": 63.53,
+                "sigma": 3.85,
+                "numspikes": 1
+            },
+            "events": [],
+            "weights_ampa": {
+                "L2_basket": 0.006562,
+                "L2_pyramidal": 7e-06,
+                "L5_pyramidal": 0.1423
+            },
+            "weights_nmda": {
+                "L2_basket": 0.019482,
+                "L2_pyramidal": 0.004317,
+                "L5_pyramidal": 0.080074
+            },
+            "synaptic_delays": {
+                "L2_basket": 0.1,
+                "L2_pyramidal": 0.1,
+                "L5_pyramidal": 0.1
+            },
+            "probability": 1.0,
+            "name": "evdist1",
+            "target_types": [
+                "L2_basket",
+                "L2_pyramidal",
+                "L5_pyramidal"
+            ],
+            "cell_specific": true
+        },
+        "evprox1": {
+            "type": "evoked",
+            "location": "proximal",
+            "n_drive_cells": 270,
+            "event_seed": 507,
+            "conn_seed": 3,
+            "dynamics": {
+                "mu": 26.61,
+                "sigma": 2.47,
+                "numspikes": 1
+            },
+            "events": [],
+            "weights_ampa": {
+                "L2_basket": 0.08831,
+                "L2_pyramidal": 0.01525,
+                "L5_basket": 0.19934,
+                "L5_pyramidal": 0.00865
+            },
+            "weights_nmda": {
+                "L2_basket": 0.0,
+                "L2_pyramidal": 0.0,
+                "L5_basket": 0.0,
+                "L5_pyramidal": 0.0
+            },
+            "synaptic_delays": {
+                "L2_basket": 0.1,
+                "L2_pyramidal": 0.1,
+                "L5_basket": 1.0,
+                "L5_pyramidal": 1.0
+            },
+            "probability": 1.0,
+            "name": "evprox1",
+            "target_types": [
+                "L2_basket",
+                "L2_pyramidal",
+                "L5_basket",
+                "L5_pyramidal"
+            ],
+            "cell_specific": true
+        },
+        "evprox2": {
+            "type": "evoked",
+            "location": "proximal",
+            "n_drive_cells": 270,
+            "event_seed": 777,
+            "conn_seed": 3,
+            "dynamics": {
+                "mu": 137.12,
+                "sigma": 8.33,
+                "numspikes": 1
+            },
+            "events": [],
+            "weights_ampa": {
+                "L2_basket": 3e-06,
+                "L2_pyramidal": 1.43884,
+                "L5_basket": 0.008958,
+                "L5_pyramidal": 0.684013
+            },
+            "weights_nmda": {
+                "L2_basket": 0.0,
+                "L2_pyramidal": 0.0,
+                "L5_basket": 0.0,
+                "L5_pyramidal": 0.0
+            },
+            "synaptic_delays": {
+                "L2_basket": 0.1,
+                "L2_pyramidal": 0.1,
+                "L5_basket": 1.0,
+                "L5_pyramidal": 1.0
+            },
+            "probability": 1.0,
+            "name": "evprox2",
+            "target_types": [
+                "L2_basket",
+                "L2_pyramidal",
+                "L5_basket",
+                "L5_pyramidal"
+            ],
+            "cell_specific": true
+        }
+    }
+}

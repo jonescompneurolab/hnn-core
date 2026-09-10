@@ -20,57 +20,16 @@ import hnn_core
 from hnn_core import read_spikes, neymotin_2020_model, simulate_dipole
 
 ###############################################################################
-# Now let's build the network. We have used the same weights as in the
+# Now let's build the network with the same canonical ERP drives used in the
 # :ref:`evoked example <sphx_glr_auto_examples_plot_simulate_evoked.py>`.
 import matplotlib.pyplot as plt
 
-net = neymotin_2020_model()
+net = neymotin_2020_model(load_erp_drives=True)
 
 ###############################################################################
-# ``net`` does not have any driving inputs and only defines the local network
-# connectivity. Let us go ahead and first add a distal evoked drive.
-# We need to define the AMPA and NMDA weights for the connections. An
-# "evoked drive" defines inputs that are normally distributed with a certain
-# mean and standard deviation.
-
-weights_ampa_d1 = {'L2_basket': 0.006562, 'L2_pyramidal': 7e-6,
-                   'L5_pyramidal': 0.142300}
-weights_nmda_d1 = {'L2_basket': 0.019482, 'L2_pyramidal': 0.004317,
-                   'L5_pyramidal': 0.080074}
-synaptic_delays_d1 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
-                      'L5_pyramidal': 0.1}
-net.add_evoked_drive(
-    'evdist1', mu=63.53, sigma=3.85, numspikes=1, weights_ampa=weights_ampa_d1,
-    weights_nmda=weights_nmda_d1, location='distal',
-    synaptic_delays=synaptic_delays_d1, event_seed=274)
-
-###############################################################################
-# The reason it is called an "evoked drive" is it can be used to simulate
-# waveforms resembling evoked responses. Here, we show how to do it with two
-# proximal drives which drive current up the dendrite and one distal drive
-# which drives current down the dendrite producing the negative deflection.
-weights_ampa_p1 = {'L2_basket': 0.08831, 'L2_pyramidal': 0.01525,
-                   'L5_basket': 0.19934, 'L5_pyramidal': 0.00865}
-synaptic_delays_prox = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
-                        'L5_basket': 1., 'L5_pyramidal': 1.}
-
-# all NMDA weights are zero; pass None explicitly
-net.add_evoked_drive(
-    'evprox1', mu=26.61, sigma=2.47, numspikes=1, weights_ampa=weights_ampa_p1,
-    weights_nmda=None, location='proximal',
-    synaptic_delays=synaptic_delays_prox, event_seed=544)
-
-###############################################################################
-# Now we add the second proximal evoked drive and simulate the network
-# dynamics with somatic voltage recordings enabled. Note: only AMPA weights
-# differ from first.
-weights_ampa_p2 = {'L2_basket': 0.000003, 'L2_pyramidal': 1.438840,
-                   'L5_basket': 0.008958, 'L5_pyramidal': 0.684013}
-# all NMDA weights are zero; omit weights_nmda (defaults to None)
-net.add_evoked_drive(
-    'evprox2', mu=137.12, sigma=8.33, numspikes=1,
-    weights_ampa=weights_ampa_p2, location='proximal',
-    synaptic_delays=synaptic_delays_prox, event_seed=814)
+# ``load_erp_drives=True`` adds the three default evoked drives (one distal,
+# two proximal) used to reproduce the tactile ERP waveform. We then simulate
+# the network dynamics with somatic voltage recordings enabled.
 
 dpls = simulate_dipole(net, tstop=170., record_vsec='soma')
 

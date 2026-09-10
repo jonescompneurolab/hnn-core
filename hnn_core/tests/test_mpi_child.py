@@ -90,7 +90,7 @@ def test_str_to_net():
     # prepare network
     params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
-    net = neymotin_2020_model(params, add_drives_from_params=True)
+    net = neymotin_2020_model(params, load_erp_drives=True)
 
     pickled_net = base64.b64encode(pickle.dumps(net))
 

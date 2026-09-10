@@ -16,12 +16,11 @@ import os.path as op
 
 import hnn_core
 from hnn_core import neymotin_2020_model, simulate_dipole, read_params
-from hnn_core.network_models import add_erp_drives_to_jones_model
 
 ###############################################################################
 # We begin by instantiating the network. For this example, we will reduce the
 # number of cells in the network to speed up the simulations.
-net = neymotin_2020_model(mesh_shape=(3, 3))
+net = neymotin_2020_model(mesh_shape=(3, 3), load_erp_drives=True)
 
 # Note that we move the cells further apart to allow better visualization of
 # the network (default inplane_distance=1.0 µm).
@@ -50,7 +49,6 @@ net_plot.fig
 # To visualize the membrane potential of cells in the
 # network, we need use `simulate_dipole(..., record_vsec='all')` which turns
 # on the recording of voltages in all sections of all cells in the network.
-add_erp_drives_to_jones_model(net)
 dpl = simulate_dipole(net, tstop=170, record_vsec='all')
 net_plot = NetworkPlotter(net)  # Reinitialize plotter with simulated network
 
