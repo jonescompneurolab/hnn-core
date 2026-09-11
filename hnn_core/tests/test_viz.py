@@ -713,20 +713,26 @@ class TestCellResponsePlotters:
         fig = net.cell_response.plot_spikes_raster(trial_idx=[0, 1], show=False)
         assert len(fig.axes[0].collections) > 0, "No data plotted in raster plot"
 
-    def test_plot_spikes_hist(self, base_simulation_spikes):
-        """Test spike histogram plotting across its arguments."""
+    def test_spikes_hist_default(self, base_simulation_spikes):
+        """Test basic spike histogram plotting."""
         net, _ = base_simulation_spikes
         net.cell_response.plot_spikes_hist()
         # simulation second run. first one it's in the base_simulation_spikes definition
         simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
 
-        # Test trial_idx arg
+    def test_spikes_hist_trial_idx(self, base_simulation_spikes):
+        """Test spike histogram with different trial arguments."""
+        net, _ = base_simulation_spikes
+
         with pytest.raises(TypeError, match="trial_idx must be an instance of"):
             net.cell_response.plot_spikes_hist(trial_idx="blah")
         net.cell_response.plot_spikes_hist(trial_idx=0, show=False)
         net.cell_response.plot_spikes_hist(trial_idx=[0, 1], show=False)
 
-        # Test color arg
+    def test_spikes_hist_color(self, base_simulation_spikes):
+        """Test spike histogram with different color arguments."""
+        net, _ = base_simulation_spikes
+
         net.cell_response.plot_spikes_hist(color="r")
         net.cell_response.plot_spikes_hist(color=["C0", "C1"])
         net.cell_response.plot_spikes_hist(color={"beta_prox": "r", "beta_dist": "g"})
@@ -752,7 +758,10 @@ class TestCellResponsePlotters:
         with pytest.raises(ValueError, match="'beta_dist' must be"):
             net.cell_response.plot_spikes_hist(color={"beta_prox": "r"})
 
-        # Test invert_spike_types arg
+    def test_spikes_hist_invert_spike_types(self, base_simulation_spikes):
+        """Test spike histogram with different invert_spike_types arguments."""
+        net, _ = base_simulation_spikes
+
         def _check_inverted_spike_axes(fig):
             # check that there are 2 y axes
             assert len(fig.axes) == 2
@@ -769,7 +778,6 @@ class TestCellResponsePlotters:
             # check that data are plotted
             assert y1_max > 1
 
-        # Test invert_spike_types
         # str input
         fig = net.cell_response.plot_spikes_hist(
             spike_types=["beta_prox", "beta_dist"],
