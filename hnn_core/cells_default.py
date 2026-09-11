@@ -785,7 +785,7 @@ def basket(cell_name, pos=(0, 0, 0), gid=None):
     Cell
         A Cell object of either the Layer 2/3 or Layer 5 Basket cell type.
     """
-    if cell_name == "L2_basket":
+    if cell_name == "L2_basket" or cell_name == "L2GABAb_basket":
         sect_loc = dict(proximal=["soma"], distal=["soma"])
     elif cell_name == "L5_basket":
         sect_loc = dict(proximal=["soma"], distal=[])

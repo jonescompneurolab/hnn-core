@@ -1234,8 +1234,7 @@ def _insert_gabab_population(net, delta=35):
         c["gid_pairs"] = {s(k): [s(g) for g in v] for k, v in c["gid_pairs"].items()}
 
     # 2. build the new cell type
-    template = basket(cell_name="L2_basket")
-    template.name = "L2GABAb_basket"
+    template = basket(cell_name="L2GABAb_basket")
     entry = {
         "cell_object": template,
         "cell_metadata": {
