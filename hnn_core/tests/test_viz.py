@@ -12,7 +12,7 @@ from numpy.testing import assert_allclose
 import pytest
 
 import hnn_core
-from hnn_core import read_params, neymotin_2020_model, read_spikes
+from hnn_core import read_params, diesburg_2024_model, neymotin_2020_model, read_spikes
 from hnn_core.dipole import simulate_dipole
 from hnn_core.network_models import default_cell_metadata
 from hnn_core.viz import (
@@ -36,12 +36,12 @@ def cleanup_matplotlib():
     plt.close("all")
 
 
-@pytest.fixture
-def setup_net():
+@pytest.fixture(params=[neymotin_2020_model, diesburg_2024_model])
+def setup_net(request):
     hnn_core_root = Path(hnn_core.__file__).parent
     params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
-    net = neymotin_2020_model(params, mesh_shape=(3, 3))
+    net = request.param(params, mesh_shape=(3, 3))
 
     return net
 
