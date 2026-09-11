@@ -12,7 +12,13 @@ from numpy.testing import assert_allclose
 import pytest
 
 import hnn_core
-from hnn_core import read_params, diesburg_2024_model, neymotin_2020_model, read_spikes
+from hnn_core import (
+    diesburg_2024_model,
+    neymotin_2020_model,
+    read_params,
+    read_spikes,
+    waller_pfcbeta_model,
+)
 from hnn_core.dipole import simulate_dipole
 from hnn_core.network_models import default_cell_metadata
 from hnn_core.viz import (
@@ -42,7 +48,6 @@ def setup_net(request):
     params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
     net = request.param(params, mesh_shape=(3, 3))
-
     return net
 
 
@@ -922,3 +927,43 @@ def test_invert_spike_types(setup_net):
     assert y1_max > 1
 
     plt.close("all")
+
+
+def test_waller_viz():
+    """Smoke test for all plotting functions in using the Waller model.
+
+    The Waller model used here is hardcoded to use only a mesh shape of (10, 10), so we
+    cannot simply execute our existing visualization tests on it.
+    """
+    net = waller_pfcbeta_model()
+    # TODO ADD STANDARD DRIVES
+    net.add_evoked_drive(
+        name="evdist1",
+        mu=5.0,
+        sigma=1.0,
+        numspikes=1,
+        location="distal",
+        weights_ampa={"L2_basket": 0.1, "L2_pyramidal": 0.1},
+    )
+    net.add_evoked_drive(
+        name="evprox1",
+        mu=5.0,
+        sigma=1.0,
+        numspikes=1,
+        location="proximal",
+        weights_ampa={"L2_basket": 0.1, "L2_pyramidal": 0.1},
+    )
+
+    plot_cells(net, show=False)
+
+    dpls = simulate_dipole(net, dt=0.5, tstop=100.0, n_trials=2)
+    plot_dipole(dpls, show=False)
+    plot_psd(dpls, show=False)
+    plot_tfr_morlet(dpls, freqs=np.array([30, 20, 10]), n_cycles=3, show=False)
+
+    plot_connectivity_matrix(net, conn_idx=0, show=False)
+    plot_cell_connectivity(net, conn_idx=0, show=False)
+
+    net.cell_response.plot_spikes_raster(show=False)
+    net.cell_response.plot_spikes_hist(show=False)
+    net.cell_response.plot_firing_rate_time(show=False, window_length=10)

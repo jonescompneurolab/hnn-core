@@ -1243,6 +1243,8 @@ def _insert_gabab_population(net, delta=35):
             "layer": "2",
             "measure_dipole": False,
             "reference": "segregated GABAb projection to L5 tufts",
+            "color": "y",
+            "marker": "x",
         },
     }
     pos = list(net.pos_dict["L2_basket"])
