@@ -1040,10 +1040,7 @@ def diesburg_2024_model(
 
 def waller_pfcbeta_model(
     params=None,
-    add_drives_from_params=False,
     legacy_mode=False,
-    mesh_shape=(10, 10),
-    gabab_params=None,
 ):
     """Instantiate the network model used to study beta events in frontocentral cortex.
 
@@ -1103,7 +1100,10 @@ def waller_pfcbeta_model(
         params = read_params(params_fname)
 
     net = neymotin_2020_model(
-        params, add_drives_from_params, legacy_mode, mesh_shape=mesh_shape
+        params,
+        add_drives_from_params=False,
+        legacy_mode=legacy_mode,
+        mesh_shape=(10, 10),
     )
     _insert_gabab_population(net)
 
