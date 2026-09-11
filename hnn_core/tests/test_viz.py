@@ -270,100 +270,6 @@ class TestDipoleViz:
         with pytest.warns(FutureWarning, match="tmin and tmax are deprecated"):
             plot_dipole(dpls[0], show=False, tmin=10, tmax=100)
 
-    def test_dipole_viz_no_data_in_raster_plt(self, run_simulation):
-        """Test that the raster plot contains data for various trial_idx inputs."""
-        net, _ = run_simulation
-        net.cell_response.plot_spikes_raster()
-        # test cell response plotting
-        with pytest.raises(TypeError, match="trial_idx must be an instance of"):
-            net.cell_response.plot_spikes_raster(trial_idx="blah", show=False)
-        net.cell_response.plot_spikes_raster(trial_idx=0, show=False)
-        fig = net.cell_response.plot_spikes_raster(trial_idx=[0, 1], show=False)
-        assert len(fig.axes[0].collections) > 0, "No data plotted in raster plot"
-
-    def test_dipole_viz_cell_response_plot_spikes_hist(self, run_simulation):
-        """Test spike histogram plotting across its arguments."""
-        net, _ = run_simulation
-        net.cell_response.plot_spikes_hist()
-        # simulation second run. first one it's in the run_simulation definition
-        simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
-
-        # Test trial_idx arg
-        with pytest.raises(TypeError, match="trial_idx must be an instance of"):
-            net.cell_response.plot_spikes_hist(trial_idx="blah")
-        net.cell_response.plot_spikes_hist(trial_idx=0, show=False)
-        net.cell_response.plot_spikes_hist(trial_idx=[0, 1], show=False)
-
-        # Test color arg
-        net.cell_response.plot_spikes_hist(color="r")
-        net.cell_response.plot_spikes_hist(color=["C0", "C1"])
-        net.cell_response.plot_spikes_hist(color={"beta_prox": "r", "beta_dist": "g"})
-        net.cell_response.plot_spikes_hist(
-            spike_types={"group1": ["beta_prox", "beta_dist"]}, color={"group1": "r"}
-        )
-        net.cell_response.plot_spikes_hist(
-            spike_types={"group1": ["beta"]}, color={"group1": "r"}
-        )
-
-        with pytest.raises(TypeError, match="color must be an instance of"):
-            net.cell_response.plot_spikes_hist(color=123)
-        with pytest.raises(ValueError):
-            net.cell_response.plot_spikes_hist(color="z")
-        with pytest.raises(ValueError):
-            net.cell_response.plot_spikes_hist(
-                color={"beta_prox": "z", "beta_dist": "g"}
-            )
-        with pytest.raises(TypeError, match="Dictionary values of color must"):
-            net.cell_response.plot_spikes_hist(
-                color={"beta_prox": 123, "beta_dist": "g"}
-            )
-        with pytest.raises(ValueError, match="'beta_dist' must be"):
-            net.cell_response.plot_spikes_hist(color={"beta_prox": "r"})
-
-        # Test invert_spike_types arg
-        def _check_inverted_spike_axes(fig):
-            # check that there are 2 y axes
-            assert len(fig.axes) == 2
-
-            # check for equivalency of both y axes
-            y1 = fig.axes[0]
-            y2 = fig.axes[1]
-
-            y1_max = max(y1.get_ylim())
-            y2_max = max(y2.get_ylim())
-
-            assert y1_max == y2_max
-
-            # check that data are plotted
-            assert y1_max > 1
-
-        # Test invert_spike_types
-        # str input
-        fig = net.cell_response.plot_spikes_hist(
-            spike_types=["beta_prox", "beta_dist"],
-            invert_spike_types="beta_prox",
-            show=False,
-        )
-        _check_inverted_spike_axes(fig)
-
-        # single-element list input
-        fig = net.cell_response.plot_spikes_hist(
-            spike_types=["beta_prox", "beta_dist"],
-            invert_spike_types=["beta_prox"],
-            show=False,
-        )
-        _check_inverted_spike_axes(fig)
-
-        # test case where all inputs are flipped
-        fig = net.cell_response.plot_spikes_hist(
-            spike_types=["beta_prox", "beta_dist"],
-            invert_spike_types=["beta_prox", "beta_dist"],
-            show=False,
-        )
-        _check_inverted_spike_axes(fig)
-
-        plt.close("all")
-
 
 def test_drive_strength(setup_net):
     """Adds empty external drives to check there strength across each cell types"""
@@ -795,6 +701,100 @@ class TestCellResponsePlotters:
             f"Expected {n_cell_spikes} spikes plotted in raster, got "
             f"{n_plotted_raster_overlay}"
         )
+
+    def test_dipole_viz_no_data_in_raster_plt(self, base_simulation_spikes):
+        """Test that the raster plot contains data for various trial_idx inputs."""
+        net, _ = base_simulation_spikes
+        net.cell_response.plot_spikes_raster()
+        # test cell response plotting
+        with pytest.raises(TypeError, match="trial_idx must be an instance of"):
+            net.cell_response.plot_spikes_raster(trial_idx="blah", show=False)
+        net.cell_response.plot_spikes_raster(trial_idx=0, show=False)
+        fig = net.cell_response.plot_spikes_raster(trial_idx=[0, 1], show=False)
+        assert len(fig.axes[0].collections) > 0, "No data plotted in raster plot"
+
+    def test_dipole_viz_cell_response_plot_spikes_hist(self, base_simulation_spikes):
+        """Test spike histogram plotting across its arguments."""
+        net, _ = base_simulation_spikes
+        net.cell_response.plot_spikes_hist()
+        # simulation second run. first one it's in the base_simulation_spikes definition
+        simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
+
+        # Test trial_idx arg
+        with pytest.raises(TypeError, match="trial_idx must be an instance of"):
+            net.cell_response.plot_spikes_hist(trial_idx="blah")
+        net.cell_response.plot_spikes_hist(trial_idx=0, show=False)
+        net.cell_response.plot_spikes_hist(trial_idx=[0, 1], show=False)
+
+        # Test color arg
+        net.cell_response.plot_spikes_hist(color="r")
+        net.cell_response.plot_spikes_hist(color=["C0", "C1"])
+        net.cell_response.plot_spikes_hist(color={"beta_prox": "r", "beta_dist": "g"})
+        net.cell_response.plot_spikes_hist(
+            spike_types={"group1": ["beta_prox", "beta_dist"]}, color={"group1": "r"}
+        )
+        net.cell_response.plot_spikes_hist(
+            spike_types={"group1": ["beta"]}, color={"group1": "r"}
+        )
+
+        with pytest.raises(TypeError, match="color must be an instance of"):
+            net.cell_response.plot_spikes_hist(color=123)
+        with pytest.raises(ValueError):
+            net.cell_response.plot_spikes_hist(color="z")
+        with pytest.raises(ValueError):
+            net.cell_response.plot_spikes_hist(
+                color={"beta_prox": "z", "beta_dist": "g"}
+            )
+        with pytest.raises(TypeError, match="Dictionary values of color must"):
+            net.cell_response.plot_spikes_hist(
+                color={"beta_prox": 123, "beta_dist": "g"}
+            )
+        with pytest.raises(ValueError, match="'beta_dist' must be"):
+            net.cell_response.plot_spikes_hist(color={"beta_prox": "r"})
+
+        # Test invert_spike_types arg
+        def _check_inverted_spike_axes(fig):
+            # check that there are 2 y axes
+            assert len(fig.axes) == 2
+
+            # check for equivalency of both y axes
+            y1 = fig.axes[0]
+            y2 = fig.axes[1]
+
+            y1_max = max(y1.get_ylim())
+            y2_max = max(y2.get_ylim())
+
+            assert y1_max == y2_max
+
+            # check that data are plotted
+            assert y1_max > 1
+
+        # Test invert_spike_types
+        # str input
+        fig = net.cell_response.plot_spikes_hist(
+            spike_types=["beta_prox", "beta_dist"],
+            invert_spike_types="beta_prox",
+            show=False,
+        )
+        _check_inverted_spike_axes(fig)
+
+        # single-element list input
+        fig = net.cell_response.plot_spikes_hist(
+            spike_types=["beta_prox", "beta_dist"],
+            invert_spike_types=["beta_prox"],
+            show=False,
+        )
+        _check_inverted_spike_axes(fig)
+
+        # test case where all inputs are flipped
+        fig = net.cell_response.plot_spikes_hist(
+            spike_types=["beta_prox", "beta_dist"],
+            invert_spike_types=["beta_prox", "beta_dist"],
+            show=False,
+        )
+        _check_inverted_spike_axes(fig)
+
+        plt.close("all")
 
 
 def test_network_plotter_init(setup_net):
