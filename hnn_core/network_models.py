@@ -206,11 +206,10 @@ def neymotin_2020_model(
 
     References
     ----------
-    .. [1] Jones, Stephanie R., et al. "Quantitative Analysis and
-           Biophysically Realistic Neural Modeling of the MEG Mu Rhythm:
-           Rhythmogenesis and Modulation of Sensory-Evoked Responses."
-           Journal of Neurophysiology 102, 3554–3572 (2009).
-           https://doi.org/10.1152/jn.00535.2009
+    .. [1] Jones, Stephanie R., et al. "Quantitative Analysis and Biophysically
+           Realistic Neural Modeling of the MEG Mu Rhythm: Rhythmogenesis and Modulation
+           of Sensory-Evoked Responses." Journal of Neurophysiology 102, 3554–3572
+           (2009). https://doi.org/10.1152/jn.00535.2009
 
     .. [2] Neymotin, Samuel A, et al. 2020. "Human Neocortical Neurosolver (HNN), a New
            Software Tool for Interpreting the Cellular and Network Origin of Human
@@ -500,6 +499,7 @@ def law_2021_model(
     .. [1] Law, Robert G., et al. "Thalamocortical Mechanisms Regulating the
            Relationship between Transient Beta Events and Human Tactile
            Perception." Cerebral Cortex, 32, 668–688 (2022).
+           https://doi.org/10.1093/cercor/bhab221
     """
 
     hnn_core_root = Path(hnn_core.__file__).parent
@@ -596,6 +596,7 @@ def calcium_model(
     .. [1] Kohl, Carmen, et al. "Neural Mechanisms Underlying Human Auditory
            Evoked Responses Revealed By Human Neocortical Neurosolver."
            Brain Topography, 35, 19–35 (2022).
+           https://doi.org/10.1007/s10548-021-00838-0
     """
     hnn_core_root = Path(hnn_core.__file__).parent
     if params is None:
@@ -938,15 +939,32 @@ def duecker_ET_model(
 def diesburg_2024_model(
     params=None, add_drives_from_params=False, legacy_mode=False, mesh_shape=(10, 10)
 ):
-    """Instantiate the expansion of Jones 2009 model to study
-    evoked potentials in the frontocentral cortex as described in
-    Diesburg et al. JNeuro, 2024 [1].
+    """Instantiate the network model described in Diesburg et al., 2024 [1]_ .
+
+    This instantiates the expansion of the Jones et al. 2009 model [2]_ used to study
+    evoked potentials in the frontocentral cortex as described in Diesburg et al. 2024
+    [1]_ .
+
+    Parameters
+    ----------
+    params : str | dict | None
+        The path to the parameter file for constructing the network.
+        If None, parameters loaded from default.json
+        Default: None
+    add_drives_from_params : bool
+        If True, add drives as defined in the params-dict. NB this is mainly
+        for backward-compatibility with HNN GUI, and will be deprecated in a
+        future release. Default: False
+    legacy_mode : bool
+        Set to False by default. Enables matching HNN GUI output when drives
+        are added suitably. Will be deprecated in a future release.
+    mesh_shape : tuple of int (default: (10, 10))
+        Defines the (n_x, n_y) shape of the grid of pyramidal cells.
 
     Returns
     -------
     net : Instance of Network object
-        Network object used to store the model used in
-        Diesburg et al. 2024.
+        Network object used to store the model used in Diesburg et al. 2024 [1]_ .
 
     See Also
     --------
@@ -954,9 +972,8 @@ def diesburg_2024_model(
 
     Notes
     -----
-    Model reproduces results from Diesburg et al. 2024
-    This model differs from the default network model in several
-    parameters including
+    This model reproduces results from Diesburg et al. 2024 [1]_ . This model differs
+    from the model of ``neymotin_2020_model`` in several parameters including:
     1) Increase L2_pyramidal -> L2_pyramidal ampa weight
     2) Increase L2_pyramidal -> L2_pyramidal nmda weight
     3) Increase L2_basket -> L2_pyramidal gabaa weight
@@ -968,10 +985,14 @@ def diesburg_2024_model(
 
     References
     ----------
-    .. [1] Diesburg, Darcy, et al. "Biophysical modeling of
-           frontocentral ERP generation links circuit-level
-           mechanisms of action-stopping to a behavioral race model."
-           JNeuro (2024).
+    .. [1] Diesburg, Darcy, et al. "Biophysical modeling of frontocentral ERP generation
+           links circuit-level mechanisms of action-stopping to a behavioral race
+           model." JNeuro (2024). https://doi.org/10.1523/JNEUROSCI.2016-23.2024
+
+    .. [2] Jones, Stephanie R., et al. "Quantitative Analysis and Biophysically
+           Realistic Neural Modeling of the MEG Mu Rhythm: Rhythmogenesis and Modulation
+           of Sensory-Evoked Responses." Journal of Neurophysiology 102, 3554–3572
+           (2009). https://doi.org/10.1152/jn.00535.2009
     """
     hnn_core_root = Path(hnn_core.__file__).parent
     params_fname = hnn_core_root / "param" / "default.json"
@@ -1024,16 +1045,26 @@ def waller_pfcbeta_model(
     mesh_shape=(10, 10),
     gabab_params=None,
 ):
-    """Instantiate the expansion of Jones 2009 model to study
-    evoked potentials in the frontocentral cortex as described in
-    Diesburg et al., JNeuro, 2024 [1] with elements from Law et al.
-    2022, Cerebreal Cortex [2] to study the impact of beta events.
+    """Instantiate the network model used to study beta events in frontocentral cortex.
+
+    This instantiates an expansion of the model from Diesburg et al. 2024 [1]_ that
+    includes elements of the model in Law et al. 2022 [2]_ and Jones et al. 2009 [3]_ to
+    study the impact of beta events in frontocentral cortex.
+
+    Parameters
+    ----------
+    params : str | dict | None
+        The path to the parameter file for constructing the network.
+        If None, parameters loaded from default.json
+        Default: None
+    legacy_mode : bool
+        Set to False by default. Enables matching HNN GUI output when drives
+        are added suitably. Will be deprecated in a future release.
 
     Returns
     -------
     net : Instance of Network object
-        Network object used to store the model used in
-        this project.
+        Network object used to store the model used in this project.
 
     See Also
     --------
@@ -1043,24 +1074,28 @@ def waller_pfcbeta_model(
 
     Notes
     -----
-    This model differs from the Diesburg model in the
-    following ways:
+    This model differs from ``diesburg_2024_model`` in the following ways:
     1) Increased gabaB duration of inhibition by increasing tau1/2.
-    2) Decreased L5 pyr -> L5 pyr NMDA weights to prevent epileptic
-    spiking activity.
+    2) Decreased L5 pyr -> L5 pyr NMDA weights to prevent epileptic spiking activity.
     3) Increased gabaB L2/L5 basket to LL2/5 pyr.
     4) Remove L2_basket -> L5_pyramidal gabaa connection
     5) Add L2 basket -> L5 Pyr tuft gabaB connection
 
     References
     ----------
-    .. [1] Diesburg, Darcy, et al. "Biophysical modeling of
-           frontocentral ERP generation links circuit-level
-           mechanisms of action-stopping to a behavioral race model."
-           JNeuro (2024).
-       [2] Law, Rob, et al. "Thalamocortical mechanisms regulating
-           the relationship between transient beta events and human
-           tactile perception. Cerebral Cortex, (2022).
+    .. [1] Diesburg, Darcy, et al. "Biophysical modeling of frontocentral ERP generation
+           links circuit-level mechanisms of action-stopping to a behavioral race
+           model." JNeuro (2024). https://doi.org/10.1523/JNEUROSCI.2016-23.2024
+
+    .. [2] Law, Robert G., et al. "Thalamocortical Mechanisms Regulating the
+           Relationship between Transient Beta Events and Human Tactile
+           Perception." Cerebral Cortex, 32, 668–688 (2022).
+           https://doi.org/10.1093/cercor/bhab221
+
+    .. [3] Jones, Stephanie R., et al. "Quantitative Analysis and Biophysically
+           Realistic Neural Modeling of the MEG Mu Rhythm: Rhythmogenesis and Modulation
+           of Sensory-Evoked Responses." Journal of Neurophysiology 102, 3554–3572
+           (2009). https://doi.org/10.1152/jn.00535.2009
     """
     hnn_core_root = Path(hnn_core.__file__).parent
     params_fname = hnn_core_root / "param" / "default.json"
