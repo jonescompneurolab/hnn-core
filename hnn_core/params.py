@@ -751,7 +751,7 @@ def _any_positive_weights(drive):
     else:
         return False
 
-
+# KD: dev team discussion: what should happen to this?
 def remove_nulled_drives(net):
     """Removes drives from network if they have been given null parameters.
 

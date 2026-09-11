@@ -1617,8 +1617,10 @@ def plot_connectivity_matrix(
     net : Instance of Network object
         The Network object
     conn_idx : int
-        Index of connection to be visualized
-        from `net.connectivity`
+        Index of connection to be visualized. Matches the ``conn_idx``
+        column of ``net.recurrent_connectivity_df`` /
+        ``net.external_drives_connectivity_df``, or the index into
+        ``net.connectivity`` if ``net.use_dataframe`` is False.
     ax : instance of Axes3D
         Matplotlib 3D axis
     show_weight : bool
@@ -1636,7 +1638,8 @@ def plot_connectivity_matrix(
     fig : instance of matplotlib Figure
         The matplotlib figure handle.
     """
-    from .cell import _get_gaussian_connection
+    import pandas as pd
+    from .cell import _calculate_gaussian, _get_gaussian_connection
     from .network import Network
 
     _validate_type(net, Network, "net", "Network")
@@ -1645,39 +1648,85 @@ def plot_connectivity_matrix(
     if ax is None:
         _, ax = plt.subplots(1, 1)
 
-    # Load objects for distance calculation
-    conn = net.connectivity[conn_idx]
-    nc_dict = conn["nc_dict"]
-    src_type = conn["src_type"]
-    target_type = conn["target_type"]
-    src_type_pos = net.pos_dict[src_type]
-    target_type_pos = net.pos_dict[target_type]
+    if net.use_dataframe:
+        # conn_idx is unique across the two dataframes, so the connection
+        # lives entirely in one of them
+        conn_df = pd.concat(
+            (net.recurrent_connectivity_df, net.external_drives_connectivity_df)
+        )
+        conn_df = conn_df[conn_df["conn_idx"] == conn_idx]
+        if conn_df.empty:
+            raise ValueError(
+                f"conn_idx {conn_idx} not found in net.recurrent_connectivity_df "
+                "or net.external_drives_connectivity_df"
+            )
+        # a template location can expand to several sections; the weight is
+        # the same for each, so keep one row per (src, target) pair
+        conn_df = conn_df.drop_duplicates(subset=["src_gid", "target_gid"])
 
-    src_range = np.array(net.gid_ranges[conn["src_type"]])
-    target_range = np.array(net.gid_ranges[conn["target_type"]])
-    connectivity_matrix = np.zeros((len(src_range), len(target_range)))
+        src_type = conn_df["src_type"].iloc[0]
+        target_type = conn_df["target_type"].iloc[0]
+        loc = conn_df["template_loc"].iloc[0]
+        receptor = conn_df["receptor"].iloc[0]
 
-    for src_gid, target_src_pair in conn["gid_pairs"].items():
-        src_idx = np.where(src_range == src_gid)[0][0]
-        target_indeces = np.where(np.isin(target_range, target_src_pair))[0]
-        for target_idx in target_indeces:
-            src_pos = src_type_pos[src_idx]
-            target_pos = target_type_pos[target_idx]
+        src_range = np.array(net.gid_ranges[src_type])
+        target_range = np.array(net.gid_ranges[target_type])
+        connectivity_matrix = np.zeros((len(src_range), len(target_range)))
 
-            # Identical calculation used in Cell.par_connect_from_src()
-            if show_weight:
-                weight, _ = _get_gaussian_connection(
-                    src_pos, target_pos, nc_dict, inplane_distance=net._inplane_distance
-                )
-            else:
-                weight = 1.0
+        src_idx = conn_df["src_gid"].to_numpy() - src_range[0]
+        target_idx = conn_df["target_gid"].to_numpy() - target_range[0]
 
-            connectivity_matrix[src_idx, target_idx] = weight
+        if show_weight:
+            # Identical calculation used in Cell.par_connect_from_src(),
+            # vectorised over all gid pairs of this connection
+            src_pos = np.array(net.pos_dict[src_type])[src_idx]
+            target_pos = np.array(net.pos_dict[target_type])[target_idx]
+            cell_dist = np.hypot(
+                target_pos[:, 0] - src_pos[:, 0], target_pos[:, 1] - src_pos[:, 1]
+            )
+            scaled_lamtha = conn_df["lamtha"].to_numpy() * net._inplane_distance
+            weight = _calculate_gaussian(
+                cell_dist, conn_df["weight"].to_numpy(), scaled_lamtha
+            )
+        else:
+            weight = 1.0
+
+        connectivity_matrix[src_idx, target_idx] = weight
+    else:
+        conn = net.connectivity[conn_idx]
+        nc_dict = conn["nc_dict"]
+        src_type = conn["src_type"]
+        target_type = conn["target_type"]
+        loc = conn["loc"]
+        receptor = conn["receptor"]
+        src_type_pos = net.pos_dict[src_type]
+        target_type_pos = net.pos_dict[target_type]
+
+        src_range = np.array(net.gid_ranges[src_type])
+        target_range = np.array(net.gid_ranges[target_type])
+        connectivity_matrix = np.zeros((len(src_range), len(target_range)))
+
+        for src_gid, target_src_pair in conn["gid_pairs"].items():
+            src_idx = np.where(src_range == src_gid)[0][0]
+            target_indeces = np.where(np.isin(target_range, target_src_pair))[0]
+            for target_idx in target_indeces:
+                src_pos = src_type_pos[src_idx]
+                target_pos = target_type_pos[target_idx]
+
+                # Identical calculation used in Cell.par_connect_from_src()
+                if show_weight:
+                    weight, _ = _get_gaussian_connection(
+                        src_pos,
+                        target_pos,
+                        nc_dict,
+                        inplane_distance=net._inplane_distance,
+                    )
+                else:
+                    weight = 1.0
+
+                connectivity_matrix[src_idx, target_idx] = weight
 
     im = ax.imshow(connectivity_matrix, cmap=colormap, interpolation="none")
-
-    ax.set_xlabel("Time (ms)")
-    ax.set_ylabel("Frequency (Hz)")
 
     if colorbar:
         fig = ax.get_figure()
@@ -1687,16 +1736,11 @@ def plot_connectivity_matrix(
         cbar.ax.yaxis.set_ticks_position("right")
         cbar.ax.set_ylabel("Weight", rotation=-90, va="bottom")
 
-    ax.set_xlabel(
-        f"{conn['target_type']} target gids ({target_range[0]}-{target_range[-1]})"
-    )
+    ax.set_xlabel(f"{target_type} target gids ({target_range[0]}-{target_range[-1]})")
     ax.set_xticklabels(list())
-    ax.set_ylabel(f"{conn['src_type']} source gids ({src_range[0]}-{src_range[-1]})")
+    ax.set_ylabel(f"{src_type} source gids ({src_range[0]}-{src_range[-1]})")
     ax.set_yticklabels(list())
-    ax.set_title(
-        f"{conn['src_type']} -> {conn['target_type']} "
-        f"({conn['loc']}, {conn['receptor']})"
-    )
+    ax.set_title(f"{src_type} -> {target_type} ({loc}, {receptor})")
 
     plt.tight_layout()
     plt_show(show)
@@ -1912,10 +1956,13 @@ def plot_cell_connectivity(
     net : Instance of Network object
         The Network object
     conn_idx : int
-        Index of connection to be visualized from net.connectivity
+        Index of connection to be visualized. Matches the ``conn_idx``
+        column of ``net.recurrent_connectivity_df`` /
+        ``net.external_drives_connectivity_df``, or the index into
+        ``net.connectivity`` if ``net.use_dataframe`` is False.
     src_gid : int | None
-        The cell ID of the source cell. It must be an element of
-        net.connectivity[conn_idx]['gid_pairs'].keys()
+        The cell ID of the source cell. It must be one of the source gids
+        of the connection selected by ``conn_idx``.
         If None, the first cell from the list of valid src_gids is selected.
     axes : instance of Axes3D
         Matplotlib 3D axis
@@ -1941,21 +1988,53 @@ def plot_cell_connectivity(
     the connection corresponds to a drive, ex: poisson, bursty, etc.
 
     """
+    import pandas as pd
     from .network import Network
 
     _validate_type(net, Network, "net", "Network")
     _validate_type(conn_idx, int, "conn_idx", "int")
 
     # Load objects for distance calculation
-    conn = net.connectivity[conn_idx]
-    nc_dict = conn["nc_dict"]
+    if net.use_dataframe:
+        # conn_idx is unique across the two dataframes, so the connection
+        # lives entirely in one of them
+        conn_df = pd.concat(
+            (net.recurrent_connectivity_df, net.external_drives_connectivity_df)
+        )
+        conn_df = conn_df[conn_df["conn_idx"] == conn_idx]
+        if conn_df.empty:
+            raise ValueError(
+                f"conn_idx {conn_idx} not found in net.recurrent_connectivity_df "
+                "or net.external_drives_connectivity_df"
+            )
+        first = conn_df.iloc[0]
+        # _update_target_plot only needs the gid pairs of this connection and
+        # the template weight / space constant of the gaussian fall-off
+        conn = {
+            "src_type": first["src_type"],
+            "target_type": first["target_type"],
+            "loc": first["template_loc"],
+            "receptor": first["receptor"],
+            "gid_pairs": {
+                int(src_gid): group["target_gid"].unique().tolist()
+                for src_gid, group in conn_df.groupby("src_gid", sort=True)
+            },
+        }
+        nc_dict = {
+            "A_weight": first["weight"],
+            "A_delay": first["delay"],
+            "lamtha": first["lamtha"],
+        }
+    else:
+        conn = net.connectivity[conn_idx]
+        nc_dict = conn["nc_dict"]
     src_type = conn["src_type"]
     target_type = conn["target_type"]
     src_type_pos = np.array(net.pos_dict[src_type])
     target_type_pos = np.array(net.pos_dict[target_type])
     src_range = np.array(net.gid_ranges[conn["src_type"]])
 
-    valid_src_gids = list(net.connectivity[conn_idx]["gid_pairs"].keys())
+    valid_src_gids = list(conn["gid_pairs"].keys())
     src_pos_valid = src_type_pos[np.isin(src_range, valid_src_gids)]
 
     if src_gid is None:

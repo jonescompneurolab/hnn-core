@@ -289,7 +289,7 @@ def _read_external_drive(net, drive_data, read_output):
     if not read_output:
         net.external_drives[drive_data["name"]]["events"] = list()
 
-
+# KD note to self/dev: need to think about whether we still need to support this
 def _read_connectivity(net, conns_data):
     """Adds connections to a Network from json encoded connectivity"""
     # Overwrite drive connections
