@@ -195,7 +195,7 @@ def test_network_visualization(setup_net):
 
 
 class TestDipoleViz:
-    def test_dipole_viz_decimation_options(self, run_simulation):
+    def test_decimation_options(self, run_simulation):
         """Test basic dipole visualisations and decimation."""
         _, dpls = run_simulation
         fig = dpls[0].plot()  # plot the first dipole alone
@@ -211,7 +211,7 @@ class TestDipoleViz:
             ):
                 plot_dipole(dpls[0], decim=dec, show=False)
 
-    def test_dipole_viz_dipole_mutiple_layers(self, run_simulation):
+    def test_dipole_mutiple_layers(self, run_simulation):
         """Test plotting dipoles across multiple trials and layers (L2, L5, agg) with matching axes."""
         _, dpls = run_simulation
         # test plotting multiple dipoles as overlay
@@ -240,7 +240,7 @@ class TestDipoleViz:
             _, axes = plt.subplots(nrows=3, ncols=1)
             _ = plot_dipole(dpls, show=False, ax=axes, layer=["L2", "L5"])
 
-    def test_dipole_viz_multiple_tfr(self, run_simulation):
+    def test_multiple_tfr(self, run_simulation):
         """Test TFR plotting of multiple dipoles and related scaling/sampling checks."""
         _, dpls = run_simulation
         # multiple TFRs get averaged
@@ -702,7 +702,7 @@ class TestCellResponsePlotters:
             f"{n_plotted_raster_overlay}"
         )
 
-    def test_dipole_viz_no_data_in_raster_plt(self, base_simulation_spikes):
+    def test_no_data_in_raster_plt(self, base_simulation_spikes):
         """Test that the raster plot contains data for various trial_idx inputs."""
         net, _ = base_simulation_spikes
         net.cell_response.plot_spikes_raster()
@@ -713,7 +713,7 @@ class TestCellResponsePlotters:
         fig = net.cell_response.plot_spikes_raster(trial_idx=[0, 1], show=False)
         assert len(fig.axes[0].collections) > 0, "No data plotted in raster plot"
 
-    def test_dipole_viz_cell_response_plot_spikes_hist(self, base_simulation_spikes):
+    def test_plot_spikes_hist(self, base_simulation_spikes):
         """Test spike histogram plotting across its arguments."""
         net, _ = base_simulation_spikes
         net.cell_response.plot_spikes_hist()
