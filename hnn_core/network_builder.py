@@ -9,6 +9,7 @@ from copy import deepcopy
 from pathlib import Path
 import numpy as np
 from neuron import h
+import pandas as pd
 
 # This is due to: https://github.com/neuronsimulator/nrn/pull/746
 from neuron import __version__
@@ -417,40 +418,52 @@ class NetworkBuilder(object):
         for gid in range(self._rank, self.net._n_cells, n_hosts):
             self._gid_list.append(gid)
 
-        for drive in self.net.external_drives.values():
-            if drive["cell_specific"]:
-                # only assign drive gids that have a target cell gid already
-                # assigned to this rank
-                for src_gid in self.net.gid_ranges[drive["name"]]:
-                    if self.net.use_dataframe:
-                        target_gids = set(
-                            self.net.connectivity_df.loc[
-                                self.net.connectivity_df["src_gid"] == src_gid,
-                                "target_gid",
-                            ]
-                        )
-                    else:
-                        conn_idxs = pick_connection(self.net, src_gids=src_gid)
-                        target_gids = set()
-                        for conn_idx in conn_idxs:
-                            gid_pairs = self.net.connectivity[conn_idx]["gid_pairs"]
-                            if src_gid in gid_pairs:
-                                target_gids.update(
-                                    self.net.connectivity[conn_idx]["gid_pairs"][
-                                        src_gid
-                                    ]
-                                )
-                    for target_gid in target_gids:
-                        if (
-                            target_gid in self._gid_list
-                            and src_gid not in self._gid_list
-                        ):
-                            self._gid_list.append(src_gid)
-            else:
-                # round robin assignment of drive gids
-                src_gids = list(self.net.gid_ranges[drive["name"]])
-                for gid_idx in range(self._rank, len(src_gids), n_hosts):
-                    self._gid_list.append(src_gids[gid_idx])
+        # if using connectivity object
+        if self.net.use_dataframe is False:
+            for drive in self.net.external_drives.values():
+                if drive["cell_specific"]:
+                    # only assign drive gids that have a target cell gid already
+                    # assigned to this rank
+                        for src_gid in self.net.gid_ranges[drive["name"]]:
+
+                            conn_idxs = pick_connection(self.net, src_gids=src_gid)
+                            target_gids = set()
+                            for conn_idx in conn_idxs:
+                                gid_pairs = self.net.connectivity[conn_idx]["gid_pairs"]
+                                if src_gid in gid_pairs:
+                                    target_gids.update(
+                                        self.net.connectivity[conn_idx]["gid_pairs"][
+                                            src_gid
+                                        ]
+                                    )
+                        for target_gid in target_gids:
+                            if (
+                                target_gid in self._gid_list
+                                and src_gid not in self._gid_list
+                            ):
+                                self._gid_list.append(src_gid)
+                elif drive["cell_specific"] is False:
+                    # round robin assignment of drive gids
+                    src_gids = list(self.net.gid_ranges[drive["name"]])
+                    for gid_idx in range(self._rank, len(src_gids), n_hosts):
+                        self._gid_list.append(src_gids[gid_idx])
+
+        # if using dataframe 
+        else:
+            df = self.net.external_drives_connectivity_df
+            for drive_name, drive in self.net.external_drives.items():
+                drive_df = df[df["src_type"] == drive_name]
+                if drive["cell_specific"]:
+                    # co-locate each drive gid with its (single) target cell
+                    on_this_rank = drive_df[drive_df["target_gid"].isin(self._gid_list)]
+                    for src_gid in on_this_rank["src_gid"].unique():
+                        if src_gid not in self._gid_list:
+                            self._gid_list.append(int(src_gid))
+                else:
+                    # round robin assignment of drive gids
+                    src_gids = sorted(drive_df["src_gid"].unique())
+                    for gid_idx in range(self._rank, len(src_gids), n_hosts):
+                        self._gid_list.append(int(src_gids[gid_idx]))
 
         # extremely important to get the gids in the right order
         self._gid_list.sort()
@@ -469,6 +482,9 @@ class NetworkBuilder(object):
         for gid in self._gid_list:
             _PC.set_gid2node(gid, self._rank)
 
+        # concatenate connectivity dataframes (for synapse placement)
+        df = pd.concat((self.net.recurrent_connectivity_df, self.net.external_drives_connectivity_df))
+
         # loop through ALL gids
         # have to loop over self._gid_list, since this is what we got
         # on this rank (MPI)
@@ -486,8 +502,8 @@ class NetworkBuilder(object):
                 src_type_metadata = self.net.cell_types[src_type]["cell_metadata"]
                 target_df = None
                 if self.net.use_dataframe:
-                    target_df = self.net.connectivity_df.loc[
-                        self.net.connectivity_df["target_gid"] == gid,
+                    target_df = df.loc[
+                        df["target_gid"] == gid,
                         ["target_type", "actual_section", "segX", "receptor"],
                     ].drop_duplicates()
                 if src_type_metadata.get("measure_dipole", False):
@@ -600,8 +616,7 @@ class NetworkBuilder(object):
         information required to identify the source and target cell types and
         configure the corresponding synapse.
         """
-        net = self.net
-        df = net.connectivity_df
+        df = pd.concat((self.net.recurrent_connectivity_df, self.net.external_drives_connectivity_df))
 
         assert len(self._cells) == len(self._gid_list) - len(self._drive_cells)
 
@@ -628,7 +643,7 @@ class NetworkBuilder(object):
             if connection_name not in self.ncs:
                 self.ncs[connection_name] = list()
 
-            pos_idx = src_gid - net.gid_ranges[_long_name(src_type)][0]
+            pos_idx = src_gid - self.net.gid_ranges[_long_name(src_type)][0]
             # these lines from 624 to 631 have also been copied from original connect_celltypes
             nc_dict = {
                 "A_weight": row.weight * row.gain,
@@ -636,7 +651,7 @@ class NetworkBuilder(object):
                 "lamtha": row.lamtha,
                 "threshold": row.threshold,
                 "gain": row.gain,
-                "pos_src": net.pos_dict[_long_name(src_type)][pos_idx],
+                "pos_src": self.net.pos_dict[_long_name(src_type)][pos_idx],
             }
 
             syn_key = f"{target_type}_{sec_name}_{receptor}_{segX}"
@@ -645,7 +660,7 @@ class NetworkBuilder(object):
                 src_gid,
                 nc_dict,
                 target_cell._nrn_synapses[syn_key],
-                net._inplane_distance,
+                self.net._inplane_distance,
             )
             self.ncs[connection_name].append(nc)
 
