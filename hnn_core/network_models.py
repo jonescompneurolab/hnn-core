@@ -1111,7 +1111,7 @@ def waller_pfcbeta_model(
     for cell_entry in net.cell_types.values():
         cell = cell_entry["cell_object"]
         if "gabab" in cell.synapses:
-            cell.synapses["gabab"] = {"mechname": "gabab_destexhe"}
+            cell.synapses["gabab"] = {"mechname": "gabab_neymotin2016"}
 
     return net
 
