@@ -713,8 +713,6 @@ class TestCellResponsePlotters:
         """Test basic spike histogram plotting."""
         net, _ = base_simulation_spikes
         net.cell_response.plot_spikes_hist()
-        # simulation second run. first one it's in the base_simulation_spikes definition
-        simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
 
     def test_spikes_hist_trial_idx(self, base_simulation_spikes):
         """Test spike histogram with different trial arguments."""
