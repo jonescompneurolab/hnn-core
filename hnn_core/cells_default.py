@@ -785,7 +785,7 @@ def basket(cell_name, pos=(0, 0, 0), gid=None):
     Cell
         A Cell object of either the Layer 2/3 or Layer 5 Basket cell type.
     """
-    if cell_name == "L2_basket":
+    if cell_name == "L2_basket" or cell_name == "L2GABAb_basket":
         sect_loc = dict(proximal=["soma"], distal=["soma"])
     elif cell_name == "L5_basket":
         sect_loc = dict(proximal=["soma"], distal=[])
@@ -1392,5 +1392,39 @@ def human_gen_interneuron(cell_name, pos=(0, 0, 0), layer=2, gid=None):
         cell_tree=cell_tree,
         gid=gid,
     )
+
+    return cell
+
+
+def pyramidal_PFC(cell_name, pos, override_params=None, gid=None):
+    # implement the insert_almog function from Kohl pyr file for k, na
+    """Slight adjustments that were made in the old GUI in Diesburg
+    et al., 2024 that are necessary for direct replication of the
+    PFC HNN model results. This edit involves distance scaling of hh2
+    mechanisms along pyramidal cells without adjusting Ca."""
+
+    if override_params is None:
+        override_params = dict()
+
+    override_params["L5Pyr_soma_gkbar_hh2"] = 0.01 * 2
+    override_params["L5Pyr_soma_gnabar_hh2"] = 0.16
+
+    gbar_na = partial(
+        _linear_g_at_dist,
+        gsoma=override_params["L5Pyr_soma_gnabar_hh2"],
+        gdend=0.14,
+        xkink=962,
+    )
+    gbar_k = partial(
+        _exp_g_at_dist,
+        gbar_at_zero=override_params["L5Pyr_soma_gkbar_hh2"],
+        exp_term=-0.006,
+        offset=0.5,
+    )
+
+    override_params["L5Pyr_dend_gnabar_hh2"] = gbar_na
+    override_params["L5Pyr_dend_gkbar_hh2"] = gbar_k
+
+    cell = pyramidal(cell_name, pos, override_params=override_params, gid=gid)
 
     return cell

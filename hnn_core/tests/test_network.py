@@ -17,10 +17,12 @@ from hnn_core import (
     CellResponse,
     Network,
     calcium_model,
+    diesburg_2024_model,
     duecker_ET_model,
-    neymotin_2020_model,
     jones_2009_model,
     law_2021_model,
+    neymotin_2020_model,
+    waller_pfcbeta_model,
     read_params,
     simulate_dipole,
 )
@@ -426,8 +428,8 @@ def test_custom_network_coords_validation():
     Network(params, pos_dict=custom_pos_dict, cell_types=custom_cell_types)
 
 
-def test_network_models():
-    """ "Test instantiations of the network object"""
+def test_network_models_law_2021():
+    """Test instantiation and custom parameters of the Law 2021 model"""
     # Make sure critical biophysics for Law model are updated
     net_law = law_2021_model()
     # instantiate drive events for NetworkBuilder
@@ -445,22 +447,9 @@ def test_network_models():
             == 200.0
         )
 
-    # Check add_default_erp()
-    net_default = neymotin_2020_model()
-    with pytest.raises(TypeError, match="net must be"):
-        add_erp_drives_to_jones_model(net="invalid_input")
-    with pytest.raises(TypeError, match="tstart must be"):
-        add_erp_drives_to_jones_model(net=net_default, tstart="invalid_input")
-    n_conn = len(net_default.connectivity)
-    for cell_name in ["L5_pyramidal", "L2_pyramidal"]:
-        assert len(net_default.pos_dict[cell_name]) == 100
-    add_erp_drives_to_jones_model(net_default)
-    for drive_name in ["evdist1", "evprox1", "evprox2"]:
-        assert drive_name in net_default.external_drives.keys()
-    # 14 drive connections are added as follows: evdist1: 3 ampa + 3 nmda,
-    # evprox1: 4 ampa, evprox2: 4 ampa
-    assert len(net_default.connectivity) == n_conn + 14
 
+def test_network_models_calcium():
+    """Test instantiation and custom parameters of the "calcium" model"""
     # Ensure distant dependent calcium gbar
     net_calcium = calcium_model()
     # instantiate drive events for NetworkBuilder
@@ -499,6 +488,104 @@ def test_network_models():
         # Ensure negative exponential distance dependent K gbar
         assert np.all(np.diff(k_gbar) < 0)
         assert np.all(np.diff(k_gbar, n=2) > 0)  # positive 2nd derivative
+
+
+def test_network_models_diesburg_2024():
+    """Test instantiation and custom parameters of the Diesburg 2024 model"""
+    net_diesburg = diesburg_2024_model()
+    del net_diesburg
+    # TODO: AES EXPECTED DRIVE ADDITIONS should be added here!
+    net_diesburg = diesburg_2024_model(add_drives_from_params=True)
+
+    # Check that custom connectivity is as expected
+    # L2_pyramidal -> L2_pyramidal excitation
+    net_diesburg.connectivity[0]["nc_dict"]["A_weight"] == 0.00075  # nmda
+    net_diesburg.connectivity[1]["nc_dict"]["A_weight"] == 0.00075  # ampa
+    # L2_basket -> L2_pyramidal inhibition
+    net_diesburg.connectivity[4]["nc_dict"]["A_weight"] == 0.1  # gabaa
+    net_diesburg.connectivity[5]["nc_dict"]["A_weight"] == 0.1  # gabab
+    # L2_pyramidal -> L5_pyramidal excitation
+    net_diesburg.connectivity[8]["nc_dict"]["A_weight"] == 0.0005  # proximal
+    net_diesburg.connectivity[9]["nc_dict"]["A_weight"] == 0.0005  # distal
+    # L5_pyramidal -> L5_pyramidal excitation
+    net_diesburg.connectivity[2]["nc_dict"]["A_weight"] == 0.00075  # nmda
+    net_diesburg.connectivity[3]["nc_dict"]["A_weight"] == 0.00075  # ampa
+    # L5_basket -> L5_pyramidal inhibition
+    net_diesburg.connectivity[7]["nc_dict"]["A_weight"] == 0.075  # gabab
+
+    net_diesburg._instantiate_drives(
+        tstop=net_diesburg._params["tstop"], n_trials=net_diesburg._params["N_trials"]
+    )
+    network_builder = NetworkBuilder(net_diesburg)
+    gid = net_diesburg.gid_ranges["L5_pyramidal"][0]
+
+    section = network_builder._cells[gid]._nrn_sections["soma"]
+    for segment in list(section.allseg())[1:-1]:
+        # Values taken from `cells_default.py::pyramidal_PFC`
+        assert segment.__getattribute__("hh2").gnabar == 0.16
+        assert segment.__getattribute__("hh2").gkbar == 0.02
+
+
+def test_network_models_waller_pfcbeta():
+    """Test instantiation and custom parameters of the Waller PFCBeta model"""
+    net_waller = waller_pfcbeta_model()
+    net_waller.add_evoked_drive(
+        name="evdist1",
+        mu=5.0,
+        sigma=1.0,
+        numspikes=1,
+        location="distal",
+        weights_ampa={"L2_basket": 0.1, "L2_pyramidal": 0.1},
+    )
+    net_waller.add_evoked_drive(
+        name="evprox1",
+        mu=5.0,
+        sigma=1.0,
+        numspikes=1,
+        location="proximal",
+        weights_ampa={"L2_basket": 0.1, "L2_pyramidal": 0.1},
+    )
+
+    # We need to run a simulation to test that the network simulates correctly here. For
+    # all other models, they are simulated in `test_network_models_mesh`, but the Waller
+    # model has a hard dependency on using a mesh-shape of (10, 10), so it is not
+    # appropriate for that test.
+    _ = simulate_dipole(net_waller, tstop=20, dt=0.5)
+
+    # Check that custom connectivity is as expected
+    # L5_pyramidal -> L5_pyramidal nmda
+    net_waller.connectivity[0]["nc_dict"]["A_weight"] == 0.00005
+    net_waller.connectivity[2]["nc_dict"]["A_weight"] == 0.0001
+    # L2_basket -> L2_pyramidal gabab
+    net_waller.connectivity[5]["nc_dict"]["A_weight"] == 0.15
+    # L5_basket -> L5_pyramidal gabab
+    net_waller.connectivity[7]["nc_dict"]["A_weight"] == 0.15
+
+    for celltype in ["L2_pyramidal", "L5_pyramidal"]:
+        synapse = net_waller.cell_types[celltype]["cell_object"].synapses["gabab"]
+        # TODO AES: discuss
+        # # Taken from the network_models.py definition
+        # assert synapse["tau1"] == 45.0
+        # assert synapse["tau2"] == 200.0
+        assert synapse["mechname"] == "gabab_neymotin2016"
+
+
+def test_network_models_add_erp_drives_to_jones_model():
+    """Test add_erp_drives_to_jones_model."""
+    net_default = neymotin_2020_model()
+    with pytest.raises(TypeError, match="net must be"):
+        add_erp_drives_to_jones_model(net="invalid_input")
+    with pytest.raises(TypeError, match="tstart must be"):
+        add_erp_drives_to_jones_model(net=net_default, tstart="invalid_input")
+    n_conn = len(net_default.connectivity)
+    for cell_name in ["L5_pyramidal", "L2_pyramidal"]:
+        assert len(net_default.pos_dict[cell_name]) == 100
+    add_erp_drives_to_jones_model(net_default)
+    for drive_name in ["evdist1", "evprox1", "evprox2"]:
+        assert drive_name in net_default.external_drives.keys()
+    # 14 drive connections are added as follows: evdist1: 3 ampa + 3 nmda,
+    # evprox1: 4 ampa, evprox2: 4 ampa
+    assert len(net_default.connectivity) == n_conn + 14
 
 
 def test_model_variant_read_from_params():
@@ -577,7 +664,12 @@ def test_model_variant_matches_network():
 
 @pytest.mark.parametrize(
     "network_model",
-    [neymotin_2020_model, law_2021_model, calcium_model],
+    [
+        neymotin_2020_model,
+        law_2021_model,
+        calcium_model,
+        diesburg_2024_model,
+    ],
 )
 def test_network_models_cell_params(network_model):
     """Test that the network models check the cell types defined in params"""
@@ -1281,6 +1373,8 @@ def test_network_drives_legacy():
         _ = neymotin_2020_model(legacy_mode=True)
         _ = law_2021_model(legacy_mode=True)
         _ = calcium_model(legacy_mode=True)
+        _ = diesburg_2024_model(legacy_mode=True)
+        _ = waller_pfcbeta_model(legacy_mode=True)
         _ = Network(params, legacy_mode=True)
 
     net = neymotin_2020_model(params, legacy_mode=True, add_drives_from_params=True)
@@ -2284,14 +2378,27 @@ def test_network_mesh():
         net = Network(params, mesh_shape="abc")  # noqa: F841
 
 
+# waller_pfcbeta_model is excluded because it has a hard dependency on using a
+# mesh_shape of (10, 10).
 @pytest.mark.parametrize(
     "network_model",
-    [neymotin_2020_model, law_2021_model, calcium_model],
+    [
+        calcium_model,
+        diesburg_2024_model,
+        law_2021_model,
+        neymotin_2020_model,
+    ],
 )
-def test_network_models_mesh(network_model):
-    mesh_shape = (2, 3)
+@pytest.mark.parametrize(
+    "mesh_shape",
+    [
+        (2, 3),
+        (10, 10),
+    ],
+)
+def test_network_models_mesh(network_model, mesh_shape):
     net = network_model(mesh_shape=mesh_shape)
-    dp = simulate_dipole(net, tstop=20.0)
+    dp = simulate_dipole(net, tstop=20.0, dt=0.5)
     assert dp is not None
     assert len(dp[0].times) > 0
     assert np.all(np.isfinite(dp[0].data["agg"]))

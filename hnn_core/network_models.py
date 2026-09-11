@@ -16,9 +16,11 @@ from .cells_default import (
     pyramidal_ca,
     pyramidal_humanL5ET,
     pyramidal_humanL23,
+    pyramidal_PFC,
     human_gen_interneuron,
 )
 from .externals.mne import _validate_type
+from collections import OrderedDict
 
 # Default cell metadata for the standard Jones 2009 network cell types.
 # Defined here at module level so that other code (e.g. JSON
@@ -105,7 +107,7 @@ def _validate_params_for_model(
         models that share no parameters with the default model, and would
         otherwise silently fall back to default values.
     excluded_cells : list of str, default=[]
-        Short names of cells that are *not* part of this network, e.g.
+        Short names of Neymotin 2020 cells that are *not* part of this network, e.g.
         ('L2Basket', 'L5Basket') for a model in which basket cells are
         replaced. Parameters for these cells are rejected.
 
@@ -204,11 +206,10 @@ def neymotin_2020_model(
 
     References
     ----------
-    .. [1] Jones, Stephanie R., et al. "Quantitative Analysis and
-           Biophysically Realistic Neural Modeling of the MEG Mu Rhythm:
-           Rhythmogenesis and Modulation of Sensory-Evoked Responses."
-           Journal of Neurophysiology 102, 3554–3572 (2009).
-           https://doi.org/10.1152/jn.00535.2009
+    .. [1] Jones, Stephanie R., et al. "Quantitative Analysis and Biophysically
+           Realistic Neural Modeling of the MEG Mu Rhythm: Rhythmogenesis and Modulation
+           of Sensory-Evoked Responses." Journal of Neurophysiology 102, 3554–3572
+           (2009). https://doi.org/10.1152/jn.00535.2009
 
     .. [2] Neymotin, Samuel A, et al. 2020. "Human Neocortical Neurosolver (HNN), a New
            Software Tool for Interpreting the Cellular and Network Origin of Human
@@ -479,7 +480,7 @@ def law_2021_model(
 
     See Also
     --------
-    jones_2009_model
+    neymotin_2020_model
 
     Notes
     -----
@@ -498,6 +499,7 @@ def law_2021_model(
     .. [1] Law, Robert G., et al. "Thalamocortical Mechanisms Regulating the
            Relationship between Transient Beta Events and Human Tactile
            Perception." Cerebral Cortex, 32, 668–688 (2022).
+           https://doi.org/10.1093/cercor/bhab221
     """
 
     hnn_core_root = Path(hnn_core.__file__).parent
@@ -579,7 +581,7 @@ def calcium_model(
 
     See Also
     --------
-    jones_2009_model
+    neymotin_2020_model
 
     Notes
     -----
@@ -594,13 +596,14 @@ def calcium_model(
     .. [1] Kohl, Carmen, et al. "Neural Mechanisms Underlying Human Auditory
            Evoked Responses Revealed By Human Neocortical Neurosolver."
            Brain Topography, 35, 19–35 (2022).
+           https://doi.org/10.1007/s10548-021-00838-0
     """
     hnn_core_root = Path(hnn_core.__file__).parent
     if params is None:
         params_fname = hnn_core_root / "param" / "default.json"
         params = read_params(params_fname)
 
-    net = jones_2009_model(
+    net = neymotin_2020_model(
         params,
         add_drives_from_params,
         legacy_mode,
@@ -933,6 +936,231 @@ def duecker_ET_model(
     return net
 
 
+def diesburg_2024_model(
+    params=None, add_drives_from_params=False, legacy_mode=False, mesh_shape=(10, 10)
+):
+    """Instantiate the network model described in Diesburg et al., 2024 [1]_ .
+
+    This instantiates the expansion of the Jones et al. 2009 model [2]_ used to study
+    evoked potentials in the frontocentral cortex as described in Diesburg et al. 2024
+    [1]_ .
+
+    Parameters
+    ----------
+    params : str | dict | None
+        The path to the parameter file for constructing the network.
+        If None, parameters loaded from default.json
+        Default: None
+    add_drives_from_params : bool
+        If True, add drives as defined in the params-dict. NB this is mainly
+        for backward-compatibility with HNN GUI, and will be deprecated in a
+        future release. Default: False
+    legacy_mode : bool
+        Set to False by default. Enables matching HNN GUI output when drives
+        are added suitably. Will be deprecated in a future release.
+    mesh_shape : tuple of int (default: (10, 10))
+        Defines the (n_x, n_y) shape of the grid of pyramidal cells.
+
+    Returns
+    -------
+    net : Instance of Network object
+        Network object used to store the model used in Diesburg et al. 2024 [1]_ .
+
+    See Also
+    --------
+    neymotin_2020_model
+
+    Notes
+    -----
+    This model reproduces results from Diesburg et al. 2024 [1]_ . This model differs
+    from the model of ``neymotin_2020_model`` in several parameters including:
+    1) Increase L2_pyramidal -> L2_pyramidal ampa weight
+    2) Increase L2_pyramidal -> L2_pyramidal nmda weight
+    3) Increase L2_basket -> L2_pyramidal gabaa weight
+    4) Increase L2_basket -> L2_pyramidal gabab weight
+    5) Increase L2_pyramidal -> L5_pyramidal weight
+    6) Increase L5_pyramidal -> L5_pyramidal ampa weight
+    7) Increase L5_pyramidal -> L5_pyramidal nmda weight
+    8) Increase L5_basket -> L5_pyramidal gabab weight
+
+    References
+    ----------
+    .. [1] Diesburg, Darcy, et al. "Biophysical modeling of frontocentral ERP generation
+           links circuit-level mechanisms of action-stopping to a behavioral race
+           model." JNeuro (2024). https://doi.org/10.1523/JNEUROSCI.2016-23.2024
+
+    .. [2] Jones, Stephanie R., et al. "Quantitative Analysis and Biophysically
+           Realistic Neural Modeling of the MEG Mu Rhythm: Rhythmogenesis and Modulation
+           of Sensory-Evoked Responses." Journal of Neurophysiology 102, 3554–3572
+           (2009). https://doi.org/10.1152/jn.00535.2009
+    """
+    hnn_core_root = Path(hnn_core.__file__).parent
+    params_fname = hnn_core_root / "param" / "default.json"
+    if params is None:
+        params = read_params(params_fname)
+
+    net = neymotin_2020_model(
+        params,
+        add_drives_from_params,
+        legacy_mode,
+        mesh_shape=mesh_shape,
+    )
+    # Ensure model_variant and params' cell types match current model (same cell type
+    # names as 'neymotin_2020_model')
+    net._model_variant = _validate_params_for_model(net, params, "diesburg_2024_model")
+
+    # Replace L5 pyramidal cell template
+    cell_name = "L5_pyramidal"
+    pos = net.cell_types[cell_name]["cell_object"].pos
+    net.cell_types[cell_name]["cell_object"] = pyramidal_PFC(
+        cell_name=cell_name, pos=pos
+    )
+
+    # Modify L2_pyramidal -> L2_pyramidal excitation
+    net.connectivity[0]["nc_dict"]["A_weight"] = 0.00075  # nmda
+    net.connectivity[1]["nc_dict"]["A_weight"] = 0.00075  # ampa
+
+    # Modify L2_basket -> L2_pyramidal inhibition
+    net.connectivity[4]["nc_dict"]["A_weight"] = 0.1  # gabaa
+    net.connectivity[5]["nc_dict"]["A_weight"] = 0.1  # gabab
+
+    # Modify L2_pyramidal -> L5_pyramidal excitation
+    net.connectivity[8]["nc_dict"]["A_weight"] = 0.0005  # proximal
+    net.connectivity[9]["nc_dict"]["A_weight"] = 0.0005  # distal
+
+    # Modify L5_pyramidal -> L5_pyramidal excitation
+    net.connectivity[2]["nc_dict"]["A_weight"] = 0.00075  # nmda
+    net.connectivity[3]["nc_dict"]["A_weight"] = 0.00075  # ampa
+
+    # Modify L5_basket -> L5_pyramidal inhibition
+    net.connectivity[7]["nc_dict"]["A_weight"] = 0.075  # gabab
+
+    return net
+
+
+def waller_pfcbeta_model(
+    params=None,
+    legacy_mode=False,
+):
+    """Instantiate the network model used to study beta events in frontocentral cortex.
+
+    This instantiates an expansion of the model from Diesburg et al. 2024 [1]_ that
+    includes elements of the model in Law et al. 2022 [2]_ and Jones et al. 2009 [3]_ to
+    study the impact of beta events in frontocentral cortex.
+
+    Parameters
+    ----------
+    params : str | dict | None
+        The path to the parameter file for constructing the network.
+        If None, parameters loaded from default.json
+        Default: None
+    legacy_mode : bool
+        Set to False by default. Enables matching HNN GUI output when drives
+        are added suitably. Will be deprecated in a future release.
+
+    Returns
+    -------
+    net : Instance of Network object
+        Network object used to store the model used in this project.
+
+    See Also
+    --------
+    neymotin_2020_model
+    diesburg_2024_model
+    law_2021_model
+
+    Notes
+    -----
+    This model differs from ``diesburg_2024_model`` in the following ways:
+    1) Increased gabaB duration of inhibition by increasing tau1/2.
+    2) Decreased L5 pyr -> L5 pyr NMDA weights to prevent epileptic spiking activity.
+    3) Increased gabaB L2/L5 basket to LL2/5 pyr.
+    4) Remove L2_basket -> L5_pyramidal gabaa connection
+    5) Add L2 basket -> L5 Pyr tuft gabaB connection
+
+    References
+    ----------
+    .. [1] Diesburg, Darcy, et al. "Biophysical modeling of frontocentral ERP generation
+           links circuit-level mechanisms of action-stopping to a behavioral race
+           model." JNeuro (2024). https://doi.org/10.1523/JNEUROSCI.2016-23.2024
+
+    .. [2] Law, Robert G., et al. "Thalamocortical Mechanisms Regulating the
+           Relationship between Transient Beta Events and Human Tactile
+           Perception." Cerebral Cortex, 32, 668–688 (2022).
+           https://doi.org/10.1093/cercor/bhab221
+
+    .. [3] Jones, Stephanie R., et al. "Quantitative Analysis and Biophysically
+           Realistic Neural Modeling of the MEG Mu Rhythm: Rhythmogenesis and Modulation
+           of Sensory-Evoked Responses." Journal of Neurophysiology 102, 3554–3572
+           (2009). https://doi.org/10.1152/jn.00535.2009
+    """
+    hnn_core_root = Path(hnn_core.__file__).parent
+    params_fname = hnn_core_root / "param" / "default.json"
+    if params is None:
+        params = read_params(params_fname)
+
+    net = neymotin_2020_model(
+        params,
+        add_drives_from_params=False,
+        legacy_mode=legacy_mode,
+        mesh_shape=(10, 10),
+    )
+    _insert_gabab_population(net)
+
+    # Because this model adds a NEW celltype AFTER creating the neymotin_2020_model, we
+    # CANNOT validate the original "flat JSON" params file's entries against the
+    # expected cell types, for the purposes of validating the `Network._model_variant`
+    # attribute. In other words, this model is NOT compatible with "flat JSON" params
+    # file usage. We will hardcode the model variant name.
+    net._model_variant = "waller_pfcbeta_model"
+
+    net.add_connection(
+        "L2GABAb_basket",
+        "L5_pyramidal",
+        "distal",
+        "gabab",
+        weight=0.07,
+        delay=net.delay,
+        lamtha=50.0,
+    )
+
+    # Begin with PFC model changes following JNEURO paper
+    # Replace L5 pyramidal cell template with updated calcium
+    cell_name = "L5_pyramidal"
+    pos = net.cell_types[cell_name]["cell_object"].pos
+    net.cell_types[cell_name]["cell_object"] = pyramidal_PFC(
+        cell_name=cell_name, pos=pos
+    )
+
+    # LAW MODEL-following CHANGES start here
+    # Update biophysics (increase gabab duration of inhibition)
+    net.cell_types["L2_pyramidal"]["cell_object"].synapses["gabab"]["tau1"] = 45.0
+    net.cell_types["L2_pyramidal"]["cell_object"].synapses["gabab"]["tau2"] = 200.0
+    net.cell_types["L5_pyramidal"]["cell_object"].synapses["gabab"]["tau1"] = 45.0
+    net.cell_types["L5_pyramidal"]["cell_object"].synapses["gabab"]["tau2"] = 200.0
+
+    # Decrease L5_pyramidal -> L5_pyramidal nmda weight (both .0005 by default)
+    net.connectivity[0]["nc_dict"]["A_weight"] = 0.00005
+    net.connectivity[2]["nc_dict"]["A_weight"] = 0.0001
+
+    # Modify L5_basket -> L5_pyramidal inhibition, default .025
+    net.connectivity[7]["nc_dict"]["A_weight"] = 0.15  # gabab
+
+    # l2 basket -> l2 pyr is .05 by default
+    net.connectivity[5]["nc_dict"]["A_weight"] = 0.15  # gabab
+
+    # Remove L2_basket -> L5_pyramidal gabaa connection
+    del net.connectivity[10]  # Original paper simply sets gbar to 0.0
+
+    # Swap in the realistic GABAb synapses
+    for cell_entry in net.cell_types.values():
+        cell = cell_entry["cell_object"]
+        if "gabab" in cell.synapses:
+            cell.synapses["gabab"] = {"mechname": "gabab_neymotin2016"}
+
+    return net
+
+
 def add_erp_drives_to_jones_model(net, tstart=0.0):
     """Add drives necessary for an event related potential (ERP)
 
@@ -1018,3 +1246,65 @@ def add_erp_drives_to_jones_model(net, tstart=0.0):
         synaptic_delays=synaptic_delays_prox,
         event_seed=814,
     )
+
+
+def _insert_gabab_population(net, delta=35):
+    """Insert L2GABAb_basket as the 2nd cell type, shifting later gids by delta.
+
+    Reproduces the gid layout of the pre-0.5 fork:
+        L2_basket 0-34, L2GABAb_basket 35-69, L2_pyramidal 70-169,
+        L5_basket 170-204, L5_pyramidal 205-304.
+    Must be called before any drives are added.
+    """
+    if net.external_drives:
+        raise RuntimeError("call _insert_gabab_population before adding drives")
+
+    # 1. shift existing connectivity gids: everything at/after 35 moves +delta
+    def s(g):
+        return g + delta if g >= delta else g
+
+    for c in net.connectivity:
+        c["src_gids"] = {s(g) for g in c["src_gids"]}
+        c["target_gids"] = {s(g) for g in c["target_gids"]}
+        c["gid_pairs"] = {s(k): [s(g) for g in v] for k, v in c["gid_pairs"].items()}
+
+    # 2. build the new cell type
+    template = basket(cell_name="L2GABAb_basket")
+    entry = {
+        "cell_object": template,
+        "cell_metadata": {
+            "morpho_type": "basket",
+            "electro_type": "inhibitory",
+            "layer": "2",
+            "measure_dipole": False,
+            "reference": "segregated GABAb projection to L5 tufts",
+            "color": "y",
+            "marker": "x",
+        },
+    }
+    pos = list(net.pos_dict["L2_basket"])
+
+    # 3. reorder cell_types and pos_dict
+    order = ["L2_basket", "L2GABAb_basket", "L2_pyramidal", "L5_basket", "L5_pyramidal"]
+    origin = net.pos_dict.get("origin")
+
+    net.cell_types = {
+        k: (entry if k == "L2GABAb_basket" else net.cell_types[k]) for k in order
+    }
+    net.pos_dict = {
+        k: (pos if k == "L2GABAb_basket" else net.pos_dict[k]) for k in order
+    }
+    if origin is not None:
+        net.pos_dict["origin"] = origin
+
+    # 4. rebuild gid bookkeeping
+    net.gid_ranges = OrderedDict()
+    net._n_gids = 0
+    net._n_cells = 0
+    for name in order:
+        ll = net._n_gids
+        net._n_gids += len(net.pos_dict[name])
+        net.gid_ranges[name] = range(ll, net._n_gids)
+        net._n_cells += len(net.pos_dict[name])
+
+    return net
