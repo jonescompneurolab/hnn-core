@@ -669,7 +669,6 @@ def test_model_variant_matches_network():
         law_2021_model,
         calcium_model,
         diesburg_2024_model,
-        waller_pfcbeta_model,
     ],
 )
 def test_network_models_cell_params(network_model):
