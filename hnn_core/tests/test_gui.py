@@ -351,7 +351,7 @@ def test_gui_smart_gains_upload_connectivity(setup_gui):
     plt.close("all")
 
 
-def test_gui_upload_drives():
+def test_gui_upload_drives(tmp_path):
     """Test if gui handles uploaded drive parameters correctly"""
     gui = HNNGUI()
     _ = gui.compose()
@@ -378,12 +378,16 @@ def test_gui_upload_drives():
     assert len(gui.drive_widgets) == 1
     assert gui.drive_widgets[0]["type"] == "Poisson"
 
-    # tstop is currently set to the tstop widget because the Network configs
-    # do not currently save a universal tstop attribute. In this case
-    # the drive tstop gets set to the widget value if the drive stop is larger
-    # than the widget tstop. This may change in the future if tstop is saved to
-    # the network configs.
-    assert gui.drive_widgets[0]["tstop"].value == 170.0
+    # Loading a drive that outlasts the simulation extends the simulation before
+    # constructing the bounded drive widget, so the configured stop is preserved.
+    assert gui.widget_tstop.value == 250.0
+    assert gui.drive_widgets[0]["tstop"].value == 250.0
+
+    # Loading the same drive must not shorten an already-longer simulation.
+    gui.widget_tstop.value = 300.0
+    gui._simulate_upload_drives(file2_url)
+    assert gui.widget_tstop.value == 300.0
+    assert gui.drive_widgets[0]["tstop"].value == 250.0
 
     # Load connectivity and make sure drives did not change
     gui._simulate_upload_connectivity(file1_url)
@@ -406,7 +410,18 @@ def test_gui_upload_drives():
     assert gui.drive_widgets[5]["type"] == "Tonic"
     assert gui.drive_widgets[5]["amplitude"]["L2_pyramidal"].value == 1.0
     assert gui.drive_widgets[5]["amplitude"]["L5_basket"].value == 0.0
-    assert gui.drive_widgets[5]["tstop"].value == 170.0
+    assert gui.drive_widgets[5]["tstop"].value == 300.0
+
+    # Explicit tonic-bias stop times also extend the simulation duration.
+    with open(file3_url, "r") as file:
+        tonic_params = json.load(file)
+    tonic_params["external_biases"]["tonic"]["L2_pyramidal"]["tstop"] = 350.0
+    tonic_params_path = tmp_path / "tonic_tstop.json"
+    with open(tonic_params_path, "w") as file:
+        json.dump(tonic_params, file)
+    gui._simulate_upload_drives(tonic_params_path)
+    assert gui.widget_tstop.value == 350.0
+    assert gui.drive_widgets[5]["tstop"].value == 350.0
 
     plt.close("all")
 
