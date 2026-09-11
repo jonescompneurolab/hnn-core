@@ -481,7 +481,7 @@ def law_2021_model(
 
     See Also
     --------
-    jones_2009_model
+    neymotin_2020_model
 
     Notes
     -----
@@ -581,7 +581,7 @@ def calcium_model(
 
     See Also
     --------
-    jones_2009_model
+    neymotin_2020_model
 
     Notes
     -----
@@ -602,7 +602,7 @@ def calcium_model(
         params_fname = hnn_core_root / "param" / "default.json"
         params = read_params(params_fname)
 
-    net = jones_2009_model(
+    net = neymotin_2020_model(
         params,
         add_drives_from_params,
         legacy_mode,
@@ -950,7 +950,7 @@ def diesburg_2024_model(
 
     See Also
     --------
-    jones_2009_model
+    neymotin_2020_model
 
     Notes
     -----
@@ -978,7 +978,7 @@ def diesburg_2024_model(
     if params is None:
         params = read_params(params_fname)
 
-    net = jones_2009_model(
+    net = neymotin_2020_model(
         params,
         add_drives_from_params,
         legacy_mode,
@@ -1037,7 +1037,7 @@ def waller_pfcbeta_model(
 
     See Also
     --------
-    jones_2009_model
+    neymotin_2020_model
     diesburg_2024_model
     law_2021_model
 
@@ -1067,7 +1067,7 @@ def waller_pfcbeta_model(
     if params is None:
         params = read_params(params_fname)
 
-    net = jones_2009_model(
+    net = neymotin_2020_model(
         params, add_drives_from_params, legacy_mode, mesh_shape=mesh_shape
     )
     _insert_gabab_population(net)
