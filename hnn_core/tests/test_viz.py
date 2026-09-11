@@ -46,44 +46,6 @@ def setup_net():
     return net
 
 
-@pytest.fixture
-def run_simulation(setup_net):
-    net = setup_net
-    weights_ampa = {"L2_pyramidal": 5.4e-5, "L5_pyramidal": 5.4e-5}
-    syn_delays = {"L2_pyramidal": 0.1, "L5_pyramidal": 1.0}
-
-    net.add_bursty_drive(
-        "beta_prox",
-        tstart=0.0,
-        burst_rate=25,
-        burst_std=5,
-        numspikes=1,
-        spike_isi=0,
-        n_drive_cells=11,
-        location="proximal",
-        weights_ampa=weights_ampa,
-        synaptic_delays=syn_delays,
-        event_seed=14,
-    )
-
-    net.add_bursty_drive(
-        "beta_dist",
-        tstart=0.0,
-        burst_rate=25,
-        burst_std=5,
-        numspikes=1,
-        spike_isi=0,
-        n_drive_cells=11,
-        location="distal",
-        weights_ampa=weights_ampa,
-        synaptic_delays=syn_delays,
-        event_seed=14,
-    )
-
-    dpl = simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
-    return net, dpl
-
-
 def _fake_click(fig, ax, point, button=1):
     """Fake a click at a point within axes."""
     x, y = ax.transData.transform_point(point)
@@ -195,6 +157,43 @@ def test_network_visualization(setup_net):
 
 
 class TestDipoleViz:
+    @pytest.fixture
+    def run_simulation(setup_net):
+        net = setup_net
+        weights_ampa = {"L2_pyramidal": 5.4e-5, "L5_pyramidal": 5.4e-5}
+        syn_delays = {"L2_pyramidal": 0.1, "L5_pyramidal": 1.0}
+
+        net.add_bursty_drive(
+            "beta_prox",
+            tstart=0.0,
+            burst_rate=25,
+            burst_std=5,
+            numspikes=1,
+            spike_isi=0,
+            n_drive_cells=11,
+            location="proximal",
+            weights_ampa=weights_ampa,
+            synaptic_delays=syn_delays,
+            event_seed=14,
+        )
+
+        net.add_bursty_drive(
+            "beta_dist",
+            tstart=0.0,
+            burst_rate=25,
+            burst_std=5,
+            numspikes=1,
+            spike_isi=0,
+            n_drive_cells=11,
+            location="distal",
+            weights_ampa=weights_ampa,
+            synaptic_delays=syn_delays,
+            event_seed=14,
+        )
+
+        dpl = simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
+        return net, dpl
+
     def test_decimation_options(self, run_simulation):
         """Test basic dipole visualisations and decimation."""
         _, dpls = run_simulation
