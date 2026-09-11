@@ -194,26 +194,25 @@ def test_network_visualization(setup_net):
     plt.close("all")
 
 
-def test_dipole_viz_decimation_options(run_simulation):
-    """Test dipole visualisations."""
-    _, dpls = run_simulation
-    fig = dpls[0].plot()  # plot the first dipole alone
-    axes = fig.get_axes()[0]
-    dpls[0].copy().smooth(window_len=10).plot(ax=axes)  # add smoothed versions
-    dpls[0].copy().savgol_filter(h_freq=30).plot(ax=axes)  # on top
-
-    # test decimation options
-    plot_dipole(dpls[0], decim=2, show=False)
-    for dec in [-1, [2, 2.0]]:
-        with pytest.raises(
-            ValueError, match="each decimation factor must be a positive"
-        ):
-            plot_dipole(dpls[0], decim=dec, show=False)
-
-
 class TestDipoleViz:
+    def test_dipole_viz_decimation_options(self, run_simulation):
+        """Test basic dipole visualisations and decimation."""
+        _, dpls = run_simulation
+        fig = dpls[0].plot()  # plot the first dipole alone
+        axes = fig.get_axes()[0]
+        dpls[0].copy().smooth(window_len=10).plot(ax=axes)  # add smoothed versions
+        dpls[0].copy().savgol_filter(h_freq=30).plot(ax=axes)  # on top
+
+        # test decimation options
+        plot_dipole(dpls[0], decim=2, show=False)
+        for dec in [-1, [2, 2.0]]:
+            with pytest.raises(
+                ValueError, match="each decimation factor must be a positive"
+            ):
+                plot_dipole(dpls[0], decim=dec, show=False)
+
     def test_dipole_viz_dipole_mutiple_layers(self, run_simulation):
-        """Test plotting dipoles across multiple layers (L2, L5, agg) with matching axes."""
+        """Test plotting dipoles across multiple trials and layers (L2, L5, agg) with matching axes."""
         _, dpls = run_simulation
         # test plotting multiple dipoles as overlay
         plot_dipole(dpls, show=False)
