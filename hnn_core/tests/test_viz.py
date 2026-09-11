@@ -153,7 +153,6 @@ def test_network_visualization(setup_net):
     _fake_click(fig, ax_src, [pos[0], pos[1]])
     pos_in_plot = ax_target.collections[2].get_offsets().data[0]
     assert_allclose(pos[:2], pos_in_plot)
-    plt.close("all")
 
 
 class TestDipoleViz:
@@ -308,8 +307,6 @@ def test_drive_strength(setup_net):
 
     any_plot = any(ax.lines or ax.patches or ax.images for ax in figure.axes)
     assert any_plot  # At least one axis contains graphical elements
-
-    plt.close("all")
 
 
 class TestCellResponsePlotters:
@@ -801,8 +798,6 @@ class TestCellResponsePlotters:
         )
         _check_inverted_spike_axes(fig)
 
-        plt.close("all")
-
 
 def test_network_plotter_init(setup_net):
     """Test init keywords of NetworkPlotter class."""
@@ -829,7 +824,6 @@ def test_network_plotter_init(setup_net):
     assert net_plot.vsec_array.shape == (159, 1)
     assert net_plot.color_array.shape == (159, 1, 4)
     assert net_plot._vsec_recorded is False
-    plt.close("all")
 
 
 def test_network_plotter_simulation(setup_net):
@@ -864,7 +858,6 @@ def test_network_plotter_simulation(setup_net):
     assert net_plot.color_array.shape == (159, 21, 4)
     assert net_plot._vsec_recorded is True
     assert isinstance(net_plot._cbar, Colorbar)
-    plt.close("all")
 
 
 def test_network_plotter_setter(setup_net):
@@ -914,7 +907,6 @@ def test_network_plotter_setter(setup_net):
 
     with pytest.raises(RuntimeError, match="Network must be simulated"):
         net_plot.trial_idx = 1
-    plt.close("all")
 
 
 def test_network_plotter_export(tmp_path, setup_net):
@@ -931,5 +923,3 @@ def test_network_plotter_export(tmp_path, setup_net):
     net_plot.export_movie(path_out, dpi=200, decim=100, writer="pillow")
 
     assert path_out.is_file()
-
-    plt.close("all")
