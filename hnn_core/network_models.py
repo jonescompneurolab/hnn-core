@@ -107,7 +107,7 @@ def _validate_params_for_model(
         models that share no parameters with the default model, and would
         otherwise silently fall back to default values.
     excluded_cells : list of str, default=[]
-        Short names of cells that are *not* part of this network, e.g.
+        Short names of Neymotin 2020 cells that are *not* part of this network, e.g.
         ('L2Basket', 'L5Basket') for a model in which basket cells are
         replaced. Parameters for these cells are rejected.
 
@@ -984,6 +984,9 @@ def diesburg_2024_model(
         legacy_mode,
         mesh_shape=mesh_shape,
     )
+    # Ensure model_variant and params' cell types match current model (same cell type
+    # names as 'neymotin_2020_model')
+    net._model_variant = _validate_params_for_model(net, params, "diesburg_2024_model")
 
     # Replace L5 pyramidal cell template
     cell_name = "L5_pyramidal"
@@ -1068,6 +1071,13 @@ def waller_pfcbeta_model(
         params, add_drives_from_params, legacy_mode, mesh_shape=mesh_shape
     )
     _insert_gabab_population(net)
+
+    # Because this model adds a NEW celltype AFTER creating the neymotin_2020_model, we
+    # CANNOT validate the original "flat JSON" params file's entries against the
+    # expected cell types, for the purposes of validating the `Network._model_variant`
+    # attribute. In other words, this model is NOT compatible with "flat JSON" params
+    # file usage. We will hardcode the model variant name.
+    net._model_variant = "waller_pfcbeta_model"
 
     net.add_connection(
         "L2GABAb_basket",
