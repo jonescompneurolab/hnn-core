@@ -157,7 +157,7 @@ def test_network_visualization(setup_net):
 
 class TestDipoleViz:
     @pytest.fixture
-    def run_simulation(setup_net):
+    def run_simulation(self, setup_net):
         net = setup_net
         weights_ampa = {"L2_pyramidal": 5.4e-5, "L5_pyramidal": 5.4e-5}
         syn_delays = {"L2_pyramidal": 0.1, "L5_pyramidal": 1.0}
