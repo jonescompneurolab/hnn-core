@@ -6,6 +6,7 @@
 
 import json
 import numpy as np
+from copy import deepcopy
 
 from collections import OrderedDict
 from pathlib import Path
@@ -112,6 +113,8 @@ def _read_cell_types(cell_types_data):
         - "cell_object": Cell instance
         - "cell_metadata": dict of metadata (empty dict for legacy format)
     """
+    from .network_models import default_cell_metadata
+
     cell_types = dict()
     for cell_name in cell_types_data:
         # Determine format and extract cell_data and metadata accordingly
@@ -128,37 +131,13 @@ def _read_cell_types(cell_types_data):
             #   Treat the entire cell_data as the cell information
             cell_data = cell_types_data[cell_name]
             if cell_name == "L2_basket":
-                cell_metadata = {
-                    "morpho_type": "basket",
-                    "electro_type": "inhibitory",
-                    "layer": "2",
-                    "measure_dipole": False,
-                    "reference": "https://doi.org/10.7554/eLife.51214",
-                }
+                cell_metadata = deepcopy(default_cell_metadata["L2_basket"])
             elif cell_name == "L2_pyramidal":
-                cell_metadata = {
-                    "morpho_type": "pyramidal",
-                    "electro_type": "excitatory",
-                    "layer": "2",
-                    "measure_dipole": True,
-                    "reference": "https://doi.org/10.7554/eLife.51214",
-                }
+                cell_metadata = deepcopy(default_cell_metadata["L2_pyramidal"])
             elif cell_name == "L5_basket":
-                cell_metadata = {
-                    "morpho_type": "basket",
-                    "electro_type": "inhibitory",
-                    "layer": "5",
-                    "measure_dipole": False,
-                    "reference": "https://doi.org/10.7554/eLife.51214",
-                }
+                cell_metadata = deepcopy(default_cell_metadata["L5_basket"])
             elif cell_name == "L5_pyramidal":
-                cell_metadata = {
-                    "morpho_type": "pyramidal",
-                    "electro_type": "excitatory",
-                    "layer": "5",
-                    "measure_dipole": True,
-                    "reference": "https://doi.org/10.7554/eLife.51214",
-                }
+                cell_metadata = deepcopy(default_cell_metadata["L5_pyramidal"])
 
         # Now cell_data contains the cell properties regardless of format
         sections = dict()
@@ -219,6 +198,7 @@ def _read_cell_response(cell_response_data, read_output):
         return None
     cell_response = CellResponse(
         cell_type_names=cell_response_data["cell_type_names"],
+        cell_type_metadata=cell_response_data.get("cell_type_metadata", None),
         spike_times=cell_response_data["spike_times"],
         spike_gids=cell_response_data["spike_gids"],
         spike_types=cell_response_data["spike_types"],
@@ -401,6 +381,7 @@ def network_to_dict(net, write_output=False):
 
     net_data = {
         "object_type": "Network",
+        "model_variant": net._model_variant,
         "legacy_mode": net._legacy_mode,
         "N_pyr_x": net._N_pyr_x,
         "N_pyr_y": net._N_pyr_y,
@@ -525,7 +506,7 @@ def dict_to_network(net_data, read_drives=True, read_external_biases=True):
     params = dict()
     params["celsius"] = net_data["celsius"]
     params["threshold"] = net_data["threshold"]
-
+    params["model_variant"] = net_data.get("model_variant", None)
     mesh_shape = (net_data["N_pyr_x"], net_data["N_pyr_y"])
 
     # Instantiating network
@@ -600,6 +581,36 @@ def read_network_configuration(fname, read_drives=True, read_external_biases=Tru
             "The file contains object of "
             "type %s" % (net_data.get("object_type"))
         )
+
+    # ensure the cell types match the model variant
+    check_var = net_data.get("model_variant", None)
+    if check_var is not None and "duecker_ET_model".startswith(check_var):
+        missing_cells = [
+            cell_name
+            for cell_name in [
+                "L2_pyramidal",
+                "L5_pyramidal",
+                "L2_inhibitory",
+                "L5_inhibitory",
+            ]
+            if cell_name not in net_data["cell_types"]
+        ]
+        if missing_cells:
+            hint = ""
+            if all(
+                cell_name in net_data["cell_types"]
+                for cell_name in ["L2_basket", "L5_basket"]
+            ):
+                hint = (
+                    " The network has basket cells instead, so you are likely"
+                    " trying to create a duecker_ET_model with"
+                    " neymotin_2020_model cell types."
+                )
+            raise ValueError(
+                f"The cell types of the network do not match "
+                f"model_variant duecker_ET_model: no "
+                f"{', '.join(missing_cells)} found.{hint}"
+            )
 
     net = dict_to_network(net_data, read_drives, read_external_biases)
     _check_global_synaptic_gains_uniformity(net)

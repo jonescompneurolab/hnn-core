@@ -361,18 +361,20 @@ class Network:
     mesh_shape : tuple of int (default: (10, 10))
         Defines the (n_x, n_y) shape of the grid of pyramidal cells.
     pos_dict : dict of list of tuple (x, y, z), optional
-        Dictionary containing the coordinate positions of all cells.
-        Keys are 'L2_pyramidal', 'L5_pyramidal', 'L2_basket', 'L5_basket',
-        or any external drive name.
+        Dictionary containing the coordinate positions of all cells. Keys are
+        'L2_pyramidal', 'L5_pyramidal', 'L2_basket', 'L5_basket', or any external drive
+        name. If you specify "pos_dict", you MUST also specify your own "cell_types"
+        argument (see below).
     cell_types : dict of dict of (Cell | dict), optional
         Dictionary containing names of real cell types in the network (e.g. 'L2_basket')
-        as keys and child-dictionaries describing the cell type. The child-dictionary
-        contains two keys: "cell_object" and "cell_metadata". The value of "cell_object"
-        is the corresponding Cell instance of the cell type being described, and this
-        instance is used as a template for the other cells of its type in the
-        population. The value of "cell_metadata" is a dictionary containing several
-        key-values pairs that describe different aspects of the cell type, described
-        below:
+        as keys and child-dictionaries describing the cell type. If you specify
+        "cell_types", you MUST also specify your own "pos_dict" argument (see
+        above). The child-dictionary contains two keys: "cell_object" and
+        "cell_metadata". The value of "cell_object" is the corresponding Cell instance
+        of the cell type being described, and this instance is used as a template for
+        the other cells of its type in the population. The value of "cell_metadata" is a
+        dictionary containing several key-values pairs that describe different aspects
+        of the cell type, described below:
             - "morpho_type" : either "basket" or "pyramidal"
             - "electro_type" : either "inhibitory" or "excitatory"
             - "layer" : either "2" or "5"
@@ -448,6 +450,7 @@ class Network:
         # Save the parameters used to create the Network
         _validate_type(params, dict, "params")
         self._params = params
+        self._model_variant = params.get("model_variant", None)
         # Initialise a dictionary of cell ID's, which get used when the
         # network is constructed ('built') in NetworkBuilder
         # We want it to remain in each Network object, so that the user can
@@ -468,7 +471,7 @@ class Network:
                 "Legacy mode is used solely to maintain compatibility with"
                 ".param files of the old HNN GUI. This feature will be "
                 "deprecrated in future releases.",
-                DeprecationWarning,
+                FutureWarning,
                 stacklevel=1,
             )
 
@@ -484,6 +487,10 @@ class Network:
 
         # extracellular recordings (if applicable)
         self.rec_arrays = dict()
+
+        # simulation-time params
+        self._tstop = None
+        self._dt = None
 
         # contents of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
@@ -504,22 +511,139 @@ class Network:
         self._N_pyr_x = mesh_shape[0]
         self._N_pyr_y = mesh_shape[1]
 
-        self._inplane_distance = 1.0  # XXX hard-coded default
-        self._layer_separation = 1307.4  # XXX hard-coded default
-
         # Handle positions and cell types
-        if pos_dict is not None and cell_types is not None:
-            # Use provided positions and cell types
+        # ------------------------------------------------------------------------------
+        if cell_types is not None or pos_dict is not None:
+            # Input validation
+            # --------------------------------------------------------------------------
+            # If a user is specifying their own cell_types, they must also specify
+            # pos_dict:
+            if pos_dict is None:
+                raise ValueError(
+                    "If custom 'cell_types' are provided to Network, you must "
+                    "also provide a custom 'pos_dict'."
+                )
+            # Vice versa:
+            elif cell_types is None:
+                raise ValueError(
+                    "If a custom 'pos_dict' is provided to Network, you must "
+                    "also provide custom 'cell_types'."
+                )
+            # Test that the keys of pos_dict and cell_types are well-formed:
+            pos_dict_keys = set(pos_dict.keys())
+            if "origin" not in pos_dict_keys:
+                raise ValueError("Origin must be defined for your custom 'pos_dict'")
+            pos_dict_keys.remove("origin")
+            cell_type_keys = set(cell_types.keys())
+            if not (cell_type_keys <= pos_dict_keys):
+                raise ValueError(
+                    "All keys of 'pos_dict' must be present in 'cell_types'. "
+                    f"'pos_dict' keys: {pos_dict_keys}, 'cell_types' keys: {cell_type_keys}"
+                )
+            for ct in cell_types.keys():
+                if "zdist_origin" not in cell_types[ct]["cell_metadata"].keys():
+                    raise ValueError(
+                        "zdist_origin must be defined for each cell type in "
+                        "your custom 'cell_types' metadata"
+                    )
             _validate_type(pos_dict, dict, "pos_dict")
             _validate_type(cell_types, dict, "cell_types")
+
+            # Use provided positions and cell types
+            # --------------------------------------------------------------------------
             self.pos_dict = deepcopy(pos_dict)
 
             # Add cell types from provided dictionary
             for cell_name, cell_template in cell_types.items():
-                if cell_name in self.pos_dict:
-                    self._add_cell_type(
-                        cell_name, self.pos_dict[cell_name], cell_template=cell_template
+                self._add_cell_type(
+                    cell_name,
+                    self.pos_dict[cell_name],
+                    cell_template=cell_template,
+                )
+
+            # Since we're in the initializer, we must calculate our inplane distance
+            # strictly from the custom pos_dict:
+            inlay_dist = []
+            for cell_type in self.cell_types.keys():
+                # For this cell type, this does the following:
+                # 1. Grab all the unique, sorted x-coordinates of the cell type.
+                # 2. Grab all the distances between each unique, sorted x-coordinate of
+                #     the cell type.
+                # 3. Grab all the unique, sorted y-coordinates of the cell type.
+                # 4. Grab all the distances between each unique, sorted y-coordinate of
+                #    the cell type.
+                # 5. Check that there is at least one distance in the x and y
+                #     directions. If not, warn the user, and override the in-plane
+                #     distance for that dimension to be 1.0, in order to prevent NaNs.
+                # 6. Concatenate the provided distances into a single array, and take
+                #     the mean. This gets you an "average in-plane distance" for this
+                #     cell type in the X and Y (but not Z!) directions.
+                x_diffs = np.diff(np.unique(np.array(self.pos_dict[cell_type])[:, 0]))
+                y_diffs = np.diff(np.unique(np.array(self.pos_dict[cell_type])[:, 1]))
+
+                for dim_diffs, dimension in [(x_diffs, "X"), (y_diffs, "Y")]:
+                    if len(dim_diffs) == 0:
+                        warnings.warn(
+                            f"Zero distance between cells of type '{cell_type}' "
+                            f"in the {dimension} dimension in the provided 'pos_dict'. "
+                            "\n"
+                            "This can happen if: "
+                            "\n"
+                            "- you are simulating a network with only a single cell of "
+                            "this cell type, e.g. using `mesh_shape=(1, 1)`."
+                            "\n"
+                            f"- the positions of '{cell_type}' in your 'pos_dict' "
+                            f"are all the same in the {dimension} dimension. "
+                            "\n"
+                            "If this is not intentional, check your 'pos_dict'!"
+                        )
+                        # Note for developers: In the warned cases above, it should be
+                        # safe to override the problematic dimension's in-plane distance
+                        # to 1.0. This allows the problematic dimension to still use its
+                        # full lamtha value when it is used in
+                        #
+                        # Cell.parconnect_from_src ->
+                        # cell.py::_get_gaussian_connection ->
+                        # cell.py::_calculate_gaussian
+                        #
+                        # instead of hitting a divide-by-NaN error. Additionally, if the
+                        # OTHER dimension has valid in-plane distances (such as cells in
+                        # a line), then those will still be taken into account when
+                        # ultimately calculating the `self._inplane_distance` below.
+                        if dimension == "X":
+                            x_diffs = np.array([1.0])
+                        elif dimension == "Y":
+                            y_diffs = np.array([1.0])
+
+                current_dist = np.mean(np.concatenate((x_diffs, y_diffs)))
+                inlay_dist.append(current_dist)
+
+            self._inplane_distance = np.min(np.array(inlay_dist))
+
+            # Since we're in the initializer, we must also calculate our layer separation
+            # strictly from the custom pos_dict:
+            for cell_type in self.cell_types:
+                if self.cell_types[cell_type]["cell_metadata"]["zdist_origin"] == 1:
+                    # Define "layer separation" using the mean z-coordinate (the third
+                    # element of the pos_dict tuples) of the celltype that has
+                    # `zdist_origin == 1` in its metadata (typically the layer
+                    # 2/3 pyramidal cell type). This is meant to identify the distance
+                    # between the somas of pyramidal cells in layer 2/3 versus those in
+                    # layer 5.
+                    #
+                    self._layer_separation = np.mean(
+                        np.array(self.pos_dict[cell_type])[:, 2]
                     )
+
+            # Make a backup copies of all the position information, in case the user
+            # wants to reset everything to original cell positions
+            self._original_pos_dict = deepcopy(self.pos_dict)
+            self._original_inplane_distance = deepcopy(self._inplane_distance)
+            self._original_layer_separation = deepcopy(self._layer_separation)
+
+            # Since we're in the initializer, we do not need to reposition any drives
+            # after creating the above.
+
         else:
             # Default behavior - create standard network
             from .network_models import default_cell_metadata
@@ -543,10 +667,32 @@ class Network:
                 },
             }
 
-            self.set_cell_positions(
+            self._inplane_distance = 1.0  # XXX hard-coded default
+            self._layer_separation = 1307.4  # XXX hard-coded default
+
+            # Set the relative positions of cells (pos_dict) assuming default cell
+            # types. This arranges them in a square grid.
+            layer_dict = _create_cell_coords(
+                n_pyr_x=self._N_pyr_x,
+                n_pyr_y=self._N_pyr_y,
+                z_coord=self._layer_separation,
                 inplane_distance=self._inplane_distance,
-                layer_separation=self._layer_separation,
             )
+
+            # Map layers to cell types, for default mapping
+            self.pos_dict = {
+                "L5_pyramidal": layer_dict["L5_bottom"],
+                "L2_pyramidal": layer_dict["L2_bottom"],
+                "L5_basket": layer_dict["L5_mid"],
+                "L2_basket": layer_dict["L2_mid"],
+                "origin": layer_dict["origin"],
+            }
+
+            # Make a backup copies of all the position information, in case the user
+            # wants to reset everything to original cell positions
+            self._original_pos_dict = deepcopy(self.pos_dict)
+            self._original_inplane_distance = deepcopy(self._inplane_distance)
+            self._original_layer_separation = deepcopy(self._layer_separation)
 
             # populates self.gid_ranges for the 1st time: order matters for
             # NetworkBuilder!
@@ -557,11 +703,9 @@ class Network:
                     cell_template=cell_template,
                 )
 
+        # Must happen after cell types are added
         if add_drives_from_params:
             _add_drives_from_params(self)
-
-        self._tstop = None
-        self._dt = None
 
     def __repr__(self):
         class_name = self.__class__.__name__
@@ -601,22 +745,59 @@ class Network:
 
         return True
 
-    def set_cell_positions(self, *, inplane_distance=None, layer_separation=None):
-        """Set relative positions of cells arranged in a square grid
+    def _reset_to_original_cell_positions(self):
+        """Reset the relative positions of cells to their original positions.
 
-        Note that it is possible to change only a subset of the parameters
-        (the default value of each is None, which implies no change).
+        This resets ``Network.pos_dict``, ``Network._inplane_distance``, and
+        ``Network._layer_separation`` to their original values, which were set when the
+        Network was first created. This includes whether the original positions were
+        using the ``Network`` defaults, or if a user passed their own ``pos_dict`` and
+        ``cell_types`` to the constructor and are using the calculated in-plane distance
+        and layer separation from that custom ``pos_dict``.
+
+        This can be used to reset your cell positions to a known-good state after
+        calling ``Network.update_cell_positions``.
+        """
+        self.pos_dict = deepcopy(self._original_pos_dict)
+        self._inplane_distance = deepcopy(self._original_inplane_distance)
+        self._layer_separation = deepcopy(self._original_layer_separation)
+
+        # update drives to be positioned at network origin
+        for drive_name, drive in self.external_drives.items():
+            pos = [self.pos_dict["origin"]] * drive["n_drive_cells"]
+            self.pos_dict[drive_name] = pos
+
+    def update_cell_positions(
+        self,
+        inplane_distance=None,
+        layer_separation=None,
+    ):
+        """Change relative positions of cells arranged in a square grid.
+
+        Note that it is possible to change one of the parameters without changing the
+        other. You must pass at least one argument.
 
         Parameters
         ----------
-        inplane_distance : float
+        inplane_distance : float, optional
             The in plane-distance (in um) between pyramidal cell somas in the
             square grid. Note that this parameter does not affect the amplitude
             of the dipole moment.
-        layer_separation : float
+        layer_separation : float, optional
             The separation of pyramidal cell soma layers 2/3 and 5. Note that
             this parameter does not affect the amplitude of the dipole moment.
         """
+        # Input validation
+        # ------------------------------------------------------------------------------
+        if inplane_distance is None and layer_separation is None:
+            raise ValueError(
+                "At least one of inplane_distance or layer_separation must be provided."
+            )
+        if np.isnan(self._inplane_distance) or np.isclose(self._inplane_distance, 0.0):
+            raise ValueError(
+                "Cannot reset cell positions because the current in-plane distance "
+                "is NaN or zero. Something has gone wrong at Network creation time."
+            )
         if inplane_distance is None:
             inplane_distance = self._inplane_distance
         _validate_type(inplane_distance, (float, int), "inplane_distance")
@@ -624,7 +805,6 @@ class Network:
             raise ValueError(
                 f"In-plane distance must be positive, got: {inplane_distance}"
             )
-
         if layer_separation is None:
             layer_separation = self._layer_separation
         _validate_type(layer_separation, (float, int), "layer_separation")
@@ -633,30 +813,87 @@ class Network:
                 f"Layer separation must be positive, got: {layer_separation}"
             )
 
-        # Get layer positions using layer dict
-        layer_dict = _create_cell_coords(
-            n_pyr_x=self._N_pyr_x,
-            n_pyr_y=self._N_pyr_y,
-            z_coord=layer_separation,
-            inplane_distance=inplane_distance,
+        # pos_dict shifting
+        # ------------------------------------------------------------------------------
+        # There should always be an existing pos_dict by the point in time when this
+        # function is called, since it can only be called after the Network is
+        # initialized.
+        xy_scaling = inplane_distance / self._inplane_distance
+        for cell_type in self.cell_types:
+            new_zdist = (
+                self.cell_types[cell_type]["cell_metadata"]["zdist_origin"]
+                * layer_separation
+            )
+            # Update the positions of the cells in pos_dict:
+            # - X and Y coordinates are scaled by the ratio of the new in-plane distance
+            #     to the old one, so that their final location is consistent with the
+            #     new in-plane distance.
+            # - Z coordinates: Because `zdist_origin` is already normalized to [0, 1],
+            #     the Z-coordinate is simply multiplied by the new layer separation
+            #     distance.
+            self.pos_dict[cell_type] = [
+                (
+                    pos[0] * xy_scaling,
+                    pos[1] * xy_scaling,
+                    new_zdist,
+                )
+                for pos in self.pos_dict[cell_type]
+            ]
+
+        # Update the position of the origin in pos_dict:
+        # - X and Y coordinates are scaled similarly to the celltypes above, via the
+        #     ratio of the new in-plane distance to the old one.
+        # - The Z coordinate is unchanged since it already defines the '0' value for
+        #     `zdist_origin` metadata of cell types.
+        origin = self.pos_dict["origin"]
+        self.pos_dict["origin"] = (
+            origin[0] * xy_scaling,
+            origin[1] * xy_scaling,
+            origin[2],
         )
 
-        # Map layers to cell types, for default mapping
-        self.pos_dict = {
-            "L5_pyramidal": layer_dict["L5_bottom"],
-            "L2_pyramidal": layer_dict["L2_bottom"],
-            "L5_basket": layer_dict["L5_mid"],
-            "L2_basket": layer_dict["L2_mid"],
-            "origin": layer_dict["origin"],
-        }
-
-        # update drives to be positioned at network origin
-        for drive_name, drive in self.external_drives.items():
-            pos = [self.pos_dict["origin"]] * drive["n_drive_cells"]
-            self.pos_dict[drive_name] = pos
+        # Update the position of the drives in pos_dict:
+        # - Drives are always positioned at the origin of the network (see
+        # https://github.com/jonescompneurolab/hnn-core/blob/5ca983a3dd53b6e749c377b24bcba64773debbd3/hnn_core/network.py#L1396
+        # so we simply reset their positions to the new origin of the network.
+        for drive_name in self.external_drives:
+            self.pos_dict[drive_name] = [self.pos_dict["origin"]] * len(
+                self.pos_dict[drive_name]
+            )
 
         self._inplane_distance = inplane_distance
         self._layer_separation = layer_separation
+
+    def set_cell_positions(
+        self,
+        inplane_distance=None,
+        layer_separation=None,
+    ):
+        """Reset relative positions of cells arranged in a square grid (Deprecated)
+
+        This function is deprecated in favor of `Network.update_cell_positions`. Note
+        that it is possible to change one of the parameters without changing the other.
+
+        Parameters
+        ----------
+        inplane_distance : float, optional
+            The in plane-distance (in um) between pyramidal cell somas in the
+            square grid. Note that this parameter does not affect the amplitude
+            of the dipole moment.
+        layer_separation : float, optional
+            The separation of pyramidal cell soma layers 2/3 and 5. Note that
+            this parameter does not affect the amplitude of the dipole moment.
+        """
+        warnings.warn(
+            "`Network.set_cell_positions` will be deprecated in favor of "
+            "`Network.update_cell_positions` in future releases.",
+            FutureWarning,
+            stacklevel=1,
+        )
+        self.update_cell_positions(
+            inplane_distance=inplane_distance,
+            layer_separation=layer_separation,
+        )
 
     def copy(self):
         """Return a copy of the Network instance
@@ -1111,7 +1348,7 @@ class Network:
         synaptic_delays=0.1,
         space_constant=3.0,
         probability=1.0,
-        conn_seed=None,
+        conn_seed=3,
     ):
         """Add an external drive from explicitly defined spike trains.
 
@@ -1483,11 +1720,11 @@ class Network:
         need to be recalculated, all the GIDs etc remain the same.
         """
         self._reset_drives()
-
         # each trial needs unique event time vectors
         for trial_idx in range(n_trials):
             for drive in self.external_drives.values():
                 event_times = list()  # new list for each trial and drive
+
                 for drive_cell_gid in self.gid_ranges[drive["name"]]:
                     drive_cell_gid_offset = (
                         drive_cell_gid - self.gid_ranges[drive["name"]][0]
@@ -1503,6 +1740,7 @@ class Network:
                                 for conn_idx in conn_idxs
                             ]
                         )
+
                         for target_type in target_types:
                             event_times.append(
                                 _drive_cell_event_times(
@@ -1531,86 +1769,520 @@ class Network:
                 # 'events': nested list (n_trials x n_drive_cells x n_events)
                 self.external_drives[drive["name"]]["events"].append(event_times)
 
-    def add_tonic_bias(
+    def _validate_tonic_bias_args(
         self,
-        *,
-        cell_type=None,
-        section="soma",
-        bias_name="tonic",
         amplitude,
-        t0=0,
-        tstop=None,
+        bias_name,
+        gid,
+        section,
+        t0,
+        tstop,
+        cell_type,
     ):
-        """Attaches parameters of tonic bias input for given cell types
+        """Validate the arguments for ``Network.add_tonic_bias``.
+
+        This has the same function signature as ``Network.add_tonic_bias``, except that
+        all arguments are required (therefore inheriting from any defaults).
+        """
+
+        def _check_cell_types_validity(input_cell_types):
+            """Helper function to validate cell types against the network, section, and bias_name.
+
+            Note: this is not used for validating individual GIDs, but instead only the
+            cell types themselves (and non-GID entities that depend on the cell type).
+            """
+            for input_type in input_cell_types:
+                # Validate that the cell type is known to the network
+                if input_type not in self.cell_types:
+                    raise ValueError(
+                        f"Provided cell type must be one of "
+                        f"{list(self.cell_types.keys())}. "
+                        f"Got '{input_type}'."
+                    )
+                # Validate that the bias name is not already defined for this cell type
+                if bias_name in self.external_biases.keys():
+                    if input_type in self.external_biases[bias_name]:
+                        raise ValueError(
+                            f"Bias named {bias_name} already defined for {input_type}"
+                        )
+                # Validate that the input section is valid for this cell type
+                valid_sections = list(
+                    self.cell_types[input_type]["cell_object"].sections.keys()
+                )
+                if section not in valid_sections:
+                    raise ValueError(
+                        f"For cell type '{input_type}', section '{section}' does not "
+                        f"exist. Section must be one of {valid_sections}."
+                    )
+
+        def _check_gids_matching(gids_to_check, amplitude, input_cell_type=None):
+            """Helper function to validate that provided GIDs match provided celltypes."""
+            for _gid in gids_to_check:
+                _gid_type = self.gid_to_type(_gid)
+                if _gid_type is None:
+                    # Note: this checks BOTH for if _gid simply out of bounds OR its
+                    # cell_type is invalid
+                    raise ValueError(
+                        f"Invalid gid '{_gid}', not found in Network.gid_ranges: "
+                        f"'{self.gid_ranges}'."
+                    )
+                elif (
+                    isinstance(amplitude, dict)
+                    and _gid_type not in amplitude.keys()
+                    and input_cell_type is None
+                ):
+                    raise ValueError(
+                        f"GID '{_gid}' is of cell type '{_gid_type}', but this cell "
+                        "type is not present in the 'amplitude' dictionary."
+                    )
+                elif input_cell_type is not None and _gid_type != input_cell_type:
+                    raise ValueError(
+                        f"GID '{_gid}' belongs to cell type '{_gid_type}' instead of "
+                        "the argument-provided cell type for this gid: "
+                        f"'{input_cell_type}'."
+                    )
+
+        # Validate the argument logic, across ALL "amplitude-cell_type-gid" variants
+        # ------------------------------------------------------------------------------
+        _validate_type(amplitude, (int, float, dict), "amplitude")
+        if cell_type is not None:
+            # Deprecated functionality: single "cell_type" and single "amplitude".
+            #
+            # Argument variant:
+            # - cell_type : anything
+            # - amplitude: int | float
+            # - gid: NOT SUPPORTED! Supporting both gid and the deprecated cell_type
+            #   will increase the complexity of the validation we need to do even
+            #   further!
+            warnings.warn(
+                "cell_type argument will be deprecated and removed in future releases. "
+                "Instead, see the documentation for arguments 'amplitude' and 'gid' "
+                "as a replacement.",
+                FutureWarning,
+                stacklevel=1,
+            )
+            if gid is not None:
+                raise ValueError(
+                    "When using the deprecated 'cell_type' argument, the 'gid' "
+                    "argument is not supported. Please use the 'amplitude' and 'gid' "
+                    "arguments instead."
+                )
+            _validate_type(amplitude, (float, int), "amplitude")
+            _check_cell_types_validity([cell_type])
+
+        else:
+            # Argument variants: For everything in this else block, 'cell_type' is not
+            # supported, and 'amplitude' can be a dict, int, or float. This else block
+            # will go through all type variants of 'gid', including int, list, and dict,
+            # and if 'gid' is a dict, whether the values are of type int, list, or str.
+            if gid is None and isinstance(amplitude, (int, float)):
+                raise ValueError(
+                    "When `amplitude` is an int or float, `gid` must be specified so "
+                    "the cell type(s) of the targeted cells can be inferred. "
+                    "To apply a bias to all cells of a type, pass `amplitude` "
+                    "as a dictionary similar to `{<cell_type>: <amplitude>}` instead."
+                )
+
+            if gid is not None:
+                _validate_type(gid, (int, list, dict), "gid")
+
+            if isinstance(amplitude, dict):
+                _check_cell_types_validity(list(amplitude.keys()))
+
+            if isinstance(gid, int):
+                # Checks for when gid is an int
+                # ----------------------------------------------------------------------
+                _check_cell_types_validity([self.gid_to_type(gid)])
+                _check_gids_matching([gid], amplitude)
+                if isinstance(amplitude, dict):
+                    if len(amplitude.keys()) > 1:
+                        raise ValueError(
+                            "When `amplitude` is a dictionary and `gid` is an int, "
+                            "the dictionary must contain only one key-value pair. "
+                            f"Got {len(amplitude.keys())} keys."
+                        )
+
+            elif isinstance(gid, list):
+                # Checks for when gid is a list
+                # ----------------------------------------------------------------------
+                _check_cell_types_validity(
+                    list(set([self.gid_to_type(_gid) for _gid in gid]))
+                )
+                _check_gids_matching(gid, amplitude)
+
+                if len(gid) == 0:
+                    raise ValueError(
+                        "The provided 'gid' argument is empty, therefore no "
+                        "biases can be defined."
+                    )
+                elif isinstance(amplitude, dict):
+                    gid_detected_cell_types = set(
+                        [self.gid_to_type(_gid) for _gid in gid]
+                    )
+                    amplitude_cell_types = set(amplitude.keys())
+                    if amplitude_cell_types > gid_detected_cell_types:
+                        raise ValueError(
+                            "The 'amplitude' dictionary contains cell types that are "
+                            "not present in the provided 'gid' argument. "
+                            f"Amplitude cell types: {amplitude_cell_types}, "
+                            f"GID cell types: {gid_detected_cell_types}."
+                            "If you want to add a tonic bias to all cells of one type, "
+                            "define 'gid' as a dictionary like {'<cell_type>': 'all'}."
+                        )
+
+            elif isinstance(gid, dict):
+                # Checks for when gid is a dict
+                # ----------------------------------------------------------------------
+                _check_cell_types_validity(gid.keys())
+                if isinstance(amplitude, dict):
+                    if set(amplitude.keys()) != set(gid.keys()):
+                        raise ValueError(
+                            "When `amplitude` is a dictionary and `gid` is a "
+                            "dictionary, the keys of both dictionaries must match. "
+                            f"Got amplitude keys {list(amplitude.keys())} and "
+                            f"gid keys {list(gid.keys())}."
+                        )
+
+                for input_cell_type, gid_value in gid.items():
+                    _validate_type(gid_value, (int, list, str), "gid.values()")
+
+                    if isinstance(gid_value, int):
+                        _check_gids_matching([gid_value], amplitude, input_cell_type)
+
+                    elif isinstance(gid_value, list):
+                        _check_gids_matching(gid_value, amplitude, input_cell_type)
+
+                        if len(gid_value) == 0:
+                            raise ValueError(
+                                f"The provided 'gid' argument for cell type "
+                                f"'{input_cell_type}' is empty, therefore no biases "
+                                "can be defined. Please check your 'gid' argument."
+                            )
+
+                    elif isinstance(gid_value, str):
+                        # Whether GIDs match their celltype does not need to be
+                        # performed in this case.
+                        if gid_value != "all":
+                            raise ValueError(
+                                "When specifying a cell type's gid value as a string, "
+                                "the only valid option is 'all'. "
+                            )
+
+        # Validate the time arguments:
+        # This is done AFTER all the above checks so that the `cell_type` argument
+        # deprecation warning is always raised first.
+        if tstop is not None:
+            if tstop < 0.0:
+                raise ValueError("End time of tonic input cannot be negative")
+            elif (tstop - t0) < 0.0:
+                raise ValueError("Duration of tonic input cannot be negative")
+
+    def _resolve_bias_amplitudes_to_cell_types(self, amplitude, cell_type, gid):
+        """Resolve the ``amplitude`` argument of a tonic bias into a per-cell-type map.
+
+        This is performed after validation, so we can assume that all relationships
+        between the arguments are valid. Note that all arguments are required
+        parameters, since this function should inherit the defaults from
+        ``Network.add_tonic_bias``.
 
         Parameters
         ----------
-        cell_types : str | None
-            The name of the cell type to add a tonic input. When supplied,
-            a float value must be provided with the `amplitude` keyword.
-            Valid inputs are those listed in  `net.cell_types`.
-        section : str
-            name of cell section the bias should be applied to.
-            See net.cell_types[cell_type].sections.keys()
-        bias_name : str
-            The name of the bias.
-        amplitude: dict | float
-            A dictionary of cell type keys (str) to amplitude values (float).
-            Valid inputs for cell types are those listed in `net.cell_types`.
-            If `cell_types` is not None, `amplitude` should be
-            a float indicating the amplitude of the tonic input
-            for the specified cell type.
-        t0 : float
-            The start time of tonic input (in ms). Default: 0 (beginning of
-            simulation). This value will be applied to all the  tonic biases if
-            multiple are specified with the `amplitude` keyword.
-        tstop : float
-            The end time of tonic input (in ms). Default: end of simulation.
-            This value will be applied to all the  tonic biases if
-            multiple are specified with the `amplitude` keyword.
+        amplitude : dict | int | float
+            Required 'amplitude' argument value as passed into
+            ``Network.add_tonic_bias``.
+        cell_type : str
+            The ``cell_type`` argument value as passed into ``Network.add_tonic_bias``.
+        gid : int | list | dict
+            The ``gid`` argument value as passed into ``Network.add_tonic_bias``.
+
+        Returns
+        -------
+        resolved_amplitude : dict
+            A dictionary where keys are cell types and values are the corresponding
+            amplitude values.
         """
-
-        # old functionality single cell type - amplitude
+        # This argument will be deprecated in a future release
         if cell_type is not None:
-            warnings.warn(
-                "cell_type argument will be deprecated and "
-                "removed in future releases. Use amplitude as a "
-                "cell_type:str,amplitude:float dictionary."
-                "Read the function docustring for more information",
-                DeprecationWarning,
-                stacklevel=1,
-            )
-            _validate_type(amplitude, (float, int), "amplitude")
+            resolved_amplitude = {cell_type: float(amplitude)}
+        elif isinstance(amplitude, (int, float)):
+            _amplitude_value = float(amplitude)
+            resolved_amplitude = dict()
+            if isinstance(gid, int):
+                _gid_type = self.gid_to_type(gid)
+                resolved_amplitude[_gid_type] = _amplitude_value
+            elif isinstance(gid, list):
+                for _gid in gid:
+                    _gid_type = self.gid_to_type(_gid)
+                    resolved_amplitude[_gid_type] = _amplitude_value
+            elif isinstance(gid, dict):
+                for _gid_type in gid.keys():
+                    resolved_amplitude[_gid_type] = _amplitude_value
+        elif isinstance(amplitude, dict):
+            # Wrap this to prevent changes by reference
+            resolved_amplitude = dict(amplitude)
 
-            _add_cell_type_bias(
-                network=self,
-                cell_type=cell_type,
+        return resolved_amplitude
+
+    def _resolve_bias_gids_to_cell_types(self, resolved_amplitude, gid):
+        """Resolve the ``gid`` argument of a tonic bias into a per-cell-type map.
+
+        This routes every variant of the provided ``gid`` argument for
+        :meth:``Network.add_tonic_bias`` into a dictionary mapping every biased cell
+        type to a list of gids of that type. This is performed after validation, so we
+        can assume that all relationships between the arguments are valid.
+
+        Parameters
+        ----------
+        resolved_amplitude : dict
+            Dictionary resulting from ``Network._resolve_bias_amplitudes_to_cell_types``
+            where keys are all the cell types we are interested in and the values are
+            their corresponding amplitude values.
+        gid : int | list | dict
+            The ``gid`` argument value as passed into ``Network.add_tonic_bias``.
+            Inside this resolve function, this is a required parameter, since it
+            should inherit the default from ``Network.add_tonic_bias``.
+
+        Returns
+        -------
+        resolved_gid : dict
+            A dictionary where keys are cell types and values are lists of gids
+            belonging to that cell type.
+        """
+        # First, let's initialize our future resolved_gid dictionary. Since everything
+        # has been validated, we can be sure that resolved_amplitude has all the cell
+        # type keys we're interested in:
+        cell_types = list(resolved_amplitude.keys())
+        resolved_gid = {cell_type: [] for cell_type in cell_types}
+
+        if gid is None:
+            for celltype in cell_types:
+                resolved_gid[celltype] = list(self.gid_ranges[celltype])
+
+        elif isinstance(gid, int):
+            # If there is only one gid, then there is only one cell type used
+            resolved_gid[cell_types[0]] = [gid]
+
+        elif isinstance(gid, list):
+            if len(cell_types) == 1:
+                resolved_gid[cell_types[0]].extend(gid)
+            else:
+                # Multiple biased cell types -- group each gid by the cell type it belongs
+                # to so the right amplitude is applied to the right cells.
+                for _gid in gid:
+                    _gid_type = self.gid_to_type(_gid)
+                    resolved_gid[_gid_type].append(_gid)
+
+        elif isinstance(gid, dict):
+            # Explicit {cell_type: gid(s)} mapping -- resolve each value to a list.
+            # We've already validated everything, so we can just iterate over the keys.
+            for _cell_type, _gids in gid.items():
+                if isinstance(_gids, int):
+                    resolved_gid[_cell_type] = [_gids]
+                elif isinstance(_gids, list):
+                    resolved_gid[_cell_type].extend(_gids)
+                elif _gids == "all":
+                    resolved_gid[_cell_type] = list(self.gid_ranges[_cell_type])
+
+        return resolved_gid
+
+    def _add_cell_type_bias(
+        self,
+        amplitude: float,
+        cell_type: str,
+        section: str,
+        bias_name: str,
+        t_0: float,
+        t_stop,
+        gid: list,
+    ):
+        """Add a tonic bias to a specific cell type in the network.
+
+        Note: This ASSUMES that the arguments have already been validated.
+
+        Parameters
+        ----------
+        amplitude : float
+            The amplitude of the tonic input (in nA) applied to the specified
+            ``cell_type``.
+        cell_type : str
+            The cell type to which the bias is applied.
+        section : str
+            The section of the cell where the bias is applied (e.g., 'soma',
+            'apical_tuft').
+        bias_name : str
+            A name identifier for the bias configuration
+        t_0 : float
+            The start time of the tonic input in milliseconds.
+        t_stop : float | None
+            The end time of the tonic input in milliseconds. If None, the bias
+            continues until the end of the simulation.
+        gid : list
+            The a list of gid(s) of ``cell_type`` to which the bias is applied.
+        """
+        cell_type_bias = {
+            "amplitude": amplitude,
+            "t0": t_0,
+            "tstop": t_stop,
+            "section": section,
+            "gid": gid,
+        }
+
+        if bias_name not in self.external_biases:
+            self.external_biases[bias_name] = dict()
+
+        self.external_biases[bias_name][cell_type] = cell_type_bias
+
+    def add_tonic_bias(
+        self,
+        amplitude,
+        bias_name="tonic",
+        gid=None,
+        section="soma",
+        t0=0,
+        tstop=None,
+        cell_type=None,
+    ):
+        """Adds a tonic bias input to provided cell types and/or cells
+
+        Parameters
+        ----------
+        amplitude : dict | int | float
+            Required parameter. All amplitudes should be given in units of nA.
+
+            - If given as a dictionary, keys should be cell type names (as in
+              ``Network.cell_types``) and values should be the amplitude of the tonic
+              input for that cell type as a `float`. An example of a valid dictionary
+              input is:
+
+              ``{'L2_pyramidal': 1.0, 'L5_pyramidal': 2.0}``
+
+            - If given as an `int` or `float`, you must also provide the ``gid``
+              argument. In this case, the amplitude is applied to all cells indicated by
+              the ``gid`` argument.
+
+        bias_name : str, default="tonic"
+            The name of the bias.
+        gid : int | list | dict, optional
+            Optionally specify gid(s) of cells to which the tonic bias should be
+            applied. This must be specified if ``amplitude`` is an `int` or `float`. May
+            be given as:
+
+            - a single gid (`int`) or a list of gids (`list` of `int`).
+              The tonic bias is connected to the provided gids, regardless of which cell
+              type they belong to.
+
+            - a dictionary mapping cell type to gid(s). If given as a dictionary, keys
+              should be cell type names (as in ``Network.cell_types``). Values should be
+              a single gid (`int`), a list of gids (`list` of `int`), or the string
+              ``'all'``. Each gid must belong to the cell type it is mapped to or else
+              an error will be raised. Examples of valid dictionary inputs are:
+
+              ``{'L5_pyramidal': 35}``
+
+              ``{'L2_pyramidal': 5, 'L5_pyramidal': 35}``
+
+              ``{'L2_pyramidal': [5, 6], 'L5_pyramidal': 35, 'L5_basket': 'all'}``
+
+        section : str, default="soma"
+            Name of cell section the bias should be applied to.
+            See ``Network.cell_types[cell_type].sections.keys()``
+        t0 : float, default=0
+            The start time of tonic input (in ms), defaulting to the beginning of
+            simulation. This value will be applied to all the tonic biases created by
+            this function call, regardless of if multiple cell types are specified using
+            either ``amplitude`` or ``gid``.
+        tstop : float, optional
+            The end time of tonic input (in ms), defaulting to the end of the
+            simulation. This value will be applied to all the tonic biases created by
+            this function call, regardless of if multiple cell types are specified using
+            either ``amplitude`` or ``gid``.
+        cell_type : str, optional
+            DEPRECATED. The name of the cell type to add a tonic input. Valid inputs are
+            those listed in ``Network.cell_types``. When supplied, the ``amplitude``
+            keyword must be provided as a `float`. This argument will be removed in
+            future releases.
+
+        Examples
+        --------
+        Apply the same amplitude to all cells of two cell types:
+
+        >>> net.add_tonic_bias(amplitude={'L2_pyramidal': 1.0, 'L5_pyramidal': 2.0})
+
+        Apply a single amplitude to a single cell, specified by providing that cell's
+        GID to ``gid`` as an `int`:
+
+        >>> net.add_tonic_bias(amplitude=1.0, gid=5)
+
+        Apply a single amplitude to several cells, specified by ``gid`` as a `list` of
+        `int`, regardless of the cell type(s) they belong to (this will NOT check
+        whether the gids belong to the same cell type):
+
+        >>> net.add_tonic_bias(amplitude=1.0, gid=[5, 6, 35])
+
+        Apply a single amplitude to several cells, specified by ``gid`` as a dictionary
+        of per-cell-type GIDs (this WILL check whether the gids belong to the cell type
+        they are mapped to):
+
+        >>> net.add_tonic_bias(
+        ...     amplitude=1.0,
+        ...     gid={'L2_pyramidal': [5, 6], 'L5_pyramidal': 35},
+        ... )
+
+        Apply per-cell-type amplitudes, restricting each to specific gids using a
+        dictionary for ``gid``:
+
+        >>> net.add_tonic_bias(
+        ...     amplitude={'L2_pyramidal': 1.0, 'L5_pyramidal': 2.0},
+        ...     gid={'L2_pyramidal': [5, 6], 'L5_pyramidal': 35},
+        ... )
+
+        Apply per-cell-type amplitudes, using the string ``'all'`` in the ``gid``
+        dictionary to apply the bias to every cell of that type:
+
+        >>> net.add_tonic_bias(
+        ...     amplitude={'L2_pyramidal': 1.0, 'L5_pyramidal': 2.0},
+        ...     gid={'L2_pyramidal': 'all', 'L5_pyramidal': 35},
+        ... )
+        """
+        # There is a large amount of input validation, so this is separated into its own
+        # function.
+        self._validate_tonic_bias_args(
+            amplitude=amplitude,
+            bias_name=bias_name,
+            gid=gid,
+            section=section,
+            t0=t0,
+            tstop=tstop,
+            cell_type=cell_type,
+        )
+
+        # Resolve the amplitudes, so that we can ensure we always have a dictionary
+        # mapping cell type to amplitude, regardless of the input argument style:
+        resolved_amplitude = self._resolve_bias_amplitudes_to_cell_types(
+            amplitude,
+            cell_type,
+            gid,
+        )
+
+        # Resolve the `gid` argument into a per-cell-type mapping so that gids are
+        # organized under the corresponding cell type. This converts all input argument
+        # styles to the dictionary format used internally:
+        resolved_gid = self._resolve_bias_gids_to_cell_types(
+            resolved_amplitude,
+            gid,
+        )
+
+        # Finally, actually add the validated biases
+        for _cell_type, _amplitude in resolved_amplitude.items():
+            self._add_cell_type_bias(
+                amplitude=_amplitude,
+                cell_type=_cell_type,
                 section=section,
                 bias_name=bias_name,
-                amplitude=float(amplitude),
                 t_0=t0,
                 t_stop=tstop,
+                gid=resolved_gid[_cell_type],
             )
-        else:
-            _validate_type(amplitude, dict, "amplitude")
-            if len(amplitude) == 0:
-                warnings.warn(
-                    "No bias have been defined, no action taken",
-                    UserWarning,
-                    stacklevel=1,
-                )
-                return
-
-            for _cell_type, _amplitude in amplitude.items():
-                _add_cell_type_bias(
-                    network=self,
-                    cell_type=_cell_type,
-                    section=section,
-                    bias_name=bias_name,
-                    amplitude=_amplitude,
-                    t_0=t0,
-                    t_stop=tstop,
-                )
 
     def _add_cell_type(self, cell_name, pos, cell_template=None):
         """Add cell type by updating pos_dict and gid_ranges."""
@@ -2077,7 +2749,7 @@ class Network:
 
         return values
 
-    def plot_cells(self, ax=None, show=True):
+    def plot_cells(self, ax=None, show=True, colors=None, markers=None):
         """Plot the cells using Network.pos_dict.
 
         Parameters
@@ -2087,13 +2759,19 @@ class Network:
             a new figure is created.
         show : bool
             If True, show the figure.
+        colors : dict | None
+            Dictionary mapping cell type names to colors. If None,
+            colors are assigned automatically from the default color cycle.
+        markers : dict | None
+            Dictionary mapping cell type names to markers. If None,
+            markers are assigned based on ``morpho_type`` in cell metadata.
 
         Returns
         -------
         fig : instance of matplotlib Figure
             The matplotlib figure handle.
         """
-        return plot_cells(net=self, ax=ax, show=show)
+        return plot_cells(net=self, ax=ax, show=show, colors=colors, markers=markers)
 
     def to_dict(self, write_output=False):
         return network_to_dict(self, write_output=write_output)
@@ -2382,70 +3060,6 @@ class _NetworkDrive(dict):
             entr += f"\nevent times instantiated for {len(self['events'])} trial{plurl}"
         entr += ">"
         return entr
-
-
-def _add_cell_type_bias(
-    network: Network,
-    amplitude: float,
-    cell_type: str,
-    section="soma",
-    bias_name="tonic",
-    t_0=0,
-    t_stop=None,
-):
-    """Add a tonic bias to a specific cell type in the network.
-
-    Parameters
-    ----------
-    network : Network
-        The network to which the tonic bias is added.
-    amplitude : float
-        The amplitude of the tonic input (in nA) applied to the specified
-        `cell_type`.
-    cell_type : str
-        The cell type to which the bias is applied.
-    section : str, default 'soma'
-        The section of the cell where the bias is applied (e.g., 'soma',
-        'apical_tuft').
-    bias_name : str, default 'tonic'
-        A name identifier for the bias configuration, allowing multiple biases
-        to be applied.
-    t_0 : float, default 0
-        The start time of the tonic input in milliseconds.
-    t_stop : float, optional
-        The end time of the tonic input in milliseconds. If None, the bias
-        continues until the end of the simulation.
-    """
-    # Validate cell_type value
-    if cell_type not in network.cell_types:
-        raise ValueError(
-            f"cell_type must be one of "
-            f"{list(network.cell_types.keys())}. "
-            f"Got {cell_type}"
-        )
-
-    if bias_name not in network.external_biases:
-        network.external_biases[bias_name] = dict()
-
-    if cell_type in network.external_biases[bias_name]:
-        raise ValueError(f"Bias named {bias_name} already defined for {cell_type}")
-
-    cell_type_bias = {
-        "amplitude": amplitude,
-        "t0": t_0,
-        "tstop": t_stop,
-        "section": section,
-    }
-
-    sections = list(network.cell_types[cell_type]["cell_object"].sections.keys())
-
-    # error when section is defined that doesn't exist.
-    if section not in sections:
-        raise ValueError(f"section must be one of {sections}. Got {section}.")
-    else:
-        cell_type_bias["section"] = section
-
-    network.external_biases[bias_name][cell_type] = cell_type_bias
 
 
 def _check_global_synaptic_gains_uniformity(net):

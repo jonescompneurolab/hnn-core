@@ -373,12 +373,12 @@ def test_get_syn_props_custom_type():
     assert "tau2" not in result[syn_type]
 
 
-def test_get_syn_props_NMDA_gao_mechname_params():
-    """_get_syn_props with the new NMDA_gao synapse mechname works for all custom params."""
+def test_get_syn_props_NMDA_gao2021_mechname_params():
+    """_get_syn_props with the new NMDA_gao2021 synapse mechname works for all custom params."""
     cell_type = "L5Pyr"
     syn_type = "nmda"
     p_all = {
-        f"{cell_type}_{syn_type}_mechname": "NMDA_gao",
+        f"{cell_type}_{syn_type}_mechname": "NMDA_gao2021",
         f"{cell_type}_{syn_type}_e": 0.0,
         f"{cell_type}_{syn_type}_Beta": 5.0,
         f"{cell_type}_{syn_type}_Cdur": 1.2,
@@ -394,13 +394,13 @@ def test_get_syn_props_NMDA_gao_mechname_params():
     assert "tau2" not in result[syn_type]
 
 
-def test_get_syn_props_gabab_destexhe_mechname_params():
-    """_get_syn_props with the new gabab_destexhe synapse mechname works for all custom
+def test_get_syn_props_gabab_neymotin2016_mechname_params():
+    """_get_syn_props with the new gabab_neymotin2016 synapse mechname works for all custom
     params."""
     cell_type = "L5Pyr"
-    syn_type = "gabab_destexhe"
+    syn_type = "gabab_neymotin2016"
     p_all = {
-        f"{cell_type}_{syn_type}_mechname": "gabab_destexhe",
+        f"{cell_type}_{syn_type}_mechname": "gabab_neymotin2016",
         f"{cell_type}_{syn_type}_g": 1.0,
     }
     result = _get_syn_props(p_all, cell_type, syn_types=[syn_type])
@@ -465,11 +465,11 @@ def test_get_syn_props_multiple_syn_types():
         "L2Pyr_gabaa_e": -80.0,
         "L2Pyr_gabaa_tau1": 0.5,
         "L2Pyr_gabaa_tau2": 5.0,
-        "L2Pyr_nmda_mechname": "NMDA_gao",
+        "L2Pyr_nmda_mechname": "NMDA_gao2021",
         "L2Pyr_nmda_e": 0.0,
         "L2Pyr_nmda_Beta": 5.0,
         "L2Pyr_nmda_Cdur": 1.2,
-        "L2Pyr_gabab_mechname": "gabab_destexhe",
+        "L2Pyr_gabab_mechname": "gabab_neymotin2016",
         "L2Pyr_gabab_g": 42069.0,
     }
     # Test that requesting only ampa returns with just ampa
@@ -505,16 +505,16 @@ def test_get_syn_props_multiple_syn_types():
     assert result3["nmda"]["e"] == 0.0
     assert result3["nmda"]["Beta"] == 5.0
     assert result3["nmda"]["Cdur"] == 1.2
-    assert result3["nmda"]["mechname"] == "NMDA_gao"
+    assert result3["nmda"]["mechname"] == "NMDA_gao2021"
     # Test that requesting only ampa and nmda return the two
     result4 = _get_syn_props(p_all, "L2Pyr", syn_types=["nmda", "gabab"])
     assert set(result4.keys()) == {"nmda", "gabab"}
     assert result4["nmda"]["e"] == 0.0
     assert result4["nmda"]["Beta"] == 5.0
     assert result4["nmda"]["Cdur"] == 1.2
-    assert result4["nmda"]["mechname"] == "NMDA_gao"
+    assert result4["nmda"]["mechname"] == "NMDA_gao2021"
     assert result4["gabab"]["g"] == 42069.0
-    assert result4["gabab"]["mechname"] == "gabab_destexhe"
+    assert result4["gabab"]["mechname"] == "gabab_neymotin2016"
 
 
 def test_get_basket_syn_props_includes_type():
