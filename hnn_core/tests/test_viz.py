@@ -697,16 +697,27 @@ class TestCellResponsePlotters:
             f"{n_plotted_raster_overlay}"
         )
 
-    def test_no_data_in_raster_plt(self, base_simulation_spikes):
+    def test_no_data_in_raster_plt(self, setup_net):
+        """Test that the raster plot contains no data."""
+        net = setup_net
+        _ = simulate_dipole(net, tstop=100.0, n_trials=2)
+        fig = net.cell_response.plot_spikes_raster(trial_idx=[0, 1], show=False)
+
+        # Exactly 4 elements present in an empty plot
+        assert len(fig.axes[0].collections) == 4
+
+    def test_data_in_raster_plt(self, base_simulation_spikes):
         """Test that the raster plot contains data for various trial_idx inputs."""
         net, _ = base_simulation_spikes
-        net.cell_response.plot_spikes_raster()
         # test cell response plotting
         with pytest.raises(TypeError, match="trial_idx must be an instance of"):
             net.cell_response.plot_spikes_raster(trial_idx="blah", show=False)
         net.cell_response.plot_spikes_raster(trial_idx=0, show=False)
         fig = net.cell_response.plot_spikes_raster(trial_idx=[0, 1], show=False)
-        assert len(fig.axes[0].collections) > 0, "No data plotted in raster plot"
+
+        # c.f. test_no_data_in_raster_plt: when there are spikes there should be more
+        # than 4 elements in the plot
+        assert len(fig.axes[0].collections) > 4
 
     def test_spikes_hist_default(self, base_simulation_spikes):
         """Test basic spike histogram plotting."""
