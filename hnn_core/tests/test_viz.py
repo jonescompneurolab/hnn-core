@@ -715,7 +715,10 @@ class TestCellResponsePlotters:
             net.cell_response.plot_spikes_raster(trial_idx="blah", show=False)
         net.cell_response.plot_spikes_raster(trial_idx=0, show=False)
         fig = net.cell_response.plot_spikes_raster(trial_idx=[0, 1], show=False)
-        assert len(fig.axes[0].collections) > 0
+
+        # c.f. test_no_data_in_raster_plt: when there are spikes there should be more
+        # than 4 elements in the plot
+        assert len(fig.axes[0].collections) > 4
 
     def test_spikes_hist_default(self, base_simulation_spikes):
         """Test basic spike histogram plotting."""
