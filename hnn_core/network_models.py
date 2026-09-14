@@ -936,9 +936,7 @@ def duecker_ET_model(
     return net
 
 
-def diesburg_2024_model(
-    params=None, add_drives_from_params=False, legacy_mode=False, mesh_shape=(10, 10)
-):
+def diesburg_2024_model(params=None, add_default_drives=False, mesh_shape=(10, 10)):
     """Instantiate the network model described in Diesburg et al., 2024 [1]_ .
 
     This instantiates the expansion of the Jones et al. 2009 model [2]_ used to study
@@ -951,13 +949,8 @@ def diesburg_2024_model(
         The path to the parameter file for constructing the network.
         If None, parameters loaded from default.json
         Default: None
-    add_drives_from_params : bool
-        If True, add drives as defined in the params-dict. NB this is mainly
-        for backward-compatibility with HNN GUI, and will be deprecated in a
-        future release. Default: False
-    legacy_mode : bool
-        Set to False by default. Enables matching HNN GUI output when drives
-        are added suitably. Will be deprecated in a future release.
+    add_default_drives : bool, default=False
+        If True, add external drives as defined in Diesburg et al., 2024 [1]_ .
     mesh_shape : tuple of int (default: (10, 10))
         Defines the (n_x, n_y) shape of the grid of pyramidal cells.
 
@@ -1001,8 +994,6 @@ def diesburg_2024_model(
 
     net = neymotin_2020_model(
         params,
-        add_drives_from_params,
-        legacy_mode,
         mesh_shape=mesh_shape,
     )
     # Ensure model_variant and params' cell types match current model (same cell type
@@ -1034,6 +1025,78 @@ def diesburg_2024_model(
 
     # Modify L5_basket -> L5_pyramidal inhibition
     net.connectivity[7]["nc_dict"]["A_weight"] = 0.075  # gabab
+
+    if add_default_drives:
+        weights_ampa_p1 = {
+            "L2_basket": 0.08831,
+            "L2_pyramidal": 0.01525,
+            "L5_basket": 0.000561,
+            "L5_pyramidal": 0.02,
+        }
+        weights_nmda_p1 = {
+            "L2_basket": 0,
+            "L2_pyramidal": 0,
+            "L5_basket": 0.1,
+            "L5_pyramidal": 0.008,
+        }
+
+        weights_ampa_d1 = {
+            "L2_basket": 0.006562,
+            "L2_pyramidal": 0.000007,
+            "L5_pyramidal": 0.1423,
+        }
+        weights_nmda_d1 = {
+            "L2_basket": 0.19482,
+            "L2_pyramidal": 0.004317,
+            "L5_pyramidal": 0.080074,
+        }
+
+        weights_ampa_p2 = {
+            "L2_basket": 0.000003,
+            "L2_pyramidal": 1.43,
+            "L5_basket": 0.008958,
+            "L5_pyramidal": 0.684013,
+        }
+        weights_nmda_p2 = {
+            "L2_basket": 0.05357,
+            "L2_pyramidal": 0.25,
+            "L5_basket": 0.25,
+            "L5_pyramidal": 4,
+        }
+
+        # external drive timing params
+        net.add_evoked_drive(
+            "evprox1",
+            mu=115,
+            sigma=15.21,
+            numspikes=1,
+            weights_ampa=weights_ampa_p1,
+            weights_nmda=weights_nmda_p1,
+            location="proximal",
+            event_seed=4,
+        )
+
+        net.add_evoked_drive(
+            "evdist1",
+            mu=190.49,
+            sigma=25.81,
+            numspikes=1,
+            weights_ampa=weights_ampa_d1,
+            weights_nmda=weights_nmda_d1,
+            location="distal",
+            event_seed=4,
+        )
+
+        net.add_evoked_drive(
+            "evprox2",
+            mu=305.64,
+            sigma=53.10,
+            numspikes=2,
+            weights_ampa=weights_ampa_p2,
+            weights_nmda=weights_nmda_p2,
+            location="proximal",
+            event_seed=4,
+        )
 
     return net
 

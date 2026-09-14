@@ -494,8 +494,7 @@ def test_network_models_diesburg_2024():
     """Test instantiation and custom parameters of the Diesburg 2024 model"""
     net_diesburg = diesburg_2024_model()
     del net_diesburg
-    # TODO: AES EXPECTED DRIVE ADDITIONS should be added here!
-    net_diesburg = diesburg_2024_model(add_drives_from_params=True)
+    net_diesburg = diesburg_2024_model(add_default_drives=True)
 
     # Check that custom connectivity is as expected
     # L2_pyramidal -> L2_pyramidal excitation
@@ -1373,7 +1372,6 @@ def test_network_drives_legacy():
         _ = neymotin_2020_model(legacy_mode=True)
         _ = law_2021_model(legacy_mode=True)
         _ = calcium_model(legacy_mode=True)
-        _ = diesburg_2024_model(legacy_mode=True)
         _ = waller_pfcbeta_model(legacy_mode=True)
         _ = Network(params, legacy_mode=True)
 
