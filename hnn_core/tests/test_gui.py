@@ -372,14 +372,19 @@ def test_gui_upload_drives(tmp_path):
     assert len(gui.drive_widgets) == original_drive_count
     drive_types = [widget["type"] for widget in gui.drive_widgets]
     assert drive_types == ["Evoked", "Evoked", "Evoked"]
+    # The default tstop of the drives in neymotin2020_base.json, and therefore the GUI
+    # as a whole, is 170
+    assert gui.widget_tstop.value == 170.0
 
     # check parameters with different files.
     gui._simulate_upload_drives(file2_url)
     assert len(gui.drive_widgets) == 1
     assert gui.drive_widgets[0]["type"] == "Poisson"
 
-    # Loading a drive that outlasts the simulation extends the simulation before
-    # constructing the bounded drive widget, so the configured stop is preserved.
+    # The default tstop is 170, but the Poisson drive in
+    # gamma_L5weak_L2weak_hierarchical.json has a tstop of 250. Loading a drive that
+    # outlasts the simulation extends the simulation before constructing the bounded
+    # drive widget, so the configured stop is preserved.
     assert gui.widget_tstop.value == 250.0
     assert gui.drive_widgets[0]["tstop"].value == 250.0
 
