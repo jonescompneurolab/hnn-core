@@ -2268,6 +2268,27 @@ class HNNGUI:
         drive_specs = net.external_drives
         tonic_specs = net.external_biases
 
+        # Drive/bias times cannot be longer than the simulation duration. However, if we
+        # load a drive/bias with a tstop that exceeds the current simulation duration,
+        # we should INCREASE the simulation duration to accommodate that drive/bias
+        # time. This is because if a drive/bias has a particularly long duration, it is
+        # *probably* necessary for the observing the drive/bias's behavior on the
+        # simulation.
+        configured_tstops = []
+        for drive in drive_specs.values():
+            tstop = drive["dynamics"].get("tstop")
+            if tstop is not None:
+                configured_tstops.append(tstop)
+        for bias in tonic_specs.values():
+            for cell_type_bias in bias.values():
+                tstop = cell_type_bias.get("tstop")
+                if tstop is not None:
+                    configured_tstops.append(tstop)
+        if configured_tstops:
+            self.widget_tstop.value = max(
+                self.widget_tstop.value, max(configured_tstops)
+            )
+
         # clear before adding drives
         self._drives_out.clear_output()
         while len(self.drive_widgets) > 0:

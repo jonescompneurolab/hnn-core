@@ -55,6 +55,10 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ### Bug Fixes
 
+- Loading external drives in the GUI now extends the simulation duration when needed,
+  preserving configured drive and tonic-bias stop times,
+  by [William Kang][] in {gh}`1348`.
+
 - [Camilo Diaz][] did considerable work in fixing our long-standing MPI Timeout issues
   and putting in place a permanent solution that uses tempfiles instead of standard
   input/output/error streams. Thanks Camilo!
