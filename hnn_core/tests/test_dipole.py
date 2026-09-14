@@ -375,12 +375,54 @@ def test_dipole_simulation_with_renamed_cells():
 @requires_mpi4py
 @requires_psutil
 @pytest.mark.uses_mpi
-def test_dipole_baseline_correction(run_hnn_core_fixture):
-    """Test that all values of baseline_correction work in simulate_dipole"""
-    for backend in {"joblib", "mpi"}:
-        for baseline_correction in [True, False]:
-            _, _ = run_hnn_core_fixture(
-                backend=backend,
-                reduced=True,
-                baseline_correction=baseline_correction,
-            )
+@pytest.mark.parametrize("baseline_correction", [True, False])
+def test_dipole_baseline_correction_mpi(run_hnn_core_fixture, baseline_correction):
+    """Test that baseline_correction works in simulate_dipole with MPIBackend."""
+    _, _ = run_hnn_core_fixture(
+        backend="mpi",
+        reduced=True,
+        baseline_correction=baseline_correction,
+    )
+
+
+def test_dipole_baseline_correction_flags():
+    """Test that all variants of baseline_correction work in simulate_dipole"""
+
+    hnn_core_root = Path(hnn_core.__file__).parent
+    params_fname = hnn_core_root / "param" / "default.json"
+    params = read_params(params_fname)
+
+    # Test that baseline_correction is flagged as true by default
+    net_yes_correct = neymotin_2020_model(
+        params, add_drives_from_params=True, mesh_shape=(3, 3)
+    )
+    assert net_yes_correct._baseline_correction_applied is False
+    dpl_yes_correct = simulate_dipole(
+        net_yes_correct, tstop=25.0, n_trials=1, baseline_correction=True
+    )[0]
+    assert net_yes_correct._baseline_correction_applied is True
+    assert dpl_yes_correct._baseline_correction_applied is True
+
+    # Test that baseline_correction, when set to False, is not applied
+    net_no_correct = neymotin_2020_model(
+        params, add_drives_from_params=True, mesh_shape=(3, 3)
+    )
+    assert net_no_correct._baseline_correction_applied is False
+    with pytest.warns(UserWarning, match="No baseline corr"):
+        dpl_no_correct = simulate_dipole(
+            net_no_correct, tstop=25.0, n_trials=1, baseline_correction=False
+        )[0]
+    assert net_no_correct._baseline_correction_applied is False
+    assert dpl_no_correct._baseline_correction_applied is False
+    assert not np.allclose(dpl_no_correct.data["agg"], dpl_yes_correct.data["agg"])
+
+    # Test that if a network has a SECOND simulation where the first had
+    # baseline_correction=True, but the second had baseline_correction=False, the second
+    # simulation will correctly not apply baseline correction.
+    with pytest.warns(UserWarning, match="No baseline corr"):
+        dpl_second_no_correct = simulate_dipole(
+            net_yes_correct, tstop=25.0, n_trials=1, baseline_correction=False
+        )[0]
+    assert net_yes_correct._baseline_correction_applied is False
+    assert dpl_second_no_correct._baseline_correction_applied is False
+    assert np.allclose(dpl_no_correct.data["agg"], dpl_second_no_correct.data["agg"])

@@ -33,7 +33,7 @@ def _thread_handler(event, out, queue):
         queue.put(line)
 
 
-def _gather_trial_data(sim_data, net, n_trials, postproc, baseline_correction=True):
+def _gather_trial_data(sim_data, net, n_trials, postproc, baseline_correction):
     """Arrange data by trial; to be called after ``<Backend>.simulate``
 
     Parameters
@@ -56,10 +56,9 @@ def _gather_trial_data(sim_data, net, n_trials, postproc, baseline_correction=Tr
         preferred way is to use the :meth:`~hnn_core.dipole.Dipole.smooth` and
         :meth:`~hnn_core.dipole.Dipole.scale` methods instead. In all preceding
         codepaths, this defaults to False.
-    baseline_correction : bool, default=True
+    baseline_correction : bool
         Whether to apply the baseline correction after simulation (which correction is
-        used depends on ``Network._model_variant``). Defaults to True, applying the
-        appropriate correction.
+        used depends on ``Network._model_variant``).
 
     Returns
     -------
