@@ -20,7 +20,7 @@ from .params_default import (
 # units for taur: ms
 
 # Default initial membrane voltages (v0, in mV) for each section of each cell type.
-_default_v_init = {
+NEYMOTIN_V_INIT = {
     "L2_pyramidal": {
         "soma": -71.46,
         "apical_1": -71.46,
@@ -330,7 +330,7 @@ def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
         p_all = compare_dictionaries(p_all, override_params)
 
     # All sections of this cell type use the same initial membrane voltage:
-    v_init = _default_v_init["L2_pyramidal"]
+    v_init = NEYMOTIN_V_INIT["L2_pyramidal"]
 
     section_names = [
         "apical_trunk",
@@ -345,9 +345,9 @@ def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
     if set(section_names + ["soma"]) != set(v_init.keys()):
         raise ValueError(
             "For L2_pyramidal cells, mismatch between hardcoded 'section_names' and "
-            "_default_v_init's section keys. "
+            "NEYMOTIN_V_INIT's section keys. "
             f"section_names (excluding 'soma'): {section_names} "
-            f"_default_v_init keys: {list(v_init.keys())}"
+            f"NEYMOTIN_V_INIT keys: {list(v_init.keys())}"
         )
 
     sections = _get_dends(
@@ -490,14 +490,14 @@ def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
     ]
 
     # Different sections of this cell type use different initial membrane voltages:
-    v_init = _default_v_init["L5_pyramidal"]
+    v_init = NEYMOTIN_V_INIT["L5_pyramidal"]
 
     if set(section_names + ["soma"]) != set(v_init.keys()):
         raise ValueError(
             "For L5_pyramidal cells, mismatch between hardcoded 'section_names' and "
-            "_default_v_init's section keys. "
+            "NEYMOTIN_V_INIT's section keys. "
             f"section_names (excluding 'soma'): {section_names} "
-            f"_default_v_init keys: {list(v_init.keys())}"
+            f"NEYMOTIN_V_INIT keys: {list(v_init.keys())}"
         )
 
     sections = _get_dends(
@@ -587,7 +587,7 @@ def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
     )
 
 
-def _get_basket_soma(v_init=_default_v_init["L2_basket"]["soma"]):
+def _get_basket_soma(v_init=NEYMOTIN_V_INIT["L2_basket"]["soma"]):
     """Create Basket somatic Section objects.
 
     This sets geometric and electrical properties (length, diameter, axial resistance,
@@ -606,7 +606,7 @@ def _get_basket_soma(v_init=_default_v_init["L2_basket"]["soma"]):
     ----------
     cell_name : ???
         Not actually used.
-    v_init : float, default=_default_v_init["L2_basket"]["soma"]
+    v_init : float, default=NEYMOTIN_V_INIT["L2_basket"]["soma"]
         Initial membrane potential in mV.
 
     Returns
@@ -828,7 +828,7 @@ def basket(cell_name, pos=(0, 0, 0), gid=None):
         raise ValueError(f"Unknown basket cell type: {cell_name}")
 
     sections = dict()
-    sections["soma"] = _get_basket_soma(v_init=_default_v_init[cell_name]["soma"])
+    sections["soma"] = _get_basket_soma(v_init=NEYMOTIN_V_INIT[cell_name]["soma"])
     synapses = _get_basket_syn_props()
     sections["soma"].syns = list(synapses.keys())
     sections["soma"].mechs = {"hh2": dict()}

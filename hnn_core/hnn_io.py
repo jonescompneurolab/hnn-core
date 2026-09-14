@@ -13,7 +13,7 @@ from pathlib import Path
 
 from .cell import Cell, Section
 from .cell_response import CellResponse
-from .cells_default import _default_v_init
+from .cells_default import NEYMOTIN_V_INIT
 from .externals.mne import fill_doc
 
 
@@ -157,7 +157,7 @@ def _read_cell_types(cell_types_data):
                     # where the Duecker model was added here:
                     # https://github.com/jonescompneurolab/hnn-core/blob/49f210fb41481ab859537e9b3e32a74117ae95fc/hnn_core/cells_default.py
                     "v0",
-                    _default_v_init[cell_name][section_name],
+                    NEYMOTIN_V_INIT[cell_name][section_name],
                 ),
                 end_pts=section_data["end_pts"],
             )
