@@ -544,6 +544,9 @@ def law_2021_model(
     """
 
     hnn_core_root = Path(hnn_core.__file__).parent
+    _validate_type(
+        params, (str, Path, dict, type(None)), "params", "str | Path | dict | None"
+    )
     if params is None:
         params_fname = hnn_core_root / "param" / "default.json"
         params = read_params(params_fname)
@@ -663,6 +666,9 @@ def calcium_model(
            Brain Topography, 35, 19–35 (2022).
     """
     hnn_core_root = Path(hnn_core.__file__).parent
+    _validate_type(
+        params, (str, Path, dict, type(None)), "params", "str | Path | dict | None"
+    )
     if params is None:
         params_fname = hnn_core_root / "param" / "default.json"
         params = read_params(params_fname)
@@ -727,6 +733,9 @@ def duecker_ET_model(
     """
 
     hnn_core_root = Path(hnn_core.__file__).parent
+    _validate_type(
+        params, (str, Path, dict, type(None)), "params", "str | Path | dict | None"
+    )
     if params is None:
         params_fname = hnn_core_root / "param" / "default_duecker_ET.json"
         params = read_params(params_fname)
