@@ -1372,7 +1372,6 @@ def test_network_drives_legacy():
         _ = neymotin_2020_model(legacy_mode=True)
         _ = law_2021_model(legacy_mode=True)
         _ = calcium_model(legacy_mode=True)
-        _ = waller_pfcbeta_model(legacy_mode=True)
         _ = Network(params, legacy_mode=True)
 
     net = neymotin_2020_model(params, legacy_mode=True, add_drives_from_params=True)

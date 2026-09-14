@@ -1103,7 +1103,6 @@ def diesburg_2024_model(params=None, add_default_drives=False, mesh_shape=(10, 1
 
 def waller_pfcbeta_model(
     params=None,
-    legacy_mode=False,
 ):
     """Instantiate the network model used to study beta events in frontocentral cortex.
 
@@ -1117,9 +1116,6 @@ def waller_pfcbeta_model(
         The path to the parameter file for constructing the network.
         If None, parameters loaded from default.json
         Default: None
-    legacy_mode : bool
-        Set to False by default. Enables matching HNN GUI output when drives
-        are added suitably. Will be deprecated in a future release.
 
     Returns
     -------
@@ -1164,8 +1160,6 @@ def waller_pfcbeta_model(
 
     net = neymotin_2020_model(
         params,
-        add_drives_from_params=False,
-        legacy_mode=legacy_mode,
         mesh_shape=(10, 10),
     )
     _insert_gabab_population(net)
@@ -1196,12 +1190,6 @@ def waller_pfcbeta_model(
     )
 
     # LAW MODEL-following CHANGES start here
-    # Update biophysics (increase gabab duration of inhibition)
-    net.cell_types["L2_pyramidal"]["cell_object"].synapses["gabab"]["tau1"] = 45.0
-    net.cell_types["L2_pyramidal"]["cell_object"].synapses["gabab"]["tau2"] = 200.0
-    net.cell_types["L5_pyramidal"]["cell_object"].synapses["gabab"]["tau1"] = 45.0
-    net.cell_types["L5_pyramidal"]["cell_object"].synapses["gabab"]["tau2"] = 200.0
-
     # Decrease L5_pyramidal -> L5_pyramidal nmda weight (both .0005 by default)
     net.connectivity[0]["nc_dict"]["A_weight"] = 0.00005
     net.connectivity[2]["nc_dict"]["A_weight"] = 0.0001
