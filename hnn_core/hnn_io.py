@@ -13,6 +13,7 @@ from pathlib import Path
 
 from .cell import Cell, Section
 from .cell_response import CellResponse
+from .cells_default import NEYMOTIN_V_INIT
 from .externals.mne import fill_doc
 
 
@@ -91,7 +92,7 @@ def _str_to_node(node_string):
     return node
 
 
-def _read_cell_types(cell_types_data):
+def _read_cell_types(cell_types_data, model_variant):
     """Returns a dict of Cell objects from json encoded data
 
     This function handles both legacy format (direct cell data) and
@@ -144,12 +145,25 @@ def _read_cell_types(cell_types_data):
         sections_data = cell_data["sections"]
         for section_name in sections_data:
             section_data = sections_data[section_name]
+            # For backwards compatibility with older files that use the Neymotin model
+            # but that do not have v0 in the json. For the Duecker model, every Section
+            # should always have a v0 present at its creation; see the commit where the
+            # Duecker model was added here:
+            # https://github.com/jonescompneurolab/hnn-core/blob/49f210fb41481ab859537e9b3e32a74117ae95fc/hnn_core/cells_default.py
+            # Otherwise, use the value of `v0` present from the input data. Otherwise,
+            # use the default value from NEYMOTIN_V_INIT.
+            if model_variant == "duecker_ET_model":
+                v_init = section_data.get("v0")
+            else:
+                v_init = section_data.get(
+                    "v0", NEYMOTIN_V_INIT[cell_name][section_name]
+                )
             sections[section_name] = Section(
                 L=section_data["L"],
                 diam=section_data["diam"],
                 cm=section_data["cm"],
                 Ra=section_data["Ra"],
-                v0=section_data.get("v0", -65),  # for backwards compatibility
+                v0=v_init,
                 end_pts=section_data["end_pts"],
             )
             # Set section attributes
@@ -515,7 +529,10 @@ def dict_to_network(net_data, read_drives=True, read_external_biases=True):
         mesh_shape=mesh_shape,
         legacy_mode=net_data["legacy_mode"],
         pos_dict=_read_pos_dict(net_data["pos_dict"]),
-        cell_types=_read_cell_types(net_data["cell_types"]),
+        cell_types=_read_cell_types(
+            net_data["cell_types"],
+            net_data.get("model_variant", None),
+        ),
     )
 
     # Setting attributes

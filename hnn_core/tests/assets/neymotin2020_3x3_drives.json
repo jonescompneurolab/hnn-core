@@ -1,5 +1,6 @@
 {
     "object_type": "Network",
+    "model_variant": "neymotin_2020_model",
     "legacy_mode": false,
     "N_pyr_x": 3,
     "N_pyr_y": 3,
