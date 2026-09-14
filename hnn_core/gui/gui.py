@@ -2268,8 +2268,12 @@ class HNNGUI:
         drive_specs = net.external_drives
         tonic_specs = net.external_biases
 
-        # Drive time widgets are bounded by the simulation duration. Increase that
-        # bound before creating the widgets so explicit drive times are not clipped.
+        # Drive/bias times cannot be longer than the simulation duration. However, if we
+        # load a drive/bias with a tstop that exceeds the current simulation duration,
+        # we should INCREASE the simulation duration to accommodate that drive/bias
+        # time. This is because if a drive/bias has a particularly long duration, it is
+        # *probably* necessary for the observing the drive/bias's behavior on the
+        # simulation.
         configured_tstops = []
         for drive in drive_specs.values():
             tstop = drive["dynamics"].get("tstop")
