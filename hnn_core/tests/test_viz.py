@@ -193,8 +193,8 @@ class TestDipoleViz:
         dpl = simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
         return net, dpl
 
-    def test_decimation_options(self, run_simulation):
-        """Test basic dipole visualisations and decimation."""
+    def test_decimation_time_options(self, run_simulation):
+        """Test basic dipole visualisations, decimation, and time args."""
         _, dpls = run_simulation
         fig = dpls[0].plot()  # plot the first dipole alone
         axes = fig.get_axes()[0]
@@ -208,6 +208,9 @@ class TestDipoleViz:
                 ValueError, match="each decimation factor must be a positive"
             ):
                 plot_dipole(dpls[0], decim=dec, show=False)
+
+        with pytest.warns(FutureWarning, match="tmin and tmax are deprecated"):
+            plot_dipole(dpls[0], show=False, tmin=10, tmax=100)
 
     def test_dipole_mutiple_layers(self, run_simulation):
         """Test plotting dipoles across multiple trials and layers (L2, L5, agg) with matching axes."""
@@ -263,10 +266,6 @@ class TestDipoleViz:
             dpl_sfreq = dpls[0].copy()
             dpl_sfreq.sfreq /= 10
             plot_psd([dpls[0], dpl_sfreq])
-
-        # pytest deprecation warning for tmin and tmax
-        with pytest.warns(FutureWarning, match="tmin and tmax are deprecated"):
-            plot_dipole(dpls[0], show=False, tmin=10, tmax=100)
 
 
 def test_drive_strength(setup_net):
