@@ -151,8 +151,14 @@ def _read_cell_types(cell_types_data):
                 cm=section_data["cm"],
                 Ra=section_data["Ra"],
                 v0=section_data.get(
-                    "v0", _default_v_init[cell_name][section_name]
-                ),  # for backwards compatibility
+                    # For backwards compatibility with older Neymotin models that do
+                    # not have v0 in the json. For the Duecker model, every Section
+                    # should always have a v0 present at its creation; see the commit
+                    # where the Duecker model was added here:
+                    # https://github.com/jonescompneurolab/hnn-core/blob/49f210fb41481ab859537e9b3e32a74117ae95fc/hnn_core/cells_default.py
+                    "v0",
+                    _default_v_init[cell_name][section_name],
+                ),
                 end_pts=section_data["end_pts"],
             )
             # Set section attributes
