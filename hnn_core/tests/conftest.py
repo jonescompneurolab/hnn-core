@@ -15,6 +15,7 @@ from hnn_core import MPIBackend, JoblibBackend
 # store history of failures per test class name and per index in parametrize
 # (if parametrize used)
 _test_failed_incremental: Dict[str, Dict[Tuple[int, ...], str]] = {}
+hnn_core_root = Path(hnn_core.__file__).parent
 
 
 def pytest_runtest_makereport(item, call):
@@ -83,8 +84,6 @@ def run_hnn_core_fixture():
         electrode_array=None,
         bsl_cor=None,
     ):
-        hnn_core_root = Path(hnn_core.__file__).parent
-
         # default params
         params_fname = hnn_core_root / "param" / "default.json"
         params = read_params(params_fname)
@@ -155,30 +154,30 @@ def run_hnn_core_fixture():
 
     return _run_hnn_core_fixture
 
+
 @pytest.fixture
 def default_params():
-    """Load default parameters for the Jones 2009 model."""
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, "param", "default.json")
+    """Load default parameters for the Neymotin 2020 (aka Jones 2009) model."""
+    params_fname = hnn_core_root / "param" / "default.json"
     return read_params(params_fname)
 
 
 @pytest.fixture
 def network_default(default_params):
-    """Default Jones 2009 network with drives."""
-    return jones_2009_model(default_params, add_drives_from_params=True)
+    """Default Neymotin 2020 (aka Jones 2009) network with drives."""
+    return neymotin_2020_model(default_params, add_drives_from_params=True)
 
 
 @pytest.fixture
 def network_no_drives(default_params):
-    """Jones 2009 network without external drives."""
-    return jones_2009_model(default_params, add_drives_from_params=False)
+    """Default Neymotin 2020 (aka Jones 2009) network without external drives."""
+    return neymotin_2020_model(default_params, add_drives_from_params=False)
 
 
 @pytest.fixture
 def network_small(default_params):
     """Small network (1x1 mesh) for faster tests."""
-    return jones_2009_model(
+    return neymotin_2020_model(
         default_params,
         add_drives_from_params=True,
         mesh_shape=(1, 1),
@@ -188,7 +187,7 @@ def network_small(default_params):
 @pytest.fixture
 def network_3x3(default_params):
     """3x3 mesh network used for testing larger network configurations."""
-    return jones_2009_model(
+    return neymotin_2020_model(
         default_params,
         add_drives_from_params=True,
         mesh_shape=(3, 3),

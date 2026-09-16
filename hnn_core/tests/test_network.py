@@ -11,7 +11,6 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 import matplotlib.pyplot as plt
-from pathlib import Path
 
 import hnn_core
 from hnn_core import (
@@ -2685,7 +2684,7 @@ def test_rename_cell_types(base_network):
     dpls4 = simulate_dipole(net4, tstop=10.0, n_trials=1)
     plot_dipole(dpls4, show=False)
     net4.cell_response.plot_spikes_raster(
-    show=False, cell_types=list(cell_type_rename_mapping.values())
+        show=False, cell_types=list(cell_type_rename_mapping.values())
     )
     net4.cell_response.plot_spikes_hist(show=False)
 

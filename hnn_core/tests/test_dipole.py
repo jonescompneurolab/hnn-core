@@ -186,6 +186,7 @@ def test_dipole(tmp_path, run_hnn_core_fixture):
 
 def test_dipole_simulation():
     """Test data produced from simulate_dipole() call."""
+    # TODO AES probably run_hnn_core_fixture
     hnn_core_root = Path(hnn_core.__file__).parent
     params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
