@@ -788,8 +788,8 @@ def _exp_g_at_dist(x, gbar_at_zero, exp_term, offset, slope=1):
 def basket(cell_name, pos=(0, 0, 0), gid=None):
     """Create a Cell object of the Basket cell type.
 
-    This constructs a Basket cell type (i.e. either 'L2Basket' or 'L5Basket') using the
-    following steps:
+    This constructs a Basket cell type (i.e. 'L2Basket', 'L5Basket', or
+    'L2GABAb_basket') using the following steps:
     1. Sets the "proximal" or "distal" section groups depending on the layer of the
     celltype.
     2. Creates the soma Section compartment object using hard-coded values in
@@ -808,8 +808,9 @@ def basket(cell_name, pos=(0, 0, 0), gid=None):
 
     Parameters
     ----------
-    cell_name : {'L2_basket', 'L5_basket'}
-        The type of basket cell to create.
+    cell_name : {'L2_basket', 'L5_basket', 'L2GABAb_basket'}
+        The type of basket cell to create. Note that 'L2GABAb_basket' is a special case
+        used only in the `waller_pfcbeta_model` network.
     pos : tuple of (int, int, int), default=(0, 0, 0)
         Coordinates of cell soma in xyz-space.
     gid : int, default=None
@@ -828,7 +829,13 @@ def basket(cell_name, pos=(0, 0, 0), gid=None):
         raise ValueError(f"Unknown basket cell type: {cell_name}")
 
     sections = dict()
-    sections["soma"] = _get_basket_soma(v_init=NEYMOTIN_V_INIT[cell_name]["soma"])
+    if cell_name == "L2GABAb_basket":
+        # Waller's L2GABAb_basket uses the same parameters as Neymotin L2_basket cells,
+        # but its cell name is a special case not used in the Neymotin model.
+        v_init_waller_gabab = NEYMOTIN_V_INIT["L2_basket"]["soma"]
+        sections["soma"] = _get_basket_soma(v_init=v_init_waller_gabab)
+    else:
+        sections["soma"] = _get_basket_soma(v_init=NEYMOTIN_V_INIT[cell_name]["soma"])
     synapses = _get_basket_syn_props()
     sections["soma"].syns = list(synapses.keys())
     sections["soma"].mechs = {"hh2": dict()}
