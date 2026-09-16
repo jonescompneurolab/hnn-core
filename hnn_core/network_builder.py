@@ -488,7 +488,7 @@ class NetworkBuilder(object):
                 if self.net.use_dataframe:
                     target_df = self.net.connectivity_df.loc[
                         self.net.connectivity_df["target_gid"] == gid,
-                        ["target_type", "actual_section", "segX", "receptor"],
+                        ["src_type", "actual_section", "segX", "receptor"],
                     ].drop_duplicates()
                 if src_type_metadata.get("measure_dipole", False):
                     cell.build(target_df=target_df, sec_name_apical="apical_trunk")
@@ -639,7 +639,7 @@ class NetworkBuilder(object):
                 "pos_src": net.pos_dict[_long_name(src_type)][pos_idx],
             }
 
-            syn_key = f"{target_type}_{sec_name}_{receptor}_{segX}"
+            syn_key = f"{src_type}_{sec_name}_{receptor}_{segX}"
 
             nc = target_cell.parconnect_from_src(
                 src_gid,
