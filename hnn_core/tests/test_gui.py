@@ -20,6 +20,7 @@ import numpy as np
 import pytest
 import traitlets
 
+import hnn_core
 from hnn_core import Dipole, Network, simulate_dipole
 from hnn_core.gui import HNNGUI
 from hnn_core.gui._viz_manager import (
@@ -47,7 +48,7 @@ from hnn_core.hnn_io import (
 from hnn_core.gui._data_store import data_store
 
 matplotlib.use("agg")
-hnn_core_root = Path(__file__).parents[1]
+hnn_core_root = Path(hnn_core.__file__).parent
 assets_path = Path(hnn_core_root, "tests", "assets")
 
 

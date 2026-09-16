@@ -10,6 +10,7 @@ from urllib.request import urlretrieve
 import numpy as np
 import pytest
 
+import hnn_core
 from hnn_core import (
     simulate_dipole,
     calcium_model,
@@ -29,7 +30,7 @@ from hnn_core.hnn_io import (
 
 from regenerate_test_network import jones_2009_additional_features
 
-hnn_core_root = Path(__file__).parents[1]
+hnn_core_root = Path(hnn_core.__file__).parent
 assets_path = Path(hnn_core_root, "tests", "assets")
 
 

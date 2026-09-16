@@ -7,13 +7,13 @@ from urllib.request import urlretrieve
 
 import pytest
 
+import hnn_core
 from hnn_core import read_params, Params, convert_to_json
 from hnn_core.hnn_io import read_network_configuration
 from hnn_core.network_models import neymotin_2020_model
 from hnn_core.params import remove_nulled_drives
 
-
-hnn_core_root = Path(__file__).parents[1]
+hnn_core_root = Path(hnn_core.__file__).parent
 
 
 def test_read_params(loaded_default_params):

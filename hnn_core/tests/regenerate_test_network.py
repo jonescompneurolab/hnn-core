@@ -3,9 +3,10 @@
 from pathlib import Path
 from shutil import copy
 
+import hnn_core
 from hnn_core import read_params, neymotin_2020_model
 
-hnn_core_root = Path(__file__).parents[1]
+hnn_core_root = Path(hnn_core.__file__).parent
 assets_path = Path(hnn_core_root, "tests", "assets")
 
 
