@@ -625,14 +625,12 @@ class Cell:
 
         Connections are grouped based on their target cell and target location.
         """
-        from hnn_core import simple
         for _, row in target_df.iterrows():
             source = row["src_type"]
             sec_name = row["actual_section"]
             receptor = row["receptor"]
             segX = row["segX"]
             seg = self._nrn_sections[sec_name](segX)
-            simple.total+=1
             syn = self.syn_create(seg, **self.synapses[receptor])
             # we can read from NEURON and add the actual segment location like
             # we have done above in create_synapses_using_synapse_trees.

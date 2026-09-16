@@ -1,4 +1,4 @@
-from hnn_core import neymotin_2020_model, simulate_dipole , simple
+from hnn_core import neymotin_2020_model, simulate_dipole 
 net_a = neymotin_2020_model(use_dataframe=True)
 net_a.add_evoked_drive(
     "evprox",
@@ -18,5 +18,3 @@ net_a.add_evoked_drive(
 
 dpls=simulate_dipole(net_a,tstop=30)
 
-
-print(simple.total)
