@@ -8,8 +8,7 @@ from numpy.testing import assert_allclose
 from h5io import write_hdf5
 import pytest
 
-import hnn_core
-from hnn_core import read_params, read_dipole, average_dipoles
+from hnn_core import read_dipole, average_dipoles
 from hnn_core import Network, neymotin_2020_model
 from hnn_core.viz import plot_dipole
 from hnn_core.dipole import Dipole, simulate_dipole, _rmse
@@ -18,13 +17,11 @@ from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 matplotlib.use("agg")
 
 
-def test_dipole(tmp_path, run_hnn_core_fixture):
+def test_dipole(tmp_path, run_hnn_core_fixture, loaded_default_params):
     """Test dipole object."""
-    hnn_core_root = Path(hnn_core.__file__).parent
-    params_fname = hnn_core_root / "param" / "default.json"
     dpl_out_fname = tmp_path / "dpl1.txt"
     dpl_out_hdf5_fname = tmp_path / "dpl.hdf5"
-    params = read_params(params_fname)
+    params = loaded_default_params
     times = np.arange(0, 6000 * params["dt"], params["dt"])
     data = np.random.random((6000, 3))
     dipole = Dipole(times, data)
@@ -184,12 +181,10 @@ def test_dipole(tmp_path, run_hnn_core_fixture):
     plt.close("all")
 
 
-def test_dipole_simulation():
+def test_dipole_simulation(loaded_default_params):
     """Test data produced from simulate_dipole() call."""
     # TODO AES probably run_hnn_core_fixture
-    hnn_core_root = Path(hnn_core.__file__).parent
-    params_fname = hnn_core_root / "param" / "default.json"
-    params = read_params(params_fname)
+    params = loaded_default_params
     params.update(
         {"dipole_smooth_win": 5, "t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20}
     )
@@ -320,7 +315,7 @@ def test_cell_response_backends(run_hnn_core_fixture):
             assert_allclose(np.array(event_times), np.array(net_ets))
 
 
-def test_rmse():
+def test_rmse(loaded_default_params):
     """Test to check RMSE calculation"""
     data_url = (
         "https://raw.githubusercontent.com/jonescompneurolab/hnn/"
@@ -334,9 +329,7 @@ def test_rmse():
         times=extdata[:, 0], data=np.c_[extdata[:, 1], extdata[:, 1], extdata[:, 1]]
     )
 
-    hnn_core_root = Path(hnn_core.__file__).parent
-    params_fname = hnn_core_root / "param" / "default.json"
-    params = read_params(params_fname)
+    params = loaded_default_params
 
     expected_rmse = 0.1
     test_dpl = Dipole(

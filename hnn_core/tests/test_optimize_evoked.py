@@ -1,11 +1,9 @@
 # Authors: Mainak Jas <mainakjas@gmail.com>
 
-from pathlib import Path
 import numpy as np
 import pytest
 
-import hnn_core
-from hnn_core import read_params, neymotin_2020_model, simulate_dipole
+from hnn_core import neymotin_2020_model, simulate_dipole
 from hnn_core.optimization.optimize_evoked import (
     _consolidate_chunks,
     _split_by_evinput,
@@ -88,11 +86,9 @@ def test_split_by_evinput():
         ]
 
 
-def test_optimize_evoked():
+def test_optimize_evoked(loaded_default_params):
     """Test running the full routine in a reduced network."""
-    hnn_core_root = Path(hnn_core.__file__).parent
-    params_fname = hnn_core_root / "param" / "default.json"
-    params = read_params(params_fname)
+    params = loaded_default_params
 
     tstop = 10.0
     n_trials = 1

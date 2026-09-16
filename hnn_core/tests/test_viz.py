@@ -1,6 +1,5 @@
 import os.path as op
 import tempfile
-from pathlib import Path
 
 import matplotlib
 from matplotlib import backend_bases
@@ -11,8 +10,7 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
-import hnn_core
-from hnn_core import read_params, neymotin_2020_model, read_spikes
+from hnn_core import neymotin_2020_model, read_spikes
 from hnn_core.dipole import simulate_dipole
 from hnn_core.network_models import default_cell_metadata
 from hnn_core.viz import (
@@ -37,10 +35,8 @@ def cleanup_matplotlib():
 
 
 @pytest.fixture
-def setup_net():
-    hnn_core_root = Path(hnn_core.__file__).parent
-    params_fname = hnn_core_root / "param" / "default.json"
-    params = read_params(params_fname)
+def setup_net(loaded_default_params):
+    params = loaded_default_params
     net = neymotin_2020_model(params, mesh_shape=(3, 3))
 
     return net
@@ -312,11 +308,9 @@ class TestCellResponsePlotters:
     """Tests plotting methods of the CellResponse class"""
 
     @pytest.fixture
-    def class_setup_net(self):
+    def class_setup_net(self, loaded_default_params):
         """Creates a base network for tests within this class"""
-        hnn_core_root = Path(hnn_core.__file__).parent
-        params_fname = hnn_core_root / "param" / "default.json"
-        params = read_params(params_fname)
+        params = loaded_default_params
         net = neymotin_2020_model(params, mesh_shape=(3, 3))
 
         return net

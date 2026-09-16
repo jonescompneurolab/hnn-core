@@ -1,14 +1,11 @@
 # Authors: Nick Tolley <nicholas_tolley@brown.edu>
 #          Christopher Bailey <cjb@cfin.au.dk>
 
-from copy import deepcopy
-from pathlib import Path
 import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
 import pytest
 
-import hnn_core
-from hnn_core import read_params, neymotin_2020_model, simulate_dipole
+from hnn_core import neymotin_2020_model, simulate_dipole
 from hnn_core.extracellular import (
     ExtracellularArray,
     calculate_csd2d,
@@ -19,14 +16,10 @@ from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 import matplotlib.pyplot as plt
 
 
-hnn_core_root = Path(hnn_core.__file__).parent
-params_fname = hnn_core_root / "param" / "default.json"
-params = read_params(params_fname)
-
-
-def test_extracellular_api():
+def test_extracellular_api(loaded_default_params):
     """Test extracellular recording API."""
-    net = neymotin_2020_model(deepcopy(params), add_drives_from_params=True)
+    params = loaded_default_params
+    net = neymotin_2020_model(params, add_drives_from_params=True)
 
     # Test LFP electrodes
     electrode_pos = (1, 2, 3)
@@ -129,8 +122,9 @@ def test_extracellular_api():
         _, _ = _get_laminar_z_coords([(1, 1, 3), (1, 1, 4), (1, 1, 3.5)])
 
 
-def test_transmembrane_currents():
+def test_transmembrane_currents(loaded_default_params):
     """Test that net transmembrane current is zero at all times."""
+    params = loaded_default_params
     params.update(
         {
             "N_pyr_x": 3,
@@ -264,11 +258,9 @@ def test_extracellular_backends(run_hnn_core_fixture):
     plt.close("all")
 
 
-def test_rec_array_calculation():
+def test_rec_array_calculation(loaded_default_params):
     """Test LFP/CSD calculation."""
-    hnn_core_root = Path(hnn_core.__file__).parent
-    params_fname = hnn_core_root / "param" / "default.json"
-    params = read_params(params_fname)
+    params = loaded_default_params
     params.update({"t_evprox_1": 7, "t_evdist_1": 17})
     net = neymotin_2020_model(params, mesh_shape=(3, 3), add_drives_from_params=True)
 
@@ -321,11 +313,9 @@ def test_rec_array_calculation():
         )
 
 
-def test_extracellular_viz():
+def test_extracellular_viz(loaded_default_params):
     """Test if deprecation warning is raised in plot_laminar_lfp."""
-    hnn_core_root = Path(hnn_core.__file__).parent
-    params_fname = hnn_core_root / "param" / "default.json"
-    params = read_params(params_fname)
+    params = loaded_default_params
     params.update({"t_evprox_1": 7, "t_evdist_1": 17})
     net = neymotin_2020_model(params, mesh_shape=(3, 3), add_drives_from_params=True)
 

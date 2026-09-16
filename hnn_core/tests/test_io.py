@@ -12,7 +12,6 @@ import pytest
 
 from hnn_core import (
     simulate_dipole,
-    read_params,
     calcium_model,
     duecker_ET_model,
 )
@@ -35,9 +34,8 @@ assets_path = Path(hnn_core_root, "tests", "assets")
 
 
 @pytest.fixture
-def params():
-    params_path = Path(hnn_core_root, "param", "default.json")
-    params = read_params(params_path)
+def params(loaded_default_params):
+    params = loaded_default_params
     params["celsius"] = 37.0
     params["threshold"] = 0.0
 

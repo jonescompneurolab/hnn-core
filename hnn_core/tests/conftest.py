@@ -15,6 +15,7 @@ from hnn_core import MPIBackend, JoblibBackend
 # store history of failures per test class name and per index in parametrize
 # (if parametrize used)
 _test_failed_incremental: Dict[str, Dict[Tuple[int, ...], str]] = {}
+
 hnn_core_root = Path(hnn_core.__file__).parent
 
 
@@ -155,40 +156,40 @@ def run_hnn_core_fixture():
     return _run_hnn_core_fixture
 
 
-@pytest.fixture
-def default_params():
-    """Load default parameters for the Neymotin 2020 (aka Jones 2009) model."""
+@pytest.fixture(scope="module")
+def loaded_default_params():
+    """Return the loaded default "flat JSON" parameters for the Neymotin 2020 (aka Jones 2009) model."""
     params_fname = hnn_core_root / "param" / "default.json"
     return read_params(params_fname)
 
 
 @pytest.fixture
-def network_default(default_params):
+def network_default(loaded_default_params):
     """Default Neymotin 2020 (aka Jones 2009) network with drives."""
-    return neymotin_2020_model(default_params, add_drives_from_params=True)
+    return neymotin_2020_model(loaded_default_params, add_drives_from_params=True)
 
 
 @pytest.fixture
-def network_no_drives(default_params):
+def network_no_drives(loaded_default_params):
     """Default Neymotin 2020 (aka Jones 2009) network without external drives."""
-    return neymotin_2020_model(default_params, add_drives_from_params=False)
+    return neymotin_2020_model(loaded_default_params, add_drives_from_params=False)
 
 
 @pytest.fixture
-def network_small(default_params):
+def network_small(loaded_default_params):
     """Small network (1x1 mesh) for faster tests."""
     return neymotin_2020_model(
-        default_params,
+        loaded_default_params,
         add_drives_from_params=True,
         mesh_shape=(1, 1),
     )
 
 
 @pytest.fixture
-def network_3x3(default_params):
+def network_3x3(loaded_default_params):
     """3x3 mesh network used for testing larger network configurations."""
     return neymotin_2020_model(
-        default_params,
+        loaded_default_params,
         add_drives_from_params=True,
         mesh_shape=(3, 3),
     )

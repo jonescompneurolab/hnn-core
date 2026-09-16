@@ -13,11 +13,9 @@ from numpy.testing import assert_array_equal, assert_allclose, assert_raises
 
 import pytest
 
-import hnn_core
 from hnn_core import (
     MPIBackend,
     neymotin_2020_model,
-    read_params,
     read_spikes,
 )
 from hnn_core.dipole import simulate_dipole
@@ -172,11 +170,9 @@ class TestParallelBackends:
 
     @requires_mpi4py
     @requires_psutil
-    def test_terminate_mpibackend(self, run_hnn_core_fixture):
+    def test_terminate_mpibackend(self, run_hnn_core_fixture, loaded_default_params):
         """Test terminating MPIBackend from thread"""
-        hnn_core_root = Path(hnn_core.__file__).parent
-        params_fname = hnn_core_root / "param" / "default.json"
-        params = read_params(params_fname)
+        params = loaded_default_params
         params.update(
             {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}
         )
@@ -208,11 +204,11 @@ class TestParallelBackends:
     @requires_mpi4py
     @requires_psutil
     @pytest.mark.parametrize("use_hwthreading_if_found", [True, False])
-    def test_run_mpibackend_oversubscribed(self, use_hwthreading_if_found):
+    def test_run_mpibackend_oversubscribed(
+        self, use_hwthreading_if_found, loaded_default_params
+    ):
         """Test running MPIBackend with oversubscribed number of procs"""
-        hnn_core_root = Path(hnn_core.__file__).parent
-        params_fname = hnn_core_root / "param" / "default.json"
-        params = read_params(params_fname)
+        params = loaded_default_params
         params.update(
             {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}
         )
@@ -310,11 +306,10 @@ class TestParallelBackends:
         use_hwthreading_if_found,
         sensible_default_cores,
         override_oversubscribe_option,
+        loaded_default_params,
     ):
         """Test running MPIBackend with oversubscribed number of procs"""
-        hnn_core_root = Path(hnn_core.__file__).parent
-        params_fname = hnn_core_root / "param" / "default.json"
-        params = read_params(params_fname)
+        params = loaded_default_params
         params.update(
             {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}
         )

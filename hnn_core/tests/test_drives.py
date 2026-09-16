@@ -2,12 +2,10 @@
 #          Christopher Bailey <bailey.cj@gmail.com>
 
 import pytest
-from pathlib import Path
 
 import numpy as np
 
-import hnn_core
-from hnn_core import Network, read_params
+from hnn_core import Network
 from hnn_core.drives import (
     _drive_cell_event_times,
     _get_prng,
@@ -18,14 +16,10 @@ from hnn_core.network import pick_connection
 from hnn_core.network_models import neymotin_2020_model
 from hnn_core import simulate_dipole
 
-hnn_core_root = Path(hnn_core.__file__).parent
-
 
 @pytest.fixture
-def setup_net():
-    hnn_core_root = Path(hnn_core.__file__).parent
-    params_fname = hnn_core_root / "param" / "default.json"
-    params = read_params(params_fname)
+def setup_net(loaded_default_params):
+    params = loaded_default_params
     net = neymotin_2020_model(params, mesh_shape=(3, 3))
 
     return net
@@ -217,11 +211,9 @@ def test_clear_drives(setup_net):
     assert net._n_gids == n_gids + len(net.gid_ranges["L5_pyramidal"])
 
 
-def test_add_drives():
+def test_add_drives(loaded_default_params):
     """Test methods for adding drives to a Network."""
-    hnn_core_root = Path(hnn_core.__file__).parent
-    params_fname = hnn_core_root / "param" / "default.json"
-    params = read_params(params_fname)
+    params = loaded_default_params
     net = Network(params, legacy_mode=False)
 
     # Ensure weights and delays are updated
