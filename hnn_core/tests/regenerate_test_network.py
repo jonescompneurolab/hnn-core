@@ -4,14 +4,14 @@ from pathlib import Path
 from shutil import copy
 
 import hnn_core
-from hnn_core import read_params, neymotin_2020_model
+from hnn_core import neymotin_2020_model
 
 hnn_core_root = Path(hnn_core.__file__).parent
-assets_path = Path(hnn_core_root, "tests", "assets")
+assets_path = hnn_core_root / "tests" / "assets"
 
 
-def jones_2009_additional_features():
-    """Instantiate default network with more features for testing purposes.
+def create_neymotin_2020_3x3_test_net():
+    """Instantiate default network with more features (drives, biases, electrodes) for testing purposes.
 
     Note: Depending on differences between CPU architectures, OS, and other
     system variables, this may produce a network for which there are small
@@ -22,13 +22,10 @@ def jones_2009_additional_features():
     regenerate the network, then please discuss with the HNN Development Team
     before pushing your newly-regenerated test network.
     """
-
-    params_path = Path(hnn_core_root, "param", "default.json")
-    params = read_params(params_path)
-
-    net = neymotin_2020_model(
-        params=params, add_drives_from_params=True, mesh_shape=(3, 3)
-    )
+    # We do not need to explicitly load the "flat JSON" parameters from from
+    # "hnn_core/param/default.json", since a default `params` argument of None already
+    # does that.
+    net = neymotin_2020_model(add_drives_from_params=True, mesh_shape=(3, 3))
 
     # Adding bias
     tonic_bias = {
@@ -113,7 +110,7 @@ def jones_2009_additional_features():
 
 
 if __name__ == "__main__":
-    new_test_network_path = assets_path.joinpath("neymotin2020_3x3_drives.json")
+    new_test_network_path = assets_path / "neymotin2020_3x3_drives.json"
 
     backup_path = Path(
         new_test_network_path.parent,
@@ -137,5 +134,5 @@ what you are doing. This will make a backup located at
 
     copy(new_test_network_path, backup_path)
 
-    net = jones_2009_additional_features()
+    net = create_neymotin_2020_3x3_test_net()
     net.write_configuration(new_test_network_path)

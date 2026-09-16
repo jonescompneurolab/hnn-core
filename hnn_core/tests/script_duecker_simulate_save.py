@@ -51,10 +51,6 @@ def rerun_and_save_duecker_model(suffix="new", backend="mpi"):
         - ``spikes_duecker_output_{suffix}.txt`` : spike times of all cells
         - ``dipole_duecker_output_{suffix}.txt`` : dipole waveform of trial 0
     """
-    print("---------------------------------\n")
-    print("-->REMEMBER to recompile the mods\n")
-    print("---------------------------------\n")
-
     # --------------------------------------------------------------------------------------
     # Begin network setup and drive config
     net = duecker_ET_model()

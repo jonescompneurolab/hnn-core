@@ -28,7 +28,7 @@ from hnn_core.hnn_io import (
     read_network_configuration,
 )
 
-from regenerate_test_network import jones_2009_additional_features
+from regenerate_test_network import create_neymotin_2020_3x3_test_net
 
 hnn_core_root = Path(hnn_core.__file__).parent
 assets_path = Path(hnn_core_root, "tests", "assets")
@@ -48,7 +48,7 @@ def jones_2009_network():
     # This allows us to define this test network once, but use it as both a
     # fixture here in this file, or regenerate the network itself if used
     # elsewhere.
-    net = jones_2009_additional_features()
+    net = create_neymotin_2020_3x3_test_net()
 
     return net
 
