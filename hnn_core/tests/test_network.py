@@ -528,22 +528,8 @@ def test_network_models_diesburg_2024():
 def test_network_models_waller_pfcbeta():
     """Test instantiation and custom parameters of the Waller PFCBeta model"""
     net_waller = waller_pfcbeta_model()
-    net_waller.add_evoked_drive(
-        name="evdist1",
-        mu=5.0,
-        sigma=1.0,
-        numspikes=1,
-        location="distal",
-        weights_ampa={"L2_basket": 0.1, "L2_pyramidal": 0.1},
-    )
-    net_waller.add_evoked_drive(
-        name="evprox1",
-        mu=5.0,
-        sigma=1.0,
-        numspikes=1,
-        location="proximal",
-        weights_ampa={"L2_basket": 0.1, "L2_pyramidal": 0.1},
-    )
+    del net_waller
+    net_waller = waller_pfcbeta_model(add_default_drives=True)
 
     # We need to run a simulation to test that the network simulates correctly here. For
     # all other models, they are simulated in `test_network_models_mesh`, but the Waller
@@ -562,10 +548,6 @@ def test_network_models_waller_pfcbeta():
 
     for celltype in ["L2_pyramidal", "L5_pyramidal"]:
         synapse = net_waller.cell_types[celltype]["cell_object"].synapses["gabab"]
-        # TODO AES: discuss
-        # # Taken from the network_models.py definition
-        # assert synapse["tau1"] == 45.0
-        # assert synapse["tau2"] == 200.0
         assert synapse["mechname"] == "gabab_neymotin2016"
 
 

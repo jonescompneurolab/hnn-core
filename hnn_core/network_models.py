@@ -1103,6 +1103,7 @@ def diesburg_2024_model(params=None, add_default_drives=False, mesh_shape=(10, 1
 
 def waller_pfcbeta_model(
     params=None,
+    add_default_drives=False,
 ):
     """Instantiate the network model used to study beta events in frontocentral cortex.
 
@@ -1116,6 +1117,8 @@ def waller_pfcbeta_model(
         The path to the parameter file for constructing the network.
         If None, parameters loaded from default.json
         Default: None
+    add_default_drives : bool, default=False
+        If True, add external drives as defined in an upcoming publication.
 
     Returns
     -------
@@ -1131,7 +1134,8 @@ def waller_pfcbeta_model(
     Notes
     -----
     This model differs from ``diesburg_2024_model`` in the following ways:
-    1) Increased gabaB duration of inhibition (see file `hnn_core/mod/gabab_neymotin2016.mod`)
+    1) Increased gabaB duration of inhibition (see file
+        `hnn_core/mod/gabab_neymotin2016.mod`)
     2) Decreased L5 pyr -> L5 pyr NMDA weights to prevent epileptic spiking activity.
     3) Increased gabaB L2/L5 basket to LL2/5 pyr.
     4) Remove L2_basket -> L5_pyramidal gabaa connection
@@ -1208,6 +1212,84 @@ def waller_pfcbeta_model(
         cell = cell_entry["cell_object"]
         if "gabab" in cell.synapses:
             cell.synapses["gabab"] = {"mechname": "gabab_neymotin2016"}
+
+    if add_default_drives:
+        new_weights_ampa_p1 = {
+            "L2_basket": 0.08831,
+            "L2_pyramidal": 0.015,
+            "L2GABAb_basket": 0,
+            "L5_basket": 0.00001,
+            "L5_pyramidal": 0.02,
+        }
+        new_weights_nmda_p1 = {
+            "L2_basket": 0,
+            "L2_pyramidal": 0,
+            "L2GABAb_basket": 0,
+            "L5_basket": 0.025,
+            "L5_pyramidal": 0.02,
+        }
+
+        new_weights_ampa_d1 = {
+            "L2_basket": 0.006562,
+            "L2_pyramidal": 0.000007,
+            "L2GABAb_basket": 0,
+            "L5_pyramidal": 0.3,
+        }
+        new_weights_nmda_d1 = {
+            "L2_basket": 0.19482,
+            "L2_pyramidal": 0.004317,
+            "L2GABAb_basket": 0,
+            "L5_pyramidal": 0.060074,
+        }
+
+        new_weights_ampa_p2 = {
+            "L2_basket": 0.000003,
+            "L2_pyramidal": 1.43,
+            "L2GABAb_basket": 0,
+            "L5_basket": 0.008958,
+            "L5_pyramidal": 0.684013,
+        }
+        new_weights_nmda_p2 = {
+            "L2_basket": 0.05357,
+            "L2_pyramidal": 0.25,
+            "L2GABAb_basket": 0,
+            "L5_basket": 0.25,
+            "L5_pyramidal": 4,
+        }
+
+        # These external drives assume the stimulus beginning occurs at 0 ms.
+        net.add_evoked_drive(
+            "evprox1",
+            mu=145,
+            sigma=15,
+            numspikes=1,
+            weights_ampa=new_weights_ampa_p1,
+            weights_nmda=new_weights_nmda_p1,
+            location="proximal",
+            event_seed=3,
+        )
+
+        net.add_evoked_drive(
+            "evdist1",
+            mu=215.08,
+            sigma=18,
+            numspikes=1,
+            weights_ampa=new_weights_ampa_d1,
+            weights_nmda=new_weights_nmda_d1,
+            location="distal",
+            event_seed=4,
+        )
+
+        net.add_evoked_drive(
+            "evprox2",
+            mu=300,
+            sigma=50,
+            numspikes=2,
+            weights_ampa=new_weights_ampa_p2,
+            weights_nmda=new_weights_nmda_p2,
+            location="proximal",
+            event_seed=4,
+        )
 
     return net
 
