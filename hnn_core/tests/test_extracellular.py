@@ -16,9 +16,9 @@ from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 import matplotlib.pyplot as plt
 
 
-def test_extracellular_api(loaded_default_params):
+def test_extracellular_api(fix_default_params):
     """Test extracellular recording API."""
-    params = loaded_default_params
+    params = fix_default_params
     net = neymotin_2020_model(params, add_drives_from_params=True)
 
     # Test LFP electrodes
@@ -122,9 +122,9 @@ def test_extracellular_api(loaded_default_params):
         _, _ = _get_laminar_z_coords([(1, 1, 3), (1, 1, 4), (1, 1, 3.5)])
 
 
-def test_transmembrane_currents(loaded_default_params):
+def test_transmembrane_currents(fix_default_params):
     """Test that net transmembrane current is zero at all times."""
-    params = loaded_default_params
+    params = fix_default_params
     params.update(
         {
             "N_pyr_x": 3,
@@ -258,9 +258,9 @@ def test_extracellular_backends(run_hnn_core_fixture):
     plt.close("all")
 
 
-def test_rec_array_calculation(loaded_default_params):
+def test_rec_array_calculation(fix_default_params):
     """Test LFP/CSD calculation."""
-    params = loaded_default_params
+    params = fix_default_params
     params.update({"t_evprox_1": 7, "t_evdist_1": 17})
     net = neymotin_2020_model(params, mesh_shape=(3, 3), add_drives_from_params=True)
 
@@ -313,9 +313,9 @@ def test_rec_array_calculation(loaded_default_params):
         )
 
 
-def test_extracellular_viz(loaded_default_params):
+def test_extracellular_viz(fix_default_params):
     """Test if deprecation warning is raised in plot_laminar_lfp."""
-    params = loaded_default_params
+    params = fix_default_params
     params.update({"t_evprox_1": 7, "t_evdist_1": 17})
     net = neymotin_2020_model(params, mesh_shape=(3, 3), add_drives_from_params=True)
 

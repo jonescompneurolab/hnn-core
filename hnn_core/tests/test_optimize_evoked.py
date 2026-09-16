@@ -86,9 +86,9 @@ def test_split_by_evinput():
         ]
 
 
-def test_optimize_evoked(loaded_default_params):
+def test_optimize_evoked(fix_default_params):
     """Test running the full routine in a reduced network."""
-    params = loaded_default_params
+    params = fix_default_params
 
     tstop = 10.0
     n_trials = 1

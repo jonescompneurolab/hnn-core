@@ -16,9 +16,9 @@ from hnn_core.params import remove_nulled_drives
 hnn_core_root = Path(hnn_core.__file__).parent
 
 
-def test_read_params(loaded_default_params):
+def test_read_params(fix_default_params):
     """Test reading of params object."""
-    params = loaded_default_params
+    params = fix_default_params
     # Smoke test that network loads params
     _ = neymotin_2020_model(params, add_drives_from_params=True, legacy_mode=False)
     _ = neymotin_2020_model(params, add_drives_from_params=True, legacy_mode=True)

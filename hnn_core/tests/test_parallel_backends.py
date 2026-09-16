@@ -170,9 +170,9 @@ class TestParallelBackends:
 
     @requires_mpi4py
     @requires_psutil
-    def test_terminate_mpibackend(self, run_hnn_core_fixture, loaded_default_params):
+    def test_terminate_mpibackend(self, run_hnn_core_fixture, fix_default_params):
         """Test terminating MPIBackend from thread"""
-        params = loaded_default_params
+        params = fix_default_params
         params.update(
             {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}
         )
@@ -205,10 +205,10 @@ class TestParallelBackends:
     @requires_psutil
     @pytest.mark.parametrize("use_hwthreading_if_found", [True, False])
     def test_run_mpibackend_oversubscribed(
-        self, use_hwthreading_if_found, loaded_default_params
+        self, use_hwthreading_if_found, fix_default_params
     ):
         """Test running MPIBackend with oversubscribed number of procs"""
-        params = loaded_default_params
+        params = fix_default_params
         params.update(
             {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}
         )
@@ -306,10 +306,10 @@ class TestParallelBackends:
         use_hwthreading_if_found,
         sensible_default_cores,
         override_oversubscribe_option,
-        loaded_default_params,
+        fix_default_params,
     ):
         """Test running MPIBackend with oversubscribed number of procs"""
-        params = loaded_default_params
+        params = fix_default_params
         params.update(
             {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}
         )

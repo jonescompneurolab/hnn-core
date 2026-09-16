@@ -35,8 +35,8 @@ assets_path = Path(hnn_core_root, "tests", "assets")
 
 
 @pytest.fixture
-def params(loaded_default_params):
-    params = loaded_default_params
+def params(fix_default_params):
+    params = fix_default_params
     params["celsius"] = 37.0
     params["threshold"] = 0.0
 

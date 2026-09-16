@@ -35,8 +35,8 @@ def cleanup_matplotlib():
 
 
 @pytest.fixture
-def setup_net(loaded_default_params):
-    params = loaded_default_params
+def setup_net(fix_default_params):
+    params = fix_default_params
     net = neymotin_2020_model(params, mesh_shape=(3, 3))
 
     return net
@@ -308,9 +308,9 @@ class TestCellResponsePlotters:
     """Tests plotting methods of the CellResponse class"""
 
     @pytest.fixture
-    def class_setup_net(self, loaded_default_params):
+    def class_setup_net(self, fix_default_params):
         """Creates a base network for tests within this class"""
-        params = loaded_default_params
+        params = fix_default_params
         net = neymotin_2020_model(params, mesh_shape=(3, 3))
 
         return net

@@ -80,10 +80,10 @@ def test_extract_data_length():
     assert output == 8
 
 
-def test_str_to_net(loaded_default_params):
+def test_str_to_net(fix_default_params):
     """Test reading the network via a string"""
     # prepare network
-    params = loaded_default_params
+    params = fix_default_params
     net = neymotin_2020_model(params, add_drives_from_params=True)
 
     pickled_net = base64.b64encode(pickle.dumps(net))
@@ -113,10 +113,10 @@ def test_str_to_net(loaded_default_params):
         _str_to_net(input_str)
 
 
-def test_child_run(loaded_default_params):
+def test_child_run(fix_default_params):
     """Test running the child process without MPI"""
     # prepare params
-    params = loaded_default_params
+    params = fix_default_params
     params_reduced = params.copy()
     params_reduced.update({"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20})
     tstop, n_trials = 25, 2

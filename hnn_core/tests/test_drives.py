@@ -18,8 +18,8 @@ from hnn_core import simulate_dipole
 
 
 @pytest.fixture
-def setup_net(loaded_default_params):
-    params = loaded_default_params
+def setup_net(fix_default_params):
+    params = fix_default_params
     net = neymotin_2020_model(params, mesh_shape=(3, 3))
 
     return net
@@ -211,9 +211,9 @@ def test_clear_drives(setup_net):
     assert net._n_gids == n_gids + len(net.gid_ranges["L5_pyramidal"])
 
 
-def test_add_drives(loaded_default_params):
+def test_add_drives(fix_default_params):
     """Test methods for adding drives to a Network."""
-    params = loaded_default_params
+    params = fix_default_params
     net = Network(params, legacy_mode=False)
 
     # Ensure weights and delays are updated
