@@ -9,7 +9,7 @@ from hnn_core.params import convert_to_json
 
 hnn_core_root = Path(hnn_core.__file__).parent
 
-network_configs_path = hnn_core_root / "hnn_core" / "param"
+network_configs_path = hnn_core_root / "param"
 # This is the "flat JSON" parameter file which all of our "hierarchical JSON"
 # network files are based off of
 input_flat_base_network_config_path = network_configs_path / "default.json"
