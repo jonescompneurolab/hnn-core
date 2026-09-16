@@ -7,9 +7,9 @@ from typing import Dict, Tuple
 import pytest
 import pickle
 
-import os.path as op
+from pathlib import Path
 import hnn_core
-from hnn_core import read_params, jones_2009_model, simulate_dipole
+from hnn_core import read_params, neymotin_2020_model, simulate_dipole
 from hnn_core import MPIBackend, JoblibBackend
 
 # store history of failures per test class name and per index in parametrize
@@ -81,11 +81,12 @@ def run_hnn_core_fixture():
         record_ca=False,
         postproc=False,
         electrode_array=None,
+        bsl_cor=None,
     ):
-        hnn_core_root = op.dirname(hnn_core.__file__)
+        hnn_core_root = Path(hnn_core.__file__).parent
 
         # default params
-        params_fname = op.join(hnn_core_root, "param", "default.json")
+        params_fname = hnn_core_root / "param" / "default.json"
         params = read_params(params_fname)
 
         tstop = 170.0
@@ -100,7 +101,7 @@ def run_hnn_core_fixture():
         else:
             mesh_shape = (10, 10)
         # Legacy mode necessary for exact dipole comparison test
-        net = jones_2009_model(
+        net = neymotin_2020_model(
             params,
             add_drives_from_params=True,
             legacy_mode=legacy_mode,
@@ -119,6 +120,7 @@ def run_hnn_core_fixture():
                     record_ca=record_ca,
                     postproc=postproc,
                     tstop=tstop,
+                    bsl_cor=bsl_cor,
                 )
         elif backend == "joblib":
             with JoblibBackend(n_jobs=n_jobs):
@@ -129,6 +131,7 @@ def run_hnn_core_fixture():
                     record_ca=record_ca,
                     postproc=postproc,
                     tstop=tstop,
+                    bsl_cor=bsl_cor,
                 )
         else:
             dpls = simulate_dipole(
@@ -138,6 +141,7 @@ def run_hnn_core_fixture():
                 record_ca=record_ca,
                 postproc=postproc,
                 tstop=tstop,
+                bsl_cor=bsl_cor,
             )
 
         # check that the network object is picklable after the simulation

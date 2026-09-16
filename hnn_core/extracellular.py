@@ -20,12 +20,15 @@ Network Local Field Potentials using LFPsim. Front Comput Neurosci 10:65.
 #          Sam Neymotin <samnemo@gmail.com>
 #          Christopher Bailey <cjb@cfin.au.dk>
 
-import numpy as np
 from copy import deepcopy
+
+import numpy as np
 from numpy.linalg import norm
 from neuron import h
 
 from .externals.mne import _validate_type, _check_option
+from .utils import smooth_waveform
+from .viz import plot_laminar_csd, plot_laminar_lfp
 
 
 def calculate_csd2d(lfp_data, delta=1):
@@ -142,6 +145,7 @@ def _transfer_resistance(
 
     sec_start = np.array([section.x3d(0), section.y3d(0), section.z3d(0)])
     sec_end = np.array([section.x3d(1), section.y3d(1), section.z3d(1)])
+
     sec_vec = sec_end - sec_start
 
     # NB segment lengths aren't equal! First/last segment center point is
@@ -219,6 +223,7 @@ def _transfer_resistance(
     # transmembrane current returned by _ref_i_membrane_ is in [nA]
     # ==> 1e-9 A x (1 / 1e-6 S) = 1e-3 V = mV
     # ===> multiply by 1e3 to get uV
+
     return 1000.0 * phi / (4.0 * np.pi * conductivity)
 
 
@@ -473,8 +478,6 @@ class ExtracellularArray:
         extracellular_copy : instance of ExtraCellularArray
             The modified ExtraCellularArray instance.
         """
-        from .utils import smooth_waveform
-
         for n_trial in range(len(self)):
             for n_contact in range(self.n_contacts):
                 self._data[n_trial][n_contact] = smooth_waveform(
@@ -536,8 +539,6 @@ class ExtracellularArray:
         fig : instance of plt.fig
             The matplotlib figure handle into which time series were plotted.
         """
-        from .viz import plot_laminar_lfp
-
         if trial_no is None:
             plot_data = self.voltages
         elif isinstance(trial_no, (list, tuple, int, slice)):
@@ -609,8 +610,6 @@ class ExtracellularArray:
         fig : instance of matplotlib Figure
             The matplotlib figure handle.
         """
-        from .viz import plot_laminar_csd
-
         lfp = self.voltages[0]
         contact_labels, delta = _get_laminar_z_coords(self.positions)
 

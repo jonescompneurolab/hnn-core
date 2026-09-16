@@ -8,11 +8,47 @@ from functools import partial
 from .cell import Cell, Section
 
 from .params import compare_dictionaries
-from .params_default import get_L2Pyr_params_default, get_L5Pyr_params_default
-
+from .params_default import (
+    get_L2Pyr_params_default,
+    get_L5Pyr_params_default,
+    get_L2Pyrhuman_params,
+    get_L5PyrET_params,
+    get_Int_params,
+)
 # Units for e: mV
 # Units for gbar: S/cm^2 unless otherwise noted
 # units for taur: ms
+
+# Default initial membrane voltages (v0, in mV) for each section of each cell type.
+NEYMOTIN_V_INIT = {
+    "L2_pyramidal": {
+        "soma": -71.46,
+        "apical_1": -71.46,
+        "apical_oblique": -71.46,
+        "apical_trunk": -71.46,
+        "apical_tuft": -71.46,
+        "basal_1": -71.46,
+        "basal_2": -71.46,
+        "basal_3": -71.46,
+    },
+    "L5_pyramidal": {
+        "soma": -72.0,
+        "apical_1": -71.32,
+        "apical_2": -69.08,
+        "apical_oblique": -72.0,
+        "apical_trunk": -72.0,
+        "apical_tuft": -67.30,
+        "basal_1": -72.0,
+        "basal_2": -72.0,
+        "basal_3": -72.0,
+    },
+    "L2_basket": {
+        "soma": -64.9737,
+    },
+    "L5_basket": {
+        "soma": -64.9737,
+    },
+}
 
 
 def _get_dends(
@@ -72,9 +108,9 @@ def _get_dends(
       value, e.g. `h.finitialize(-65)`.
     - The 'v0' (initial voltage) parameter is handled separately from other properties
       as it is a newer addition not found in legacy parameter files.
-    - In the (Jones et al., 2009) model, this is used to construct both apical and basal
-      dendrite sections. In the newer (Duecker 2025) model, this is only used for the
-      apical dendrite sections.
+    - In the (Neymotin et al., 2020) model, this is used to construct both apical and
+      basal dendrite sections. In the newer Duecker model, this is only used for the
+      apical dendrite sections (excluding apical_oblique).
     """
     prop_names = ["L", "diam", "Ra", "cm"]
     sections = dict()
@@ -96,7 +132,6 @@ def _get_dends(
             dend_prop["v0"] = v_init["all"]
         else:
             dend_prop["v0"] = v_init[section_name]
-
         sections[section_name] = Section(
             L=dend_prop["L"],
             diam=dend_prop["diam"],
@@ -155,6 +190,92 @@ def _get_pyr_soma(params, cell_type, v_init=-65):
     )
 
 
+def _get_basal(params, cell_type, section_names, v_init={"all": -65}):
+    """Create Duecker-only basal and apical_oblique dendritic Section objects.
+
+    Extracts geometric and electrical properties (length, diameter, axial resistance,
+    membrane capacitance) from a flat parameter dictionary, takes initial membrane
+    voltage from an argument, and constructs Section objects for each basal dendritic
+    compartment. Handles parameter key name transformations (e.g., 'apical_oblique' ->
+    'apicaloblique') required for lookup in the parameter dictionary.
+
+    *Importantly*, "Section objects" in this context are objects of the class
+    `hnn_core/cell.py::Section`, NOT the "true" NEURON sections. The "true" NEURON
+    sections are only created later, immediately before a simulation is run, using
+    `NetworkBuilder._build`.
+
+    Parameters
+    ----------
+    params : dict
+        Flat dictionary containing cell parameters with keys formatted as
+        '{cell_type}_{section}_{property}' (e.g., 'L5Pyr_apicaltrunk_L'). 'Ra' and 'cm'
+        use "dend" as the middle component rather than specific section names. This
+        'params' dictionary is expected to be constructed using
+        functions like `params_default.py::get_L2Pyr_params_default`.
+    cell_type : {'L2Pyr', 'L5Pyr'}
+        Cell type identifier used as prefix in parameter key lookups.
+    section_names : list of str
+        Names of dendritic sections to create (e.g., ["basal_1", "basal_2", "basal_3",
+        "apical_oblique"]). Underscores are removed for parameter lookups except for
+        'Ra' and 'cm'.
+    v_init : dict, default={"all": -65}
+        Initial membrane potential in mV. If dict contains single key "all", that value
+        is applied to all sections. Otherwise, keys must match 'section_names' for
+        section-specific initialization.
+
+    Returns
+    -------
+    sections : dict
+        Dictionary mapping section names (str) to Section objects with attributes 'L',
+        'diam', 'Ra', and 'cm' set from 'params', and 'v0' set from argument.
+
+    Notes
+    -----
+    - KD: This function is where the initial voltages for the dendritic sections are
+      set; these voltages are not overridden by `h.finitialize` unless called with a
+      value, e.g. `h.finitialize(-65)`.
+    - The 'v0' (initial voltage) parameter is handled separately from other properties
+      as it is a newer addition not found in legacy parameter files.
+    - This is not used in the (Neymotin et al., 2020) model. In the newer Duecker model,
+      this is only used for the basal dendrite and "apical_oblique" dendrite sections.
+    """
+    prop_names = ["L", "diam", "Ra", "cm"]
+    sections = dict()
+    for section_name in section_names:
+        dend_prop = dict()
+        middle = section_name.replace("_", "")
+        for key in prop_names:
+            if key in ["Ra", "cm"]:
+                middle = "basal"
+            else:
+                # map apicaltrunk -> apical_trunk etc.
+                middle = section_name.replace("_", "")
+            dend_prop[key] = params[f"{cell_type}_{middle}_{key}"]
+            if len(v_init) == 1:
+                dend_prop["v0"] = v_init["all"]
+            else:
+                dend_prop["v0"] = v_init[section_name]
+        sections[section_name] = Section(
+            L=dend_prop["L"],
+            diam=dend_prop["diam"],
+            Ra=dend_prop["Ra"],
+            cm=dend_prop["cm"],
+            v0=dend_prop["v0"],
+        )
+    return sections
+
+
+def _get_pyr_soma(p_all, cell_type, v_init=-65):
+    """Get somatic properties."""
+    return Section(
+        L=p_all[f"{cell_type}_soma_L"],
+        diam=p_all[f"{cell_type}_soma_diam"],
+        cm=p_all[f"{cell_type}_soma_cm"],
+        Ra=p_all[f"{cell_type}_soma_Ra"],
+        v0=v_init,
+    )
+
+
 def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
     """Create a Cell object of the Layer 2/3 Pyramidal cell type.
 
@@ -209,7 +330,7 @@ def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
         p_all = compare_dictionaries(p_all, override_params)
 
     # All sections of this cell type use the same initial membrane voltage:
-    all_v_init = -71.46
+    v_init = NEYMOTIN_V_INIT["L2_pyramidal"]
 
     section_names = [
         "apical_trunk",
@@ -221,18 +342,24 @@ def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
         "basal_3",
     ]
 
+    if set(section_names + ["soma"]) != set(v_init.keys()):
+        raise ValueError(
+            "For L2_pyramidal cells, mismatch between hardcoded 'section_names' and "
+            "NEYMOTIN_V_INIT's section keys. "
+            f"section_names (excluding 'soma'): {section_names} "
+            f"NEYMOTIN_V_INIT keys: {list(v_init.keys())}"
+        )
+
     sections = _get_dends(
         p_all,
         cell_type="L2Pyr",
         section_names=section_names,
-        v_init={
-            "all": all_v_init,
-        },
+        v_init=v_init,
     )
     sections["soma"] = _get_pyr_soma(
         p_all,
         "L2Pyr",
-        v_init=all_v_init,
+        v_init=v_init["soma"],
     )
 
     end_pts = {
@@ -284,7 +411,7 @@ def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
         "distal": ["apical_tuft"],
     }
 
-    synapses = _get_pyr_syn_props(p_all, "L2Pyr")
+    synapses = _get_syn_props(p_all, "L2Pyr")
     return Cell(
         "L2Pyr",
         pos,
@@ -363,17 +490,15 @@ def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
     ]
 
     # Different sections of this cell type use different initial membrane voltages:
-    v_init = {
-        "apical_1": -71.32,
-        "apical_2": -69.08,
-        "apical_tuft": -67.30,
-        "apical_trunk": -72,
-        "soma": -72.0,
-        "basal_1": -72,
-        "basal_2": -72,
-        "basal_3": -72,
-        "apical_oblique": -72,
-    }
+    v_init = NEYMOTIN_V_INIT["L5_pyramidal"]
+
+    if set(section_names + ["soma"]) != set(v_init.keys()):
+        raise ValueError(
+            "For L5_pyramidal cells, mismatch between hardcoded 'section_names' and "
+            "NEYMOTIN_V_INIT's section keys. "
+            f"section_names (excluding 'soma'): {section_names} "
+            f"NEYMOTIN_V_INIT keys: {list(v_init.keys())}"
+        )
 
     sections = _get_dends(
         p_all,
@@ -450,7 +575,7 @@ def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
         "distal": ["apical_tuft"],
     }
 
-    synapses = _get_pyr_syn_props(p_all, "L5Pyr")
+    synapses = _get_syn_props(p_all, "L5Pyr")
     return Cell(
         "L5Pyr",
         pos,
@@ -462,7 +587,7 @@ def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
     )
 
 
-def _get_basket_soma(v_init=-64.9737):
+def _get_basket_soma(v_init=NEYMOTIN_V_INIT["L2_basket"]["soma"]):
     """Create Basket somatic Section objects.
 
     This sets geometric and electrical properties (length, diameter, axial resistance,
@@ -481,7 +606,7 @@ def _get_basket_soma(v_init=-64.9737):
     ----------
     cell_name : ???
         Not actually used.
-    v_init : float, default=-64.9737
+    v_init : float, default=NEYMOTIN_V_INIT["L2_basket"]["soma"]
         Initial membrane potential in mV.
 
     Returns
@@ -507,11 +632,28 @@ def _get_basket_soma(v_init=-64.9737):
     )
 
 
-def _get_pyr_syn_props(p_all, cell_type):
-    """Return the default synaptic parameters for a given Pyramidal cell_type.
+def _get_interneuron_soma(cell_name, v_init=-69):
+    """Create Duecker-only interneuron soma Sections.
 
-    Extracts the 'e', 'tau1', and 'tau2' parameters for all synapse types for a
-    particular cell_type.
+    These values were taken from (Chamberland et al., 2023)
+    https://doi.org/10.1016/j.neuron.2023.01.017
+    """
+    end_pts = [[0, 0, 0], [0, 0, 20.0]]
+    return Section(L=20.0, diam=20.0, cm=1, Ra=200.0, end_pts=end_pts, v0=v_init)
+
+
+def _get_syn_props(p_all, cell_type, syn_types=["ampa", "nmda", "gabaa", "gabab"]):
+    """Get synaptic properties for a specific cell type.
+
+    When parameters in `p_all` are provided for a "syn_type" (of the set {ampa, nmda,
+    gabaa, gabab}), and no "syn_type_mechname" key is present in p_all, then this will
+    *always* return the default synapse mechanism of "Exp2Syn". In order to use a custom
+    "mechanism" (such as "NMDA_gao2021" or "gabab_neymotin2016"), the incoming parameters in
+    `p_all` should include a key of the form `f"{cell_type}_{syn_type}_mechname"` with
+    the value being the name of the custom mechanism.
+
+    This was formerly called `_get_pyr_syn_props`, but `_pyr` was dropped from name due
+    to this function's future usage by interneurons in the upcoming Duecker model.
 
     Parameters
     ----------
@@ -521,39 +663,46 @@ def _get_pyr_syn_props(p_all, cell_type):
         dictionary is expected to be constructed using functions like
         `params_default.py::get_L2Pyr_params_default`.
     cell_type : {'L2Pyr', 'L5Pyr'}
-        Cell type identifier used as prefix in parameter key lookups.
+        The "short-name" type of cell
+    syn_types : list of str, optional
+        List of synapse types to extract properties for. Default: ["ampa", "nmda",
+        "gabaa", "gabab"]
 
     Returns
     -------
-    dict
-        A dictionary where the keys are the four synapse types {'ampa', 'nmda', 'gabaa',
-        'gabab'}, and where the values are dictionaries whose keys are {'e', 'tau1',
-        'tau2'} and whose values are the parameter values of that case from default
-        parameter dictionaries such as from
-        `params_default.py::get_L2Pyr_params_default`.
+    syn_props : dict
+        Dictionary where keys are synapse types and values are dictionaries containing
+        synapse properties. At minimum includes 'mechname' (synapse mechanism name,
+        e.g., 'Exp2Syn'). For `Exp2Syn` synapses, includes 'e' (reversal potential),
+        'tau1' (rise time constant), and 'tau2' (decay time constant). Custom synapse
+        mechanisms may include additional parameters specific to that mechanism.
     """
-    return {
-        "ampa": {
-            "e": p_all["%s_ampa_e" % cell_type],
-            "tau1": p_all["%s_ampa_tau1" % cell_type],
-            "tau2": p_all["%s_ampa_tau2" % cell_type],
-        },
-        "nmda": {
-            "e": p_all["%s_nmda_e" % cell_type],
-            "tau1": p_all["%s_nmda_tau1" % cell_type],
-            "tau2": p_all["%s_nmda_tau2" % cell_type],
-        },
-        "gabaa": {
-            "e": p_all["%s_gabaa_e" % cell_type],
-            "tau1": p_all["%s_gabaa_tau1" % cell_type],
-            "tau2": p_all["%s_gabaa_tau2" % cell_type],
-        },
-        "gabab": {
-            "e": p_all["%s_gabab_e" % cell_type],
-            "tau1": p_all["%s_gabab_tau1" % cell_type],
-            "tau2": p_all["%s_gabab_tau2" % cell_type],
-        },
-    }
+    syn_props = dict()
+    for syn in syn_types:
+        # Backwards compatibility check: if syn_type key is missing or None, default to
+        # Exp2Syn
+        if (f"{cell_type}_{syn}_mechname" not in p_all.keys()) or (
+            p_all[f"{cell_type}_{syn}_mechname"] == "Exp2Syn"
+        ):
+            syn_props[syn] = {
+                key: p_all[f"{cell_type}_{syn}_{key}"] for key in ["e", "tau1", "tau2"]
+            }
+            syn_props[syn].update({"mechname": "Exp2Syn"})
+        else:
+            # We should only be here if there is a `f"{cell_type}_{syn}_mechname"` key
+            # in p_all!
+            # Get all parameter keys for this synapse mechanism
+            syn_custom_var_keys = [
+                key.split(f"{cell_type}_{syn}_")[1]
+                for key in p_all.keys()
+                if key.startswith(f"{cell_type}_{syn}_")
+            ]
+            # Build synapse properties dict from available parameters
+            # (This should include 'mechname' as well)
+            syn_props[syn] = {
+                key: p_all[f"{cell_type}_{syn}_{key}"] for key in syn_custom_var_keys
+            }
+    return syn_props
 
 
 def _get_basket_syn_props():
@@ -569,9 +718,9 @@ def _get_basket_syn_props():
         'tau1', 'tau2'} and whose values are hard-coded.
     """
     return {
-        "ampa": {"e": 0, "tau1": 0.5, "tau2": 5.0},
-        "gabaa": {"e": -80, "tau1": 0.5, "tau2": 5.0},
-        "nmda": {"e": 0, "tau1": 1.0, "tau2": 20.0},
+        "ampa": {"e": 0, "tau1": 0.5, "tau2": 5.0, "mechname": "Exp2Syn"},
+        "gabaa": {"e": -80, "tau1": 0.5, "tau2": 5.0, "mechname": "Exp2Syn"},
+        "nmda": {"e": 0, "tau1": 1.0, "tau2": 20.0, "mechname": "Exp2Syn"},
     }
 
 
@@ -679,7 +828,7 @@ def basket(cell_name, pos=(0, 0, 0), gid=None):
         raise ValueError(f"Unknown basket cell type: {cell_name}")
 
     sections = dict()
-    sections["soma"] = _get_basket_soma()
+    sections["soma"] = _get_basket_soma(v_init=NEYMOTIN_V_INIT[cell_name]["soma"])
     synapses = _get_basket_syn_props()
     sections["soma"].syns = list(synapses.keys())
     sections["soma"].mechs = {"hh2": dict()}
@@ -789,5 +938,494 @@ def pyramidal_ca(cell_name, pos, override_params=None, gid=None):
     override_params["L5Pyr_dend_gkbar_hh2"] = gbar_k
 
     cell = pyramidal(cell_name, pos, override_params=override_params, gid=gid)
+
+    return cell
+
+
+def pyramidal_humanL5ET(cell_name, pos=(0, 0, 0), gid=None):
+    """Create a Cell object of a human extra-telencephalic-projecting L5Pyr pyramidal neuron (developed for duecker_ET_model).
+
+    Parameters
+    ----------
+    cell_name : str
+        Should be "L5Pyr".
+    pos : tuple of (int, int, int), default=(0, 0, 0)
+        Coordinates of cell soma in xyz-space
+    gid : int or None (optional)
+        The unique, "global ID" (GID) of the cell.
+    """
+
+    p_all = get_L5PyrET_params()
+
+    # override params according to function
+    gbar_Ca_HVA = partial(
+        _linear_g_at_dist,
+        gsoma=2.78e-5 / 2 * 1.0,
+        gdend=2.78e-5 / 2 * 12.0,
+        xkink=1500,
+        hotzone_factor=4.5,
+        hotzone_boundaries=[1500, 1700],
+    )
+    gbar_Ca_LVA = partial(
+        _linear_g_at_dist,
+        gsoma=93.5e-6 / 2,
+        gdend=93.5e-6 / 2 * 2.25,
+        xkink=1500,
+        hotzone_factor=2.25,
+        hotzone_boundaries=[1500, 1700],
+    )
+    gbar_Ih = partial(
+        _exp_g_at_dist,
+        gbar_at_zero=p_all["L5Pyr_dend_gbar_Ih_hay2011"],
+        exp_term=1.0 / 323,
+        offset=-0.8696,
+        slope=2.087,
+    )
+
+    # basal dendrites
+    gbar_NaTs2_t = partial(
+        _linear_g_at_dist,
+        gsoma=p_all["L5Pyr_basal_gbar_NaTs2_t_hay2011"],
+        gdend=0,
+        xkink=255,
+    )
+    gbar_SKv3_1 = partial(
+        _linear_g_at_dist,
+        gsoma=0,
+        gdend=p_all["L5Pyr_basal_gbar_SKv3_1_hay2011"],
+        xkink=255,
+    )
+
+    override_params = dict()
+    override_params["L5Pyr_dend_gbar_Ca_HVA_hay2011"] = gbar_Ca_HVA
+    override_params["L5Pyr_dend_gbar_Ca_LVAst_hay2011"] = gbar_Ca_LVA
+    override_params["L5Pyr_dend_gbar_Ih_hay2011"] = gbar_Ih
+    override_params["L5Pyr_basal_gbar_NaTs2_t_hay2011"] = gbar_NaTs2_t
+    override_params["L5Pyr_basal_gbar_SKv3_1_hay2011"] = gbar_SKv3_1
+
+    p_all = compare_dictionaries(p_all, override_params)
+
+    end_pts = {
+        "soma": [[0, 0, 0], [0, 0, 23]],
+        "apical_trunk": [[0, 0, 23], [0, 0, 83]],
+        "apical_oblique": [[0, 0, 83], [-150, 0, 83]],
+        "apical_1": [[0, 0, 83], [0, 0, 483]],
+        "apical_2": [[0, 0, 483], [0, 0, 883]],
+        "apical_tuft": [[0, 0, 883], [0, 0, 1133]],
+        "basal_1": [[0, 0, 0], [0, 0, -50]],
+        "basal_2": [[0, 0, -50], [-106, 0, -156]],
+        "basal_3": [[0, 0, -50], [106, 0, -156]],
+    }
+
+    cell_tree = {
+        ("apical_trunk", 0): [("apical_trunk", 1)],
+        ("apical_1", 0): [("apical_1", 1)],
+        ("apical_2", 0): [("apical_2", 1)],
+        ("apical_tuft", 0): [("apical_tuft", 1)],
+        ("apical_oblique", 0): [("apical_oblique", 1)],
+        ("basal_1", 0): [("basal_1", 1)],
+        ("basal_2", 0): [("basal_2", 1)],
+        ("basal_3", 0): [("basal_3", 1)],
+        # Different sections connected
+        ("soma", 0): [("soma", 1), ("basal_1", 0)],
+        ("soma", 1): [("apical_trunk", 0)],
+        ("apical_trunk", 1): [("apical_1", 0), ("apical_oblique", 0)],
+        ("apical_1", 1): [("apical_2", 0)],
+        ("apical_2", 1): [("apical_tuft", 0)],
+        ("basal_1", 1): [("basal_2", 0), ("basal_3", 0)],
+    }
+
+    # build sections
+    section_names = list(end_pts.keys())
+
+    # initialize section voltage
+    v_init = {
+        "apical_trunk": -71.48534399721858,
+        "apical_1": -70.35766714762656,
+        "apical_2": -66.1410056008678,
+        "apical_tuft": -61.46830840811679,
+        "basal_1": -71.63003121190522,
+        "basal_2": -71.75791098784391,
+        "basal_3": -71.75791098784391,
+        "apical_oblique": -71.51514840992614,
+        "soma": -71.54401603093514,
+    }
+
+    sections_apcl = _get_dends(
+        p_all,
+        "L5Pyr",
+        section_names=["apical_trunk", "apical_1", "apical_2", "apical_tuft"],
+        v_init=v_init,
+    )
+    sections_basal = _get_basal(
+        p_all,
+        "L5Pyr",
+        section_names=["basal_1", "basal_2", "basal_3", "apical_oblique"],
+        v_init=v_init,
+    )
+
+    sections = {**sections_apcl, **sections_basal}
+
+    sections["soma"] = _get_pyr_soma(p_all, "L5Pyr", v_init=v_init["soma"])
+
+    # Soma and apical mechanisms
+    mechanisms = {
+        "NaTs2_t_hay2011": ["gbar_NaTs2_t_hay2011"],
+        "SKv3_1_hay2011": ["gbar_SKv3_1_hay2011"],
+        "Nap_Et2_hay2011": ["gbar_Nap_Et2_hay2011"],
+        "Ca_HVA_hay2011": ["gbar_Ca_HVA_hay2011"],
+        "Ca_LVAst_hay2011": ["gbar_Ca_LVAst_hay2011"],
+        "SK_E2_hay2011": ["gbar_SK_E2_hay2011"],
+        "pas": ["g_pas", "e_pas"],
+        "Ih_hay2011": ["gbar_Ih_hay2011"],
+        "Im_hay2011": ["gbar_Im_hay2011"],
+        "K_Pst_hay2011": ["gbar_K_Pst_hay2011"],
+        "K_Tst_hay2011": ["gbar_K_Tst_hay2011"],
+        "CaDynamics_E2_hay2011": [
+            "decay_CaDynamics_E2_hay2011",
+            "gamma_CaDynamics_E2_hay2011",
+        ],
+    }
+
+    p_mech_soma = _get_mechanisms(p_all, "L5Pyr", ["soma"], mechanisms)
+
+    section_names = ["apical_trunk", "apical_1", "apical_2", "apical_tuft"]
+
+    mechanisms = {
+        "NaTa_t_hay2011": ["gbar_NaTa_t_hay2011"],
+        "SKv3_1_hay2011": ["gbar_SKv3_1_hay2011"],
+        "Ca_HVA_hay2011": ["gbar_Ca_HVA_hay2011"],
+        "Ca_LVAst_hay2011": ["gbar_Ca_LVAst_hay2011"],
+        "SK_E2_hay2011": ["gbar_SK_E2_hay2011"],
+        "pas": ["g_pas", "e_pas"],
+        "Ih_hay2011": ["gbar_Ih_hay2011"],
+        "Im_hay2011": ["gbar_Im_hay2011"],
+        "K_Pst_hay2011": ["gbar_K_Pst_hay2011"],
+        "K_Tst_hay2011": ["gbar_K_Tst_hay2011"],
+        "CaDynamics_E2_hay2011": [
+            "decay_CaDynamics_E2_hay2011",
+            "gamma_CaDynamics_E2_hay2011",
+        ],
+    }
+
+    p_mech_apical = _get_mechanisms(p_all, "L5Pyr", section_names, mechanisms)
+
+    # basal sections - super hacky because I can't mess with _get_mechanisms
+    mechanisms = {
+        "NaTs2_t_hay2011": ["gbar_NaTs2_t_hay2011"],
+        "SKv3_1_hay2011": ["gbar_SKv3_1_hay2011"],
+        "pas": ["g_pas", "e_pas"],
+        "Ih_hay2011": ["gbar_Ih_hay2011"],
+        "CaDynamics_E2_hay2011": [
+            "decay_CaDynamics_E2_hay2011",
+            "gamma_CaDynamics_E2_hay2011",
+        ],
+    }
+
+    section_names = ["basal_1", "basal_2", "basal_3", "apical_oblique"]
+
+    p_mech_basal = dict()
+    for sec_name in section_names:
+        this_sec_prop = dict()
+
+        for mech_name in mechanisms:
+            this_mech_prop = dict()
+            for mech_attr in mechanisms[mech_name]:
+                key = f"{cell_name}_basal_{mech_attr}"
+                this_mech_prop[mech_attr] = p_all[key]
+            this_sec_prop[mech_name] = this_mech_prop
+        p_mech_basal[sec_name] = this_sec_prop
+
+    p_mech = {**p_mech_soma, **p_mech_basal, **p_mech_apical}
+
+    for sec_name, section in sections.items():
+        section._end_pts = end_pts[sec_name]
+
+        if sec_name == "soma":
+            section.syns = ["gabaa", "gabab"]
+        elif sec_name == "apical_2":
+            section.syns = ["ampa", "nmda", "gabaa_slow", "gabab"]
+        else:
+            section.syns = ["ampa", "nmda", "gabaa", "gabab"]
+
+        section.mechs = p_mech[sec_name]
+
+    sect_loc = {
+        "proximal": ["apical_oblique", "basal_2", "basal_3"],
+        "distal": ["apical_tuft"],
+    }
+
+    synapses = _get_syn_props(
+        p_all, "L5Pyr", syn_types=["ampa", "nmda", "gabaa", "gabaa_slow", "gabab"]
+    )
+
+    cell = Cell(
+        cell_name,
+        pos,
+        sections=sections,
+        synapses=synapses,
+        sect_loc=sect_loc,
+        cell_tree=cell_tree,
+        gid=gid,
+    )
+
+    return cell
+
+
+def pyramidal_humanL23(cell_name, pos=(0, 0, 0), gid=None):
+    """Create a Cell object of a human L2/3 pyramidal neuron (developed for duecker_ET_model).
+
+    Parameters
+    ----------
+    cell_name : str
+        Should be "L2pyr".
+    pos : tuple of (int, int, int), default=(0, 0, 0)
+        Coordinates of cell soma in xyz-space
+    gid : int or None (optional)
+        The unique, "global ID" (GID) of the cell.
+    """
+
+    p_all = get_L2Pyrhuman_params()
+
+    gbar_Ih = partial(
+        _exp_g_at_dist,
+        gbar_at_zero=p_all["L2Pyr_dend_gbar_Ih_hay2011"],
+        exp_term=1.0 / 323,
+        offset=-0.8696,
+        slope=2.087,
+    )
+    gbar_Ca_HVA = partial(
+        _linear_g_at_dist,
+        gsoma=0.00001,
+        gdend=0.002,
+        xkink=200,
+        hotzone_factor=4,
+        hotzone_boundaries=[200, 400],
+    )
+    gbar_Ca_LVA = partial(
+        _linear_g_at_dist,
+        gsoma=0.0000001,
+        gdend=0.001,
+        xkink=200,
+        hotzone_factor=4,
+        hotzone_boundaries=[200, 400],
+    )
+    gbar_SK_E2 = partial(
+        _linear_g_at_dist,
+        gsoma=3.0e-06,
+        gdend=3.0e-03,
+        xkink=200,
+        hotzone_factor=10,
+        hotzone_boundaries=[200, 400],
+    )
+
+    override_params = dict()
+    override_params["L2Pyr_dend_gbar_Ih_hay2011"] = gbar_Ih
+    override_params["L2Pyr_dend_gbar_Ca_HVA_hay2011"] = gbar_Ca_HVA
+    override_params["L2Pyr_dend_gbar_Ca_LVAst_hay2011"] = gbar_Ca_LVA
+    override_params["L2Pyr_dend_gbar_SK_E2_hay2011"] = gbar_SK_E2
+
+    p_all = compare_dictionaries(p_all, override_params)
+
+    end_pts = {
+        "soma": [[-50, 0, 765], [-50, 0, 778]],
+        "apical_trunk": [[-50, 0, 778], [-50, 0, 813]],
+        "apical_oblique": [[-50, 0, 813], [-250, 0, 813]],
+        "apical_1": [[-50, 0, 813], [-50, 0, 993]],
+        "apical_tuft": [[-50, 0, 993], [-50, 0, 1133]],
+        "basal_1": [[-50, 0, 765], [-50, 0, 715]],
+        "basal_2": [[-50, 0, 715], [-156, 0, 609]],
+        "basal_3": [[-50, 0, 715], [56, 0, 609]],
+    }
+
+    cell_tree = {
+        ("apical_trunk", 0): [("apical_trunk", 1)],
+        ("apical_1", 0): [("apical_1", 1)],
+        ("apical_tuft", 0): [("apical_tuft", 1)],
+        ("apical_oblique", 0): [("apical_oblique", 1)],
+        ("basal_1", 0): [("basal_1", 1)],
+        ("basal_2", 0): [("basal_2", 1)],
+        ("basal_3", 0): [("basal_3", 1)],
+        # Different sections connected
+        ("soma", 0): [("soma", 1), ("basal_1", 0)],
+        ("soma", 1): [("apical_trunk", 0)],
+        ("apical_trunk", 1): [("apical_1", 0), ("apical_oblique", 0)],
+        ("apical_1", 1): [("apical_tuft", 0)],
+        ("basal_1", 1): [("basal_2", 0), ("basal_3", 0)],
+    }
+
+    # build sections
+    section_names = list(end_pts.keys())
+
+    v_init = {
+        "soma": -73.50426114124605,
+        "apical_trunk": -73.47809226638849,
+        "apical_oblique": -73.47597057498221,
+        "apical_1": -73.28712400156321,
+        "apical_tuft": -73.0318451642059,
+        "basal_1": -73.51253755658675,
+        "basal_2": -73.53697581734804,
+        "basal_3": -73.53697581734804,
+    }
+
+    sections = _get_dends(p_all, "L2Pyr", section_names, v_init=v_init)
+    sections["soma"] = _get_pyr_soma(p_all, "L2Pyr", v_init=v_init["soma"])
+
+    mechanisms = {
+        "NaTs2_t_32d_hay2011": ["gbar_NaTs2_t_32d_hay2011"],
+        "SKv3_1_hay2011": ["gbar_SKv3_1_hay2011"],
+        "Nap_Et2_hay2011": ["gbar_Nap_Et2_hay2011"],
+        "Ca_HVA_hay2011": ["gbar_Ca_HVA_hay2011"],
+        "Ca_LVAst_hay2011": ["gbar_Ca_LVAst_hay2011"],
+        "SK_E2_hay2011": ["gbar_SK_E2_hay2011"],
+        "pas": ["g_pas", "e_pas"],
+        "Ih_hay2011": ["gbar_Ih_hay2011"],
+        "Im_hay2011": ["gbar_Im_hay2011"],
+        "CaDynamics_E2_hay2011": [
+            "decay_CaDynamics_E2_hay2011",
+            "gamma_CaDynamics_E2_hay2011",
+        ],
+    }
+
+    p_mech_soma = _get_mechanisms(p_all, "L2Pyr", ["soma"], mechanisms)
+
+    # apical sections
+    mechanisms = {
+        "NaTa_t_32d_hay2011": ["gbar_NaTa_t_32d_hay2011"],
+        "SKv3_1_hay2011": ["gbar_SKv3_1_hay2011"],
+        "Ca_HVA_hay2011": ["gbar_Ca_HVA_hay2011"],
+        "Ca_LVAst_hay2011": ["gbar_Ca_LVAst_hay2011"],
+        "SK_E2_hay2011": ["gbar_SK_E2_hay2011"],
+        "pas": ["g_pas", "e_pas"],
+        "Ih_hay2011": ["gbar_Ih_hay2011"],
+        "Im_hay2011": ["gbar_Im_hay2011"],
+        "CaDynamics_E2_hay2011": [
+            "decay_CaDynamics_E2_hay2011",
+            "gamma_CaDynamics_E2_hay2011",
+        ],
+    }
+
+    section_names = ["apical_trunk", "apical_1", "apical_tuft"]
+    p_mech_apical = _get_mechanisms(p_all, "L2Pyr", section_names, mechanisms)
+
+    # basal sections - super hacky because I can't mess with _get_mechanisms
+    mechanisms = {
+        "NaTs2_t_32d_hay2011": ["gbar_NaTs2_t_32d_hay2011"],
+        "SKv3_1_hay2011": ["gbar_SKv3_1_hay2011"],
+        "pas": ["g_pas", "e_pas"],
+        "Ih_hay2011": ["gbar_Ih_hay2011"],
+        "CaDynamics_E2_hay2011": [
+            "decay_CaDynamics_E2_hay2011",
+            "gamma_CaDynamics_E2_hay2011",
+        ],
+    }
+
+    section_names = ["basal_1", "basal_2", "basal_3", "apical_oblique"]
+
+    p_mech_basal = dict()
+    for sec_name in section_names:
+        this_sec_prop = dict()
+        for mech_name in mechanisms:
+            this_mech_prop = dict()
+            for mech_attr in mechanisms[mech_name]:
+                key = f"{cell_name}_basal_{mech_attr}"
+                this_mech_prop[mech_attr] = p_all[key]
+            this_sec_prop[mech_name] = this_mech_prop
+        p_mech_basal[sec_name] = this_sec_prop
+
+    p_mech = {**p_mech_soma, **p_mech_basal, **p_mech_apical}
+
+    for sec_name, section in sections.items():
+        section._end_pts = end_pts[sec_name]
+
+        if sec_name == "soma":
+            section.syns = ["gabaa", "gabab"]
+        else:
+            section.syns = ["ampa", "nmda", "gabaa", "gabab"]
+
+        section.mechs = p_mech[sec_name]
+
+    sect_loc = {
+        "proximal": ["apical_oblique", "basal_2", "basal_3"],
+        "distal": ["apical_tuft"],
+    }
+
+    synapses = _get_syn_props(
+        p_all, "L2Pyr", syn_types=["ampa", "nmda", "gabaa", "gabab"]
+    )
+
+    cell = Cell(
+        cell_name,
+        pos,
+        sections=sections,
+        synapses=synapses,
+        sect_loc=sect_loc,
+        cell_tree=cell_tree,
+        gid=gid,
+    )
+
+    return cell
+
+
+def human_gen_interneuron(cell_name, pos=(0, 0, 0), layer=2, gid=None):
+    """Create a Cell object of a "human generic interneuron" tuned to dynamics of aspiny human cells.
+
+    Stands in for both Parvalbumin+ and Somatostatin+ cells in duecker_ET_model.
+
+    Parameters
+    ----------
+    cell_name : str
+        Should be "L2pyr".
+    pos : tuple of (int, int, int), default=(0, 0, 0)
+        Coordinates of cell soma in xyz-space
+    gid : int or None (optional)
+        The unique, "global ID" (GID) of the cell.
+    """
+
+    p_all = get_Int_params()
+    sections = dict()
+    sections["soma"] = _get_interneuron_soma(cell_name, v_init=-69.5972)
+    synapses = _get_syn_props(
+        p_all, "Int", syn_types=["ampa", "nmda", "gabaa", "gabab"]
+    )
+    sections["soma"].syns = list(synapses.keys())
+
+    if layer == 2:
+        sect_loc = dict(proximal=["soma"], distal=["soma"])
+    elif layer == 5:
+        sect_loc = dict(proximal=["soma"], distal=[])
+
+    cell_tree = None
+
+    mechanisms = {
+        "nas_golomb2007": ["gbar_nas_golomb2007"],
+        "kdr_golomb2007": ["gbar_kdr_golomb2007"],
+        "kd_golomb2007": ["gbar_kd_golomb2007"],
+        "Ih_hay2011": ["gbar_Ih_hay2011"],
+        "pas": ["g_pas", "e_pas"],
+        "CaDynamics_E2_hay2011": [
+            "decay_CaDynamics_E2_hay2011",
+            "gamma_CaDynamics_E2_hay2011",
+        ],
+    }
+
+    sections["soma"].mechs = dict()
+
+    for mech_name in mechanisms:
+        this_mech_prop = dict()
+        for mech_attr in mechanisms[mech_name]:
+            key = f"Int_{mech_attr}"
+            this_mech_prop[mech_attr] = p_all[key]
+        sections["soma"].mechs[mech_name] = this_mech_prop
+
+    cell = Cell(
+        cell_name,
+        pos,
+        sections=sections,
+        synapses=synapses,
+        sect_loc=sect_loc,
+        cell_tree=cell_tree,
+        gid=gid,
+    )
 
     return cell

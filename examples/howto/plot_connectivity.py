@@ -16,7 +16,7 @@ import os.path as op
 # Let us import ``hnn_core``.
 
 import hnn_core
-from hnn_core import jones_2009_model, simulate_dipole
+from hnn_core import neymotin_2020_model, simulate_dipole
 
 ###############################################################################
 # To explore how to modify network connectivity, we will start with simulating
@@ -25,7 +25,7 @@ from hnn_core import jones_2009_model, simulate_dipole
 # explore how it changes with new connections. We first instantiate the
 # network. (Note: Setting ``add_drives_from_params=True`` loads a set of
 # predefined drives without the drives API shown previously).
-net_erp = jones_2009_model(add_drives_from_params=True)
+net_erp = neymotin_2020_model(add_drives_from_params=True)
 
 ###############################################################################
 # Instantiating the network comes with a predefined set of connections that
@@ -71,7 +71,7 @@ net_erp.cell_response.plot_spikes_raster()
 # connections to be specified with either cell names, or the cell IDs (gids)
 # directly.
 def get_network(probability=1.0):
-    net = jones_2009_model(add_drives_from_params=True)
+    net = neymotin_2020_model(add_drives_from_params=True)
     net.clear_connectivity()
 
     # Pyramidal cell connections

@@ -33,7 +33,7 @@ Network Models (:py:mod:`hnn_core`):
 .. autosummary::
    :toctree: generated/
 
-   jones_2009_model
+   neymotin_2020_model
    law_2021_model
    calcium_model
 

@@ -9,6 +9,9 @@ recursive-include hnn_core/mod *
 recursive-include hnn_core *.py
 recursive-include hnn_core *.ipynb
 
+recursive-include hnn_core *.css
+recursive-include hnn_core *.js
+
 ### Exclude
 
 exclude Makefile pytest.ini .circleci

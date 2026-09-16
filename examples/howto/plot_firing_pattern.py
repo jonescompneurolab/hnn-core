@@ -17,14 +17,14 @@ import tempfile
 # Let us import ``hnn_core``.
 
 import hnn_core
-from hnn_core import read_spikes, jones_2009_model, simulate_dipole
+from hnn_core import read_spikes, neymotin_2020_model, simulate_dipole
 
 ###############################################################################
 # Now let's build the network. We have used the same weights as in the
 # :ref:`evoked example <sphx_glr_auto_examples_plot_simulate_evoked.py>`.
 import matplotlib.pyplot as plt
 
-net = jones_2009_model()
+net = neymotin_2020_model()
 
 ###############################################################################
 # ``net`` does not have any driving inputs and only defines the local network

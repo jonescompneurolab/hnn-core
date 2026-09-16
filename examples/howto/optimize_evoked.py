@@ -27,7 +27,7 @@ from matplotlib.lines import Line2D
 # required for this tutorial.
 
 import hnn_core
-from hnn_core import (MPIBackend, jones_2009_model, simulate_dipole,
+from hnn_core import (MPIBackend, neymotin_2020_model, simulate_dipole,
                       read_dipole)
 from hnn_core.viz import plot_dipole
 
@@ -66,7 +66,7 @@ ax.legend(['experimental'])
 # we arrived to after some hand-tuning. This simulation will provide a baseline
 # to compare against the experimental data before optimization.
 
-net_initial = jones_2009_model()
+net_initial = neymotin_2020_model()
 
 n_drive_cells = 1
 cell_specific = False
@@ -246,7 +246,7 @@ initial_params = dict({'evprox2_ampa_L5_pyramidal': 0.1,
 #
 # .. note:: A custom objective function can also be supplied.
 
-net = jones_2009_model()
+net = neymotin_2020_model()
 optim = Optimizer(net, tstop=tstop, constraints=constraints,
                   set_params=set_params, initial_params=initial_params, max_iter=50)
 with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):

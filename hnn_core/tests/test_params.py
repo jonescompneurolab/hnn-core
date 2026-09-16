@@ -1,7 +1,6 @@
 # Authors: Mainak Jas <mainakjas@gmail.com>
 #          Blake Caldwell <blake_caldwell@brown.edu>
 
-import os.path as op
 import json
 from pathlib import Path
 from urllib.request import urlretrieve
@@ -10,7 +9,7 @@ import pytest
 
 from hnn_core import read_params, Params, convert_to_json
 from hnn_core.hnn_io import read_network_configuration
-from hnn_core.network_models import jones_2009_model
+from hnn_core.network_models import neymotin_2020_model
 from hnn_core.params import remove_nulled_drives
 
 
@@ -19,18 +18,18 @@ hnn_core_root = Path(__file__).parents[1]
 
 def test_read_params():
     """Test reading of params object."""
-    params_fname = op.join(hnn_core_root, "param", "default.json")
+    params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
     # Smoke test that network loads params
-    _ = jones_2009_model(params, add_drives_from_params=True, legacy_mode=False)
-    _ = jones_2009_model(params, add_drives_from_params=True, legacy_mode=True)
+    _ = neymotin_2020_model(params, add_drives_from_params=True, legacy_mode=False)
+    _ = neymotin_2020_model(params, add_drives_from_params=True, legacy_mode=True)
     print(params)
     print(params["L2Pyr*"])
 
     # unsupported extension
     pytest.raises(ValueError, read_params, "params.txt")
     # empty file
-    empty_fname = op.join(hnn_core_root, "param", "empty.json")
+    empty_fname = hnn_core_root / "param" / "empty.json"
     with open(empty_fname, "w") as json_data:
         json.dump({}, json_data)
     pytest.raises(ValueError, read_params, empty_fname)
@@ -44,11 +43,11 @@ def test_read_legacy_params():
     param_url = (
         "https://raw.githubusercontent.com/hnnsolver/hnn-core/test_data/default.param"
     )
-    params_legacy_fname = op.join(hnn_core_root, "param", "default.param")
-    if not op.exists(params_legacy_fname):
+    params_legacy_fname = hnn_core_root / "param" / "default.param"
+    if not Path(params_legacy_fname).exists():
         urlretrieve(param_url, params_legacy_fname)
 
-    params_new_fname = op.join(hnn_core_root, "param", "default.json")
+    params_new_fname = hnn_core_root / "param" / "default.json"
     params_legacy = read_params(params_legacy_fname)
     params_new = read_params(params_new_fname)
 
@@ -71,8 +70,8 @@ def test_base_params():
         "https://raw.githubusercontent.com/jonescompneurolab/"
         "hnn-core/test_data/base.json"
     )
-    params_base_fname = op.join(hnn_core_root, "param", "base.json")
-    if not op.exists(params_base_fname):
+    params_base_fname = hnn_core_root / "param" / "base.json"
+    if not Path(params_base_fname).exists():
         urlretrieve(param_url, params_base_fname)
 
     params_base = read_params(params_base_fname)
@@ -90,10 +89,10 @@ def test_remove_nulled_drives(tmp_path):
         "master/param/ERPYes100Trials.param"
     )
     params_fname = Path(hnn_core_root, "param", "ERPYes100Trials.param")
-    if not op.exists(params_fname):
+    if not Path(params_fname).exists():
         urlretrieve(param_url, params_fname)
 
-    net = jones_2009_model(
+    net = neymotin_2020_model(
         params=read_params(params_fname),
         add_drives_from_params=True,
         legacy_mode=True,
@@ -127,7 +126,7 @@ class TestConvertToJson:
     def test_default_network_connectivity(self, tmp_path):
         """Tests conversion with default parameters"""
 
-        net_params = jones_2009_model(
+        net_params = neymotin_2020_model(
             params=read_params(self.path_default), add_drives_from_params=True
         )
 
@@ -158,9 +157,9 @@ class TestConvertToJson:
             "hnn-core/test_data/default.param"
         )
         params_base_fname = Path(hnn_core_root, "param", "default.param")
-        if not op.exists(params_base_fname):
+        if not Path(params_base_fname).exists():
             urlretrieve(param_url, params_base_fname)
-        net_params = jones_2009_model(
+        net_params = neymotin_2020_model(
             read_params(params_base_fname),
             add_drives_from_params=True,
             legacy_mode=True,

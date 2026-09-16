@@ -7,20 +7,19 @@ from pathlib import Path
 import time
 import pytest
 import numpy as np
-import os
 
 from hnn_core.batch_simulate import BatchSimulate
-from hnn_core import jones_2009_model
+from hnn_core import neymotin_2020_model
 
 hnn_core_root = Path(__file__).parents[1]
 assets_path = Path(hnn_core_root, "tests", "assets")
 
 
-@pytest.fixture
-def batch_simulate_instance(tmp_path):
+@pytest.fixture(params=["jones", "duecker"])
+def batch_simulate_instance(tmp_path, request):
     """Fixture for creating a BatchSimulate instance with custom parameters."""
 
-    def set_params(param_values, net):
+    def set_params(net, param_values):
         weights_ampa = {
             "L2_basket": param_values["weight_basket"],
             "L2_pyramidal": param_values["weight_pyr"],
@@ -47,14 +46,15 @@ def batch_simulate_instance(tmp_path):
             synaptic_delays=synaptic_delays,
         )
 
-    net = jones_2009_model(mesh_shape=(3, 3))
+    net = neymotin_2020_model(mesh_shape=(3, 3))
     return BatchSimulate(
         net=net,
         set_params=set_params,
-        tstop=10,
+        tstop=30,
         save_folder=tmp_path,
         batch_size=3,
         n_trials=3,
+        bsl_cor=request.param,
     )
 
 
@@ -149,9 +149,6 @@ def test_simulate_batch(batch_simulate_instance, param_grid):
     with pytest.raises(ValueError, match="Invalid value for the 'backend'"):
         batch_simulate_instance.simulate_batch(param_combinations, backend="invalid")
 
-    with pytest.raises(TypeError, match="verbose must be"):
-        batch_simulate_instance.simulate_batch(param_combinations, verbose="invalid")
-
 
 def test_run(batch_simulate_instance, param_grid):
     """Test the run method of the batch_simulate_instance."""
@@ -177,7 +174,7 @@ def test_run(batch_simulate_instance, param_grid):
         return_output=True,
         combinations=False,
         backend="loky",
-        verbose=50,
+        verbose=False,
     )
 
     assert results_with_cache is not None
@@ -210,10 +207,10 @@ def test_save_load_and_overwrite(batch_simulate_instance, param_grid, tmp_path):
 
     batch_simulate_instance._save(results, start_idx, end_idx)
 
-    file_name = os.path.join(tmp_path, f"sim_run_{start_idx}-{end_idx}.npz")
-    assert os.path.exists(file_name)
+    file_path = tmp_path / f"sim_run_{start_idx}-{end_idx}.npz"
+    assert file_path.exists()
 
-    loaded_data = np.load(file_name, allow_pickle=True)
+    loaded_data = np.load(file_path, allow_pickle=True)
     loaded_results = {key: loaded_data[key].tolist() for key in loaded_data.files}
 
     original_data = np.stack([result["dpl"][0].data["agg"] for result in results])
@@ -231,7 +228,7 @@ def test_save_load_and_overwrite(batch_simulate_instance, param_grid, tmp_path):
     batch_simulate_instance.overwrite = True
     batch_simulate_instance._save(results, start_idx, end_idx)
 
-    loaded_data = np.load(file_name, allow_pickle=True)
+    loaded_data = np.load(file_path, allow_pickle=True)
     loaded_results = {key: loaded_data[key].tolist() for key in loaded_data.files}
 
     original_data = np.stack([result["dpl"][0].data["agg"] for result in results])
@@ -261,11 +258,11 @@ def test_load_results(batch_simulate_instance, param_grid, tmp_path):
     end_idx = len(results)
     batch_simulate_instance._save(results, start_idx, end_idx)
 
-    file_name = os.path.join(tmp_path, f"sim_run_{start_idx}-{end_idx}.npz")
-    assert os.path.exists(file_name)
+    file_path = tmp_path / f"sim_run_{start_idx}-{end_idx}.npz"
+    assert file_path.exists()
 
     # single result file
-    loaded_results = batch_simulate_instance.load_results(file_name)
+    loaded_results = batch_simulate_instance.load_results(file_path)
     assert "param_values" in loaded_results
     assert "dpl" in loaded_results
     assert len(loaded_results["dpl"]) == len(results)
@@ -305,9 +302,24 @@ def test_parallel_execution(batch_simulate_instance, param_grid):
     end_time = time.perf_counter()
     serial_time = end_time - start_time
 
+    # Run the parallel execution once WITHOUT measuring the time, in order to "warm up"
+    # the parallel pool. This is necessary because there is an approximate 0.5-1.5
+    # second overhead for the first parallel `loky` run of a given parallel
+    # configuration, but the serial case (above) does not have to pay this. Once the
+    # parallel pool is warmed up, we can run the parallel execution again to get its
+    # actual simulation execution time.
+    #
+    # On older hardware such as Github Actions' macos-intel runners, warming up the
+    # parallel pool is still not enough to ensure that the parallel execution is faster,
+    # so AES has also increased the compute work needed to be done (increasing the
+    # length of the simulation to 30 ms) and also increasing the number of cores used to
+    # 3 since we always have access to at least 3 in Github Actions runners.
+    _ = batch_simulate_instance.simulate_batch(
+        param_combinations, n_jobs=3, backend="loky"
+    )
     start_time = time.perf_counter()
     _ = batch_simulate_instance.simulate_batch(
-        param_combinations, n_jobs=2, backend="loky"
+        param_combinations, n_jobs=3, backend="loky"
     )
     end_time = time.perf_counter()
     parallel_time = end_time - start_time

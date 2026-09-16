@@ -30,13 +30,13 @@ import matplotlib.pyplot as plt
 # Let us import hnn_core
 
 import hnn_core
-from hnn_core import simulate_dipole, jones_2009_model
+from hnn_core import simulate_dipole, neymotin_2020_model
 from hnn_core.viz import plot_dipole
 
 ###############################################################################
 # Let us first create our default network and visualize the cells
 # inside it.
-net = jones_2009_model()
+net = neymotin_2020_model()
 net.plot_cells()
 net.cell_types['L5_pyramidal']['cell_object'].plot_morphology()
 
@@ -126,7 +126,7 @@ plot_dipole(dpls, average=False, layer=['L2', 'L5', 'agg'], show=False)
 # synchronous and see what happens. This is achieved by setting
 # ``n_drive_cells=1`` and ``cell_specific=False`` when adding each drive.
 
-net_sync = jones_2009_model()
+net_sync = neymotin_2020_model()
 
 n_drive_cells=1
 cell_specific=False

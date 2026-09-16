@@ -4,15 +4,16 @@
 #          Nick Tolley <nicholas_tolley@brown.edu>
 #          George Dang <george_dang@brown.edu>
 
-import os
 import json
 import numpy as np
+from copy import deepcopy
 
 from collections import OrderedDict
 from pathlib import Path
 
 from .cell import Cell, Section
 from .cell_response import CellResponse
+from .cells_default import NEYMOTIN_V_INIT
 from .externals.mne import fill_doc
 
 
@@ -91,7 +92,7 @@ def _str_to_node(node_string):
     return node
 
 
-def _read_cell_types(cell_types_data):
+def _read_cell_types(cell_types_data, model_variant):
     """Returns a dict of Cell objects from json encoded data
 
     This function handles both legacy format (direct cell data) and
@@ -113,6 +114,8 @@ def _read_cell_types(cell_types_data):
         - "cell_object": Cell instance
         - "cell_metadata": dict of metadata (empty dict for legacy format)
     """
+    from .network_models import default_cell_metadata
+
     cell_types = dict()
     for cell_name in cell_types_data:
         # Determine format and extract cell_data and metadata accordingly
@@ -129,49 +132,38 @@ def _read_cell_types(cell_types_data):
             #   Treat the entire cell_data as the cell information
             cell_data = cell_types_data[cell_name]
             if cell_name == "L2_basket":
-                cell_metadata = {
-                    "morpho_type": "basket",
-                    "electro_type": "inhibitory",
-                    "layer": "2",
-                    "measure_dipole": False,
-                    "reference": "https://doi.org/10.7554/eLife.51214",
-                }
+                cell_metadata = deepcopy(default_cell_metadata["L2_basket"])
             elif cell_name == "L2_pyramidal":
-                cell_metadata = {
-                    "morpho_type": "pyramidal",
-                    "electro_type": "excitatory",
-                    "layer": "2",
-                    "measure_dipole": True,
-                    "reference": "https://doi.org/10.7554/eLife.51214",
-                }
+                cell_metadata = deepcopy(default_cell_metadata["L2_pyramidal"])
             elif cell_name == "L5_basket":
-                cell_metadata = {
-                    "morpho_type": "basket",
-                    "electro_type": "inhibitory",
-                    "layer": "5",
-                    "measure_dipole": False,
-                    "reference": "https://doi.org/10.7554/eLife.51214",
-                }
+                cell_metadata = deepcopy(default_cell_metadata["L5_basket"])
             elif cell_name == "L5_pyramidal":
-                cell_metadata = {
-                    "morpho_type": "pyramidal",
-                    "electro_type": "excitatory",
-                    "layer": "5",
-                    "measure_dipole": True,
-                    "reference": "https://doi.org/10.7554/eLife.51214",
-                }
+                cell_metadata = deepcopy(default_cell_metadata["L5_pyramidal"])
 
         # Now cell_data contains the cell properties regardless of format
         sections = dict()
         sections_data = cell_data["sections"]
         for section_name in sections_data:
             section_data = sections_data[section_name]
+            # For backwards compatibility with older files that use the Neymotin model
+            # but that do not have v0 in the json. For the Duecker model, every Section
+            # should always have a v0 present at its creation; see the commit where the
+            # Duecker model was added here:
+            # https://github.com/jonescompneurolab/hnn-core/blob/49f210fb41481ab859537e9b3e32a74117ae95fc/hnn_core/cells_default.py
+            # Otherwise, use the value of `v0` present from the input data. Otherwise,
+            # use the default value from NEYMOTIN_V_INIT.
+            if model_variant == "duecker_ET_model":
+                v_init = section_data.get("v0")
+            else:
+                v_init = section_data.get(
+                    "v0", NEYMOTIN_V_INIT[cell_name][section_name]
+                )
             sections[section_name] = Section(
                 L=section_data["L"],
                 diam=section_data["diam"],
                 cm=section_data["cm"],
                 Ra=section_data["Ra"],
-                v0=section_data.get("v0", -65),  # for backwards compatibility
+                v0=v_init,
                 end_pts=section_data["end_pts"],
             )
             # Set section attributes
@@ -220,6 +212,7 @@ def _read_cell_response(cell_response_data, read_output):
         return None
     cell_response = CellResponse(
         cell_type_names=cell_response_data["cell_type_names"],
+        cell_type_metadata=cell_response_data.get("cell_type_metadata", None),
         spike_times=cell_response_data["spike_times"],
         spike_gids=cell_response_data["spike_gids"],
         spike_types=cell_response_data["spike_types"],
@@ -402,6 +395,7 @@ def network_to_dict(net, write_output=False):
 
     net_data = {
         "object_type": "Network",
+        "model_variant": net._model_variant,
         "legacy_mode": net._legacy_mode,
         "N_pyr_x": net._N_pyr_x,
         "N_pyr_y": net._N_pyr_y,
@@ -455,10 +449,11 @@ def write_network_configuration(net, output, overwrite=True):
     net_data_converted = _convert_np_array_to_list(net_data)
 
     if isinstance(output, (str, Path)):
-        if overwrite is False and os.path.exists(output):
+        output = Path(output)
+        if overwrite is False and output.exists():
             raise FileExistsError(
-                "File already exists at path %s. Rename "
-                "the file or set overwrite=True." % (output,)
+                f"File already exists at path {output}. Rename "
+                f"the file or set overwrite=True."
             )
         # Saving file
         with open(output, "w", encoding="utf-8") as f:
@@ -525,7 +520,7 @@ def dict_to_network(net_data, read_drives=True, read_external_biases=True):
     params = dict()
     params["celsius"] = net_data["celsius"]
     params["threshold"] = net_data["threshold"]
-
+    params["model_variant"] = net_data.get("model_variant", None)
     mesh_shape = (net_data["N_pyr_x"], net_data["N_pyr_y"])
 
     # Instantiating network
@@ -534,7 +529,10 @@ def dict_to_network(net_data, read_drives=True, read_external_biases=True):
         mesh_shape=mesh_shape,
         legacy_mode=net_data["legacy_mode"],
         pos_dict=_read_pos_dict(net_data["pos_dict"]),
-        cell_types=_read_cell_types(net_data["cell_types"]),
+        cell_types=_read_cell_types(
+            net_data["cell_types"],
+            net_data.get("model_variant", None),
+        ),
     )
 
     # Setting attributes
@@ -600,6 +598,36 @@ def read_network_configuration(fname, read_drives=True, read_external_biases=Tru
             "The file contains object of "
             "type %s" % (net_data.get("object_type"))
         )
+
+    # ensure the cell types match the model variant
+    check_var = net_data.get("model_variant", None)
+    if check_var is not None and "duecker_ET_model".startswith(check_var):
+        missing_cells = [
+            cell_name
+            for cell_name in [
+                "L2_pyramidal",
+                "L5_pyramidal",
+                "L2_inhibitory",
+                "L5_inhibitory",
+            ]
+            if cell_name not in net_data["cell_types"]
+        ]
+        if missing_cells:
+            hint = ""
+            if all(
+                cell_name in net_data["cell_types"]
+                for cell_name in ["L2_basket", "L5_basket"]
+            ):
+                hint = (
+                    " The network has basket cells instead, so you are likely"
+                    " trying to create a duecker_ET_model with"
+                    " neymotin_2020_model cell types."
+                )
+            raise ValueError(
+                f"The cell types of the network do not match "
+                f"model_variant duecker_ET_model: no "
+                f"{', '.join(missing_cells)} found.{hint}"
+            )
 
     net = dict_to_network(net_data, read_drives, read_external_biases)
     _check_global_synaptic_gains_uniformity(net)
