@@ -99,10 +99,11 @@ class TestParallelBackends:
     dpls_reduced_default = None
     dpls_reduced_joblib = None
 
-    def test_run_default(self, run_hnn_core_fixture):
+    def test_run_default(self, fix_net_neymotin_2020, fix_run_simulation):
         """Test consistency between default backend simulation and master"""
         global dpls_reduced_default
-        dpls_reduced_default, _ = run_hnn_core_fixture(None, reduced=True)
+        net = fix_net_neymotin_2020(reduced=True)
+        dpls_reduced_default, _ = fix_run_simulation(net, tstop=40, backend=None)
         # test consistency across all parallel backends for multiple trials
         assert_raises(
             AssertionError,
@@ -111,12 +112,13 @@ class TestParallelBackends:
             dpls_reduced_default[1].data["agg"],
         )
 
-    def test_run_joblibbackend(self, run_hnn_core_fixture):
+    def test_run_joblibbackend(self, fix_net_neymotin_2020, fix_run_simulation):
         """Test consistency between joblib backend simulation with master"""
         global dpls_reduced_default, dpls_reduced_joblib
 
-        dpls_reduced_joblib, _ = run_hnn_core_fixture(
-            backend="joblib", n_jobs=2, reduced=True
+        net = fix_net_neymotin_2020(reduced=True)
+        dpls_reduced_joblib, _ = fix_run_simulation(
+            net, tstop=40, backend="joblib", n_jobs=2
         )
 
         for trial_idx in range(len(dpls_reduced_default)):
@@ -155,10 +157,11 @@ class TestParallelBackends:
 
     @requires_mpi4py
     @requires_psutil
-    def test_run_mpibackend(self, run_hnn_core_fixture):
+    def test_run_mpibackend(self, fix_net_neymotin_2020, fix_run_simulation):
         """Test running a MPIBackend on reduced model"""
         global dpls_reduced_default, dpls_reduced_mpi
-        dpls_reduced_mpi, _ = run_hnn_core_fixture(backend="mpi", reduced=True)
+        net = fix_net_neymotin_2020(reduced=True)
+        dpls_reduced_mpi, _ = fix_run_simulation(net, tstop=40, backend="mpi")
         for trial_idx in range(len(dpls_reduced_default)):
             # account for rounding error incured during MPI parallelization
             assert_allclose(
@@ -170,16 +173,9 @@ class TestParallelBackends:
 
     @requires_mpi4py
     @requires_psutil
-    def test_terminate_mpibackend(self, run_hnn_core_fixture, fix_default_params):
+    def test_terminate_mpibackend(self, fix_net_neymotin_2020):
         """Test terminating MPIBackend from thread"""
-        params = fix_default_params
-        params.update(
-            {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}
-        )
-        net = neymotin_2020_model(
-            params, add_drives_from_params=True, mesh_shape=(3, 3)
-        )
-
+        net = fix_net_neymotin_2020(reduced=True)
         with MPIBackend() as backend:
             event = Event()
             # start background thread that will kill all MPIBackends
@@ -195,7 +191,7 @@ class TestParallelBackends:
                 with pytest.raises(
                     RuntimeError, match="MPI simulation failed. Return code: 1"
                 ):
-                    simulate_dipole(net, tstop=40)
+                    simulate_dipole(net, tstop=40, n_trials=2)
 
             event.set()
         expected_string = "Child process failed unexpectedly"
@@ -306,21 +302,15 @@ class TestParallelBackends:
         use_hwthreading_if_found,
         sensible_default_cores,
         override_oversubscribe_option,
-        fix_default_params,
+        fix_net_neymotin_2020,
     ):
         """Test running MPIBackend with oversubscribed number of procs"""
-        params = fix_default_params
-        params.update(
-            {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}
-        )
-        net = neymotin_2020_model(
-            params, add_drives_from_params=True, mesh_shape=(3, 3)
-        )
+        net = fix_net_neymotin_2020(reduced=True)
 
         n_procs = 2
         # Test that the network runs at all
         with MPIBackend(n_procs=n_procs) as backend:
-            simulate_dipole(net, tstop=40)
+            simulate_dipole(net, tstop=40, n_trials=2)
 
         [_, detected_hwthreading] = _determine_cores_hwthreading(
             use_hwthreading_if_found=use_hwthreading_if_found,
@@ -332,9 +322,8 @@ class TestParallelBackends:
 
         # Possibly needed to prevent MPIBackend failures to exit processes
         del net
-        net = neymotin_2020_model(
-            params, add_drives_from_params=True, mesh_shape=(3, 3)
-        )
+        net = fix_net_neymotin_2020(reduced=True)
+
         with MPIBackend(
             n_procs=n_procs,
             use_hwthreading_if_found=use_hwthreading_if_found,
@@ -344,7 +333,7 @@ class TestParallelBackends:
         ) as backend:
             if detected_hwthreading:
                 assert "--use-hwthread-cpus" in " ".join(backend.mpi_cmd)
-            simulate_dipole(net, tstop=40)
+            simulate_dipole(net, tstop=40, n_trials=2)
 
         # Case 2: Check that hwthreading turns on if forced. Note that the
         # simulation should NOT be run in this case, since the underlying
@@ -364,9 +353,8 @@ class TestParallelBackends:
 
         # Possibly needed to prevent MPIBackend failures to exit processes
         del net
-        net = neymotin_2020_model(
-            params, add_drives_from_params=True, mesh_shape=(3, 3)
-        )
+        net = fix_net_neymotin_2020(reduced=True)
+
         with MPIBackend(
             n_procs=n_procs,
             use_hwthreading_if_found=use_hwthreading_if_found,
@@ -375,10 +363,12 @@ class TestParallelBackends:
             override_hwthreading_option=override_hwthreading_option,
         ) as backend:
             assert "--use-hwthread-cpus" not in " ".join(backend.mpi_cmd)
-            simulate_dipole(net, tstop=40)
+            simulate_dipole(net, tstop=40, n_trials=2)
 
     @pytest.mark.parametrize("backend", ["mpi", "joblib"])
-    def test_compare_hnn_core(self, run_hnn_core_fixture, backend, n_jobs=1):
+    def test_compare_hnn_core(
+        self, fix_net_neymotin_2020, fix_run_simulation, backend, n_jobs=1
+    ):
         """Test hnn-core does not break."""
         # small snippet of data on data branch for now. To be deleted
         # later. Data branch should have only commit so it does not
@@ -391,7 +381,9 @@ class TestParallelBackends:
             urlretrieve(data_url, "dpl.txt")
         dpl_master = loadtxt("dpl.txt")
 
-        dpls, net = run_hnn_core_fixture(backend=backend)
+        # TODO AES: CURRENTLY NEEDS LEGACY MODE
+        net = fix_net_neymotin_2020(legacy_mode=True)
+        dpls, net = fix_run_simulation(net, tstop=170, backend=backend)
         dpl = dpls[0].smooth(30).scale(3000)
 
         # write the dipole to a file and compare
@@ -428,15 +420,16 @@ class TestParallelBackends:
 @requires_mpi4py
 @requires_psutil
 @pytest.mark.uses_mpi
-def test_mpi_failure(run_hnn_core_fixture):
+def test_mpi_failure(fix_net_neymotin_2020, fix_run_simulation):
     """Test that an MPI failure is handled and messages are printed"""
     # this MPI parameter will cause a MPI job to fail
     environ["OMPI_MCA_btl"] = "self"
 
+    net = fix_net_neymotin_2020(reduced=True)
     with pytest.warns(UserWarning) as record:
         with io.StringIO() as buf, redirect_stdout(buf):
             with pytest.raises(RuntimeError, match="MPI simulation failed"):
-                run_hnn_core_fixture(backend="mpi", reduced=True, postproc=False)
+                _, _ = fix_run_simulation(net, tstop=40, backend="mpi", postproc=False)
             stdout = buf.getvalue()
 
     assert "MPI processes are unable to reach each other" in stdout

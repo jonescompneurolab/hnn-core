@@ -1,5 +1,6 @@
 # Authors: Nick Tolley <nicholas_tolley@brown.edu>
 #          Christopher Bailey <cjb@cfin.au.dk>
+from copy import deepcopy
 
 import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
@@ -199,27 +200,29 @@ def test_transfer_resistance():
 @requires_mpi4py
 @requires_psutil
 @pytest.mark.uses_mpi
-def test_extracellular_backends(run_hnn_core_fixture):
+def test_extracellular_backends(fix_net_neymotin_2020, fix_run_simulation):
     """Test extracellular outputs across backends."""
     # calculation of CSD requires >=4 electrode contacts
     electrode_array = {"arr1": [(2, 2, 400), (2, 2, 600), (2, 2, 800), (2, 2, 1000)]}
-    _, joblib_net = run_hnn_core_fixture(
+    joblib_net = fix_net_neymotin_2020(reduced=True, electrode_array=electrode_array)
+    mpi_net = deepcopy(joblib_net)
+
+    _, joblib_net = fix_run_simulation(
+        joblib_net,
+        tstop=40,
         backend="joblib",
-        n_jobs=1,
-        reduced=True,
+        n_jobs=2,
         record_isec="soma",
         record_vsec="soma",
         record_ca="soma",
-        electrode_array=electrode_array,
     )
-    _, mpi_net = run_hnn_core_fixture(
+    _, mpi_net = fix_run_simulation(
+        mpi_net,
+        tstop=40,
         backend="mpi",
-        n_procs=2,
-        reduced=True,
         record_isec="soma",
         record_vsec="soma",
         record_ca="soma",
-        electrode_array=electrode_array,
     )
 
     assert (

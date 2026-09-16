@@ -72,38 +72,32 @@ def pytest_runtest_setup(item):
 
 
 @pytest.fixture(scope="module")
-def run_hnn_core_fixture():
-    def _run_hnn_core_fixture(
-        backend=None,
-        n_procs=None,
-        n_jobs=1,
+def fix_net_neymotin_2020():
+    def _fix_net_neymotin_2020(
+        add_drives_from_params=True,
+        legacy_mode=False,
         reduced=False,
-        record_vsec=False,
-        record_isec=False,
-        record_ca=False,
-        postproc=False,
         electrode_array=None,
-        bsl_cor=None,
     ):
         # default params
         params_fname = hnn_core_root / "param" / "default.json"
         params = read_params(params_fname)
 
-        tstop = 170.0
-        legacy_mode = True
         if reduced:
             mesh_shape = (3, 3)
-            params.update(
-                {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}
-            )
-            tstop = 40.0
-            legacy_mode = False
+            # NOTE: `run_hnn_core_fixture` with `reduced=True` originally set:
+            # - trials to 2 using the `Network` object (instead of at simulation)
+            # - set simulation time to 40 ms, and
+            # - disabled legacy_mode
+            # Trials and simulation time are now only set at simulation time, and legacy
+            # mode is a regular argument.
+            params.update({"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20})
         else:
             mesh_shape = (10, 10)
         # Legacy mode necessary for exact dipole comparison test
         net = neymotin_2020_model(
             params,
-            add_drives_from_params=True,
+            add_drives_from_params=add_drives_from_params,
             legacy_mode=legacy_mode,
             mesh_shape=mesh_shape,
         )
@@ -111,36 +105,67 @@ def run_hnn_core_fixture():
             for name, positions in electrode_array.items():
                 net.add_electrode_array(name, positions)
 
+        return net
+
+    return _fix_net_neymotin_2020
+
+
+@pytest.fixture(scope="module")
+def fix_run_simulation():
+    def _fix_run_simulation(
+        net,
+        tstop,
+        dt=0.025,
+        n_trials=2,  # default is 2!!!
+        record_vsec=False,
+        record_isec=False,
+        record_ca=False,
+        postproc=False,
+        verbose=True,
+        bsl_cor=None,
+        backend=None,
+        n_procs=None,
+        n_jobs=1,
+    ):
         if backend == "mpi":
             with MPIBackend(n_procs=n_procs, mpi_cmd="mpiexec"):
                 dpls = simulate_dipole(
                     net,
+                    tstop=tstop,
+                    dt=dt,
+                    n_trials=n_trials,
                     record_vsec=record_vsec,
                     record_isec=record_isec,
                     record_ca=record_ca,
                     postproc=postproc,
-                    tstop=tstop,
+                    verbose=verbose,
                     bsl_cor=bsl_cor,
                 )
         elif backend == "joblib":
             with JoblibBackend(n_jobs=n_jobs):
                 dpls = simulate_dipole(
                     net,
+                    tstop=tstop,
+                    dt=dt,
+                    n_trials=n_trials,
                     record_vsec=record_vsec,
                     record_isec=record_isec,
                     record_ca=record_ca,
                     postproc=postproc,
-                    tstop=tstop,
+                    verbose=verbose,
                     bsl_cor=bsl_cor,
                 )
         else:
             dpls = simulate_dipole(
                 net,
+                tstop=tstop,
+                dt=dt,
+                n_trials=n_trials,
                 record_vsec=record_vsec,
                 record_isec=record_isec,
                 record_ca=record_ca,
                 postproc=postproc,
-                tstop=tstop,
+                verbose=verbose,
                 bsl_cor=bsl_cor,
             )
 
@@ -149,11 +174,15 @@ def run_hnn_core_fixture():
 
         # number of trials simulated
         for drive in net.external_drives.values():
-            assert len(drive["events"]) == params["N_trials"]
+            # In the old `run_hnn_core_fixture`, simulated trials were compared against
+            # the Network object's `_params["N_trials"]` attribute. However, for the
+            # sake of eventually moving past usage of `params`, trials will now be
+            # compared to the number provided by the argument.
+            assert len(drive["events"]) == n_trials
 
         return dpls, net
 
-    return _run_hnn_core_fixture
+    return _fix_run_simulation
 
 
 @pytest.fixture(scope="module")
