@@ -1131,7 +1131,7 @@ def waller_pfcbeta_model(
     Notes
     -----
     This model differs from ``diesburg_2024_model`` in the following ways:
-    1) Increased gabaB duration of inhibition by increasing tau1/2.
+    1) Increased gabaB duration of inhibition (see file `hnn_core/mod/gabab_neymotin2016.mod`)
     2) Decreased L5 pyr -> L5 pyr NMDA weights to prevent epileptic spiking activity.
     3) Increased gabaB L2/L5 basket to LL2/5 pyr.
     4) Remove L2_basket -> L5_pyramidal gabaa connection
