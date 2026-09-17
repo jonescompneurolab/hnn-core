@@ -123,7 +123,7 @@ def fix_net_duecker_ET():
             }
 
             net.add_evoked_drive(
-                "prox1",
+                "evprox1",
                 mu=prox1_mu,
                 sigma=2.5,
                 numspikes=1,
@@ -150,7 +150,7 @@ def fix_net_duecker_ET():
             }
 
             net.add_evoked_drive(
-                "dist1",
+                "evdist1",
                 mu=dist1_mu,
                 sigma=5,
                 numspikes=2,
@@ -179,7 +179,7 @@ def fix_net_duecker_ET():
                 "L5_pyramidal": 1.0,
             }
             net.add_evoked_drive(
-                "prox2",
+                "evprox2",
                 mu=prox2_mu,
                 sigma=15,
                 numspikes=1,
