@@ -18,11 +18,13 @@ from hnn_core.network_models import default_cell_metadata
 from hnn_core.viz import (
     plot_cells,
     plot_dipole,
+    plot_drive_arrows,
     plot_psd,
     plot_tfr_morlet,
     plot_connectivity_matrix,
     plot_cell_connectivity,
     plot_drive_strength,
+    _collect_drive_arrow_markers,
     NetworkPlotter,
 )
 
@@ -266,6 +268,42 @@ class TestDipoleViz:
             dpl_sfreq = dpls[0].copy()
             dpl_sfreq.sfreq /= 10
             plot_psd([dpls[0], dpl_sfreq])
+
+    def test_plot_drive_arrows(self, run_simulation):
+        import matplotlib.patches
+
+        net, dpls = run_simulation
+        weights_ampa = {"L2_pyramidal": 5.4e-5, "L5_pyramidal": 5.4e-5}
+        net.add_evoked_drive(
+            "ev_test",
+            mu=30.0,
+            sigma=0.1,
+            numspikes=1,
+            location="proximal",
+            weights_ampa=weights_ampa,
+            n_drive_cells=1,
+            cell_specific=False,
+        )
+        markers = _collect_drive_arrow_markers(net)
+        assert any(marker["label"] == "ev_test" for marker in markers)
+
+        _, ax = plt.subplots()
+        plot_dipole(dpls[0], ax=ax, show=False, net=net, show_drive_arrows=True)
+        assert any(
+            isinstance(child, matplotlib.text.Annotation) for child in ax.get_children()
+        )
+        assert "ev_test" in [text.get_text() for text in ax.texts]
+        plt.close("all")
+
+        with pytest.raises(ValueError, match="net must be provided"):
+            plot_dipole(dpls[0], show=False, show_drive_arrows=True)
+
+        _, ax = plt.subplots()
+        plot_drive_arrows(ax, net)
+        assert any(
+            isinstance(child, matplotlib.text.Annotation) for child in ax.get_children()
+        )
+        plt.close("all")
 
 
 def test_drive_strength(setup_net):

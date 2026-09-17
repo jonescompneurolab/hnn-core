@@ -269,6 +269,136 @@ def plot_laminar_lfp(
     return ax.get_figure()
 
 
+def _drive_arrow_label(drive_name):
+    """Short display label for default ERP drive name patterns."""
+    if "evdist" in drive_name:
+        return "evdist"
+    if "evprox" in drive_name:
+        return "evprox"
+    return drive_name
+
+
+def _collect_drive_arrow_markers(net):
+    """Return sorted drive time markers for overlay on dipole plots."""
+    from hnn_core.network_models import default_drive_colors
+
+    markers = list()
+    seen = set()
+    for drive_name in sorted(net.external_drives.keys()):
+        drive = net.external_drives[drive_name]
+        drive_type = drive["type"]
+        dynamics = drive.get("dynamics", dict())
+        location = drive.get("location", "proximal")
+        if location in default_drive_colors:
+            color = default_drive_colors[location]
+        else:
+            color = default_drive_colors["default"]
+
+        event_time = None
+        if drive_type in ("evoked", "gaussian"):
+            event_time = dynamics["mu"]
+        elif drive_type == "bursty":
+            event_time = dynamics["tstart"]
+
+        if event_time is None:
+            continue
+
+        label = _drive_arrow_label(drive_name)
+        key = (label, round(float(event_time), 4))
+        if key in seen:
+            continue
+        seen.add(key)
+        markers.append(
+            {"time": float(event_time), "label": label, "color": color}
+        )
+
+    markers.sort(key=lambda marker: marker["time"])
+    return markers
+
+
+def plot_drive_arrows(
+    ax,
+    net,
+    *,
+    tmin=None,
+    tmax=None,
+    show_labels=True,
+):
+    """Mark external drive times on a dipole axis with colored arrows.
+
+    Arrows are drawn at the mean onset time of evoked (and Gaussian) drives
+    and at the start time of bursty drives, using colors from
+    :data:`~hnn_core.network_models.default_drive_colors`.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes
+        Axis containing a dipole time series.
+    net : instance of Network
+        Network whose ``external_drives`` define the markers.
+    tmin, tmax : float | None
+        Time window (ms). Markers outside the window are skipped. If None,
+        the current x-axis limits of ``ax`` are used.
+    show_labels : bool
+        If True, label each arrow with the drive name (or ``evprox`` /
+        ``evdist`` for default ERP drives).
+
+    Returns
+    -------
+    ax : matplotlib.axes.Axes
+        The axis with arrows added.
+    """
+    from matplotlib.transforms import blended_transform_factory
+
+    from hnn_core.network import Network
+
+    _validate_type(net, Network, "net", "Network")
+
+    if tmin is None or tmax is None:
+        x_left, x_right = ax.get_xlim()
+        if tmin is None:
+            tmin = x_left
+        if tmax is None:
+            tmax = x_right
+
+    trans = blended_transform_factory(ax.transData, ax.transAxes)
+    markers = _collect_drive_arrow_markers(net)
+    time_offsets = dict()
+
+    for marker in markers:
+        event_time = marker["time"]
+        if event_time < tmin or event_time > tmax:
+            continue
+
+        offset_idx = time_offsets.get(event_time, 0)
+        time_offsets[event_time] = offset_idx + 1
+        label_y = 0.97 - offset_idx * 0.05
+        arrow_y = 0.88 - offset_idx * 0.05
+        time_plot = event_time + offset_idx * 1.5
+
+        ax.annotate(
+            "",
+            xy=(time_plot, arrow_y),
+            xycoords=trans,
+            xytext=(time_plot, label_y),
+            textcoords=trans,
+            arrowprops=dict(arrowstyle="->", color=marker["color"], lw=1.5),
+        )
+        if show_labels:
+            ax.text(
+                time_plot,
+                label_y + 0.02,
+                marker["label"],
+                transform=trans,
+                fontsize=7,
+                color=marker["color"],
+                ha="center",
+                va="bottom",
+            )
+
+    return ax
+
+
 def plot_dipole(
     dpl,
     tmin=None,
@@ -279,6 +409,8 @@ def plot_dipole(
     color="k",
     label="average",
     average=False,
+    net=None,
+    show_drive_arrows=False,
     show=True,
 ):
     """Simple layer-specific plot function.
@@ -307,6 +439,12 @@ def plot_dipole(
         Dipole label. Enabled when average=True.
     average : bool, default=False
         If True, render the average across all dpls.
+    net : instance of Network | None
+        Network used to overlay drive timing arrows when
+        ``show_drive_arrows=True``.
+    show_drive_arrows : bool, default=False
+        If True, draw arrows on each axis marking evoked / bursty drive times.
+        Requires ``net``.
     show : bool, default=True
         If True, show the figure.
 
@@ -316,6 +454,7 @@ def plot_dipole(
         The matplotlib figure handle.
     """
     from .dipole import Dipole, average_dipoles
+    from .network import Network
 
     layers = layer if isinstance(layer, list) else [layer]
     if ax is None:
@@ -391,6 +530,12 @@ def plot_dipole(
         else:
             title_str = layer
         ax.set_title(title_str)
+
+        if show_drive_arrows:
+            if net is None:
+                raise ValueError("net must be provided when show_drive_arrows=True")
+            _validate_type(net, Network, "net", "Network")
+            plot_drive_arrows(ax, net, tmin=tmin, tmax=tmax)
 
     plt_show(show)
     return axes[0].get_figure()
