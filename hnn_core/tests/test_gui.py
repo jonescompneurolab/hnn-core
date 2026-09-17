@@ -53,11 +53,18 @@ assets_path = Path(hnn_core_root, "tests", "assets")
 
 
 @pytest.fixture
-def setup_gui():
+def setup_reduced_gui():
     gui = HNNGUI(network_configuration=assets_path / "neymotin2020_3x3_drives.json")
     gui.compose()
     gui.widget_dt.value = 0.5  # speed up tests
     gui.widget_tstop.value = 70  # speed up tests
+    return gui
+
+
+@pytest.fixture
+def setup_full_gui():
+    gui = HNNGUI()
+    gui.compose()
     return gui
 
 
@@ -137,18 +144,17 @@ def check_equal_networks(net1, net2):
         check_equality(getattr(net1, attr), getattr(net2, attr), f"{attr} not equal")
 
 
-def test_gui_load_params():
+def test_gui_load_params(setup_full_gui):
     """Test if gui loads default parameters properly"""
-    gui = HNNGUI()
+    gui = setup_full_gui
 
     assert isinstance(gui.params, dict)
     assert gui.params["object_type"] == "Network"
     plt.close("all")
 
 
-def test_gui_compose():
-    gui = HNNGUI()
-    gui.compose()
+def test_gui_compose(setup_full_gui):
+    gui = setup_full_gui
     assert len(gui.connectivity_widgets) == 12
     assert len(gui.global_gain_widgets) == 4
     assert len(gui.cell_parameters_widgets) == 6
@@ -183,10 +189,9 @@ def test_simulate_prepare_upload_file():
     assert dict_from_url == dict_from_local
 
 
-def test_gui_upload_connectivity():
+def test_gui_upload_connectivity(setup_full_gui):
     """Test if gui handles uploaded connectivity parameters correctly"""
-    gui = HNNGUI()
-    _ = gui.compose()
+    gui = setup_full_gui
     default_params = gui.params.copy()
 
     # clear the connectivity widgets
@@ -228,9 +233,9 @@ def test_gui_upload_connectivity():
     assert gui.connectivity_widgets[0][0].children[1].children[0].value == 0.01
 
 
-def test_gui_smart_gains_upload_connectivity(setup_gui):
+def test_gui_smart_gains_upload_connectivity(setup_reduced_gui):
     """Test if gui 'smartly' handles upload of Network with non-default global gains."""
-    gui = setup_gui
+    gui = setup_reduced_gui
     # The non-uniform-gain warning is emitted via ``print`` and only reaches the
     # GUI log window because, in a notebook, the GUI globally redirects stdout to
     # its logger (``_GUI_PrintToLogger``). pytest's stdout capture clobbers that
@@ -352,10 +357,9 @@ def test_gui_smart_gains_upload_connectivity(setup_gui):
     plt.close("all")
 
 
-def test_gui_upload_drives(tmp_path):
+def test_gui_upload_drives(tmp_path, setup_full_gui):
     """Test if gui handles uploaded drive parameters correctly"""
-    gui = HNNGUI()
-    _ = gui.compose()
+    gui = setup_full_gui
 
     # clear the drive widgets
     original_drive_count = len(gui.drive_widgets)
@@ -432,13 +436,11 @@ def test_gui_upload_drives(tmp_path):
     plt.close("all")
 
 
-def test_gui_rerun_saved_network_without_n_trials():
+def test_gui_rerun_saved_network_without_n_trials(setup_full_gui):
     """Test rerunning a GUI-saved network without N_trials defined.
     Ensures simulate_dipole defaults correctly instead of raising KeyError.
     """
-
-    gui = HNNGUI()
-    gui.compose()
+    gui = setup_full_gui
 
     gui.widget_tstop.value = 20
     gui.widget_dt.value = 0.5
@@ -461,10 +463,9 @@ def test_gui_rerun_saved_network_without_n_trials():
     assert len(dpls) == 1
 
 
-def test_gui_upload_data():
+def test_gui_upload_data(setup_full_gui):
     """Test if gui handles uploaded data"""
-    gui = HNNGUI()
-    _ = gui.compose()
+    gui = setup_full_gui
 
     assert len(gui.viz_manager.data["figs"]) == 0
     assert len(data_store.experimental_data) == 0
@@ -507,10 +508,9 @@ def test_gui_upload_data():
     plt.close("all")
 
 
-def test_gui_change_connectivity():
+def test_gui_change_connectivity(setup_full_gui):
     """Test if GUI properly changes cell connectivity parameters."""
-    gui = HNNGUI()
-    _ = gui.compose()
+    gui = setup_full_gui
 
     for connectivity_field in gui.connectivity_widgets:
         for vbox in connectivity_field:
@@ -555,10 +555,9 @@ def test_gui_change_connectivity():
     plt.close("all")
 
 
-def test_gui_add_drives():
+def test_gui_add_drives(setup_full_gui):
     """Test if gui add different type of drives."""
-    gui = HNNGUI()
-    _ = gui.compose()
+    gui = setup_full_gui
 
     for val_drive_type in ("Poisson", "Evoked", "Rhythmic"):
         for val_location in ("Distal", "Proximal"):
@@ -578,9 +577,9 @@ def test_gui_add_drives():
     plt.close("all")
 
 
-def test_gui_init_network(setup_gui):
+def test_gui_init_network(setup_reduced_gui):
     """Test if gui initializes network properly"""
-    gui = setup_gui
+    gui = setup_reduced_gui
     # now the default parameter has been loaded.
     _single_simulation = {}
     _single_simulation["net"] = dict_to_network(gui.params)
@@ -612,10 +611,9 @@ def test_gui_init_network(setup_gui):
 @requires_mpi4py
 @requires_psutil
 @pytest.mark.uses_mpi
-def test_gui_run_simulation_mpi():
+def test_gui_run_simulation_mpi(setup_full_gui):
     """Test if run button triggers simulation with MPIBackend."""
-    gui = HNNGUI()
-    _ = gui.compose()
+    gui = setup_full_gui
 
     gui.widget_tstop.value = 70
     gui.widget_dt.value = 0.5
@@ -632,9 +630,9 @@ def test_gui_run_simulation_mpi():
     plt.close("all")
 
 
-def test_gui_run_simulations(setup_gui):
+def test_gui_run_simulations(setup_reduced_gui):
     """Test if run button triggers multiple simulations correctly."""
-    gui = setup_gui
+    gui = setup_reduced_gui
 
     tstop_trials_tstep = [(10, 1, 0.25), (10, 2, 0.5), (12, 1, 0.5)]
     gui.widget_backend_selection.value = "Joblib"
@@ -664,9 +662,9 @@ def test_gui_run_simulations(setup_gui):
     assert len(list(data_store.simulated_data)) == sim_count
 
 
-def test_simulation_auto_rename_duplicate(setup_gui):
+def test_simulation_auto_rename_duplicate(setup_reduced_gui):
     """Checks that simulation auto-renames if the name is already taken."""
-    gui = setup_gui
+    gui = setup_reduced_gui
 
     default_sim_name = gui.widget_simulation_name.value
 
@@ -768,9 +766,9 @@ def test_gui_take_screenshots():
     plt.close("all")
 
 
-def test_gui_add_figure(setup_gui):
+def test_gui_add_figure(setup_reduced_gui):
     """Test if the GUI adds/deletes figs properly."""
-    gui = setup_gui
+    gui = setup_reduced_gui
 
     fig_tabs = gui.viz_manager.figs_tabs
     axes_config_tabs = gui.viz_manager.axes_config_tabs
@@ -815,9 +813,9 @@ def test_gui_add_figure(setup_gui):
     plt.close("all")
 
 
-def test_gui_spectrogram_trial_averaging(setup_gui):
+def test_gui_spectrogram_trial_averaging(setup_reduced_gui):
     """Test whether the spectrogram plot data is consistent across simulations on various trials"""
-    gui = setup_gui
+    gui = setup_reduced_gui
     gui.widget_tstop.value = 500
     simulations = [("sim1", 1), ("sim2", 1), ("sim3", 2)]
 
@@ -859,9 +857,9 @@ def test_gui_spectrogram_trial_averaging(setup_gui):
     plt.close("all")
 
 
-def test_gui_add_data_dependent_figure(setup_gui):
+def test_gui_add_data_dependent_figure(setup_reduced_gui):
     """Test if the GUI adds/deletes figs data dependent properly."""
-    gui = setup_gui
+    gui = setup_reduced_gui
 
     fig_tabs = gui.viz_manager.figs_tabs
     axes_config_tabs = gui.viz_manager.axes_config_tabs
@@ -900,9 +898,9 @@ def test_gui_add_data_dependent_figure(setup_gui):
     assert len(fig_tabs.children) == n_fig
 
 
-def test_gui_edit_figure(setup_gui):
+def test_gui_edit_figure(setup_reduced_gui):
     """Test if the GUI adds/deletes figs properly."""
-    gui = setup_gui
+    gui = setup_reduced_gui
 
     fig_tabs = gui.viz_manager.figs_tabs
     axes_config_tabs = gui.viz_manager.axes_config_tabs
@@ -923,9 +921,9 @@ def test_gui_edit_figure(setup_gui):
     plt.close("all")
 
 
-def test_gui_synchronous_inputs(setup_gui):
+def test_gui_synchronous_inputs(setup_reduced_gui):
     """Test if the GUI creates plot using synchronous_inputs."""
-    gui = setup_gui
+    gui = setup_reduced_gui
 
     # Set cell_specific to False
     gui.drive_widgets[0]["is_cell_specific"].value = False
@@ -955,9 +953,9 @@ def test_gui_synchronous_inputs(setup_gui):
             assert len(connectivity["src_gids"]) == n_drive_cells
 
 
-def test_gui_cell_specific_drive(setup_gui):
+def test_gui_cell_specific_drive(setup_reduced_gui):
     """Tests 1:1 connection with cell_specific widget"""
-    gui = setup_gui
+    gui = setup_reduced_gui
     # Set cell_specific to False
     gui.drive_widgets[0]["is_cell_specific"].value = True
     # Assert that the n_drive_cells is disabled
@@ -981,9 +979,9 @@ def test_gui_cell_specific_drive(setup_gui):
         assert len(connectivity["src_gids"]) == len(connectivity["target_gids"])
 
 
-def test_gui_figure_overlay(setup_gui):
+def test_gui_figure_overlay(setup_reduced_gui):
     """Test if the GUI adds/deletes figs properly."""
-    gui = setup_gui
+    gui = setup_reduced_gui
 
     axes_config_tabs = gui.viz_manager.axes_config_tabs
 
@@ -1009,10 +1007,10 @@ def test_gui_figure_overlay(setup_gui):
     plt.close("all")
 
 
-def test_gui_visualization(setup_gui):
+def test_gui_visualization(setup_reduced_gui):
     """Tests updating a figure creates plots with data."""
 
-    gui = setup_gui
+    gui = setup_reduced_gui
     # Spectrogram needs longer time for wavelet analysis
     gui.widget_tstop.value = 500
     gui.run_button.click()
@@ -1103,9 +1101,9 @@ def test_gui_visualization(setup_gui):
     plt.close("all")
 
 
-def test_dipole_data_overlay(setup_gui):
+def test_dipole_data_overlay(setup_reduced_gui):
     """Tests dipole plot with a simulation and data overlay."""
-    gui = setup_gui
+    gui = setup_reduced_gui
 
     # Run simulation with 2 trials
     gui.widget_ntrials.value = 2
@@ -1194,10 +1192,10 @@ def test_unlink_relink_widget():
     assert gui.tab_group_2.selected_index == 0
 
 
-def test_gui_download_simulation(setup_gui):
+def test_gui_download_simulation(setup_reduced_gui):
     """Test the GUI download simulation pipeline."""
 
-    gui = setup_gui
+    gui = setup_reduced_gui
 
     # Run a simulation with 2 trials
     gui.widget_ntrials.value = 2
@@ -1242,10 +1240,10 @@ def test_gui_download_simulation(setup_gui):
     )
 
 
-def test_gui_upload_csv_simulation(setup_gui):
+def test_gui_upload_csv_simulation(setup_reduced_gui):
     """Test if gui handles uploaded csv data"""
 
-    gui = setup_gui
+    gui = setup_reduced_gui
 
     assert len(gui.viz_manager.data["figs"]) == 0
     assert len(data_store.experimental_data) == 0
@@ -1285,10 +1283,10 @@ def test_gui_upload_csv_simulation(setup_gui):
     )
 
 
-def test_gui_download_configuration(setup_gui):
+def test_gui_download_configuration(setup_reduced_gui):
     """Test the GUI download simulation pipeline."""
 
-    gui = setup_gui
+    gui = setup_reduced_gui
 
     # Initiate 1st simulation
     sim_name = "sim1"
@@ -1313,10 +1311,9 @@ def test_gui_download_configuration(setup_gui):
     check_equal_networks(net1, net2)
 
 
-def test_gui_add_tonic_input():
+def test_gui_add_tonic_input(setup_full_gui):
     """Test if gui add different type of drives."""
-    gui = HNNGUI()
-    _ = gui.compose()
+    gui = setup_full_gui
     assert "tonic" not in [drive["type"].lower() for drive in gui.drive_widgets]
 
     _single_simulation = {}
@@ -1369,9 +1366,9 @@ def test_gui_add_tonic_input():
     assert net.external_biases[tonic_drive_name]["L5_pyramidal"]["amplitude"] == 10.0
 
 
-def test_gui_cell_params_widgets(setup_gui):
+def test_gui_cell_params_widgets(setup_reduced_gui):
     """Test if gui add different type of drives."""
-    gui = setup_gui
+    gui = setup_reduced_gui
     _single_simulation = {}
     _single_simulation["net"] = dict_to_network(gui.params)
     _single_simulation["net"].cell_types
@@ -1409,10 +1406,10 @@ def test_gui_cell_params_widgets(setup_gui):
     assert len(cell_params["Biophysics L5"]) == 20
 
 
-def test_fig_tabs_dropdown_lists(setup_gui):
+def test_fig_tabs_dropdown_lists(setup_reduced_gui):
     """Test the GUI download simulation pipeline."""
 
-    gui = setup_gui
+    gui = setup_reduced_gui
 
     gui.widget_ntrials.value = 1
 
@@ -1521,9 +1518,9 @@ def test_update_nested_dict():
     assert updated == expected
 
 
-def test_delete_single_drive(setup_gui):
+def test_delete_single_drive(setup_reduced_gui):
     """Deleting a single drive."""
-    gui = setup_gui
+    gui = setup_reduced_gui
     assert len(gui.drive_accordion.children) == 6
     assert gui.drive_accordion.titles == (
         "evdist1 (distal)",
@@ -1545,10 +1542,10 @@ def test_delete_single_drive(setup_gui):
     )
 
 
-def test_default_scaling(setup_gui):
+def test_default_scaling(setup_reduced_gui):
     """Tests default scaling is inherited correctly"""
 
-    gui = setup_gui
+    gui = setup_reduced_gui
     gui.run_button.click()
 
     # check that the unadjusted default scaling is the same everywhere
@@ -1601,10 +1598,10 @@ def test_default_scaling(setup_gui):
     plt.close("all")
 
 
-def test_default_smoothing(setup_gui):
+def test_default_smoothing(setup_reduced_gui):
     """Tests default smoothing is inherited correctly"""
 
-    gui = setup_gui
+    gui = setup_reduced_gui
     gui.run_button.click()
 
     # check that the unadjusted default smoothing is the same everywhere
@@ -1657,9 +1654,9 @@ def test_default_smoothing(setup_gui):
     plt.close("all")
 
 
-def test_default_frequencies(setup_gui):
+def test_default_frequencies(setup_reduced_gui):
     """Tests that default min/max frequency are inherited correctly"""
-    gui = setup_gui
+    gui = setup_reduced_gui
 
     # check that the defaults are the same everywhere after running
     # the default simulation
@@ -1693,10 +1690,10 @@ def test_default_frequencies(setup_gui):
     assert gui_max == viz_max == new_max
 
 
-def test_adjust_synaptic_weights(setup_gui):
+def test_adjust_synaptic_weights(setup_reduced_gui):
     """Test adjusting synaptic weight widgets."""
 
-    gui = setup_gui
+    gui = setup_reduced_gui
     _single_simulation = {}
     _single_simulation["net"] = dict_to_network(gui.params)
     _init_network_from_widgets(
@@ -1733,9 +1730,9 @@ def test_adjust_synaptic_weights(setup_gui):
     assert gains_altered == {"e_e": 0.5, "e_i": 0.5, "i_e": 1.1, "i_i": 1.1}
 
 
-def test_global_gain_widgets_initialization(setup_gui):
+def test_global_gain_widgets_initialization(setup_reduced_gui):
     """Test that global gain widgets are initialized properly."""
-    gui = setup_gui
+    gui = setup_reduced_gui
 
     # Check initial values are 1.0
     for gain_type in ["e_e", "e_i", "i_e", "i_i"]:
@@ -1748,9 +1745,9 @@ def test_global_gain_widgets_initialization(setup_gui):
         assert gui.global_gain_widgets[gain_type].step == 0.1
 
 
-def test_combined_gain_indicator_updates(setup_gui):
+def test_combined_gain_indicator_updates(setup_reduced_gui):
     """Test that combined gain indicators update when global or single gains change."""
-    gui = setup_gui
+    gui = setup_reduced_gui
 
     # Get a connectivity widget that has gain indicators
     # Find a L2_pyramidal->L2_pyramidal connection to test e_e type
@@ -1781,9 +1778,9 @@ def test_combined_gain_indicator_updates(setup_gui):
     assert f"{expected_combined:.2f}" in combined_indicator.value
 
 
-def test_custom_gains_simulate_and_download(setup_gui):
+def test_custom_gains_simulate_and_download(setup_reduced_gui):
     """Test that network configurations include gain values in serialization."""
-    gui = setup_gui
+    gui = setup_reduced_gui
 
     # Set some non-default gains
     global_custom_gain = 0.8
@@ -1820,7 +1817,7 @@ def test_custom_gains_simulate_and_download(setup_gui):
             )
 
 
-def test_diff_gui_vs_api_networks_simulations():
+def test_diff_gui_vs_api_networks_simulations(setup_full_gui):
     """Test that synaptic gain changes are reproducible between the GUI and API."""
     # Config
     # --------------------------------
@@ -1839,9 +1836,7 @@ def test_diff_gui_vs_api_networks_simulations():
 
     # Setup and run the GUI simulation
     # --------------------------------
-    gui = HNNGUI(network_configuration=net_file_path)
-    gui.compose()
-
+    gui = setup_full_gui
     gui.widget_dt.value = local_dt
     gui.widget_tstop.value = local_tstop
 
@@ -1900,7 +1895,7 @@ def test_diff_gui_vs_api_networks_simulations():
         pytest.param("MPI", "cobyla", 0.025, marks=pytest.mark.uses_mpi),
     ],
 )
-def test_gui_run_optimization(backend_selection, opt_solver, dt, setup_gui):
+def test_gui_run_optimization(backend_selection, opt_solver, dt, setup_reduced_gui):
     """Comprehensively test optimization functionality in the GUI.
 
     This is a pretty comprehensive test of optimization usage in the GUI (but of course
@@ -1931,7 +1926,7 @@ def test_gui_run_optimization(backend_selection, opt_solver, dt, setup_gui):
     TODO: future refactor: add deterministic testing for Cobyla and, after testing
     seeds, Bayesian and CMA
     """
-    gui = setup_gui
+    gui = setup_reduced_gui
 
     # Setup initial params:
     # so that we avoid windowing errors for short sims
@@ -2134,9 +2129,9 @@ def test_gui_run_optimization(backend_selection, opt_solver, dt, setup_gui):
     plt.close("all")
 
 
-def test_gui_optimization_no_constraints(setup_gui):
+def test_gui_optimization_no_constraints(setup_reduced_gui):
     """Test that optimization fails gracefully when no constraints are selected."""
-    gui = setup_gui
+    gui = setup_reduced_gui
 
     # Using this objective function because we don't have to load target data and run it
     # without any additional config
@@ -2169,9 +2164,9 @@ def test_gui_optimization_no_constraints(setup_gui):
     plt.close("all")
 
 
-def test_gui_optimization_no_target_data(setup_gui):
+def test_gui_optimization_no_target_data(setup_reduced_gui):
     """Test that optimization fails when no target data is selected."""
-    gui = setup_gui
+    gui = setup_reduced_gui
 
     # Select a constraint but don't upload target data
     gui.opt_drive_widgets[0]["mu_opt_checkbox"].value = True
@@ -2196,9 +2191,9 @@ def test_gui_optimization_no_target_data(setup_gui):
     plt.close("all")
 
 
-def test_traceback_logging(setup_gui, monkeypatch):
+def test_traceback_logging(setup_reduced_gui, monkeypatch):
     logger = logging.getLogger("hnn_gui")
-    gui = setup_gui
+    gui = setup_reduced_gui
     tstop_trials_tstep = [(10, 1, 0.25)]
     gui.widget_backend_selection.value = "Joblib"
     sim_count = 0
@@ -2318,10 +2313,10 @@ def test_data_store_direct_reset():
     assert store.simulated_data["new_sim"] == {"net": None, "dpls": []}
 
 
-def test_data_store_reset_on_gui_reinit(setup_gui):
+def test_data_store_reset_on_gui_reinit(setup_reduced_gui):
     """Instantiating a new HNNGUI on browser reload event must reset the shared
     data_store singleton"""
-    gui = setup_gui
+    gui = setup_reduced_gui
     gui.run_button.click()
     assert len(data_store.simulated_data) > 0
 
@@ -2333,9 +2328,9 @@ def test_data_store_reset_on_gui_reinit(setup_gui):
     assert len(data_store.networks) == 0
 
 
-def test_data_store_shared_singleton_across_modules(setup_gui):
+def test_data_store_shared_singleton_across_modules(setup_reduced_gui):
     """gui.py and _viz_manager.py must observe the exact same data_store instance"""
-    gui = setup_gui
+    gui = setup_reduced_gui
     sim_name = "shared_data_store_test"
     gui.widget_simulation_name.value = sim_name
     gui.run_button.click()
@@ -2347,10 +2342,10 @@ def test_data_store_shared_singleton_across_modules(setup_gui):
     assert sim_name in gui.viz_manager.viz_tab_simulation_data_dropdown.value
 
 
-def test_viz_tab_dropdown(setup_gui):
+def test_viz_tab_dropdown(setup_reduced_gui):
     """Test switch template values in visualization tabs shows/hides the
     simulation and experimental data dropdowns"""
-    gui = setup_gui
+    gui = setup_reduced_gui
     sim_name_1 = "default"
     gui.widget_simulation_name.value = sim_name_1
     gui.run_button.click()
@@ -2387,12 +2382,12 @@ def test_viz_tab_dropdown(setup_gui):
 
 
 ### Test generated by  Claude AI
-def test_viz_tab_ax_control_dropdowns(setup_gui):
+def test_viz_tab_ax_control_dropdowns(setup_reduced_gui):
     """Test dropdowns in ax controls :
     Simulation Data Dropdown only shows simulated data
     Experimental Data only shows experimental data"""
 
-    gui = setup_gui
+    gui = setup_reduced_gui
 
     sim_name = "sim1"
     gui.widget_simulation_name.value = sim_name
@@ -2421,9 +2416,9 @@ def test_viz_tab_ax_control_dropdowns(setup_gui):
 
 
 ### Test generated by  Claude AI
-def test_fig_contain_data(setup_gui, tmp_path):
+def test_fig_contain_data(setup_reduced_gui, tmp_path):
     """Check figures are not empty white canvas after run simulation or upload data"""
-    gui = setup_gui
+    gui = setup_reduced_gui
 
     # use unadjusted scaling/smoothing so the simulated dipole plotted here
     # matches, value for value, the same dipole data re-plotted below after
@@ -2460,11 +2455,11 @@ def test_fig_contain_data(setup_gui, tmp_path):
 
 
 ### Test generated by  Claude AI
-def test_axe_control_dropdowns(setup_gui):
+def test_axe_control_dropdowns(setup_reduced_gui):
     """Test that the simulation_selection and experimental_data_selection dropdowns
     always load the last run and uploaded data respectively"""
 
-    gui = setup_gui
+    gui = setup_reduced_gui
 
     # Each run should select itself in the new figure's Simulation Data
     # dropdown, leaving Experimental Data at "None".
@@ -2496,11 +2491,11 @@ def test_axe_control_dropdowns(setup_gui):
     plt.close("all")
 
 
-def test_experimental_comparison_change_disables_plot_type(setup_gui):
+def test_experimental_comparison_change_disables_plot_type(setup_reduced_gui):
     """Test that picking an experimental dataset to compare against disables
     the plot type dropdown, and picking "None" re-enables it."""
 
-    gui = setup_gui
+    gui = setup_reduced_gui
 
     sim_name = "sim1"
     gui.widget_simulation_name.value = sim_name
@@ -2538,9 +2533,9 @@ def test_experimental_comparison_change_disables_plot_type(setup_gui):
 
 
 ### Test generated by  Claude AI
-def test_gui_upload_data_name_conflicts_with_simulation(setup_gui):
+def test_gui_upload_data_name_conflicts_with_simulation(setup_reduced_gui):
     """Test that uploading data named after an existing simulation logs an error."""
-    gui = setup_gui
+    gui = setup_reduced_gui
 
     # Run a simulation whose name will later collide with an uploaded data file
     sim_name = "test_default"
