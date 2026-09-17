@@ -342,6 +342,17 @@ def fix_net_neymotin_2020():
 
 
 @pytest.fixture(scope="module")
+def fix_load_featureful_neymotin_net(tmp_path_factory, fix_net_neymotin_2020):
+    """Load the featureful reduced Neymotin 2020 network from the fixture."""
+    net = fix_net_neymotin_2020(featureful_reduced_network=True)
+    net_path = (
+        tmp_path_factory.mktemp("network") / "neymotin_2020_featureful_reduced.json"
+    )
+    net.write_configuration(net_path, overwrite=True)
+    return net_path
+
+
+@pytest.fixture(scope="module")
 def fix_run_simulation():
     def _fix_run_simulation(
         net,
@@ -442,14 +453,4 @@ def network_small(fix_default_params):
         fix_default_params,
         add_drives_from_params=True,
         mesh_shape=(1, 1),
-    )
-
-
-@pytest.fixture
-def network_3x3(fix_default_params):
-    """3x3 mesh network used for testing larger network configurations."""
-    return neymotin_2020_model(
-        fix_default_params,
-        add_drives_from_params=True,
-        mesh_shape=(3, 3),
     )
