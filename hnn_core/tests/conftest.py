@@ -73,9 +73,15 @@ def pytest_runtest_setup(item):
 
 @pytest.fixture(scope="module")
 def fix_net_duecker_ET():
+    """Test fixture for the Duecker ET model network.
+
+    Note that the argument `legacy_mode` is unused, since it is only present for API
+    equality with `fix_net_neymotin_2020`.
+    """
+
     def _fix_net_duecker_ET(
         add_drives_from_params=True,
-        # legacy_mode=False,
+        legacy_mode=False,
         reduced=False,
         electrode_array=None,
     ):
@@ -195,6 +201,11 @@ def fix_net_duecker_ET():
 
 @pytest.fixture(scope="module")
 def fix_net_neymotin_2020():
+    """Test fixture for the Neymotin 2020 model network.
+
+    TODO Docstring coming soon! UNDER CONSTRUCTION <construction-beaver.gif>
+    """
+
     def _fix_net_neymotin_2020(
         add_drives_from_params=True,
         legacy_mode=False,

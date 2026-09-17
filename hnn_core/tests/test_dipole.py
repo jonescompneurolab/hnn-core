@@ -10,7 +10,7 @@ from h5io import write_hdf5
 import pytest
 
 from hnn_core import read_dipole, average_dipoles
-from hnn_core import Network, neymotin_2020_model
+from hnn_core import Network
 from hnn_core.viz import plot_dipole
 from hnn_core.dipole import Dipole, simulate_dipole, _rmse
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
@@ -362,9 +362,11 @@ def test_rmse(fix_default_params):
     assert_allclose(avg_rmse, expected_rmse)
 
 
-def test_dipole_simulation_with_renamed_cells():
+def test_dipole_simulation_with_renamed_cells(
+    fix_net_neymotin_2020, fix_run_simulation
+):
     """Test dipole simulation works with renamed pyramidal cells."""
-    net = neymotin_2020_model()
+    net = fix_net_neymotin_2020(add_drives_from_params=False)
 
     # renaming the pyramidal cells (their cell_metadata should remeain the same)
     rename_mapping = {"L2_pyramidal": "My_L2_Pyr", "L5_pyramidal": "My_L5_Pyr"}
