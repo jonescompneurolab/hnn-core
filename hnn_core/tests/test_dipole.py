@@ -18,13 +18,18 @@ from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 matplotlib.use("agg")
 
 
+@pytest.mark.parametrize(
+    "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+)
 def test_dipole(
     tmp_path,
     fix_default_params,
-    fix_net_neymotin_2020,
+    fix_net_model,
     fix_run_simulation,
+    request,
 ):
     """Test dipole object."""
+    net_model = request.getfixturevalue(fix_net_model)
     dpl_out_fname = tmp_path / "dpl1.txt"
     dpl_out_hdf5_fname = tmp_path / "dpl.hdf5"
     params = fix_default_params
@@ -156,7 +161,7 @@ def test_dipole(
     dipole_exp_avg = average_dipoles([dipole_exp, dipole_exp])
     assert_allclose(dipole_exp.data["agg"], dipole_exp_avg.data["agg"])
 
-    net_raw = fix_net_neymotin_2020(reduced=True)
+    net_raw = net_model(reduced=True)
     net_proc = deepcopy(net_raw)
 
     dpls_raw, net_raw = fix_run_simulation(

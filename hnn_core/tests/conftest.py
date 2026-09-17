@@ -9,7 +9,7 @@ import pickle
 
 from pathlib import Path
 import hnn_core
-from hnn_core import read_params, neymotin_2020_model, simulate_dipole
+from hnn_core import read_params, duecker_ET_model, neymotin_2020_model, simulate_dipole
 from hnn_core import MPIBackend, JoblibBackend
 
 # store history of failures per test class name and per index in parametrize
@@ -69,6 +69,128 @@ def pytest_runtest_setup(item):
             # and test name
             if test_name is not None:
                 pytest.xfail("previous test failed ({})".format(test_name))
+
+
+@pytest.fixture(scope="module")
+def fix_net_duecker_ET():
+    def _fix_net_duecker_ET(
+        add_drives_from_params=True,
+        # legacy_mode=False,
+        reduced=False,
+        electrode_array=None,
+    ):
+        if reduced:
+            mesh_shape = (3, 3)
+            # Shorten when the drives start, since we usually use a shorter simulation
+            # when using a reduced network.
+            prox1_mu = 5
+            dist1_mu = 10
+            prox2_mu = 20
+        else:
+            mesh_shape = (10, 10)
+            prox1_mu = 18
+            dist1_mu = 62
+            prox2_mu = 100
+
+        net = duecker_ET_model(
+            mesh_shape=mesh_shape,
+        )
+
+        if add_drives_from_params:
+            weights_ampa_p1 = {
+                "L2_inhibitory": 0.01,
+                "L2_pyramidal": 0.015,
+                "L5_inhibitory": 0.0,
+                "L5_pyramidal": 0.03,
+            }
+            weights_nmda_p1 = {
+                "L2_inhibitory": 0.01,
+                "L2_pyramidal": 0.05,
+                "L5_inhibitory": 0.0,
+                "L5_pyramidal": 0.025,
+            }
+            synaptic_delays_prox = {
+                "L2_inhibitory": 0.1,
+                "L2_pyramidal": 0.1,
+                "L5_inhibitory": 1,
+                "L5_pyramidal": 1,
+            }
+
+            net.add_evoked_drive(
+                "prox1",
+                mu=prox1_mu,
+                sigma=2.5,
+                numspikes=1,
+                weights_ampa=weights_ampa_p1,
+                weights_nmda=weights_nmda_p1,
+                location="proximal",
+                synaptic_delays=synaptic_delays_prox,
+            )
+
+            weights_ampa_d1 = {
+                "L2_inhibitory": 0.005,
+                "L2_pyramidal": 0.01,
+                "L5_pyramidal": 1.0,
+            }
+            weights_nmda_d1 = {
+                "L2_inhibitory": 0.0,
+                "L2_pyramidal": 0.01,
+                "L5_pyramidal": 1.0,
+            }
+            synaptic_delays_dist = {
+                "L2_inhibitory": 0.1,
+                "L2_pyramidal": 0.1,
+                "L5_pyramidal": 0.1,
+            }
+
+            net.add_evoked_drive(
+                "dist1",
+                mu=dist1_mu,
+                sigma=5,
+                numspikes=2,
+                weights_ampa=weights_ampa_d1,
+                weights_nmda=weights_nmda_d1,
+                location="distal",
+                synaptic_delays=synaptic_delays_dist,
+            )
+
+            weights_ampa_p2 = {
+                "L2_inhibitory": 0.01,
+                "L2_pyramidal": 0.3,
+                "L5_inhibitory": 0.001,
+                "L5_pyramidal": 0.3,
+            }
+            weights_nmda_p2 = {
+                "L2_inhibitory": 0.01,
+                "L2_pyramidal": 0.2,
+                "L5_inhibitory": 0.001,
+                "L5_pyramidal": 0.2,
+            }
+            synaptic_delays_prox = {
+                "L2_inhibitory": 0.1,
+                "L2_pyramidal": 0.1,
+                "L5_inhibitory": 1.0,
+                "L5_pyramidal": 1.0,
+            }
+            net.add_evoked_drive(
+                "prox2",
+                mu=prox2_mu,
+                sigma=15,
+                numspikes=1,
+                weights_ampa=weights_ampa_p2,
+                weights_nmda=weights_nmda_p2,
+                location="proximal",
+                synaptic_delays=synaptic_delays_prox,
+            )
+
+        net.set_cell_positions(inplane_distance=30.0)
+        if electrode_array is not None:
+            for name, positions in electrode_array.items():
+                net.add_electrode_array(name, positions)
+
+        return net
+
+    return _fix_net_duecker_ET
 
 
 @pytest.fixture(scope="module")
