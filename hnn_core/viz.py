@@ -348,8 +348,6 @@ def plot_drive_arrows(
     ax : matplotlib.axes.Axes
         The axis with arrows added.
     """
-    from matplotlib.transforms import blended_transform_factory
-
     from hnn_core.network import Network
 
     _validate_type(net, Network, "net", "Network")
@@ -361,7 +359,11 @@ def plot_drive_arrows(
         if tmax is None:
             tmax = x_right
 
-    trans = blended_transform_factory(ax.transData, ax.transAxes)
+    ymin, ymax = ax.get_ylim()
+    y_span = ymax - ymin
+    if y_span == 0:
+        y_span = 1.0
+
     markers = _collect_drive_arrow_markers(net)
     time_offsets = dict()
 
@@ -372,29 +374,24 @@ def plot_drive_arrows(
 
         offset_idx = time_offsets.get(event_time, 0)
         time_offsets[event_time] = offset_idx + 1
-        label_y = 0.97 - offset_idx * 0.05
-        arrow_y = 0.88 - offset_idx * 0.05
         time_plot = event_time + offset_idx * 1.5
+        stack_y = offset_idx * 0.06 * y_span
+        # Keep labels and arrow tails inside the axes (below the top spine).
+        label_y = ymax - 0.04 * y_span - stack_y
+        arrow_tip_y = ymax - 0.16 * y_span - stack_y
 
+        label = marker["label"] if show_labels else ""
         ax.annotate(
-            "",
-            xy=(time_plot, arrow_y),
-            xycoords=trans,
+            label,
+            xy=(time_plot, arrow_tip_y),
             xytext=(time_plot, label_y),
-            textcoords=trans,
+            ha="center",
+            va="top",
+            color=marker["color"],
+            fontsize=7,
+            annotation_clip=True,
             arrowprops=dict(arrowstyle="->", color=marker["color"], lw=1.5),
         )
-        if show_labels:
-            ax.text(
-                time_plot,
-                label_y + 0.02,
-                marker["label"],
-                transform=trans,
-                fontsize=7,
-                color=marker["color"],
-                ha="center",
-                va="bottom",
-            )
 
     return ax
 
