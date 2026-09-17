@@ -211,32 +211,130 @@ def fix_net_neymotin_2020():
         legacy_mode=False,
         reduced=False,
         electrode_array=None,
+        featureful_reduced_network=False,
     ):
         # default params
         params_fname = hnn_core_root / "param" / "default.json"
         params = read_params(params_fname)
 
-        if reduced:
-            mesh_shape = (3, 3)
-            # NOTE: `run_hnn_core_fixture` with `reduced=True` originally set:
-            # - trials to 2 using the `Network` object (instead of at simulation)
-            # - set simulation time to 40 ms, and
-            # - disabled legacy_mode
-            # Trials and simulation time are now only set at simulation time, and legacy
-            # mode is a regular argument.
-            params.update({"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20})
-        else:
-            mesh_shape = (10, 10)
-        # Legacy mode necessary for exact dipole comparison test
-        net = neymotin_2020_model(
-            params,
-            add_drives_from_params=add_drives_from_params,
-            legacy_mode=legacy_mode,
-            mesh_shape=mesh_shape,
-        )
-        if electrode_array is not None:
-            for name, positions in electrode_array.items():
-                net.add_electrode_array(name, positions)
+        if featureful_reduced_network and (
+            legacy_mode or reduced or electrode_array is not None
+        ):
+            raise ValueError(
+                "featureful_reduced_network cannot be used with legacy_mode, reduced, "
+                "or electrode_array arguments."
+            )
+
+        if not featureful_reduced_network:
+            if reduced:
+                mesh_shape = (3, 3)
+                # NOTE: `run_hnn_core_fixture` with `reduced=True` originally set:
+                # - trials to 2 using the `Network` object (instead of at simulation)
+                # - set simulation time to 40 ms, and
+                # - disabled legacy_mode
+                # Trials and simulation time are now only set at simulation time, and legacy
+                # mode is a regular argument.
+                params.update({"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20})
+            else:
+                mesh_shape = (10, 10)
+            # Legacy mode necessary for exact dipole comparison test
+            net = neymotin_2020_model(
+                params,
+                add_drives_from_params=add_drives_from_params,
+                legacy_mode=legacy_mode,
+                mesh_shape=mesh_shape,
+            )
+            if electrode_array is not None:
+                for name, positions in electrode_array.items():
+                    net.add_electrode_array(name, positions)
+
+        # Formerly called the network at
+        # `hnn_core/tests/assets/neymotin2020_3x3_drives.json`
+        elif featureful_reduced_network:
+            net = neymotin_2020_model(
+                params=None,
+                add_drives_from_params=True,
+                legacy_mode=False,
+                mesh_shape=(3, 3),
+            )
+            # Adding bias
+            tonic_bias = {
+                "L2_pyramidal": 1.0,
+                "L5_pyramidal": 0.0,
+                "L2_basket": 0.0,
+                "L5_basket": 0.0,
+            }
+            net.add_tonic_bias(amplitude=tonic_bias)
+
+            # Add drives
+            location = "proximal"
+            burst_std = 20
+            weights_ampa_p = {
+                "L2_pyramidal": 5.4e-5,
+                "L5_pyramidal": 5.4e-5,
+                "L2_basket": 0.0,
+                "L5_basket": 0.0,
+            }
+            weights_nmda_p = {
+                "L2_pyramidal": 0.0,
+                "L5_pyramidal": 0.0,
+                "L2_basket": 0.0,
+                "L5_basket": 0.0,
+            }
+            syn_delays_p = {
+                "L2_pyramidal": 0.1,
+                "L5_pyramidal": 1.0,
+                "L2_basket": 0.0,
+                "L5_basket": 0.0,
+            }
+            net.add_bursty_drive(
+                "alpha_prox",
+                tstart=1.0,
+                burst_rate=10,
+                burst_std=burst_std,
+                numspikes=2,
+                spike_isi=10,
+                n_drive_cells=10,
+                location=location,
+                weights_ampa=weights_ampa_p,
+                weights_nmda=weights_nmda_p,
+                synaptic_delays=syn_delays_p,
+                event_seed=284,
+            )
+
+            weights_ampa = {
+                "L2_pyramidal": 0.0008,
+                "L5_pyramidal": 0.0075,
+                "L2_basket": 0.0,
+                "L5_basket": 0.0,
+            }
+            synaptic_delays = {
+                "L2_pyramidal": 0.1,
+                "L5_pyramidal": 1.0,
+                "L2_basket": 0.0,
+                "L5_basket": 0.0,
+            }
+            rate_constant = {
+                "L2_pyramidal": 140.0,
+                "L5_pyramidal": 40.0,
+                "L2_basket": 40.0,
+                "L5_basket": 40.0,
+            }
+            net.add_poisson_drive(
+                "poisson",
+                rate_constant=rate_constant,
+                weights_ampa=weights_ampa,
+                weights_nmda=weights_nmda_p,
+                location="proximal",
+                synaptic_delays=synaptic_delays,
+                event_seed=1349,
+            )
+
+            # Adding electrode arrays
+            electrode_pos = (1, 2, 3)
+            net.add_electrode_array("el1", electrode_pos)
+            electrode_pos = [(1, 2, 3), (-1, -2, -3)]
+            net.add_electrode_array("arr1", electrode_pos)
 
         return net
 

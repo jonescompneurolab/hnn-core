@@ -28,20 +28,8 @@ from hnn_core.hnn_io import (
     read_network_configuration,
 )
 
-from regenerate_test_network import create_neymotin_2020_3x3_test_net
-
 hnn_core_root = Path(hnn_core.__file__).parent
 assets_path = Path(hnn_core_root, "tests", "assets")
-
-
-@pytest.fixture
-def jones_2009_network():
-    # This allows us to define this test network once, but use it as both a
-    # fixture here in this file, or regenerate the network itself if used
-    # elsewhere.
-    net = create_neymotin_2020_3x3_test_net()
-
-    return net
 
 
 @pytest.fixture
@@ -62,8 +50,8 @@ def calcium_network():
     return net
 
 
-def test_eq(jones_2009_network, calcium_network):
-    net1 = jones_2009_network
+def test_eq(fix_net_neymotin_2020, calcium_network):
+    net1 = fix_net_neymotin_2020(featureful_reduced_network=True)
     net2 = calcium_network
 
     # Check eq of same network
@@ -87,8 +75,8 @@ def test_eq(jones_2009_network, calcium_network):
     assert net1_hard_change_drive != net1
 
 
-def test_eq_conn(jones_2009_network):
-    net1 = jones_2009_network
+def test_eq_conn(fix_net_neymotin_2020):
+    net1 = fix_net_neymotin_2020(featureful_reduced_network=True)
 
     # Check a change in connectivity
     net1_clear_conn = net1.copy()
@@ -118,10 +106,10 @@ def test_eq_conn(jones_2009_network):
     assert net1_alt_conn1 != net1_alt_conn2
 
 
-def test_write_configuration(tmp_path, jones_2009_network):
+def test_write_configuration(tmp_path, fix_net_neymotin_2020):
     """Tests that a json file is written"""
 
-    net = jones_2009_network.copy()
+    net = fix_net_neymotin_2020(featureful_reduced_network=True)
     simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
 
     # Check no file is already written
@@ -129,19 +117,19 @@ def test_write_configuration(tmp_path, jones_2009_network):
     assert not path_out.is_file()
 
     # Write network check
-    jones_2009_network.write_configuration(path_out)
+    net.write_configuration(path_out)
     assert path_out.is_file()
 
     # Overwrite network check
     last_mod_time1 = path_out.stat().st_mtime
     sleep(0.05)
-    jones_2009_network.write_configuration(path_out)
+    net.write_configuration(path_out)
     last_mod_time2 = path_out.stat().st_mtime
     assert last_mod_time1 < last_mod_time2
 
     # No overwrite check
     with pytest.raises(FileExistsError, match="File already exists at path "):
-        jones_2009_network.write_configuration(path_out, overwrite=False)
+        net.write_configuration(path_out, overwrite=False)
 
     # Check no outputs were written
     with open(path_out) as file:
@@ -153,9 +141,9 @@ def test_write_configuration(tmp_path, jones_2009_network):
     assert read_in["cell_response"] == {}
 
 
-def test_cell_response_to_dict(jones_2009_network):
+def test_cell_response_to_dict(fix_net_neymotin_2020):
     """Tests _cell_response_to_dict function"""
-    net = jones_2009_network
+    net = fix_net_neymotin_2020(featureful_reduced_network=True)
 
     # When a simulation hasn't been run, return an empty dict
     result1 = _cell_response_to_dict(net, write_output=True)
@@ -172,9 +160,9 @@ def test_cell_response_to_dict(jones_2009_network):
     assert result3 == dict()
 
 
-def test_rec_array_to_dict(jones_2009_network):
+def test_rec_array_to_dict(fix_net_neymotin_2020):
     """Tests _rec_array_to_dict function"""
-    net = jones_2009_network
+    net = fix_net_neymotin_2020(featureful_reduced_network=True)
 
     # Check rec array times and voltages are in dict after simulation
     simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
@@ -202,9 +190,9 @@ def test_rec_array_to_dict(jones_2009_network):
     assert result2["voltages"].size == 0
 
 
-def test_conn_to_dict(jones_2009_network):
+def test_conn_to_dict(fix_net_neymotin_2020):
     """Tests _connectivity_to_list_of_dicts function"""
-    net = jones_2009_network
+    net = fix_net_neymotin_2020(featureful_reduced_network=True)
 
     result = _conn_to_dict(net.connectivity[0])
     assert isinstance(result, dict)
@@ -230,9 +218,9 @@ def test_conn_to_dict(jones_2009_network):
     }
 
 
-def test_external_drive_to_dict(jones_2009_network):
+def test_external_drive_to_dict(fix_net_neymotin_2020):
     """Tests _external_drive_to_dict function"""
-    net = jones_2009_network
+    net = fix_net_neymotin_2020(featureful_reduced_network=True)
 
     simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
     first_key = list(net.external_drives.keys())[0]
@@ -275,13 +263,12 @@ def test_str_to_node():
     assert isinstance(result[1], int)
 
 
-def test_order_drives(jones_2009_network):
+def test_order_drives(fix_net_neymotin_2020):
     """Reorders drive dict by ascending range order"""
-    drive_names = list(jones_2009_network.external_drives.keys())
+    net = fix_net_neymotin_2020(featureful_reduced_network=True)
+    drive_names = list(net.external_drives.keys())
     drive_names_alpha = sorted(drive_names)
-    drives_reordered = {
-        name: jones_2009_network.external_drives for name in drive_names_alpha
-    }
+    drives_reordered = {name: net.external_drives for name in drive_names_alpha}
     assert list(drives_reordered.keys()) == [
         "alpha_prox",
         "evdist1",
@@ -290,7 +277,7 @@ def test_order_drives(jones_2009_network):
         "poisson",
     ]
 
-    drives_by_range = _order_drives(jones_2009_network.gid_ranges, drives_reordered)
+    drives_by_range = _order_drives(net.gid_ranges, drives_reordered)
     assert list(drives_by_range.keys()) == [
         "evdist1",
         "evprox1",
@@ -300,10 +287,13 @@ def test_order_drives(jones_2009_network):
     ]
 
 
-def test_read_configuration_json(jones_2009_network):
-    """Read-in of a hdf5 file"""
-    net = read_network_configuration(Path(assets_path, "neymotin2020_3x3_drives.json"))
-    assert net == jones_2009_network
+def test_read_configuration_json(fix_net_neymotin_2020):
+    """Read-in of a hierarchical JSON Network file"""
+    net_call = fix_net_neymotin_2020(featureful_reduced_network=True)
+    net_load = read_network_configuration(
+        Path(assets_path, "neymotin2020_3x3_drives.json")
+    )
+    assert net_call == net_load
 
     # Read without drives
     net_no_drives = read_network_configuration(
@@ -316,7 +306,10 @@ def test_read_configuration_json(jones_2009_network):
         connection["src_type"] for connection in net_no_drives.connectivity
     ]
     assert not any(
-        [src_type in net.external_drives.keys() for src_type in connection_src_types]
+        [
+            src_type in net_load.external_drives.keys()
+            for src_type in connection_src_types
+        ]
     )
 
     # Read without external bias
@@ -414,9 +407,9 @@ def test_read_model_variant_cell_types(tmp_path):
             _write_and_read(missing_data)
 
 
-def test_network_serialization_metadata(jones_2009_network, tmp_path):
+def test_network_serialization_metadata(fix_net_neymotin_2020, tmp_path):
     """Test saving and loading a network with the cell_metadata structure."""
-    net_original = jones_2009_network
+    net_original = fix_net_neymotin_2020(featureful_reduced_network=True)
     net_original.add_evoked_drive(
         "evd1",
         mu=5,
