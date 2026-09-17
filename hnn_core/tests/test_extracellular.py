@@ -6,7 +6,7 @@ import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
 import pytest
 
-from hnn_core import neymotin_2020_model, simulate_dipole
+from hnn_core import simulate_dipole
 from hnn_core.extracellular import (
     ExtracellularArray,
     calculate_csd2d,
@@ -17,10 +17,13 @@ from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 import matplotlib.pyplot as plt
 
 
-def test_extracellular_api(fix_default_params):
+@pytest.mark.parametrize(
+    "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+)
+def test_extracellular_api(fix_net_model, request):
     """Test extracellular recording API."""
-    params = fix_default_params
-    net = neymotin_2020_model(params, add_drives_from_params=True)
+    net_model = request.getfixturevalue(fix_net_model)
+    net = net_model()
 
     # Test LFP electrodes
     electrode_pos = (1, 2, 3)
@@ -123,20 +126,13 @@ def test_extracellular_api(fix_default_params):
         _, _ = _get_laminar_z_coords([(1, 1, 3), (1, 1, 4), (1, 1, 3.5)])
 
 
-def test_transmembrane_currents(fix_default_params):
+@pytest.mark.parametrize(
+    "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+)
+def test_transmembrane_currents(fix_net_model, request):
     """Test that net transmembrane current is zero at all times."""
-    params = fix_default_params
-    params.update(
-        {
-            "N_pyr_x": 3,
-            "N_pyr_y": 3,
-            "t_evprox_1": 5,
-            "t_evdist_1": 10,
-            "t_evprox_2": 20,
-            "N_trials": 1,
-        }
-    )
-    net = neymotin_2020_model(params, add_drives_from_params=True)
+    net_model = request.getfixturevalue(fix_net_model)
+    net = net_model(reduced=True)
     electrode_pos = (0, 0, 0)  # irrelevant where electrode is
     # all transfer resistances set to unity
     net.add_electrode_array("net_Im", electrode_pos, method=None)
@@ -200,11 +196,15 @@ def test_transfer_resistance():
 @requires_mpi4py
 @requires_psutil
 @pytest.mark.uses_mpi
-def test_extracellular_backends(fix_net_neymotin_2020, fix_run_simulation):
+@pytest.mark.parametrize(
+    "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+)
+def test_extracellular_backends(fix_net_model, fix_run_simulation, request):
     """Test extracellular outputs across backends."""
     # calculation of CSD requires >=4 electrode contacts
     electrode_array = {"arr1": [(2, 2, 400), (2, 2, 600), (2, 2, 800), (2, 2, 1000)]}
-    joblib_net = fix_net_neymotin_2020(reduced=True, electrode_array=electrode_array)
+    net_model = request.getfixturevalue(fix_net_model)
+    joblib_net = net_model(reduced=True, electrode_array=electrode_array)
     mpi_net = deepcopy(joblib_net)
 
     _, joblib_net = fix_run_simulation(
@@ -261,11 +261,15 @@ def test_extracellular_backends(fix_net_neymotin_2020, fix_run_simulation):
     plt.close("all")
 
 
-def test_rec_array_calculation(fix_default_params):
+@pytest.mark.parametrize(
+    "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+)
+def test_rec_array_calculation(fix_net_model, request):
     """Test LFP/CSD calculation."""
-    params = fix_default_params
-    params.update({"t_evprox_1": 7, "t_evdist_1": 17})
-    net = neymotin_2020_model(params, mesh_shape=(3, 3), add_drives_from_params=True)
+    net_model = request.getfixturevalue(fix_net_model)
+    net = net_model(reduced=True)
+    net.external_drives["evprox1"]["dynamics"]["mu"] = 7
+    net.external_drives["evdist1"]["dynamics"]["mu"] = 17
 
     # one electrode inside, one above the active elements of the network,
     # and two more to allow calculation of CSD (2nd spatial derivative)
@@ -316,16 +320,20 @@ def test_rec_array_calculation(fix_default_params):
         )
 
 
-def test_extracellular_viz(fix_default_params):
+@pytest.mark.parametrize(
+    "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+)
+def test_extracellular_viz(fix_net_model, request):
     """Test if deprecation warning is raised in plot_laminar_lfp."""
-    params = fix_default_params
-    params.update({"t_evprox_1": 7, "t_evdist_1": 17})
-    net = neymotin_2020_model(params, mesh_shape=(3, 3), add_drives_from_params=True)
-
     # one electrode inside, one above the active elements of the network,
     # and two more to allow calculation of CSD (2nd spatial derivative)
-    electrode_pos = [(1, 2, 1000), (2, 3, 3000), (3, 4, 5000), (4, 5, 7000)]
-    net.add_electrode_array("arr1", electrode_pos)
+    electrode_array = {"arr1": [(1, 2, 1000), (2, 3, 3000), (3, 4, 5000), (4, 5, 7000)]}
+
+    net_model = request.getfixturevalue(fix_net_model)
+    net = net_model(reduced=True, electrode_array=electrode_array)
+    net.external_drives["evprox1"]["dynamics"]["mu"] = 7
+    net.external_drives["evdist1"]["dynamics"]["mu"] = 17
+
     _ = simulate_dipole(net, tstop=5, n_trials=1)
 
     with pytest.warns(FutureWarning, match="tmin and tmax are deprecated"):
