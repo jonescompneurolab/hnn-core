@@ -15,6 +15,7 @@ from .cell import Cell, Section
 from .cell_response import CellResponse
 from .cells_default import NEYMOTIN_V_INIT
 from .externals.mne import fill_doc
+from .dipole import _baseline_renormalize_dueckerET, _baseline_renormalize_neymotin2020
 
 
 def _convert_np_array_to_list(obj):
@@ -535,6 +536,28 @@ def dict_to_network(net_data, read_drives=True, read_external_biases=True):
         ),
     )
 
+    if params["model_variant"] is None:
+        net._model_variant = "neymotin_2020_model"
+    else:
+        net._model_variant = params["model_variant"]
+
+    hnn_og_models = [
+        "neymotin_2020_model",
+        "jones_2009_model",
+        "calcium_model",
+        "law_2021_model",
+    ]
+    if net._model_variant in hnn_og_models:
+        net._baseline_renormalize = _baseline_renormalize_neymotin2020
+    elif net._model_variant == "duecker_ET_model":
+        net._baseline_renormalize = _baseline_renormalize_dueckerET
+    else:
+        raise ValueError(
+            f"model_variant is {net._model_variant} but has to be"
+            f"one of {hnn_og_models + ['duecker_ET_model']}."
+            "Please check model_variant in your .json file."
+        )
+
     # Setting attributes
     # Set gid ranges
     gid_ranges_data = dict()
@@ -600,6 +623,8 @@ def read_network_configuration(fname, read_drives=True, read_external_biases=Tru
         )
 
     # ensure the cell types match the model variant
+    # TODO: AES delete this block after we ensure that all users of Duecker model are
+    # updated to use the latest code upon version 0.7 release.
     check_var = net_data.get("model_variant", None)
     if check_var is not None and "duecker_ET_model".startswith(check_var):
         missing_cells = [

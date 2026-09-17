@@ -30,7 +30,7 @@ def simulate_dipole(
     record_ca=False,
     postproc=False,
     verbose=True,
-    bsl_cor="jones",
+    baseline_correction=True,
 ):
     """Simulate a dipole given the experiment parameters.
 
@@ -65,9 +65,8 @@ def simulate_dipole(
         :meth:`~hnn_core.dipole.Dipole.scale` methods instead. Default: False.
     verbose : bool
         If True, print build steps and simulation progress to console. Default: True.
-    bsl_cor : {"jones", "duecker"}, default="jones"
-        Baseline correction method. For neymotin_2020_model and law_2021_model, use
-        method 'jones' (manual correction). For duecker_ET_model, use method 'duecker'.
+    baseline_correction : bool
+        If True, applies baseline correction to simulated dipole (depends on net._model_variant)
 
     Returns
     -------
@@ -114,13 +113,6 @@ def simulate_dipole(
             if duration < 0.0:
                 raise ValueError("Duration of tonic input cannot be negative")
 
-    if bsl_cor is None:
-        bsl_cor = "neymotin"
-    elif bsl_cor not in {"neymotin", "jones", "duecker", "none"}:
-        raise ValueError(
-            "'bsl_cor' must be 'neymotin', 'jones' (deprecated), 'duecker' or 'none'"
-        )
-
     net._instantiate_drives(n_trials=n_trials, tstop=tstop)
     net._reset_rec_arrays()
 
@@ -150,7 +142,7 @@ def simulate_dipole(
 
     net._verbose = verbose
 
-    dpls = _BACKEND.simulate(net, tstop, dt, n_trials, postproc, bsl_cor)
+    dpls = _BACKEND.simulate(net, tstop, dt, n_trials, postproc, baseline_correction)
 
     return dpls
 
@@ -820,88 +812,6 @@ class Dipole(object):
             show=show,
         )
 
-    def _baseline_renormalize_dueckerET(self):
-        """Baseline correction based on Duecker model without drives"""
-
-        hnn_core_root = Path(hnn_core.__file__).parent
-        # load the baseline dipole
-        with open(hnn_core_root / "param" / "bsl_corr_duecker_ET.json", "r") as f:
-            bsl_dpl = json.load(f)
-
-        A_L2 = bsl_dpl["L2"][-1]
-        A_L5 = bsl_dpl["L5"][-1]
-
-        C_L2 = bsl_dpl["L2"][1]
-        C_L5 = bsl_dpl["L5"][1]
-
-        popt_l2 = np.array(bsl_dpl["popt_l2"])
-        popt_l5 = np.array(bsl_dpl["popt_l5"])
-
-        def exp_decay(t, A, C, b):
-            return ((C - A) * np.exp(-b * (t))) + A
-
-        exp_fit_l2 = exp_decay(np.array(self.times[1:]), A_L2, C_L2, *popt_l2)
-        exp_fit_l5 = exp_decay(np.array(self.times[1:]), A_L5, C_L5, *popt_l5)
-
-        self.data["L2"][1:] -= exp_fit_l2
-        self.data["L5"][1:] -= exp_fit_l5
-
-        self.data["agg"] = self.data["L2"] + self.data["L5"]
-
-    def _baseline_renormalize(self, N_pyr_x, N_pyr_y):
-        """Only baseline renormalize if the units are fAm.
-
-        Parameters
-        ----------
-        N_pyr_x : int
-            Nr of cells (x)
-        N_pyr_y : int
-            Nr of cells (y)
-        """
-        # N_pyr cells in grid. This is PER LAYER
-        N_pyr = N_pyr_x * N_pyr_y
-        # dipole offset calculation: increasing number of pyr
-        # cells (L2 and L5, simultaneously)
-        # with no inputs resulted in an aggregate dipole over the
-        # interval [50., 1000.] ms that
-        # eventually plateaus at -48 fAm. The range over this interval
-        # is something like 3 fAm
-        # so the resultant correction is here, per dipole
-        # dpl_offset = N_pyr * 50.207
-        dpl_offset = {
-            # these values will be subtracted
-            "L2": N_pyr * 0.0443,
-            "L5": N_pyr * -49.0502,
-            # 'L5': N_pyr * -48.3642,
-            # will be calculated next, this is a placeholder
-            # 'agg': None,
-        }
-        # L2 dipole offset can be roughly baseline shifted over
-        # the entire range of t
-        self.data["L2"] -= dpl_offset["L2"]
-        # L5 dipole offset should be different for interval [50., 500.]
-        # and then it can be offset
-        # slope (m) and intercept (b) params for L5 dipole offset
-        # uncorrected for N_cells
-        # these values were fit over the range [37., 750.)
-        m = 3.4770508e-3
-        b = -51.231085
-        # these values were fit over the range [750., 5000]
-        t1 = 750.0
-        m1 = 1.01e-4
-        b1 = -48.412078
-        # piecewise normalization
-        self.data["L5"][self.times <= 37.0] -= dpl_offset["L5"]
-        self.data["L5"][(self.times > 37.0) & (self.times < t1)] -= N_pyr * (
-            m * self.times[(self.times > 37.0) & (self.times < t1)] + b
-        )
-        self.data["L5"][self.times >= t1] -= N_pyr * (
-            m1 * self.times[self.times >= t1] + b1
-        )
-        # recalculate the aggregate dipole based on the baseline
-        # normalized ones
-        self.data["agg"] = self.data["L2"] + self.data["L5"]
-
     def _write_txt(self, fname):
         """Write dipole values to a file.
 
@@ -994,3 +904,96 @@ class Dipole(object):
                 "File extension should be either txt or hdf5, but "
                 f"the given extension is {file_extension}."
             )
+
+
+# model-specific baseline corrections
+
+
+# duecker_ET_model
+def _baseline_renormalize_dueckerET(dpl, N_pyr_x, N_pyr_y):
+    """Baseline correction based on Duecker model without drives"""
+
+    # exponential decay function
+    def _exp_decay(t, A, C, b):
+        return ((C - A) * np.exp(-b * (t))) + A
+
+    hnn_core_root = Path(hnn_core.__file__).parent
+    # load the baseline dipole
+    with open(hnn_core_root / "param" / "bsl_corr_duecker_ET.json", "r") as f:
+        bsl_dpl = json.load(f)
+
+    scale = N_pyr_x * N_pyr_y / bsl_dpl["N_pyr_ref"]
+
+    A_L2 = bsl_dpl["L2"][-1] * scale
+    A_L5 = bsl_dpl["L5"][-1] * scale
+
+    C_L2 = bsl_dpl["L2"][1] * scale
+    C_L5 = bsl_dpl["L5"][1] * scale
+
+    exp_fit_l2 = _exp_decay(np.array(dpl.times[1:]), A_L2, C_L2, bsl_dpl["popt_l2"][0])
+    exp_fit_l5 = _exp_decay(np.array(dpl.times[1:]), A_L5, C_L5, bsl_dpl["popt_l5"][0])
+
+    dpl.data["L2"][1:] -= exp_fit_l2
+    dpl.data["L5"][1:] -= exp_fit_l5
+
+    dpl.data["agg"] = dpl.data["L2"] + dpl.data["L5"]
+    dpl.baseline_applied = "duecker_ET_model"
+
+    return dpl
+
+
+# neymotin_2020_model
+def _baseline_renormalize_neymotin2020(dpl, N_pyr_x, N_pyr_y):
+    """Only baseline renormalize if the units are fAm.
+
+    Parameters
+    ----------
+    N_pyr_x : int
+        Nr of cells (x)
+    N_pyr_y : int
+        Nr of cells (y)
+    """
+    # N_pyr cells in grid. This is PER LAYER
+    N_pyr = N_pyr_x * N_pyr_y
+    # dipole offset calculation: increasing number of pyr
+    # cells (L2 and L5, simultaneously)
+    # with no inputs resulted in an aggregate dipole over the
+    # interval [50., 1000.] ms that
+    # eventually plateaus at -48 fAm. The range over this interval
+    # is something like 3 fAm
+    # so the resultant correction is here, per dipole
+    # dpl_offset = N_pyr * 50.207
+    dpl_offset = {
+        # these values will be subtracted
+        "L2": N_pyr * 0.0443,
+        "L5": N_pyr * -49.0502,
+        # 'L5': N_pyr * -48.3642,
+        # will be calculated next, this is a placeholder
+        # 'agg': None,
+    }
+    # L2 dipole offset can be roughly baseline shifted over
+    # the entire range of t
+    dpl.data["L2"] -= dpl_offset["L2"]
+    # L5 dipole offset should be different for interval [50., 500.]
+    # and then it can be offset
+    # slope (m) and intercept (b) params for L5 dipole offset
+    # uncorrected for N_cells
+    # these values were fit over the range [37., 750.)
+    m = 3.4770508e-3
+    b = -51.231085
+    # these values were fit over the range [750., 5000]
+    t1 = 750.0
+    m1 = 1.01e-4
+    b1 = -48.412078
+    # piecewise normalization
+    dpl.data["L5"][dpl.times <= 37.0] -= dpl_offset["L5"]
+    dpl.data["L5"][(dpl.times > 37.0) & (dpl.times < t1)] -= N_pyr * (
+        m * dpl.times[(dpl.times > 37.0) & (dpl.times < t1)] + b
+    )
+    dpl.data["L5"][dpl.times >= t1] -= N_pyr * (m1 * dpl.times[dpl.times >= t1] + b1)
+    # recalculate the aggregate dipole based on the baseline
+    # normalized ones
+    dpl.data["agg"] = dpl.data["L2"] + dpl.data["L5"]
+    dpl.baseline_applied = "neymotin_2020_model"
+
+    return dpl

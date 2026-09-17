@@ -105,9 +105,8 @@ def _calculate_obj_fun(
             Required. A dipole object with experimental data.
         n_trials : int, default=1
             Number of trials to simulate and average.
-        bsl_cor : {"jones", "duecker"}, default="jones"
-            Baseline correction method. For neymotin_2020_model and law_2021_model, use
-            method 'jones' (manual correction). For duecker_ET_model, use method 'duecker'.
+        baseline_correction : bool
+                If True, applies baseline correction to simulated dipole (depends on net._model_variant)
 
     best : dict, optional
         Dictionary with keys "obj" and "params" to store the best objective value and
@@ -146,7 +145,7 @@ def _calculate_obj_fun(
             tstop=tstop,
             overwrite=False,
             clear_cache=False,
-            bsl_cor=obj_fun_kwargs.get("bsl_cor", None),
+            baseline_correction=obj_fun_kwargs.get("baseline_correction", True),
         )
 
         res = batch_simulation.run(
@@ -180,7 +179,7 @@ def _calculate_obj_fun(
             tstop=tstop,
             dt=obj_fun_kwargs.get("dt", 0.025),
             n_trials=obj_fun_kwargs.get("n_trials", 1),
-            bsl_cor=obj_fun_kwargs.get("bsl_cor", None),
+            baseline_correction=obj_fun_kwargs.get("baseline_correction", True),
         )
 
         # smooth & scale all dipoles

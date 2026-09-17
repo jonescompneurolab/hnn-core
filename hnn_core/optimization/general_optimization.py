@@ -219,10 +219,8 @@ class Optimizer:
             The dipole scale factor to use after every optimization iteration before
             data comparison. There is no scaling applied by default, so you must pass a
             value if you want any scaling.
-        bsl_cor : {"jones", "duecker"}, default="jones"
-            Baseline correction method. For neymotin_2020_model and law_2021_model, use
-            method 'jones' (manual correction). For duecker_ET_model, use method
-            'duecker'.
+        baseline_correction : bool
+                If True, applies baseline correction to simulated dipole (depends on net._model_variant)
         smooth_window_len : float, optional
             The smooth window length to use after every optimization iteration before
             data comparison. There is no smoothing applied by default, so you must pass
