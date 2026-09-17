@@ -35,15 +35,6 @@ assets_path = Path(hnn_core_root, "tests", "assets")
 
 
 @pytest.fixture
-def params(fix_default_params):
-    params = fix_default_params
-    params["celsius"] = 37.0
-    params["threshold"] = 0.0
-
-    return params
-
-
-@pytest.fixture
 def jones_2009_network():
     # This allows us to define this test network once, but use it as both a
     # fixture here in this file, or regenerate the network itself if used
@@ -54,9 +45,9 @@ def jones_2009_network():
 
 
 @pytest.fixture
-def calcium_network(params):
+def calcium_network():
     # Instantiating network along with drives
-    net = calcium_model(params=params, add_drives_from_params=True, mesh_shape=(3, 3))
+    net = calcium_model(add_drives_from_params=True, mesh_shape=(3, 3))
 
     # Adding bias
     tonic_bias = {"L2_pyramidal": 1.0}
