@@ -366,10 +366,6 @@ def _rmse(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
     return np.sqrt((weights * ((dpl1 - dpl2) ** 2)).sum() / weights.sum())
 
 
-def exp_decay(t, A, C, b):
-    return ((C - A) * np.exp(-b * t)) + A
-
-
 def _anticorr(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
     """Calculates Anticorrelation (1 - corr) between data in dpl and exp_dpl
 
