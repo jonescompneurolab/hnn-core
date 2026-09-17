@@ -359,26 +359,35 @@ def plot_drive_arrows(
         if tmax is None:
             tmax = x_right
 
-    ymin, ymax = ax.get_ylim()
-    y_span = ymax - ymin
+    markers = _collect_drive_arrow_markers(net)
+    visible_markers = [
+        marker
+        for marker in markers
+        if tmin <= marker["time"] <= tmax
+    ]
+    if not visible_markers:
+        return ax
+
+    ymin, ymax_data = ax.get_ylim()
+    y_span = ymax_data - ymin
     if y_span == 0:
         y_span = 1.0
 
-    markers = _collect_drive_arrow_markers(net)
+    # Pad the top of the axis so drive labels sit above the dipole, not on it.
+    headroom_frac = 0.22
+    ax.set_ylim(ymin, ymax_data + headroom_frac * y_span)
+
     time_offsets = dict()
+    label_band_top = ymax_data + (headroom_frac - 0.03) * y_span
+    arrow_tip_y = ymax_data - 0.02 * y_span
 
-    for marker in markers:
+    for marker in visible_markers:
         event_time = marker["time"]
-        if event_time < tmin or event_time > tmax:
-            continue
-
         offset_idx = time_offsets.get(event_time, 0)
         time_offsets[event_time] = offset_idx + 1
         time_plot = event_time + offset_idx * 1.5
-        stack_y = offset_idx * 0.06 * y_span
-        # Keep labels and arrow tails inside the axes (below the top spine).
-        label_y = ymax - 0.04 * y_span - stack_y
-        arrow_tip_y = ymax - 0.16 * y_span - stack_y
+        stack_y = offset_idx * 0.08 * y_span
+        label_y = label_band_top - stack_y
 
         label = marker["label"] if show_labels else ""
         ax.annotate(
