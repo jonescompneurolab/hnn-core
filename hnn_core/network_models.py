@@ -621,9 +621,7 @@ def calcium_model(
     return net
 
 
-def duecker_ET_model(
-    params=None, add_drives_from_params=False, legacy_mode=False, mesh_shape=(10, 10)
-):
+def duecker_ET_model(params=None, add_drives_from_params=False, mesh_shape=(10, 10)):
     """ "Initiate like old calcium model and then replace with new cells"""
 
     hnn_core_root = Path(hnn_core.__file__).parent
@@ -711,7 +709,7 @@ def duecker_ET_model(
     net = Network(
         params,
         add_drives_from_params=add_drives_from_params,
-        legacy_mode=legacy_mode,
+        legacy_mode=False,
         mesh_shape=mesh_shape,
         pos_dict=pos_dict,
         cell_types=cell_types,
