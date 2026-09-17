@@ -178,9 +178,10 @@ def neymotin_2020_model(
         `hnn_core/param/neymotin2020_base.json`). If dict, it is assumed to be a
         dictionary of parameters in the "flat" JSON style. If None (the default), the
         default parameters are used from `hnn_core/param/default.json`. Note that if you
-        have drive parameters included, but you ALSO set the deprecated
-        `add_drives_from_params` to True, the drives will be added twice if the drive
-        names are the same.
+        want to use any drives defined in the params (either your provided custom params
+        or the default), then you must also set `add_drives_from_params` to True. If you
+        pass any custom params, then no default params will be used, including for
+        drives.
     add_drives_from_params : bool, default=False
         If True, add drives as defined in the params-dict. NB this is mainly
         for backward-compatibility with HNN GUI, and will be deprecated in a
