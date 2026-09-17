@@ -13,6 +13,8 @@ from .network_models import (
     law_2021_model,
     calcium_model,
     duecker_ET_model,
+    diesburg_2024_model,
+    waller_pfcbeta_model,
 )
 from .cell import Cell
 from .cell_response import CellResponse, read_spikes
