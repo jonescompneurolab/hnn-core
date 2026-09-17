@@ -11,7 +11,6 @@ import itertools as it
 from copy import deepcopy
 from collections import OrderedDict, defaultdict
 from typing import Dict
-
 import numpy as np
 import warnings
 
@@ -28,7 +27,8 @@ from .check import _check_gids, _gid_to_type, _string_input_to_list
 from .hnn_io import write_network_configuration, network_to_dict
 from .externals.mne import copy_doc
 from .utils import _replace_dict_identifier
-
+import pandas as pd
+import inspect
 
 def _create_cell_coords(n_pyr_x, n_pyr_y, z_coord, inplane_distance):
     """Creates coordinate grid and place cells in it.
@@ -312,6 +312,50 @@ def pick_connection(net, src_gids=None, target_gids=None, loc=None, receptor=Non
 
     return sorted(conn_set)
 
+def pick_connection_from_dataframe(net, src_gids=None, target_gids=None, loc=None, receptor=None):
+    valid_srcs = list(net.gid_ranges.keys())  # includes drives as srcs
+    valid_targets = list(net.cell_types.keys())
+    src_gids_checked = _check_gids(
+        src_gids, net.gid_ranges, valid_srcs, "src_gids", same_type=False
+    )
+    target_gids_checked = _check_gids(
+        target_gids, net.gid_ranges, valid_targets, "target_gids", same_type=False
+    )
+
+    _validate_type(loc, (str, list, None), "loc", "str, list, or None")
+    _validate_type(receptor, (str, list, None), "receptor", "str, list, or None")
+
+    valid_loc = ["proximal", "distal", "soma"]
+    valid_receptor = ["ampa", "nmda", "gabaa", "gabab"]
+
+    # Convert receptor and loc to list
+    loc_list = _string_input_to_list(loc, valid_loc, "loc")
+    receptor_list = _string_input_to_list(receptor, valid_receptor, "receptor")
+
+    conn_df = net.connectivity_df
+    any_search_applied = False
+
+    if src_gids_checked: #get a list of source gids
+        conn_df = conn_df[conn_df["src_gid"].isin(src_gids_checked)]
+        any_search_applied = True
+
+    if target_gids_checked:# we get a list of target gids
+        conn_df = conn_df[conn_df["target_gid"].isin(target_gids_checked)]
+        any_search_applied = True
+
+    if loc_list:# location list
+        conn_df = conn_df[conn_df["template_loc"].isin(loc_list)]
+        any_search_applied = True
+
+    if receptor_list: # receptor list
+        conn_df = conn_df[conn_df["receptor"].isin(receptor_list)]
+        any_search_applied = True
+
+    if not any_search_applied:
+        return list()
+
+    #counter behaves same as index in the connectivity list
+    return sorted(conn_df["counter"].unique().tolist())
 
 def _get_cell_index_by_synapse_type(net):
     """Returns the indices of excitatory and inhibitory cells in the Network.
@@ -441,6 +485,7 @@ class Network:
     def __init__(
         self,
         params,
+        use_dataframe=False,
         add_drives_from_params=False,
         legacy_mode=False,
         mesh_shape=(10, 10),
@@ -474,30 +519,31 @@ class Network:
                 FutureWarning,
                 stacklevel=1,
             )
-
+        self.connectivity_df = pd.DataFrame()
         self.cell_response = None
         # external drives and biases
         self.external_drives = dict()
         self.external_biases = dict()
-
         # network connectivity
-        self.connectivity = list()
+        self.connectivity = ConnectivityList()
         self.threshold = self._params["threshold"]
         self.delay = 1.0
-
+        self.use_dataframe = use_dataframe
+        if isinstance(self.use_dataframe, pd.DataFrame):
+            self.connectivity_df = use_dataframe
         # extracellular recordings (if applicable)
         self.rec_arrays = dict()
 
         # simulation-time params
         self._tstop = None
         self._dt = None
+        self._counter=0
 
         # contents of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
         self._n_cells = 0  # used in tests and MPIBackend checks
         self.pos_dict = dict()
         self.cell_types = dict()
-
         # set the mesh shape
         _validate_type(mesh_shape, tuple, "mesh_shape")
         _validate_type(mesh_shape[0], int, "mesh_shape[0]")
@@ -1731,16 +1777,24 @@ class Network:
                     )
                     trial_seed_offset = self._n_gids
                     if drive["cell_specific"]:
+                        if self.use_dataframe:
+                            conn_idxs = pick_connection_from_dataframe(self, src_gids=drive_cell_gid)
+                            target_types = set(
+                                self.connectivity_df.loc[
+                                    self.connectivity_df["counter"].isin(conn_idxs),
+                                    "target_type",
+                                ]
+                            )
+                        else:
+                            conn_idxs = pick_connection(self, src_gids=drive_cell_gid)
+                            target_types = set(
+                                [
+                                    self.connectivity[conn_idx]["target_type"]
+                                    for conn_idx in conn_idxs
+                                ]
+                            )
                         # loop over drives (one for each target cell
                         # population) and create event times
-                        conn_idxs = pick_connection(self, src_gids=drive_cell_gid)
-                        target_types = set(
-                            [
-                                self.connectivity[conn_idx]["target_type"]
-                                for conn_idx in conn_idxs
-                            ]
-                        )
-
                         for target_type in target_types:
                             event_times.append(
                                 _drive_cell_event_times(
@@ -2361,7 +2415,6 @@ class Network:
     def gid_to_type(self, gid):
         """Reverse lookup of gid to type."""
         return _gid_to_type(gid, self.gid_ranges)
-
     def add_connection(
         self,
         src_gids,
@@ -2562,27 +2615,74 @@ class Network:
         # Probabilistically define connections
         if probability != 1.0:
             _connection_probability(conn, probability, conn_seed)
-
         conn["probability"] = probability
         conn["allow_autapses"] = allow_autapses
+        if isinstance(self.use_dataframe, bool) and not self.use_dataframe:
+            self.connectivity.append(deepcopy(conn))
+        rows = []
+        for src_gid, target_gids in conn["gid_pairs"].items():
+            for target_gid in target_gids:
+                target_type = self.gid_to_type(target_gid)
+                target_cell = self.cell_types[target_type]["cell_object"]
 
-        self.connectivity.append(deepcopy(conn))
+                if loc in target_cell.sect_loc:
+                    valid_sections = target_cell.sect_loc[loc]
+                else:
+                    valid_sections = [loc]
+                for section in valid_sections:
+                    nc_dict = conn["nc_dict"]
+                    rows.append(
+                        {   
+                            "counter":self._counter,
+                            "src_gid": src_gid,
+                            "target_gid": target_gid,
+                            "src_type": self.gid_to_type(src_gids[0]),
+                            "target_type": self.gid_to_type(target_gids[0]),
+                            "receptor": receptor,
+                            "template_loc": loc,
+                            "actual_section": section,
+                            "segX": 0.5,  # synapse is placed in the middle of the section by default
+                            "weight": nc_dict["A_weight"],
+                            "delay": nc_dict["A_delay"],
+                            "lamtha": nc_dict["lamtha"],
+                            "threshold": nc_dict["threshold"],
+                            "gain": nc_dict["gain"],
+                        }
+                    )
+        self.connectivity_df = pd.concat(
+            [self.connectivity_df, pd.DataFrame(rows)], ignore_index=True
+        )
+        self._counter+=1
 
     def clear_connectivity(self):
         """Remove all connections defined in Network.connectivity"""
+
         connectivity = list()
+
         for conn in self.connectivity:
             if conn["src_type"] in self.external_drives.keys():
                 connectivity.append(conn)
+
         self.connectivity = connectivity
 
+        # Keep only drive connections in connectivity_df
+        self.connectivity_df = self.connectivity_df[
+            self.connectivity_df["src_type"].isin(self.external_drives.keys())
+        ].reset_index(drop=True)
+
     def clear_drives(self):
-        """Remove all drives defined in Network.connectivity"""
+        """Remove all drives defined in Network.connectivity and Network.Connectivity"""
+
         self.connectivity = [
             conn
             for conn in self.connectivity
             if conn["src_type"] not in self.external_drives.keys()
         ]
+
+        #Removing drive connections from connectivity DataFrame
+        self.connectivity_df = self.connectivity_df[
+            ~self.connectivity_df["src_type"].isin(self.external_drives.keys())
+        ].reset_index(drop=True)
 
         for cell_name in list(self.gid_ranges.keys()):
             if cell_name in self.external_drives:
@@ -3004,6 +3104,28 @@ class _Connectivity(dict):
         entr += "\n "
 
         return entr
+
+
+class ConnectivityList(list):
+    """This is a temporary class used to warn users about an API change
+    whenever they attempt to access or modify the connectivity."""
+
+    DEPRECATION_MSG = """Direct access to net.connectivity will be deprecated in
+        the next release and will be replaced by dataframe. To
+        understand how to access connectivity go to tutorial x
+        """
+
+    def __getitem__(self, key):
+        caller = inspect.stack()[1].filename
+
+        if not (caller.endswith("network.py") or caller.endswith("network_builder.py")):
+            warnings.warn(self.DEPRECATION_MSG, FutureWarning, stacklevel=2)
+
+        return super().__getitem__(key)
+
+    def __repr__(self):
+        return """net.connectivity is deprecated - connection data now
+            lives in net.connectivity_df. """ + super().__repr__()
 
 
 class _NetworkDrive(dict):

@@ -96,8 +96,7 @@ def test_eq(jones_2009_network, calcium_network):
     (net1_hard_change_drive.external_drives["evdist1"]["weights_ampa"]["L2_basket"]) = 0
     assert net1_hard_change_drive != net1
 
-
-def test_eq_conn(jones_2009_network):
+def test_eq_conn_(jones_2009_network):
     net1 = jones_2009_network
 
     # Check a change in connectivity

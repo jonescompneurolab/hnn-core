@@ -106,6 +106,7 @@ def run_hnn_core_fixture():
             add_drives_from_params=True,
             legacy_mode=legacy_mode,
             mesh_shape=mesh_shape,
+            use_dataframe=True,
         )
         if electrode_array is not None:
             for name, positions in electrode_array.items():
