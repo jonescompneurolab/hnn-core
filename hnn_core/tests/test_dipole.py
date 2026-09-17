@@ -246,13 +246,17 @@ def test_dipole_simulation(fix_net_neymotin_2020, fix_default_params):
 @requires_mpi4py
 @requires_psutil
 @pytest.mark.uses_mpi
-def test_cell_response_backends(fix_net_neymotin_2020, fix_run_simulation):
+@pytest.mark.parametrize(
+    "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+)
+def test_cell_response_backends(fix_net_model, fix_run_simulation, request):
     """Test cell_response outputs across backends."""
 
     # Specific values we will test against each other later
     trial_idx, n_trials, gid = 0, 2, 7
 
-    joblib_net = fix_net_neymotin_2020(reduced=True)
+    net_model = request.getfixturevalue(fix_net_model)
+    joblib_net = net_model(reduced=True)
     mpi_net = deepcopy(joblib_net)
 
     _, joblib_net = fix_run_simulation(
@@ -295,8 +299,34 @@ def test_cell_response_backends(fix_net_neymotin_2020, fix_run_simulation):
     assert (
         len(mpi_net.cell_response.isec[trial_idx][gid]["soma"]["soma_gabaa"]) == n_times
     )
-    assert mpi_net.cell_response.vsec == joblib_net.cell_response.vsec
-    assert mpi_net.cell_response.isec == joblib_net.cell_response.isec
+    # AES: Used Claude to turn simple `mpi...vsec == joblib...vsec`, which was failing
+    # in the Duecker case, into a form that handles when Joblib vs MPI produce
+    # floating-point differences (even on the same machine!)
+    #
+    # Backends can differ in the last floating-point bits, so compare the
+    # recorded voltages within tolerance rather than exactly
+    for mpi_trial, joblib_trial in zip(
+        mpi_net.cell_response.vsec, joblib_net.cell_response.vsec
+    ):
+        assert mpi_trial.keys() == joblib_trial.keys()
+        for cell_gid in mpi_trial:
+            assert mpi_trial[cell_gid].keys() == joblib_trial[cell_gid].keys()
+            for sec_name in mpi_trial[cell_gid]:
+                assert np.allclose(
+                    mpi_trial[cell_gid][sec_name], joblib_trial[cell_gid][sec_name]
+                )
+    for mpi_trial, joblib_trial in zip(
+        mpi_net.cell_response.isec, joblib_net.cell_response.isec
+    ):
+        assert mpi_trial.keys() == joblib_trial.keys()
+        for cell_gid in mpi_trial:
+            assert mpi_trial[cell_gid].keys() == joblib_trial[cell_gid].keys()
+            for sec_name in mpi_trial[cell_gid]:
+                mpi_sec = mpi_trial[cell_gid][sec_name]
+                joblib_sec = joblib_trial[cell_gid][sec_name]
+                assert mpi_sec.keys() == joblib_sec.keys()
+                for receptor in mpi_sec:
+                    assert np.allclose(mpi_sec[receptor], joblib_sec[receptor])
 
     # test if calcium concentration is stored correctly (only L5 pyramidal)
     gid = joblib_net.gid_ranges["L5_pyramidal"][0]
