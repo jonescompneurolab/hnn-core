@@ -621,9 +621,28 @@ def calcium_model(
     return net
 
 
-def duecker_ET_model(params=None, add_drives_from_params=False, mesh_shape=(10, 10)):
-    """ "Initiate like old calcium model and then replace with new cells"""
+def duecker_ET_model(params=None, add_default_drives=False, mesh_shape=(10, 10)):
+    """Instantiate the Duecker human-derived model (publication pending)
 
+    Parameters
+    ----------
+    params : str | dict | None
+        The path to the parameter file for constructing the network.
+        If None, parameters loaded from 'default_duecker_ET.json'
+        Default: None
+    add_default_drives : bool, default=False
+        If True, add drives as commonly used.
+    mesh_shape : tuple of int (default: (10, 10))
+        Defines the (n_x, n_y) shape of the grid of pyramidal cells.
+
+    Returns
+    -------
+    net : Instance of Network object
+        Network object used to store
+    """
+
+    # Prepare parameters used to create the initial Network object
+    # ----------------------------------------------------------------------------------
     hnn_core_root = Path(hnn_core.__file__).parent
     if params is None:
         params_fname = hnn_core_root / "param" / "default_duecker_ET.json"
@@ -705,6 +724,8 @@ def duecker_ET_model(params=None, add_drives_from_params=False, mesh_shape=(10, 
         "origin": layer_dict["origin"],
     }
 
+    # Created the Network object, and do some housekeeping
+    # ----------------------------------------------------------------------------------
     # Create network with cell types and positions
     net = Network(
         params,
@@ -727,6 +748,8 @@ def duecker_ET_model(params=None, add_drives_from_params=False, mesh_shape=(10, 
 
     delay = net.delay
 
+    # Add recurrent connections
+    # ----------------------------------------------------------------------------------
     # layer2 Pyr -> layer2 Pyr
     lamtha = 6.125  # calculated from human data Campganola et al. 2022
     loc = "proximal"
@@ -927,6 +950,95 @@ def duecker_ET_model(params=None, add_drives_from_params=False, mesh_shape=(10, 
     loc = "soma"
     receptor = "ampa"
     net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+
+    # Add drives, if requested
+    # ----------------------------------------------------------------------------------
+    if add_default_drives:
+        weights_ampa_p1 = {
+            "L2_inhibitory": 0.01,
+            "L2_pyramidal": 0.015,
+            "L5_inhibitory": 0.0,
+            "L5_pyramidal": 0.03,
+        }
+        weights_nmda_p1 = {
+            "L2_inhibitory": 0.01,
+            "L2_pyramidal": 0.05,
+            "L5_inhibitory": 0.0,
+            "L5_pyramidal": 0.025,
+        }
+        synaptic_delays_prox = {
+            "L2_inhibitory": 0.1,
+            "L2_pyramidal": 0.1,
+            "L5_inhibitory": 1,
+            "L5_pyramidal": 1,
+        }
+
+        net.add_evoked_drive(
+            "prox1",
+            mu=18,
+            sigma=2.5,
+            numspikes=1,
+            weights_ampa=weights_ampa_p1,
+            weights_nmda=weights_nmda_p1,
+            location="proximal",
+            synaptic_delays=synaptic_delays_prox,
+        )
+
+        weights_ampa_d1 = {
+            "L2_inhibitory": 0.005,
+            "L2_pyramidal": 0.01,
+            "L5_pyramidal": 1.0,
+        }
+        weights_nmda_d1 = {
+            "L2_inhibitory": 0.0,
+            "L2_pyramidal": 0.01,
+            "L5_pyramidal": 1.0,
+        }
+        synaptic_delays_dist = {
+            "L2_inhibitory": 0.1,
+            "L2_pyramidal": 0.1,
+            "L5_pyramidal": 0.1,
+        }
+
+        net.add_evoked_drive(
+            "dist1",
+            mu=62,
+            sigma=5,
+            numspikes=2,
+            weights_ampa=weights_ampa_d1,
+            weights_nmda=weights_nmda_d1,
+            location="distal",
+            synaptic_delays=synaptic_delays_dist,
+        )
+
+        weights_ampa_p2 = {
+            "L2_inhibitory": 0.01,
+            "L2_pyramidal": 0.3,
+            "L5_inhibitory": 0.001,
+            "L5_pyramidal": 0.3,
+        }
+        weights_nmda_p2 = {
+            "L2_inhibitory": 0.01,
+            "L2_pyramidal": 0.2,
+            "L5_inhibitory": 0.001,
+            "L5_pyramidal": 0.2,
+        }
+        synaptic_delays_prox = {
+            "L2_inhibitory": 0.1,
+            "L2_pyramidal": 0.1,
+            "L5_inhibitory": 1.0,
+            "L5_pyramidal": 1.0,
+        }
+        net.add_evoked_drive(
+            "prox2",
+            mu=100,
+            sigma=15,
+            numspikes=1,
+            weights_ampa=weights_ampa_p2,
+            weights_nmda=weights_nmda_p2,
+            location="proximal",
+            synaptic_delays=synaptic_delays_prox,
+        )
 
     return net
 
