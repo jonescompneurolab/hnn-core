@@ -53,8 +53,8 @@ assets_path = Path(hnn_core_root, "tests", "assets")
 
 
 @pytest.fixture
-def setup_reduced_gui(fix_load_featureful_neymotin_net):
-    gui = HNNGUI(network_configuration=fix_load_featureful_neymotin_net)
+def setup_reduced_gui(fix_load_featureful_tmp_path):
+    gui = HNNGUI(network_configuration=fix_load_featureful_tmp_path)
     gui.compose()
     gui.widget_dt.value = 0.5  # speed up tests
     gui.widget_tstop.value = 70  # speed up tests
@@ -357,7 +357,7 @@ def test_gui_smart_gains_upload_connectivity(setup_reduced_gui):
     plt.close("all")
 
 
-def test_gui_upload_drives(tmp_path, setup_full_gui, fix_load_featureful_neymotin_net):
+def test_gui_upload_drives(tmp_path, setup_full_gui, fix_load_featureful_tmp_path):
     """Test if gui handles uploaded drive parameters correctly"""
     gui = setup_full_gui
 
@@ -370,7 +370,7 @@ def test_gui_upload_drives(tmp_path, setup_full_gui, fix_load_featureful_neymoti
     # simulate upload default.json
     file1_url = Path(hnn_core_root, "param", "neymotin2020_base.json")
     file2_url = Path(assets_path, "gamma_L5weak_L2weak_hierarchical.json")
-    file3_url = fix_load_featureful_neymotin_net
+    file3_url = fix_load_featureful_tmp_path
 
     # check if parameter reloads
     gui._simulate_upload_drives(file1_url)
@@ -577,7 +577,7 @@ def test_gui_add_drives(setup_full_gui):
     plt.close("all")
 
 
-def test_gui_init_network(setup_reduced_gui, fix_load_featureful_neymotin_net):
+def test_gui_init_network(setup_reduced_gui, fix_load_featureful_tmp_path):
     """Test if gui initializes network properly"""
     gui = setup_reduced_gui
     # now the default parameter has been loaded.
@@ -602,7 +602,7 @@ def test_gui_init_network(setup_reduced_gui, fix_load_featureful_neymotin_net):
     assert np.isclose(net_from_gui._layer_separation, 1307.4)
 
     # Compare Network created from API
-    net_from_api = read_network_configuration(fix_load_featureful_neymotin_net)
+    net_from_api = read_network_configuration(fix_load_featureful_tmp_path)
 
     check_equal_networks(net_from_gui, net_from_api)
 
@@ -1282,9 +1282,7 @@ def test_gui_upload_csv_simulation(setup_reduced_gui):
     )
 
 
-def test_gui_download_configuration(
-    setup_reduced_gui, fix_load_featureful_neymotin_net
-):
+def test_gui_download_configuration(setup_reduced_gui, fix_load_featureful_tmp_path):
     """Test the GUI download simulation pipeline."""
 
     gui = setup_reduced_gui
@@ -1301,7 +1299,7 @@ def test_gui_download_configuration(
     net_from_buffer = json.loads(configs)
 
     # Load configuration from file
-    with open(fix_load_featureful_neymotin_net, "r") as file:
+    with open(fix_load_featureful_tmp_path, "r") as file:
         net_source_config = json.load(file)
 
     # Create  networks
@@ -1828,7 +1826,7 @@ def test_diff_gui_vs_api_networks_simulations(setup_full_gui):
     single_custom_gain = 2.0
 
     # AES: For some strange reason, the "featureful" network produced by the
-    # `conftest.py::fix_load_featureful_neymotin_net` fixture (formerly the file at
+    # `conftest.py::fix_load_featureful_tmp_path` fixture (formerly the file at
     # hnn_core_root / "tests" / "assets" / "neymotin2020_3x3_drives.json") does NOT
     # produce identical output, even when the synaptic gains are made identical. I think
     # that's a separate bug. Using the full GUI base file for now.
@@ -2314,7 +2312,7 @@ def test_data_store_direct_reset():
 
 
 def test_data_store_reset_on_gui_reinit(
-    setup_reduced_gui, fix_load_featureful_neymotin_net
+    setup_reduced_gui, fix_load_featureful_tmp_path
 ):
     """Instantiating a new HNNGUI on browser reload event must reset the shared
     data_store singleton"""
@@ -2323,7 +2321,7 @@ def test_data_store_reset_on_gui_reinit(
     assert len(data_store.simulated_data) > 0
 
     ## Setup a new HNNGUI
-    HNNGUI(network_configuration=fix_load_featureful_neymotin_net)
+    HNNGUI(network_configuration=fix_load_featureful_tmp_path)
 
     assert len(data_store.simulated_data) == 0
     assert len(data_store.experimental_data) == 0

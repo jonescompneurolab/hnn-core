@@ -287,17 +287,15 @@ def test_order_drives(fix_net_neymotin_2020):
     ]
 
 
-def test_read_configuration_json(
-    fix_net_neymotin_2020, fix_load_featureful_neymotin_net
-):
+def test_read_configuration_json(fix_net_neymotin_2020, fix_load_featureful_tmp_path):
     """Read-in of a hierarchical JSON Network file"""
     net_call = fix_net_neymotin_2020(featureful_reduced_network=True)
-    net_load = read_network_configuration(fix_load_featureful_neymotin_net)
+    net_load = read_network_configuration(fix_load_featureful_tmp_path)
     assert net_call == net_load
 
     # Read without drives
     net_no_drives = read_network_configuration(
-        fix_load_featureful_neymotin_net, read_drives=False
+        fix_load_featureful_tmp_path, read_drives=False
     )
     # Check there are no external drives
     assert len(net_no_drives.external_drives) == 0
@@ -314,7 +312,7 @@ def test_read_configuration_json(
 
     # Read without external bias
     net_no_bias = read_network_configuration(
-        fix_load_featureful_neymotin_net, read_external_biases=False
+        fix_load_featureful_tmp_path, read_external_biases=False
     )
     assert len(net_no_bias.external_biases) == 0
     assert len(net_no_bias.external_drives) > 0

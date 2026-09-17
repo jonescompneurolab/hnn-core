@@ -342,7 +342,7 @@ def fix_net_neymotin_2020():
 
 
 @pytest.fixture(scope="module")
-def fix_load_featureful_neymotin_net(tmp_path_factory, fix_net_neymotin_2020):
+def fix_load_featureful_tmp_path(tmp_path_factory, fix_net_neymotin_2020):
     """Load the featureful reduced Neymotin 2020 network from the fixture."""
     net = fix_net_neymotin_2020(featureful_reduced_network=True)
     net_path = (

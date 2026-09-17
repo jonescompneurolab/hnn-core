@@ -2559,7 +2559,7 @@ class TestPickConnection:
         assert len(indices) == expected
 
 
-def test_rename_cell_types(base_network, fix_load_featureful_neymotin_net):
+def test_rename_cell_types(base_network, fix_load_featureful_tmp_path):
     """Tests renaming cell function"""
     net1, params = base_network
 
@@ -2661,7 +2661,7 @@ def test_rename_cell_types(base_network, fix_load_featureful_neymotin_net):
     net3.cell_response.plot_spikes_hist(show=False)
 
     # Test the other main network we use for testing
-    net4 = hnn_core.hnn_io.read_network_configuration(fix_load_featureful_neymotin_net)
+    net4 = hnn_core.hnn_io.read_network_configuration(fix_load_featureful_tmp_path)
 
     net4._rename_cell_types(cell_type_rename_mapping)
     dpls4 = simulate_dipole(net4, tstop=10.0, n_trials=1)
