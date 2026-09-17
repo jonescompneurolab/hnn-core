@@ -76,7 +76,6 @@ jobs:
           - save_cache:
               key: built-{{ checksum ".circleci/build_cache" }}
               paths:
-                - doc/auto_examples
                 - doc/_build
 
           - store_artifacts:
