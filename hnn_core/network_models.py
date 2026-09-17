@@ -631,7 +631,8 @@ def duecker_ET_model(params=None, add_default_drives=False, mesh_shape=(10, 10))
         If None, parameters loaded from 'default_duecker_ET.json'
         Default: None
     add_default_drives : bool, default=False
-        If True, add drives as commonly used.
+        If True, add drives as commonly used. Note that these drives, like the model
+        itself, are subject to change until the time of release.
     mesh_shape : tuple of int (default: (10, 10))
         Defines the (n_x, n_y) shape of the grid of pyramidal cells.
 
@@ -729,7 +730,7 @@ def duecker_ET_model(params=None, add_default_drives=False, mesh_shape=(10, 10))
     # Create network with cell types and positions
     net = Network(
         params,
-        add_drives_from_params=add_drives_from_params,
+        add_drives_from_params=False,
         legacy_mode=False,
         mesh_shape=mesh_shape,
         pos_dict=pos_dict,
