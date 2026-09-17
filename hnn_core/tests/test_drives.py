@@ -13,16 +13,7 @@ from hnn_core.drives import (
     _create_bursty_input,
 )
 from hnn_core.network import pick_connection
-from hnn_core.network_models import neymotin_2020_model
 from hnn_core import simulate_dipole
-
-
-@pytest.fixture
-def setup_net(fix_default_params):
-    params = fix_default_params
-    net = neymotin_2020_model(params, mesh_shape=(3, 3))
-
-    return net
 
 
 def test_external_drive_times():
@@ -113,9 +104,9 @@ def test_external_drive_times():
         )
 
 
-def test_drive_seeds(setup_net):
+def test_drive_seeds(fix_net_neymotin_2020):
     """Test that unique spike times are generated across trials"""
-    net = setup_net
+    net = fix_net_neymotin_2020(add_drives_from_params=False, reduced=True)
     weights_ampa = {
         "L2_basket": 0.3,
         "L2_pyramidal": 0.3,
@@ -143,12 +134,12 @@ def test_drive_seeds(setup_net):
     trial1_spikes = np.array(sorted(net.external_drives["prox"]["events"][0]))
     trial2_spikes = np.array(sorted(net.external_drives["prox"]["events"][1]))
     # No two spikes should be perfectly identical across seeds
-    assert ~np.any(np.allclose(trial1_spikes, trial2_spikes))
+    assert not np.any(np.allclose(trial1_spikes, trial2_spikes))
 
 
-def test_clear_drives(setup_net):
+def test_clear_drives(fix_net_neymotin_2020):
     """Test clearing drives updates Network"""
-    net = setup_net
+    net = fix_net_neymotin_2020(add_drives_from_params=False, reduced=True)
     weights_ampa = {"L5_pyramidal": 0.3}
     synaptic_delays = {"L5_pyramidal": 1.0}
 
@@ -662,7 +653,7 @@ def test_add_drives(fix_default_params):
         simulate_dipole(net, tstop=10)
 
 
-def test_drive_random_state():
+def test_drive_random_state(fix_net_neymotin_2020):
     """Tests to check same random state always gives same spike times."""
 
     weights_ampa = {
@@ -678,7 +669,7 @@ def test_drive_random_state():
         "L5_pyramidal": 1.0,
     }
 
-    net = neymotin_2020_model()
+    net = fix_net_neymotin_2020(add_drives_from_params=False, reduced=True)
     for drive_name in ["evprox1", "evprox2"]:
         net.add_evoked_drive(
             drive_name,
@@ -708,9 +699,11 @@ def test_drive_random_state():
         (2.0, True, "n_cells"),
     ],
 )
-def test_add_poisson_drive(setup_net, rate_constant, cell_specific, n_drive_cells):
+def test_add_poisson_drive(
+    fix_net_neymotin_2020, rate_constant, cell_specific, n_drive_cells
+):
     """Testing rate constant when adding non-cell-specific poisson drive"""
-    net = setup_net
+    net = fix_net_neymotin_2020(add_drives_from_params=False, reduced=True)
 
     weights_ampa_noise = {
         "L2_basket": 0.01,
@@ -729,3 +722,65 @@ def test_add_poisson_drive(setup_net, rate_constant, cell_specific, n_drive_cell
     )
 
     simulate_dipole(net, tstop=5)
+
+
+def test_add_drives_duecker(fix_net_duecker_ET):
+    """Test that all drives can be added to Duecker model."""
+    net = fix_net_duecker_ET(add_drives_from_params=False, reduced=True)
+
+    # Evoked drive
+    weights_ampa = {
+        "L2_inhibitory": 0.3,
+        "L2_pyramidal": 0.3,
+        "L5_inhibitory": 0.3,
+        "L5_pyramidal": 0.3,
+    }
+    synaptic_delays = {
+        "L2_inhibitory": 0.1,
+        "L2_pyramidal": 0.1,
+        "L5_inhibitory": 1.0,
+        "L5_pyramidal": 1.0,
+    }
+    net.add_evoked_drive(
+        "prox",
+        mu=40,
+        sigma=8.33,
+        numspikes=1,
+        weights_ampa=weights_ampa,
+        location="proximal",
+        synaptic_delays=synaptic_delays,
+        event_seed=1,
+    )
+
+    # Bursty drive
+    weights_ampa = {"L2_inhibitory": 1.0, "L2_pyramidal": 3.0, "L5_pyramidal": 4.0}
+    syn_delays = {"L2_inhibitory": 1.0, "L2_pyramidal": 2.0, "L5_pyramidal": 4.0}
+
+    n_drive_cells = 10
+    net.add_bursty_drive(
+        "bursty",
+        location="distal",
+        burst_rate=10,
+        weights_ampa=weights_ampa,
+        synaptic_delays=syn_delays,
+        n_drive_cells=n_drive_cells,
+    )
+
+    # Poisson drive
+    weights_ampa_noise = {
+        "L2_inhibitory": 0.01,
+        "L2_pyramidal": 0.002,
+        "L5_pyramidal": 0.02,
+    }
+
+    net.add_poisson_drive(
+        "noise_global",
+        rate_constant=2.0,
+        location="distal",
+        weights_ampa=weights_ampa_noise,
+        space_constant=100,
+        n_drive_cells="n_cells",
+        cell_specific=True,
+    )
+
+    _ = simulate_dipole(net, tstop=5)
