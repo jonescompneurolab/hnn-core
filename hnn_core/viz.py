@@ -373,21 +373,23 @@ def plot_drive_arrows(
     if y_span == 0:
         y_span = 1.0
 
-    # Pad the top of the axis so drive labels sit above the dipole, not on it.
-    headroom_frac = 0.22
+    # Small top margin (legacy HNN / eLife Fig 4): short arrows in the band
+    # above the trace, not long markers through the dipole.
+    headroom_frac = 0.12
     ax.set_ylim(ymin, ymax_data + headroom_frac * y_span)
 
     time_offsets = dict()
-    label_band_top = ymax_data + (headroom_frac - 0.03) * y_span
-    arrow_tip_y = ymax_data - 0.02 * y_span
+    ymax_plot = ymax_data + headroom_frac * y_span
+    label_y_base = ymax_plot - 0.008 * y_span
+    arrow_tip_y = ymax_data + 0.015 * y_span
 
     for marker in visible_markers:
         event_time = marker["time"]
         offset_idx = time_offsets.get(event_time, 0)
         time_offsets[event_time] = offset_idx + 1
         time_plot = event_time + offset_idx * 1.5
-        stack_y = offset_idx * 0.08 * y_span
-        label_y = label_band_top - stack_y
+        stack_y = offset_idx * 0.035 * y_span
+        label_y = label_y_base - stack_y
 
         label = marker["label"] if show_labels else ""
         ax.annotate(
@@ -399,7 +401,13 @@ def plot_drive_arrows(
             color=marker["color"],
             fontsize=7,
             annotation_clip=True,
-            arrowprops=dict(arrowstyle="->", color=marker["color"], lw=1.5),
+            arrowprops=dict(
+                arrowstyle="-|>",
+                color=marker["color"],
+                lw=1.2,
+                shrinkA=0,
+                shrinkB=0,
+            ),
         )
 
     return ax
