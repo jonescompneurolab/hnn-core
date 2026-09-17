@@ -804,6 +804,9 @@ def plot_spikes_raster(
         cell_type_gids = np.unique(spike_gids[spike_types == cell_type])
         cell_type_times, cell_type_ypos = [], []
 
+        if len(cell_type_gids) > 0:
+            max_gid = max(cell_type_gids)
+
         for gid in cell_type_gids:
             gid_time = spike_times[spike_gids == gid]
             cell_type_times.append(gid_time)
@@ -850,7 +853,7 @@ def plot_spikes_raster(
         dipole_times = dpl[0].times
 
         # Scale dipole to fit the spike raster plot
-        raster_max = max(cell_type_gids)
+        raster_max = max_gid
         raster_midpoint = round((raster_max / 2), 0)
         raster_quarterpoint = round((raster_max / 4), 0)
 
