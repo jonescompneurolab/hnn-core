@@ -424,7 +424,7 @@ def test_custom_network_coords_validation(fix_default_params):
     Network(params, pos_dict=custom_pos_dict, cell_types=custom_cell_types)
 
 
-def test_network_models():
+def test_network_models(fix_net_calcium):
     """ "Test instantiations of the network object"""
     # Make sure critical biophysics for Law model are updated
     net_law = law_2021_model()
@@ -460,7 +460,7 @@ def test_network_models():
     assert len(net_default.connectivity) == n_conn + 14
 
     # Ensure distant dependent calcium gbar
-    net_calcium = calcium_model()
+    net_calcium = fix_net_calcium(add_drives_from_params=False)
     # instantiate drive events for NetworkBuilder
     net_calcium._instantiate_drives(
         tstop=net_calcium._params["tstop"], n_trials=net_calcium._params["N_trials"]

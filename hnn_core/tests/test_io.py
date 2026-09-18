@@ -13,7 +13,6 @@ import pytest
 import hnn_core
 from hnn_core import (
     simulate_dipole,
-    calcium_model,
     duecker_ET_model,
 )
 from hnn_core.cells_default import NEYMOTIN_V_INIT
@@ -32,47 +31,29 @@ hnn_core_root = Path(hnn_core.__file__).parent
 assets_path = Path(hnn_core_root, "tests", "assets")
 
 
-@pytest.fixture
-def calcium_network():
-    # Instantiating network along with drives
-    net = calcium_model(add_drives_from_params=True, mesh_shape=(3, 3))
-
-    # Adding bias
-    tonic_bias = {"L2_pyramidal": 1.0}
-    net.add_tonic_bias(amplitude=tonic_bias)
-
-    # Adding electrode arrays
-    electrode_pos = (1, 2, 3)
-    net.add_electrode_array("el1", electrode_pos)
-    electrode_pos = [(1, 2, 3), (-1, -2, -3)]
-    net.add_electrode_array("arr1", electrode_pos)
-
-    return net
-
-
-def test_eq(fix_net_neymotin_2020, calcium_network):
-    net1 = fix_net_neymotin_2020(featureful_reduced_network=True)
-    net2 = calcium_network
+def test_eq(fix_net_neymotin_2020, fix_net_calcium):
+    net_neymotin = fix_net_neymotin_2020(featureful_reduced_network=True)
+    net_calcium = fix_net_calcium(reduced=True)
 
     # Check eq of same network
-    assert net1 == net1
+    assert net_neymotin == net_neymotin
     # Check eq of different networks
-    assert not net1 == net2
+    assert not net_neymotin == net_calcium
 
     # Check change in drives
-    net1_clear_drive = net1.copy()
+    net1_clear_drive = net_neymotin.copy()
     net1_clear_drive.clear_drives()
-    assert net1_clear_drive != net1
+    assert net1_clear_drive != net_neymotin
 
     # Hardwired change in drive attribute
-    net1_hard_change_drive = net1.copy()
+    net1_hard_change_drive = net_neymotin.copy()
     net1_hard_change_drive.external_drives["type"] = ""
-    assert net1_hard_change_drive != net1
+    assert net1_hard_change_drive != net_neymotin
 
     # Hardwired change in drive weights
-    net1_hard_change_drive = net1.copy()
+    net1_hard_change_drive = net_neymotin.copy()
     (net1_hard_change_drive.external_drives["evdist1"]["weights_ampa"]["L2_basket"]) = 0
-    assert net1_hard_change_drive != net1
+    assert net1_hard_change_drive != net_neymotin
 
 
 def test_eq_conn(fix_net_neymotin_2020):

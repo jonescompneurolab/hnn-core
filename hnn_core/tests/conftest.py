@@ -9,7 +9,13 @@ import pickle
 
 from pathlib import Path
 import hnn_core
-from hnn_core import read_params, duecker_ET_model, neymotin_2020_model, simulate_dipole
+from hnn_core import (
+    read_params,
+    calcium_model,
+    duecker_ET_model,
+    neymotin_2020_model,
+    simulate_dipole,
+)
 from hnn_core import MPIBackend, JoblibBackend
 
 # store history of failures per test class name and per index in parametrize
@@ -234,6 +240,7 @@ def fix_net_neymotin_2020():
                 # - disabled legacy_mode
                 # Trials and simulation time are now only set at simulation time, and legacy
                 # mode is a regular argument.
+                # TODO AES: Use the API for this, NOT params!
                 params.update({"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20})
             else:
                 mesh_shape = (10, 10)
@@ -350,6 +357,38 @@ def fix_load_featureful_tmp_path(tmp_path_factory, fix_net_neymotin_2020):
     )
     net.write_configuration(net_path, overwrite=True)
     return net_path
+
+
+@pytest.fixture(scope="module")
+def fix_net_calcium():
+    """Test fixture for the "Calcium" model network.
+
+    TODO Docstring coming soon! UNDER CONSTRUCTION <construction-beaver.gif>
+    """
+
+    def _fix_net_calcium(
+        add_drives_from_params=True,
+        legacy_mode=False,
+        reduced=False,
+        electrode_array=None,
+    ):
+        if reduced:
+            mesh_shape = (3, 3)
+        else:
+            mesh_shape = (10, 10)
+        # Legacy mode necessary for exact dipole comparison test
+        net = calcium_model(
+            add_drives_from_params=add_drives_from_params,
+            legacy_mode=legacy_mode,
+            mesh_shape=mesh_shape,
+        )
+        if electrode_array is not None:
+            for name, positions in electrode_array.items():
+                net.add_electrode_array(name, positions)
+
+        return net
+
+    return _fix_net_calcium
 
 
 @pytest.fixture(scope="module")
