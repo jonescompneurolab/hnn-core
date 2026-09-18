@@ -18,11 +18,13 @@ from hnn_core.network_models import default_cell_metadata
 from hnn_core.viz import (
     plot_cells,
     plot_dipole,
+    plot_drive_arrows,
     plot_psd,
     plot_tfr_morlet,
     plot_connectivity_matrix,
     plot_cell_connectivity,
     plot_drive_strength,
+    _collect_drive_arrow_markers,
     NetworkPlotter,
 )
 
@@ -266,6 +268,63 @@ class TestDipoleViz:
             dpl_sfreq = dpls[0].copy()
             dpl_sfreq.sfreq /= 10
             plot_psd([dpls[0], dpl_sfreq])
+
+    def test_plot_drive_arrows(self, run_simulation):
+        net, dpls = run_simulation
+        weights_ampa = {"L2_pyramidal": 5.4e-5, "L5_pyramidal": 5.4e-5}
+        net.add_evoked_drive(
+            "ev_test",
+            mu=30.0,
+            sigma=0.1,
+            numspikes=1,
+            location="proximal",
+            weights_ampa=weights_ampa,
+            n_drive_cells=1,
+            cell_specific=False,
+        )
+        markers = _collect_drive_arrow_markers(net)
+        assert any(marker["label"] == "ev_test" for marker in markers)
+
+        _, ax = plt.subplots()
+        plot_dipole(dpls[0], ax=ax, show=False, net=net, show_drive_arrows=True)
+        annotations = [
+            child
+            for child in ax.get_children()
+            if isinstance(child, matplotlib.text.Annotation)
+        ]
+        assert annotations
+        proximal_arrows = [
+            ann
+            for ann in annotations
+            if ann.get_color() == "r" or ann.arrow_patch.get_edgecolor()[0] > 0.9
+        ]
+        assert proximal_arrows
+        assert all(ann.xy[1] > ann.xyann[1] for ann in proximal_arrows)
+        guide_lines = [
+            line
+            for line in ax.lines
+            if line.get_linestyle() == "--" and line.get_color() in ("0.75", 0.75)
+        ]
+        assert guide_lines
+        assert any(abs(line.get_xdata()[0] - 30.0) < 0.01 for line in guide_lines)
+        assert "ev_test" not in [text.get_text() for text in ax.texts]
+        plt.close("all")
+
+        with pytest.raises(ValueError, match="net must be provided"):
+            plot_dipole(dpls[0], show=False, show_drive_arrows=True)
+
+        _, ax = plt.subplots()
+        plot_drive_arrows(ax, net)
+        assert any(
+            isinstance(child, matplotlib.text.Annotation) for child in ax.get_children()
+        )
+        plt.close("all")
+
+        _, ax = plt.subplots()
+        plot_dipole(dpls[0], ax=ax, show=False)
+        plot_drive_arrows(ax, net, show_labels=True)
+        assert "ev_test" in [text.get_text() for text in ax.texts]
+        plt.close("all")
 
 
 def test_drive_strength(setup_net):

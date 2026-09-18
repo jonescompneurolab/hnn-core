@@ -269,6 +269,199 @@ def plot_laminar_lfp(
     return ax.get_figure()
 
 
+def _drive_arrow_label(drive_name):
+    """Short display label for default ERP drive name patterns."""
+    if "evdist" in drive_name:
+        return "evdist"
+    if "evprox" in drive_name:
+        return "evprox"
+    return drive_name
+
+
+def _collect_drive_arrow_markers(net):
+    """Return sorted drive time markers for overlay on dipole plots."""
+    from hnn_core.network_models import default_drive_colors
+
+    markers = list()
+    seen = set()
+    for drive_name in sorted(net.external_drives.keys()):
+        drive = net.external_drives[drive_name]
+        drive_type = drive["type"]
+        dynamics = drive.get("dynamics", dict())
+        location = drive.get("location", "proximal")
+        if location in default_drive_colors:
+            color = default_drive_colors[location]
+        else:
+            color = default_drive_colors["default"]
+
+        event_time = None
+        if drive_type in ("evoked", "gaussian"):
+            event_time = dynamics["mu"]
+        elif drive_type == "bursty":
+            event_time = dynamics["tstart"]
+
+        if event_time is None:
+            continue
+
+        label = _drive_arrow_label(drive_name)
+        key = (label, round(float(event_time), 4))
+        if key in seen:
+            continue
+        seen.add(key)
+        markers.append(
+            {
+                "time": float(event_time),
+                "label": label,
+                "color": color,
+                "location": location,
+            }
+        )
+
+    markers.sort(key=lambda marker: marker["time"])
+    return markers
+
+
+def plot_drive_arrows(
+    ax,
+    net,
+    *,
+    tmin=None,
+    tmax=None,
+    show_labels=False,
+):
+    """Mark external drive times on a dipole axis with colored arrows.
+
+    Arrows are drawn at the mean onset time of evoked (and Gaussian) drives
+    and at the start time of bursty drives, using colors from
+    :data:`~hnn_core.network_models.default_drive_colors`. Proximal drives
+    use short arrows below the trace (pointing up); distal drives use arrows
+    above the trace (pointing down). A faint dashed vertical line at each
+    drive time marks where that input crosses the dipole waveform.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes
+        Axis containing a dipole time series.
+    net : instance of Network
+        Network whose ``external_drives`` define the markers.
+    tmin, tmax : float | None
+        Time window (ms). Markers outside the window are skipped. If None,
+        the current x-axis limits of ``ax`` are used.
+    show_labels : bool, default=False
+        If True, label each arrow with the drive name (or ``evprox`` /
+        ``evdist`` for default ERP drives).
+
+    Returns
+    -------
+    ax : matplotlib.axes.Axes
+        The axis with arrows added.
+    """
+    from hnn_core.network import Network
+
+    _validate_type(net, Network, "net", "Network")
+
+    if tmin is None or tmax is None:
+        x_left, x_right = ax.get_xlim()
+        if tmin is None:
+            tmin = x_left
+        if tmax is None:
+            tmax = x_right
+
+    markers = _collect_drive_arrow_markers(net)
+    visible_markers = [
+        marker
+        for marker in markers
+        if tmin <= marker["time"] <= tmax
+    ]
+    if not visible_markers:
+        return ax
+
+    ymin_data, ymax_data = ax.get_ylim()
+    y_span = ymax_data - ymin_data
+    if y_span == 0:
+        y_span = 1.0
+
+    # Short arrows in bands above/below the trace (legacy HNN / eLife Fig 4).
+    arrow_scale = 0.65
+    headroom_frac = 0.12 * arrow_scale
+    tip_inset = 0.015 * y_span * arrow_scale
+    anchor_inset = 0.008 * y_span * arrow_scale
+    stack_step = 0.035 * y_span * arrow_scale
+    has_proximal = any(marker["location"] == "proximal" for marker in visible_markers)
+    has_distal = any(marker["location"] == "distal" for marker in visible_markers)
+    ymin_plot = ymin_data
+    ymax_plot = ymax_data
+    if has_proximal:
+        ymin_plot = ymin_data - headroom_frac * y_span
+    if has_distal:
+        ymax_plot = ymax_data + headroom_frac * y_span
+    ax.set_ylim(ymin_plot, ymax_plot)
+
+    for guide_time in sorted({marker["time"] for marker in visible_markers}):
+        ax.axvline(
+            guide_time,
+            color="0.75",
+            linestyle="--",
+            linewidth=0.8,
+            zorder=0,
+        )
+
+    time_offsets_top = dict()
+    time_offsets_bottom = dict()
+
+    def _arrowprops(color):
+        return dict(
+            arrowstyle="-|>",
+            color=color,
+            lw=1.2,
+            shrinkA=0,
+            shrinkB=0,
+        )
+
+    for marker in visible_markers:
+        event_time = marker["time"]
+        label = marker["label"] if show_labels else ""
+        color = marker["color"]
+
+        if marker["location"] == "proximal":
+            offset_idx = time_offsets_bottom.get(event_time, 0)
+            time_offsets_bottom[event_time] = offset_idx + 1
+            time_plot = event_time + offset_idx * 1.5
+            arrow_tip_y = ymin_data + tip_inset
+            label_y = ymin_plot + anchor_inset + offset_idx * stack_step
+            ax.annotate(
+                label,
+                xy=(time_plot, arrow_tip_y),
+                xytext=(time_plot, label_y),
+                ha="center",
+                va="bottom",
+                color=color,
+                fontsize=7,
+                annotation_clip=True,
+                arrowprops=_arrowprops(color),
+            )
+        else:
+            offset_idx = time_offsets_top.get(event_time, 0)
+            time_offsets_top[event_time] = offset_idx + 1
+            time_plot = event_time + offset_idx * 1.5
+            stack_y = offset_idx * stack_step
+            arrow_tip_y = ymax_data + tip_inset
+            label_y = ymax_plot - anchor_inset - stack_y
+            ax.annotate(
+                label,
+                xy=(time_plot, arrow_tip_y),
+                xytext=(time_plot, label_y),
+                ha="center",
+                va="top",
+                color=color,
+                fontsize=7,
+                annotation_clip=True,
+                arrowprops=_arrowprops(color),
+            )
+
+    return ax
+
+
 def plot_dipole(
     dpl,
     tmin=None,
@@ -279,6 +472,8 @@ def plot_dipole(
     color="k",
     label="average",
     average=False,
+    net=None,
+    show_drive_arrows=False,
     show=True,
 ):
     """Simple layer-specific plot function.
@@ -307,6 +502,12 @@ def plot_dipole(
         Dipole label. Enabled when average=True.
     average : bool, default=False
         If True, render the average across all dpls.
+    net : instance of Network | None
+        Network used to overlay drive timing arrows when
+        ``show_drive_arrows=True``.
+    show_drive_arrows : bool, default=False
+        If True, draw arrows on each axis marking evoked / bursty drive times.
+        Requires ``net``.
     show : bool, default=True
         If True, show the figure.
 
@@ -316,6 +517,7 @@ def plot_dipole(
         The matplotlib figure handle.
     """
     from .dipole import Dipole, average_dipoles
+    from .network import Network
 
     layers = layer if isinstance(layer, list) else [layer]
     if ax is None:
@@ -391,6 +593,12 @@ def plot_dipole(
         else:
             title_str = layer
         ax.set_title(title_str)
+
+        if show_drive_arrows:
+            if net is None:
+                raise ValueError("net must be provided when show_drive_arrows=True")
+            _validate_type(net, Network, "net", "Network")
+            plot_drive_arrows(ax, net, tmin=tmin, tmax=tmax)
 
     plt_show(show)
     return axes[0].get_figure()
