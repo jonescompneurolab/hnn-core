@@ -382,7 +382,11 @@ def plot_drive_arrows(
         y_span = 1.0
 
     # Short arrows in bands above/below the trace (legacy HNN / eLife Fig 4).
-    headroom_frac = 0.12
+    arrow_scale = 0.65
+    headroom_frac = 0.12 * arrow_scale
+    tip_inset = 0.015 * y_span * arrow_scale
+    anchor_inset = 0.008 * y_span * arrow_scale
+    stack_step = 0.035 * y_span * arrow_scale
     has_proximal = any(marker["location"] == "proximal" for marker in visible_markers)
     has_distal = any(marker["location"] == "distal" for marker in visible_markers)
     ymin_plot = ymin_data
@@ -423,12 +427,8 @@ def plot_drive_arrows(
             offset_idx = time_offsets_bottom.get(event_time, 0)
             time_offsets_bottom[event_time] = offset_idx + 1
             time_plot = event_time + offset_idx * 1.5
-            arrow_tip_y = ymin_data + 0.015 * y_span
-            label_y = (
-                ymin_plot
-                + 0.008 * y_span
-                + offset_idx * 0.035 * y_span
-            )
+            arrow_tip_y = ymin_data + tip_inset
+            label_y = ymin_plot + anchor_inset + offset_idx * stack_step
             ax.annotate(
                 label,
                 xy=(time_plot, arrow_tip_y),
@@ -444,9 +444,9 @@ def plot_drive_arrows(
             offset_idx = time_offsets_top.get(event_time, 0)
             time_offsets_top[event_time] = offset_idx + 1
             time_plot = event_time + offset_idx * 1.5
-            stack_y = offset_idx * 0.035 * y_span
-            arrow_tip_y = ymax_data + 0.015 * y_span
-            label_y = ymax_plot - 0.008 * y_span - stack_y
+            stack_y = offset_idx * stack_step
+            arrow_tip_y = ymax_data + tip_inset
+            label_y = ymax_plot - anchor_inset - stack_y
             ax.annotate(
                 label,
                 xy=(time_plot, arrow_tip_y),
