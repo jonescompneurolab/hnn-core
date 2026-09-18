@@ -304,6 +304,7 @@ class TestDipoleViz:
         plt.close("all")
 
         _, ax = plt.subplots()
+        plot_dipole(dpls[0], ax=ax, show=False)
         plot_drive_arrows(ax, net, show_labels=True)
         assert "ev_test" in [text.get_text() for text in ax.texts]
         plt.close("all")
