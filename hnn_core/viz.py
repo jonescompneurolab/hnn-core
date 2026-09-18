@@ -309,7 +309,12 @@ def _collect_drive_arrow_markers(net):
             continue
         seen.add(key)
         markers.append(
-            {"time": float(event_time), "label": label, "color": color}
+            {
+                "time": float(event_time),
+                "label": label,
+                "color": color,
+                "location": location,
+            }
         )
 
     markers.sort(key=lambda marker: marker["time"])
@@ -328,7 +333,9 @@ def plot_drive_arrows(
 
     Arrows are drawn at the mean onset time of evoked (and Gaussian) drives
     and at the start time of bursty drives, using colors from
-    :data:`~hnn_core.network_models.default_drive_colors`.
+    :data:`~hnn_core.network_models.default_drive_colors`. Proximal drives
+    use short arrows below the trace (pointing up); distal drives use arrows
+    above the trace (pointing down).
 
     Parameters
     ----------
@@ -368,47 +375,79 @@ def plot_drive_arrows(
     if not visible_markers:
         return ax
 
-    ymin, ymax_data = ax.get_ylim()
-    y_span = ymax_data - ymin
+    ymin_data, ymax_data = ax.get_ylim()
+    y_span = ymax_data - ymin_data
     if y_span == 0:
         y_span = 1.0
 
-    # Small top margin (legacy HNN / eLife Fig 4): short arrows in the band
-    # above the trace, not long markers through the dipole.
+    # Short arrows in bands above/below the trace (legacy HNN / eLife Fig 4).
     headroom_frac = 0.12
-    ax.set_ylim(ymin, ymax_data + headroom_frac * y_span)
+    has_proximal = any(marker["location"] == "proximal" for marker in visible_markers)
+    has_distal = any(marker["location"] == "distal" for marker in visible_markers)
+    ymin_plot = ymin_data
+    ymax_plot = ymax_data
+    if has_proximal:
+        ymin_plot = ymin_data - headroom_frac * y_span
+    if has_distal:
+        ymax_plot = ymax_data + headroom_frac * y_span
+    ax.set_ylim(ymin_plot, ymax_plot)
 
-    time_offsets = dict()
-    ymax_plot = ymax_data + headroom_frac * y_span
-    label_y_base = ymax_plot - 0.008 * y_span
-    arrow_tip_y = ymax_data + 0.015 * y_span
+    time_offsets_top = dict()
+    time_offsets_bottom = dict()
+
+    def _arrowprops(color):
+        return dict(
+            arrowstyle="-|>",
+            color=color,
+            lw=1.2,
+            shrinkA=0,
+            shrinkB=0,
+        )
 
     for marker in visible_markers:
         event_time = marker["time"]
-        offset_idx = time_offsets.get(event_time, 0)
-        time_offsets[event_time] = offset_idx + 1
-        time_plot = event_time + offset_idx * 1.5
-        stack_y = offset_idx * 0.035 * y_span
-        label_y = label_y_base - stack_y
-
         label = marker["label"] if show_labels else ""
-        ax.annotate(
-            label,
-            xy=(time_plot, arrow_tip_y),
-            xytext=(time_plot, label_y),
-            ha="center",
-            va="top",
-            color=marker["color"],
-            fontsize=7,
-            annotation_clip=True,
-            arrowprops=dict(
-                arrowstyle="-|>",
-                color=marker["color"],
-                lw=1.2,
-                shrinkA=0,
-                shrinkB=0,
-            ),
-        )
+        color = marker["color"]
+
+        if marker["location"] == "proximal":
+            offset_idx = time_offsets_bottom.get(event_time, 0)
+            time_offsets_bottom[event_time] = offset_idx + 1
+            time_plot = event_time + offset_idx * 1.5
+            arrow_tip_y = ymin_data + 0.015 * y_span
+            label_y = (
+                ymin_plot
+                + 0.008 * y_span
+                + offset_idx * 0.035 * y_span
+            )
+            ax.annotate(
+                label,
+                xy=(time_plot, arrow_tip_y),
+                xytext=(time_plot, label_y),
+                ha="center",
+                va="bottom",
+                color=color,
+                fontsize=7,
+                annotation_clip=True,
+                arrowprops=_arrowprops(color),
+            )
+        else:
+            offset_idx = time_offsets_top.get(event_time, 0)
+            time_offsets_top[event_time] = offset_idx + 1
+            time_plot = event_time + offset_idx * 1.5
+            stack_y = offset_idx * 0.035 * y_span
+            arrow_tip_y = ymax_data + 0.015 * y_span
+            label_y = ymax_plot - 0.008 * y_span - stack_y
+            ax.annotate(
+                label,
+                xy=(time_plot, arrow_tip_y),
+                xytext=(time_plot, label_y),
+                ha="center",
+                va="top",
+                color=color,
+                fontsize=7,
+                annotation_clip=True,
+                arrowprops=_arrowprops(color),
+            )
 
     return ax
 

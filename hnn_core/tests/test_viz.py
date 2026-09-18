@@ -287,9 +287,19 @@ class TestDipoleViz:
 
         _, ax = plt.subplots()
         plot_dipole(dpls[0], ax=ax, show=False, net=net, show_drive_arrows=True)
-        assert any(
-            isinstance(child, matplotlib.text.Annotation) for child in ax.get_children()
-        )
+        annotations = [
+            child
+            for child in ax.get_children()
+            if isinstance(child, matplotlib.text.Annotation)
+        ]
+        assert annotations
+        proximal_arrows = [
+            ann
+            for ann in annotations
+            if ann.get_color() == "r" or ann.arrow_patch.get_edgecolor()[0] > 0.9
+        ]
+        assert proximal_arrows
+        assert all(ann.xy[1] > ann.xyann[1] for ann in proximal_arrows)
         assert "ev_test" not in [text.get_text() for text in ax.texts]
         plt.close("all")
 
