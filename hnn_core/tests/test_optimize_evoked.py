@@ -1,11 +1,9 @@
 # Authors: Mainak Jas <mainakjas@gmail.com>
 
-from pathlib import Path
 import numpy as np
 import pytest
 
-import hnn_core
-from hnn_core import read_params, neymotin_2020_model, simulate_dipole
+from hnn_core import simulate_dipole
 from hnn_core.optimization.optimize_evoked import (
     _consolidate_chunks,
     _split_by_evinput,
@@ -88,46 +86,33 @@ def test_split_by_evinput():
         ]
 
 
-def test_optimize_evoked():
+def test_optimize_evoked(fix_net_neymotin_2020):
     """Test running the full routine in a reduced network."""
-    hnn_core_root = Path(hnn_core.__file__).parent
-    params_fname = hnn_core_root / "param" / "default.json"
-    params = read_params(params_fname)
+
+    # simulate a dipole to establish ground-truth drive parameters
+    net_orig = fix_net_neymotin_2020(reduced=True)
+    mu_orig = 6.0
+    net_orig.external_drives["evprox1"]["dynamics"]["mu"] = mu_orig
+    net_orig.external_drives["evprox1"]["dynamics"]["sigma"] = 2.0
+    net_orig.external_drives["evdist1"]["dynamics"]["mu"] = mu_orig + 2
+    net_orig.external_drives["evdist1"]["dynamics"]["sigma"] = 2.0
+    del net_orig.external_drives["evprox2"]
 
     tstop = 10.0
     n_trials = 1
-
-    # simulate a dipole to establish ground-truth drive parameters
-    mu_orig = 6.0
-    params.update(
-        {
-            "t_evprox_1": mu_orig,
-            "sigma_t_evprox_1": 2.0,
-            "t_evdist_1": mu_orig + 2,
-            "sigma_t_evdist_1": 2.0,
-        }
-    )
-    net_orig = neymotin_2020_model(
-        params, add_drives_from_params=True, mesh_shape=(3, 3)
-    )
-    del net_orig.external_drives["evprox2"]
     dpl_orig = simulate_dipole(net_orig, tstop=tstop, n_trials=n_trials)[0]
 
     # simulate a dipole with a time-shifted drive
     mu_offset = 4.0
-    params.update(
-        {
-            "t_evprox_1": mu_offset,
-            "sigma_t_evprox_1": 2.0,
-            "t_evdist_1": mu_offset + 2,
-            "sigma_t_evdist_1": 2.0,
-        }
-    )
-    net_offset = neymotin_2020_model(
-        params, add_drives_from_params=True, mesh_shape=(3, 3)
-    )
+    net_offset = fix_net_neymotin_2020(reduced=True)
+    net_offset.external_drives["evprox1"]["dynamics"]["mu"] = mu_offset
+    net_offset.external_drives["evprox1"]["dynamics"]["sigma"] = 2.0
+    net_offset.external_drives["evdist1"]["dynamics"]["mu"] = mu_offset + 2
+    net_offset.external_drives["evdist1"]["dynamics"]["sigma"] = 2.0
     del net_offset.external_drives["evprox2"]
+
     dpl_offset = simulate_dipole(net_offset, tstop=tstop, n_trials=n_trials)[0]
+
     # get drive params from the pre-optimization Network instance
     _, _, drive_static_params_orig = _get_drive_params(net_offset, ["evprox1"])
 

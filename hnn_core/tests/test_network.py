@@ -36,14 +36,12 @@ from hnn_core.network_models import add_erp_drives_to_jones_model
 from hnn_core.viz import plot_dipole
 
 hnn_core_root = Path(hnn_core.__file__).parent
-params_fname = hnn_core_root / "param" / "default.json"
 
 
 @pytest.fixture(scope="class")
-def base_network():
+def base_network(fix_default_params):
     """Base Network with connections and drives"""
-    params_fname = hnn_core_root / "param" / "default.json"
-    params = read_params(params_fname)
+    params = fix_default_params
     net = Network(params, legacy_mode=False)
     # add some basic local network connectivity
     # layer2 Pyr -> layer2 Pyr
@@ -128,8 +126,8 @@ def test_create_cell_coords():
 
 
 @pytest.mark.parametrize("mesh_shape", [(1, 1), (2, 2), (2, 3)])
-def test_custom_network_coords(mesh_shape):
-    params = read_params(params_fname)
+def test_custom_network_coords(mesh_shape, fix_default_params):
+    params = fix_default_params
 
     # network with custom cell types and positions (an irregular one)
     custom_cell_types = {
@@ -283,9 +281,9 @@ def test_custom_network_coords(mesh_shape):
     assert np.all(np.isfinite(dipole_custom[0].data["agg"]))
 
 
-def test_custom_network_coords_degenerate_dimension():
+def test_custom_network_coords_degenerate_dimension(fix_default_params):
     """Test warning/fallback when pos_dict has no spread in X and/or Y"""
-    params = read_params(params_fname)
+    params = fix_default_params
 
     custom_cell_types = {
         "L2_pyramidal": {
@@ -358,9 +356,9 @@ def test_custom_network_coords_degenerate_dimension():
     assert np.isclose(net_grid._inplane_distance, 2.0)
 
 
-def test_custom_network_coords_validation():
+def test_custom_network_coords_validation(fix_default_params):
     """Test input validation of custom pos_dict/cell_types in Network"""
-    params = read_params(params_fname)
+    params = fix_default_params
 
     custom_cell_types = {
         "L2_pyramidal": {
@@ -426,7 +424,7 @@ def test_custom_network_coords_validation():
     Network(params, pos_dict=custom_pos_dict, cell_types=custom_cell_types)
 
 
-def test_network_models():
+def test_network_models(fix_net_calcium):
     """ "Test instantiations of the network object"""
     # Make sure critical biophysics for Law model are updated
     net_law = law_2021_model()
@@ -472,7 +470,7 @@ def test_network_models():
     assert len(net_default.connectivity) == n_conn + 14
 
     # Ensure distant dependent calcium gbar
-    net_calcium = calcium_model()
+    net_calcium = fix_net_calcium(add_drives_from_params=False)
     # instantiate drive events for NetworkBuilder
     net_calcium._instantiate_drives(
         tstop=net_calcium._params["tstop"], n_trials=net_calcium._params["N_trials"]
@@ -511,21 +509,21 @@ def test_network_models():
         assert np.all(np.diff(k_gbar, n=2) > 0)  # positive 2nd derivative
 
 
-def test_model_variant_read_from_params():
+def test_model_variant_read_from_params(fix_default_params):
     """Test that 'model_variant' survives read_params"""
     duecker_params_fname = hnn_core_root / "param" / "default_duecker_ET.json"
     params = read_params(duecker_params_fname)
     assert params["model_variant"] == "duecker_ET_model"
 
     # param files of models that predate 'model_variant' don't define it
-    assert "model_variant" not in read_params(params_fname)
+    assert "model_variant" not in fix_default_params
 
 
-def test_model_variant_matches_network():
+def test_model_variant_matches_network(fix_default_params):
     """Test that a mismatch between param file and network model is caught"""
     duecker_params_fname = hnn_core_root / "param" / "default_duecker_ET.json"
     duecker_params = read_params(duecker_params_fname)
-    neymo_params = read_params(params_fname)
+    neymo_params = fix_default_params
     mesh_shape = (3, 3)
 
     # default call assigns model_variant correctly
@@ -566,21 +564,15 @@ def test_model_variant_matches_network():
 
     # models that predate 'model_variant' still build without it
     assert (
-        neymotin_2020_model(
-            params=read_params(params_fname), mesh_shape=mesh_shape
-        )._model_variant
+        neymotin_2020_model(params=neymo_params, mesh_shape=mesh_shape)._model_variant
         == "neymotin_2020_model"
     )
     assert (
-        calcium_model(
-            params=read_params(params_fname), mesh_shape=mesh_shape
-        )._model_variant
+        calcium_model(params=neymo_params, mesh_shape=mesh_shape)._model_variant
         == "calcium_model"
     )
     assert (
-        law_2021_model(
-            params=read_params(params_fname), mesh_shape=mesh_shape
-        )._model_variant
+        law_2021_model(params=neymo_params, mesh_shape=mesh_shape)._model_variant
         == "law_2021_model"
     )
 
@@ -589,9 +581,9 @@ def test_model_variant_matches_network():
     "network_model",
     [neymotin_2020_model, law_2021_model, calcium_model],
 )
-def test_network_models_cell_params(network_model):
+def test_network_models_cell_params(network_model, fix_default_params):
     """Test that the network models check the cell types defined in params"""
-    default_params = read_params(params_fname)
+    default_params = fix_default_params
     mesh_shape = (3, 3)
 
     # law_2021_model and calcium_model inherit the check from the
@@ -770,7 +762,9 @@ def test_network_cell_positions(mesh_shape):
     "model_name", ["neymotin_2020_model", "duecker_ET_model", "custom_pos_dict"]
 )
 @pytest.mark.parametrize("mesh_shape", [(3, 3), (10, 10)])
-def test_network_reset_to_original_cell_positions(model_name, mesh_shape):
+def test_network_reset_to_original_cell_positions(
+    model_name, mesh_shape, fix_default_params
+):
     """Test that Network._reset_to_original_cell_positions restores positions.
 
     ``neymotin_2020_model`` exercises the default-network branch of the Network
@@ -831,7 +825,7 @@ def test_network_reset_to_original_cell_positions(model_name, mesh_shape):
             "origin": layer_dict["origin"],
         }
         net = Network(
-            read_params(params_fname),
+            fix_default_params,
             pos_dict=custom_pos_dict,
             cell_types=custom_cell_types,
         )
@@ -936,11 +930,11 @@ def test_network_reset_to_original_cell_positions(model_name, mesh_shape):
         assert_allclose(np.array(drive_cell_pos), np.array(original_origin))
 
 
-def test_network_drives():
+def test_network_drives(fix_default_params):
     """Test manipulation of drives in the network object."""
     with pytest.raises(TypeError, match="params must be an instance of dict"):
         Network("hello")
-    params = read_params(params_fname)
+    params = fix_default_params
     net = neymotin_2020_model(params, legacy_mode=False)
 
     # add all drives explicitly and ensure that the expected number of drive
@@ -1271,9 +1265,9 @@ def test_network_drives():
     assert nc.threshold == params["threshold"]
 
 
-def test_network_drives_legacy():
+def test_network_drives_legacy(fix_default_params):
     """Test manipulation of drives in the network object under legacy mode."""
-    params = read_params(params_fname)
+    params = fix_default_params
     # add rhythmic inputs (i.e., a type of common input)
     params.update(
         {
@@ -1612,9 +1606,9 @@ def test_network_connectivity(base_network):
         simulate_dipole(net, tstop=10)
 
 
-def test_add_cell_type():
+def test_add_cell_type(fix_default_params):
     """Test adding a new cell type."""
-    params = read_params(params_fname)
+    params = fix_default_params
     net = neymotin_2020_model(params)
     # instantiate drive events for NetworkBuilder
     net._instantiate_drives(tstop=params["tstop"], n_trials=params["N_trials"])
@@ -1713,14 +1707,9 @@ def test_tonic_biases_non_gid():
     assert np.isclose(net.external_biases["tonic_soma"]["L5_pyramidal"]["tstop"], 10.0)
 
 
-def test_tonic_biases_legacy_params_api():
+def test_tonic_biases_legacy_params_api(fix_default_params):
     """Test that the legacy 'params' API for tonic biases is still functional."""
-    hnn_core_root = Path(hnn_core.__file__).parent
-
-    # default params
-    params_fname = hnn_core_root / "param" / "default.json"
-    params = read_params(params_fname)
-
+    params = fix_default_params
     net = Network(params)
     # add arbitrary local network connectivity to avoid simulation warning
     net.add_connection(
@@ -2260,13 +2249,9 @@ def test_tonic_biases_validation():
         net.add_tonic_bias(amplitude=good_amplitude, gid=[35, 36])
 
 
-def test_network_mesh():
+def test_network_mesh(fix_default_params):
     """Test mesh for defining cell positions biases."""
-    hnn_core_root = Path(hnn_core.__file__).parent
-
-    # default params
-    params_fname = hnn_core_root / "param" / "default.json"
-    params = read_params(params_fname)
+    params = fix_default_params
 
     # Test custom mesh_shape
     mesh_shape = (2, 3)
@@ -2584,7 +2569,7 @@ class TestPickConnection:
         assert len(indices) == expected
 
 
-def test_rename_cell_types(base_network):
+def test_rename_cell_types(base_network, fix_load_featureful_tmp_path):
     """Tests renaming cell function"""
     net1, params = base_network
 
@@ -2686,9 +2671,7 @@ def test_rename_cell_types(base_network):
     net3.cell_response.plot_spikes_hist(show=False)
 
     # Test the other main network we use for testing
-    net4 = hnn_core.hnn_io.read_network_configuration(
-        hnn_core_root / "tests" / "assets" / "neymotin2020_3x3_drives.json"
-    )
+    net4 = hnn_core.hnn_io.read_network_configuration(fix_load_featureful_tmp_path)
 
     net4._rename_cell_types(cell_type_rename_mapping)
     dpls4 = simulate_dipole(net4, tstop=10.0, n_trials=1)
