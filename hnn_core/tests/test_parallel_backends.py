@@ -42,12 +42,19 @@ def _terminate_mpibackend(event, backend):
         sleep(0.01)
 
 
-def test_gid_assignment():
+@pytest.mark.parametrize(
+    "fix_net_model, inh_name",
+    [
+        ("fix_net_neymotin_2020", "basket"),
+        ("fix_net_duecker_ET", "inhibitory"),
+    ],
+)
+def test_gid_assignment(fix_net_model, inh_name, request):
     """Test that gids are assigned without overlap across ranks"""
-
-    net = neymotin_2020_model(add_drives_from_params=False)
-    weights_ampa = {"L2_basket": 1.0, "L2_pyramidal": 2.0, "L5_pyramidal": 3.0}
-    syn_delays = {"L2_basket": 0.1, "L2_pyramidal": 0.2, "L5_pyramidal": 0.3}
+    net_model = request.getfixturevalue(fix_net_model)
+    net = net_model(add_drives_from_params=False)
+    weights_ampa = {f"L2_{inh_name}": 1.0, "L2_pyramidal": 2.0, "L5_pyramidal": 3.0}
+    syn_delays = {f"L2_{inh_name}": 0.1, "L2_pyramidal": 0.2, "L5_pyramidal": 0.3}
 
     net.add_bursty_drive(
         "bursty_dist",
