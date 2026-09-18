@@ -658,6 +658,7 @@ def plot_spikes_raster(
     ax=None,
     show=True,
     cell_types=None,
+    gid_ranges=None,
     colors=None,
     show_legend=True,
     marker_size=1.0,
@@ -683,6 +684,13 @@ def plot_spikes_raster(
         If True, show the figure.
     cell_types : list of str
         List of cell types to plot
+    gid_ranges : dict of lists or range objects | None
+        Dictionary with keys, e.g. net.gid_ranges containing the range of Cell or
+        input GIDs of different cell or input types. If provided, the raster spans
+        the full range of the plotted cell types, so that cells which never spiked
+        still occupy a row, and any overlaid dipoles are scaled to that range. If
+        None (default), the extent of the raster is inferred from the cells that
+        spiked.
     colors : list of str | None
         Optional custom colors to plot. Default will use the color cycler.
     show_legend : bool
@@ -743,6 +751,18 @@ def plot_spikes_raster(
     else:
         cell_types = cell_response._cell_type_names
 
+    # validate gid_ranges argument
+    _validate_type(gid_ranges, (dict, None), "gid_ranges", "dict")
+    if gid_ranges is not None:
+        missing_types = [
+            cell_type for cell_type in cell_types if cell_type not in gid_ranges
+        ]
+        if missing_types:
+            raise ValueError(
+                "gid_ranges must contain all plotted cell types. "
+                f"Missing {missing_types}"
+            )
+
     cell_type_metadata = getattr(cell_response, "_cell_type_metadata", None)
     # validate colors argument
     _validate_type(colors, (list, dict, None), "color", "list of str, or dict")
@@ -799,10 +819,17 @@ def plot_spikes_raster(
     if ax is None:
         _, ax = plt.subplots(1, 1, constrained_layout=True)
 
+    # Track the largest gid among the cells that spiked. Used to scale the raster
+    # when gid_ranges is not provided. -1 marks "no cell spiked", as gids are >= 0.
+    max_gid = -1
+
     events = []
     for cell_type, color in cell_colors.items():
         cell_type_gids = np.unique(spike_gids[spike_types == cell_type])
         cell_type_times, cell_type_ypos = [], []
+
+        if len(cell_type_gids) > 0:
+            max_gid = max(max_gid, max(cell_type_gids))
 
         for gid in cell_type_gids:
             gid_time = spike_times[spike_gids == gid]
@@ -827,8 +854,18 @@ def plot_spikes_raster(
                 )
             )
 
-    # invert y axis
-    ax.invert_yaxis()
+    # Extent of y-axis based on maximum gid in gid_ranges if provided, otherwise the range of the cells that
+    # spiked
+    if gid_ranges is not None:
+        raster_min = min(min(gid_ranges[cell_type]) for cell_type in cell_types)
+        raster_max = max(max(gid_ranges[cell_type]) for cell_type in cell_types)
+        # Show every cell of the plotted types, including the silent ones, with
+        # enough padding for the markers of the outermost cells
+        ax.set_ylim(raster_max + marker_size / 2, raster_min - marker_size / 2)
+    else:
+        raster_max = max_gid
+        # invert y axis
+        ax.invert_yaxis()
 
     # Overlay dipoles on raster plot
     if overlay_dipoles:
@@ -850,7 +887,10 @@ def plot_spikes_raster(
         dipole_times = dpl[0].times
 
         # Scale dipole to fit the spike raster plot
-        raster_max = max(cell_type_gids)
+        if raster_max < 0:
+            raise ValueError(
+                "Dipoles cannot be overlaid on a raster plot without spikes."
+            )
         raster_midpoint = round((raster_max / 2), 0)
         raster_quarterpoint = round((raster_max / 4), 0)
 
@@ -928,6 +968,7 @@ def plot_spikes_raster(
 
     ax.set_ylabel(ylabel)
     ax.set_xlabel(xlabel)
+    ax.set_ylim([0, raster_max+marker_size])
 
     # add title
     ax.set_title(title)

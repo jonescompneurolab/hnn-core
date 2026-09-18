@@ -12,7 +12,7 @@ from numpy.testing import assert_allclose
 import pytest
 
 import hnn_core
-from hnn_core import read_params, neymotin_2020_model, read_spikes
+from hnn_core import CellResponse, read_params, neymotin_2020_model, read_spikes
 from hnn_core.dipole import simulate_dipole
 from hnn_core.network_models import default_cell_metadata
 from hnn_core.viz import (
@@ -634,6 +634,61 @@ class TestCellResponsePlotters:
         )
 
         assert updated_raster_yrange <= initial_raster_yrange
+
+    def test_spikes_raster_ylim(self):
+        """Raster y-axis spans the network gids, or the gids that spiked."""
+
+        # generate some spike times for some example cells
+        gid_ranges = {
+            "L2_basket": range(0, 5),
+            "L2_pyramidal": range(5, 15),
+            "L5_basket": range(15, 20),
+            "L5_pyramidal": range(20, 29),
+        }
+
+        # Hard-coded spikes, with the cell type associated with largest gids silent
+        spike_times, spike_gids, spike_types = [], [], []
+        for cell_type in ["L2_basket", "L2_pyramidal", "L5_basket"]:
+            for gid in gid_ranges[cell_type]:
+                spike_times.append(10.0 + gid)
+                spike_gids.append(gid)
+                spike_types.append(cell_type)
+
+        # create cell_response object
+        cell_response = CellResponse(
+            cell_type_names=list(gid_ranges.keys()),
+            spike_times=[spike_times],
+            spike_gids=[spike_gids],
+            spike_types=[spike_types],
+            times=np.linspace(0, 100, 101),
+        )
+
+        marker_size = 1.0
+
+        # case 1: no defined gid_ranges, y-axis ends at largest gid + marker_size
+        fig = cell_response.plot_spikes_raster(show=False, marker_size=marker_size)
+        assert fig.axes[0].get_ylim() == pytest.approx(
+            (0, max(spike_gids) + marker_size)
+        )
+
+        # case 2: gid_ranges added as input, y-axis spans largest gid + marker size
+        fig = cell_response.plot_spikes_raster(
+            show=False, marker_size=marker_size, gid_ranges=gid_ranges
+        )
+        assert fig.axes[0].get_ylim() == pytest.approx(
+            (0, max(gid_ranges["L5_pyramidal"]) + marker_size)
+        )
+
+        # case 3: plotting a subset of cell types spans the gids of those types only
+        fig = cell_response.plot_spikes_raster(
+            show=False,
+            marker_size=marker_size,
+            gid_ranges=gid_ranges,
+            cell_types=["L2_basket", "L2_pyramidal"],
+        )
+        assert fig.axes[0].get_ylim() == pytest.approx(
+            (0, max(gid_ranges["L2_pyramidal"]) + marker_size)
+        )
 
     # smoke test for raster plot input arguments
     def test_spikes_raster_input_args(self, base_simulation_spikes):
