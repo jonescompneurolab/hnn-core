@@ -270,8 +270,6 @@ class TestDipoleViz:
             plot_psd([dpls[0], dpl_sfreq])
 
     def test_plot_drive_arrows(self, run_simulation):
-        import matplotlib.patches
-
         net, dpls = run_simulation
         weights_ampa = {"L2_pyramidal": 5.4e-5, "L5_pyramidal": 5.4e-5}
         net.add_evoked_drive(
@@ -292,7 +290,7 @@ class TestDipoleViz:
         assert any(
             isinstance(child, matplotlib.text.Annotation) for child in ax.get_children()
         )
-        assert "ev_test" in [text.get_text() for text in ax.texts]
+        assert "ev_test" not in [text.get_text() for text in ax.texts]
         plt.close("all")
 
         with pytest.raises(ValueError, match="net must be provided"):
@@ -303,6 +301,11 @@ class TestDipoleViz:
         assert any(
             isinstance(child, matplotlib.text.Annotation) for child in ax.get_children()
         )
+        plt.close("all")
+
+        _, ax = plt.subplots()
+        plot_drive_arrows(ax, net, show_labels=True)
+        assert "ev_test" in [text.get_text() for text in ax.texts]
         plt.close("all")
 
 

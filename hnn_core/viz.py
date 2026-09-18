@@ -322,7 +322,7 @@ def plot_drive_arrows(
     *,
     tmin=None,
     tmax=None,
-    show_labels=True,
+    show_labels=False,
 ):
     """Mark external drive times on a dipole axis with colored arrows.
 
@@ -339,7 +339,7 @@ def plot_drive_arrows(
     tmin, tmax : float | None
         Time window (ms). Markers outside the window are skipped. If None,
         the current x-axis limits of ``ax`` are used.
-    show_labels : bool
+    show_labels : bool, default=False
         If True, label each arrow with the drive name (or ``evprox`` /
         ``evdist`` for default ERP drives).
 
