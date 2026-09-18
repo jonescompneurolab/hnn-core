@@ -968,7 +968,7 @@ def plot_spikes_raster(
 
     ax.set_ylabel(ylabel)
     ax.set_xlabel(xlabel)
-    ax.set_ylim([0, raster_max+marker_size])
+    ax.set_ylim([0, raster_max + marker_size])
 
     # add title
     ax.set_title(title)
