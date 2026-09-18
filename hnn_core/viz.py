@@ -335,7 +335,8 @@ def plot_drive_arrows(
     and at the start time of bursty drives, using colors from
     :data:`~hnn_core.network_models.default_drive_colors`. Proximal drives
     use short arrows below the trace (pointing up); distal drives use arrows
-    above the trace (pointing down).
+    above the trace (pointing down). A faint dashed vertical line at each
+    drive time marks where that input crosses the dipole waveform.
 
     Parameters
     ----------
@@ -391,6 +392,15 @@ def plot_drive_arrows(
     if has_distal:
         ymax_plot = ymax_data + headroom_frac * y_span
     ax.set_ylim(ymin_plot, ymax_plot)
+
+    for guide_time in sorted({marker["time"] for marker in visible_markers}):
+        ax.axvline(
+            guide_time,
+            color="0.75",
+            linestyle="--",
+            linewidth=0.8,
+            zorder=0,
+        )
 
     time_offsets_top = dict()
     time_offsets_bottom = dict()

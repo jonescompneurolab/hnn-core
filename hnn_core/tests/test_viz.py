@@ -300,6 +300,13 @@ class TestDipoleViz:
         ]
         assert proximal_arrows
         assert all(ann.xy[1] > ann.xyann[1] for ann in proximal_arrows)
+        guide_lines = [
+            line
+            for line in ax.lines
+            if line.get_linestyle() == "--" and line.get_color() in ("0.75", 0.75)
+        ]
+        assert guide_lines
+        assert any(abs(line.get_xdata()[0] - 30.0) < 0.01 for line in guide_lines)
         assert "ev_test" not in [text.get_text() for text in ax.texts]
         plt.close("all")
 
