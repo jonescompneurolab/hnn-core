@@ -476,6 +476,58 @@ def test_cma_seed():
     assert not np.allclose(optim_seed1.opt_params_, optim_seed2.opt_params_)
 
 
+def test_bayesian_seed():
+    """Test random seed control during Bayesian optimization."""
+
+    class DummyNet:
+        def copy(self):
+            return DummyNet()
+
+    def set_params(net, params):
+        pass
+
+    def objective(
+        initial_net,
+        initial_params,
+        set_params,
+        predicted_params,
+        update_params,
+        obj_values,
+        tstop,
+        obj_fun_kwargs,
+    ):
+        predicted_params = np.asarray(predicted_params)
+        obj = np.sum((predicted_params - 0.25) ** 2)
+        obj_values.append(obj)
+        return obj
+
+    def run_optimizer(seed):
+        samples = list()
+
+        def recording_objective(**kwargs):
+            samples.append(np.asarray(kwargs["predicted_params"]))
+            return objective(**kwargs)
+
+        optim = Optimizer(
+            initial_net=DummyNet(),
+            tstop=1.0,
+            constraints={"x": (-1.0, 1.0), "y": (-1.0, 1.0)},
+            set_params=set_params,
+            solver="bayesian",
+            obj_fun=recording_objective,
+            max_iter=2,
+        )
+        optim.fit(seed=seed)
+        return np.asarray(samples)
+
+    samples_seed1 = run_optimizer(seed=111)
+    samples_seed1_repeat = run_optimizer(seed=111)
+    samples_seed2 = run_optimizer(seed=999999)
+
+    assert np.allclose(samples_seed1, samples_seed1_repeat)
+    assert not np.allclose(samples_seed1, samples_seed2)
+
+
 @pytest.mark.parametrize("solver", ["bayesian", "cma", "cobyla"])
 def test_custom_loss_fun(solver):
     """Test optimization routines with a user-defined loss function."""
