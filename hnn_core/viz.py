@@ -328,6 +328,7 @@ def plot_drive_arrows(
     tmin=None,
     tmax=None,
     show_labels=False,
+    line_width=2.0,
 ):
     """Mark external drive times on a dipole axis with colored arrows.
 
@@ -350,6 +351,8 @@ def plot_drive_arrows(
     show_labels : bool, default=False
         If True, label each arrow with the drive name (or ``evprox`` /
         ``evdist`` for default ERP drives).
+    line_width : float, default=2.0
+        Line width of the arrow shaft and head outline (matplotlib ``lw``).
 
     Returns
     -------
@@ -382,7 +385,7 @@ def plot_drive_arrows(
         y_span = 1.0
 
     # Short arrows in bands above/below the trace (legacy HNN / eLife Fig 4).
-    arrow_scale = 0.65
+    arrow_scale = 0.75
     headroom_frac = 0.12 * arrow_scale
     tip_inset = 0.015 * y_span * arrow_scale
     anchor_inset = 0.008 * y_span * arrow_scale
@@ -409,11 +412,14 @@ def plot_drive_arrows(
     time_offsets_top = dict()
     time_offsets_bottom = dict()
 
+    arrow_head_scale = 6.0 * line_width
+
     def _arrowprops(color):
         return dict(
             arrowstyle="-|>",
             color=color,
-            lw=1.2,
+            lw=line_width,
+            mutation_scale=arrow_head_scale,
             shrinkA=0,
             shrinkB=0,
         )
@@ -474,6 +480,7 @@ def plot_dipole(
     average=False,
     net=None,
     show_drive_arrows=False,
+    line_width=2.0,
     show=True,
 ):
     """Simple layer-specific plot function.
@@ -508,6 +515,9 @@ def plot_dipole(
     show_drive_arrows : bool, default=False
         If True, draw arrows on each axis marking evoked / bursty drive times.
         Requires ``net``.
+    line_width : float, default=2.0
+        Line width for drive timing arrows when ``show_drive_arrows=True``.
+        Passed to :func:`plot_drive_arrows`.
     show : bool, default=True
         If True, show the figure.
 
@@ -598,7 +608,9 @@ def plot_dipole(
             if net is None:
                 raise ValueError("net must be provided when show_drive_arrows=True")
             _validate_type(net, Network, "net", "Network")
-            plot_drive_arrows(ax, net, tmin=tmin, tmax=tmax)
+            plot_drive_arrows(
+                ax, net, tmin=tmin, tmax=tmax, line_width=line_width
+            )
 
     plt_show(show)
     return axes[0].get_figure()

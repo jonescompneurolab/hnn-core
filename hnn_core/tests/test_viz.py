@@ -300,6 +300,7 @@ class TestDipoleViz:
         ]
         assert proximal_arrows
         assert all(ann.xy[1] > ann.xyann[1] for ann in proximal_arrows)
+        assert proximal_arrows[0].arrow_patch.get_linewidth() == 2.0
         guide_lines = [
             line
             for line in ax.lines
@@ -318,6 +319,15 @@ class TestDipoleViz:
         assert any(
             isinstance(child, matplotlib.text.Annotation) for child in ax.get_children()
         )
+        custom_lw = 3.5
+        _, ax = plt.subplots()
+        plot_drive_arrows(ax, net, line_width=custom_lw)
+        ann = next(
+            child
+            for child in ax.get_children()
+            if isinstance(child, matplotlib.text.Annotation)
+        )
+        assert ann.arrow_patch.get_linewidth() == custom_lw
         plt.close("all")
 
         _, ax = plt.subplots()
