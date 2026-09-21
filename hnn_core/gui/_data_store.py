@@ -5,6 +5,7 @@ class DataStore(dict):
     """Centralized store for HNN session data."""
 
     def __init__(self):
+
         super().__init__(
             {
                 "simulated_data": defaultdict(lambda: dict(net=None, dpls=list())),
