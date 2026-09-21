@@ -8,6 +8,7 @@ from time import sleep
 from urllib.request import urlretrieve
 
 import numpy as np
+import pandas as pd
 import pytest
 
 from hnn_core import (
@@ -114,6 +115,15 @@ def test_eq_conn_(jones_2009_network):
     net1_hard_change_conn.connectivity[0]["nc_dict"]["A_weight"] = 0
     assert net1_hard_change_conn != net1
 
+    #copied same from above
+    net1_hard_change_conn_df = net1.copy()
+    first_conn_idx = net1_hard_change_conn_df.connectivity_df["conn_idx"].min()
+    net1_hard_change_conn_df.connectivity_df.loc[
+        net1_hard_change_conn_df.connectivity_df["conn_idx"] == first_conn_idx,
+        "weight",
+    ] = 0
+    assert net1_hard_change_conn_df != net1
+
     # Check edge case, same number of connections, different replicate in conn
     net1_alt_conn1 = net1.copy()
     net1_alt_conn2 = net1.copy()
@@ -125,6 +135,24 @@ def test_eq_conn_(jones_2009_network):
     assert net1 != net1_alt_conn1
     assert net1_alt_conn1 == net1_alt_conn1
     assert net1_alt_conn1 != net1_alt_conn2
+
+    #same copied from above
+    net1_alt_conn1_df = net1.copy()
+    net1_alt_conn2_df = net1.copy()
+
+    df = net1_alt_conn1_df.connectivity_df
+
+    net1_alt_conn1_df.connectivity_df = pd.concat(
+        [df.iloc[[0]], df], ignore_index=True
+    )
+
+    net1_alt_conn2_df.connectivity_df = pd.concat(
+        [df, df.iloc[[-1]]], ignore_index=True
+    )
+
+    assert net1 != net1_alt_conn1_df
+    assert net1_alt_conn1_df == net1_alt_conn1_df
+    assert net1_alt_conn1_df != net1_alt_conn2_df
 
 
 def test_write_configuration(tmp_path, jones_2009_network):
@@ -326,6 +354,15 @@ def test_read_configuration_json(jones_2009_network):
     ]
     assert not any(
         [src_type in net.external_drives.keys() for src_type in connection_src_types]
+    )
+
+    # dataframe: same check
+    connection_src_types_df = list(net_no_drives.connectivity_df["src_type"])
+    assert not any(
+        [
+            src_type in net.external_drives.keys()
+            for src_type in connection_src_types_df
+        ]
     )
 
     # Read without external bias

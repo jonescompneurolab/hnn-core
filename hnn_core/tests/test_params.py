@@ -111,6 +111,9 @@ def test_remove_nulled_drives(tmp_path):
     conn_src_types = set([conn["src_type"] for conn in net_removed.connectivity])
     assert all([drive not in conn_src_types for drive in drives_removed])
 
+    conn_src_types_df = set(net_removed.connectivity_df["src_type"])
+    assert all([drive not in conn_src_types_df for drive in drives_removed])
+
     # gid ranges were updated
     assert all([drive not in net_removed.gid_ranges.keys() for drive in drives_removed])
 
@@ -173,6 +176,7 @@ class TestConvertToJson:
         assert net_json != net_params
         assert len(net_json.external_drives) == 3
         assert len(net_json.connectivity) == 39
+        assert net_json.connectivity_df["conn_idx"].nunique() == 39 #same as above 
         assert len(net_json.gid_ranges) == 7
 
     def test_convert_to_json_bad_type(self):

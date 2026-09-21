@@ -354,8 +354,7 @@ def pick_connection_from_dataframe(net, src_gids=None, target_gids=None, loc=Non
     if not any_search_applied:
         return list()
 
-    #counter behaves same as index in the connectivity list
-    return sorted(conn_df["counter"].unique().tolist())
+    return sorted(conn_df["conn_idx"].unique().tolist())
 
 def _get_cell_index_by_synapse_type(net):
     """Returns the indices of excitatory and inhibitory cells in the Network.
@@ -776,8 +775,15 @@ class Network:
         ):
             return False
 
+        if not self.connectivity_df.equals(other.connectivity_df):
+            #self improvemnt . earlier i was earlier doing like  
+
+            #if self.connectivty_df != other.connectivity_df ->
+            #this would return a dataframe of true or false. Foolish me 
+            return False
+
         # Check all other attributes
-        attrs_to_ignore = ["connectivity"]
+        attrs_to_ignore = ["connectivity", "connectivity_df"]# i couldn't understand why is this in the first place ? As connectvity was present , i also added the dataframe.
         for attr in vars(self).keys():
             if attr.startswith("_") or attr in attrs_to_ignore:
                 continue
@@ -1781,7 +1787,7 @@ class Network:
                             conn_idxs = pick_connection_from_dataframe(self, src_gids=drive_cell_gid)
                             target_types = set(
                                 self.connectivity_df.loc[
-                                    self.connectivity_df["counter"].isin(conn_idxs),
+                                    self.connectivity_df["conn_idx"].isin(conn_idxs),
                                     "target_type",
                                 ]
                             )
@@ -2633,7 +2639,7 @@ class Network:
                     nc_dict = conn["nc_dict"]
                     rows.append(
                         {   
-                            "counter":self._counter,
+                            "conn_idx":self._counter,
                             "src_gid": src_gid,
                             "target_gid": target_gid,
                             "src_type": self.gid_to_type(src_gids[0]),

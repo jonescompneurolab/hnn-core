@@ -109,6 +109,13 @@ def check_equal_networks(net1, net2):
     assert len(net1.connectivity) == len(net2.connectivity)
     assert _compare_lists(net1.connectivity, net2.connectivity)
 
+    # dataframe: same check
+    assert (
+        net1.connectivity_df["conn_idx"].nunique()
+        == net2.connectivity_df["conn_idx"].nunique()
+    )
+    assert net1.connectivity_df.equals(net2.connectivity_df)
+
     # Check drives
     for drive1, drive2 in zip(
         net1.external_drives.values(), net2.external_drives.values()
@@ -126,7 +133,7 @@ def check_equal_networks(net1, net2):
             )
 
     # Check all other attributes
-    attrs_to_ignore = ["connectivity", "external_drives", "external_biases"]
+    attrs_to_ignore = ["connectivity", "external_drives", "external_biases","connectivty_df"]
     for attr in vars(net1).keys():
         if attr.startswith("_") or attr in attrs_to_ignore:
             continue
@@ -924,6 +931,11 @@ def test_gui_synchronous_inputs(setup_gui):
         for connectivity in driver_connections:
             assert len(connectivity["src_gids"]) == n_drive_cells
 
+        #earlier i was looping over and then grouping . However with help of pandas all of this is vectorised
+        conn_df = sim["net"].connectivity_df
+        driver_df = conn_df[conn_df["src_type"] == drive_name]
+        n_src_gids_by_conn = driver_df.groupby("conn_idx")["src_gid"].nunique()
+        assert (n_src_gids_by_conn == n_drive_cells).all()
 
 def test_gui_cell_specific_drive(setup_gui):
     """Tests 1:1 connection with cell_specific widget"""
@@ -949,6 +961,13 @@ def test_gui_cell_specific_drive(setup_gui):
     # Check src_gids length
     for connectivity in driver_connections:
         assert len(connectivity["src_gids"]) == len(connectivity["target_gids"])
+
+    #same as above
+    conn_df = sim["net"].connectivity_df
+    driver_grouped = conn_df[conn_df["src_type"] == driver_name].groupby("conn_idx")
+    assert (
+        driver_grouped["src_gid"].nunique() == driver_grouped["target_gid"].nunique()
+    ).all()
 
 
 def test_gui_figure_overlay(setup_gui):
