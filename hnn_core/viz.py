@@ -329,6 +329,7 @@ def plot_drive_arrows(
     tmax=None,
     show_labels=False,
     line_width=2.0,
+    arrow_height=1.75,
 ):
     """Mark external drive times on a dipole axis with colored arrows.
 
@@ -353,6 +354,9 @@ def plot_drive_arrows(
         ``evdist`` for default ERP drives).
     line_width : float, default=2.0
         Line width of the arrow shaft and head outline (matplotlib ``lw``).
+    arrow_height : float, default=1.75
+        Scale for arrow shaft length and the margin bands above/below the
+        dipole trace (1.0 matches the first prototype sizing).
 
     Returns
     -------
@@ -385,11 +389,10 @@ def plot_drive_arrows(
         y_span = 1.0
 
     # Short arrows in bands above/below the trace (legacy HNN / eLife Fig 4).
-    arrow_scale = 0.75
-    headroom_frac = 0.12 * arrow_scale
-    tip_inset = 0.015 * y_span * arrow_scale
-    anchor_inset = 0.008 * y_span * arrow_scale
-    stack_step = 0.035 * y_span * arrow_scale
+    headroom_frac = 0.12 * arrow_height
+    tip_inset = 0.015 * y_span * arrow_height
+    anchor_inset = 0.008 * y_span * arrow_height
+    stack_step = 0.035 * y_span * arrow_height
     has_proximal = any(marker["location"] == "proximal" for marker in visible_markers)
     has_distal = any(marker["location"] == "distal" for marker in visible_markers)
     ymin_plot = ymin_data
@@ -481,6 +484,7 @@ def plot_dipole(
     net=None,
     show_drive_arrows=False,
     line_width=2.0,
+    arrow_height=1.75,
     show=True,
 ):
     """Simple layer-specific plot function.
@@ -517,6 +521,9 @@ def plot_dipole(
         Requires ``net``.
     line_width : float, default=2.0
         Line width for drive timing arrows when ``show_drive_arrows=True``.
+        Passed to :func:`plot_drive_arrows`.
+    arrow_height : float, default=1.75
+        Vertical scale for drive timing arrows when ``show_drive_arrows=True``.
         Passed to :func:`plot_drive_arrows`.
     show : bool, default=True
         If True, show the figure.
@@ -609,7 +616,12 @@ def plot_dipole(
                 raise ValueError("net must be provided when show_drive_arrows=True")
             _validate_type(net, Network, "net", "Network")
             plot_drive_arrows(
-                ax, net, tmin=tmin, tmax=tmax, line_width=line_width
+                ax,
+                net,
+                tmin=tmin,
+                tmax=tmax,
+                line_width=line_width,
+                arrow_height=arrow_height,
             )
 
     plt_show(show)
