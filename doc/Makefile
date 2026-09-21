@@ -22,9 +22,7 @@ I18NSPHINXOPTS  = $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 .PHONY: help
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
-	@echo "  html-noplot to make standalone HTML files, without plotting anything"
 	@echo "  html       to make standalone HTML files"
-	@echo "  html_dev-pattern to make standalone HTML files for one example dir (dev version)"
 	@echo "  view	    to view the documentation in a browser"
 	@echo "  linkcheck        to check all external links for integrity"
 
@@ -32,14 +30,8 @@ help:
 
 clean:
 	rm -rf $(BUILDDIR)/*
-	rm -rf auto_examples/
 	rm -rf generated/*
 	rm -rf modules/*
-
-html-noplot:
-	$(SPHINXBUILD) -D plot_gallery=0 -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
-	@echo
-	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
 .PHONY: html
 html:
@@ -47,16 +39,11 @@ html:
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
-html_dev-pattern:
-	BUILD_DEV_HTML=1 $(SPHINXBUILD) -D sphinx_gallery_conf.filename_pattern=$(PATTERN) -D sphinx_gallery_conf.run_stale_examples=True -b html $(ALLSPHINXOPTS) _build/html
-	@echo
-	@echo "Build finished. The HTML pages are in _build/html"
-
 linkcheck:
-	@$(SPHINXBUILD) -b linkcheck -D nitpicky=0 -D plot_gallery=0 -d _build/doctrees . _build/linkcheck
+	@$(SPHINXBUILD) -b linkcheck -D nitpicky=0 -d _build/doctrees . _build/linkcheck
 
 linkcheck-all:
-	@$(SPHINXBUILD) -b linkcheck -D nitpicky=0 -D plot_gallery=0 -D linkcheck_ignore='https://www.nsgportal.org','https://doi.org/10.1152/jn.00535.2009','https://doi.org/10.1152/jn.00122.2010','https://doi.org/10.1101/2021.04.16.440210','https://doi.org/10.7554/eLife.51214','https://github.com/jonescompneurolab/hnn-core/settings/','https://www.timeanddate.com/worldclock/usa/providence','(http|https):\/\/localhost:\d+' -d _build/doctrees . _build/linkcheck
+	@$(SPHINXBUILD) -b linkcheck -D nitpicky=0 -D linkcheck_ignore='https://www.nsgportal.org','https://doi.org/10.1152/jn.00535.2009','https://doi.org/10.1152/jn.00122.2010','https://doi.org/10.1101/2021.04.16.440210','https://doi.org/10.7554/eLife.51214','https://github.com/jonescompneurolab/hnn-core/settings/','https://www.timeanddate.com/worldclock/usa/providence','(http|https):\/\/localhost:\d+' -d _build/doctrees . _build/linkcheck
 
 view:
 	@python -c "import webbrowser; webbrowser.open_new_tab('file://$(PWD)/_build/html/index.html')"
