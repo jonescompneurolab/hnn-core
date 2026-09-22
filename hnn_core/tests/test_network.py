@@ -460,7 +460,7 @@ def test_network_models(fix_net_calcium):
     assert len(net_default.connectivity) == n_conn + 14
 
     # Ensure distant dependent calcium gbar
-    net_calcium = fix_net_calcium(add_drives_from_params=False)
+    net_calcium = fix_net_calcium()
     # instantiate drive events for NetworkBuilder
     net_calcium._instantiate_drives(
         tstop=net_calcium._params["tstop"], n_trials=net_calcium._params["N_trials"]

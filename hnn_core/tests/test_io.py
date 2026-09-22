@@ -33,7 +33,7 @@ assets_path = Path(hnn_core_root, "tests", "assets")
 
 def test_eq(fix_net_neymotin_2020, fix_net_calcium):
     net_neymotin = fix_net_neymotin_2020(featureful_reduced_network=True)
-    net_calcium = fix_net_calcium(reduced=True)
+    net_calcium = fix_net_calcium(add_drives_from_params=True, reduced=True)
 
     # Check eq of same network
     assert net_neymotin == net_neymotin

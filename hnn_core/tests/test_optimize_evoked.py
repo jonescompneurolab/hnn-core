@@ -90,7 +90,7 @@ def test_optimize_evoked(fix_net_neymotin_2020):
     """Test running the full routine in a reduced network."""
 
     # simulate a dipole to establish ground-truth drive parameters
-    net_orig = fix_net_neymotin_2020(reduced=True)
+    net_orig = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
     mu_orig = 6.0
     net_orig.external_drives["evprox1"]["dynamics"]["mu"] = mu_orig
     net_orig.external_drives["evprox1"]["dynamics"]["sigma"] = 2.0
@@ -104,7 +104,7 @@ def test_optimize_evoked(fix_net_neymotin_2020):
 
     # simulate a dipole with a time-shifted drive
     mu_offset = 4.0
-    net_offset = fix_net_neymotin_2020(reduced=True)
+    net_offset = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
     net_offset.external_drives["evprox1"]["dynamics"]["mu"] = mu_offset
     net_offset.external_drives["evprox1"]["dynamics"]["sigma"] = 2.0
     net_offset.external_drives["evdist1"]["dynamics"]["mu"] = mu_offset + 2

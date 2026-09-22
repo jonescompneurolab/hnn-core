@@ -161,7 +161,7 @@ def test_dipole(
     dipole_exp_avg = average_dipoles([dipole_exp, dipole_exp])
     assert_allclose(dipole_exp.data["agg"], dipole_exp_avg.data["agg"])
 
-    net_raw = net_model(reduced=True)
+    net_raw = net_model(add_drives_from_params=True, reduced=True)
     net_proc = deepcopy(net_raw)
 
     dpls_raw, net_raw = fix_run_simulation(
@@ -196,7 +196,7 @@ def test_dipole(
 
 def test_dipole_simulation(fix_net_neymotin_2020, fix_default_params):
     """Test data produced from simulate_dipole() call."""
-    net = fix_net_neymotin_2020(reduced=True)
+    net = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
     net._params["dipole_smooth_win"] = 5
     with pytest.raises(ValueError, match="Invalid number of simulations: 0"):
         simulate_dipole(net, tstop=25.0, n_trials=0)
@@ -256,7 +256,7 @@ def test_cell_response_backends(fix_net_model, fix_run_simulation, request):
     trial_idx, n_trials, gid = 0, 2, 7
 
     net_model = request.getfixturevalue(fix_net_model)
-    joblib_net = net_model(reduced=True)
+    joblib_net = net_model(add_drives_from_params=True, reduced=True)
     mpi_net = deepcopy(joblib_net)
 
     _, joblib_net = fix_run_simulation(
@@ -396,7 +396,7 @@ def test_dipole_simulation_with_renamed_cells(
     fix_net_neymotin_2020, fix_run_simulation
 ):
     """Test dipole simulation works with renamed pyramidal cells."""
-    net = fix_net_neymotin_2020(add_drives_from_params=False)
+    net = fix_net_neymotin_2020()
 
     # renaming the pyramidal cells (their cell_metadata should remeain the same)
     rename_mapping = {"L2_pyramidal": "My_L2_Pyr", "L5_pyramidal": "My_L5_Pyr"}
@@ -429,7 +429,7 @@ def test_dipole_bsl_cor(fix_net_neymotin_2020, fix_run_simulation):
     """Test that all values of bsl_cor work in simulate_dipole"""
     for backend in {"joblib", "mpi"}:
         for bsl_cor in {"jones", "duecker"}:
-            net = fix_net_neymotin_2020(reduced=True)
+            net = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
             _, _ = fix_run_simulation(
                 net,
                 tstop=40,

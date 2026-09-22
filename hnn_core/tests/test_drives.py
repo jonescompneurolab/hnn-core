@@ -106,7 +106,7 @@ def test_external_drive_times():
 
 def test_drive_seeds(fix_net_neymotin_2020):
     """Test that unique spike times are generated across trials"""
-    net = fix_net_neymotin_2020(add_drives_from_params=False, reduced=True)
+    net = fix_net_neymotin_2020(reduced=True)
     weights_ampa = {
         "L2_basket": 0.3,
         "L2_pyramidal": 0.3,
@@ -139,7 +139,7 @@ def test_drive_seeds(fix_net_neymotin_2020):
 
 def test_clear_drives(fix_net_neymotin_2020):
     """Test clearing drives updates Network"""
-    net = fix_net_neymotin_2020(add_drives_from_params=False, reduced=True)
+    net = fix_net_neymotin_2020(reduced=True)
     weights_ampa = {"L5_pyramidal": 0.3}
     synaptic_delays = {"L5_pyramidal": 1.0}
 
@@ -669,7 +669,7 @@ def test_drive_random_state(fix_net_neymotin_2020):
         "L5_pyramidal": 1.0,
     }
 
-    net = fix_net_neymotin_2020(add_drives_from_params=False, reduced=True)
+    net = fix_net_neymotin_2020(reduced=True)
     for drive_name in ["evprox1", "evprox2"]:
         net.add_evoked_drive(
             drive_name,
@@ -703,7 +703,7 @@ def test_add_poisson_drive(
     fix_net_neymotin_2020, rate_constant, cell_specific, n_drive_cells
 ):
     """Testing rate constant when adding non-cell-specific poisson drive"""
-    net = fix_net_neymotin_2020(add_drives_from_params=False, reduced=True)
+    net = fix_net_neymotin_2020(reduced=True)
 
     weights_ampa_noise = {
         "L2_basket": 0.01,
@@ -726,7 +726,7 @@ def test_add_poisson_drive(
 
 def test_add_drives_duecker(fix_net_duecker_ET):
     """Test that all drives can be added to Duecker model."""
-    net = fix_net_duecker_ET(add_drives_from_params=False, reduced=True)
+    net = fix_net_duecker_ET(reduced=True)
 
     # Evoked drive
     weights_ampa = {

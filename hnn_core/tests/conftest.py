@@ -86,7 +86,7 @@ def fix_net_duecker_ET():
     """
 
     def _fix_net_duecker_ET(
-        add_drives_from_params=True,
+        add_drives_from_params=False,
         legacy_mode=False,
         reduced=False,
         electrode_array=None,
@@ -213,7 +213,7 @@ def fix_net_neymotin_2020():
     """
 
     def _fix_net_neymotin_2020(
-        add_drives_from_params=True,
+        add_drives_from_params=False,
         legacy_mode=False,
         reduced=False,
         electrode_array=None,
@@ -367,7 +367,7 @@ def fix_net_calcium():
     """
 
     def _fix_net_calcium(
-        add_drives_from_params=True,
+        add_drives_from_params=False,
         legacy_mode=False,
         reduced=False,
         electrode_array=None,
