@@ -815,7 +815,7 @@ def plot_spikes_raster(
     max_gid = -1
 
     events = []
-    for cell_type, color in cell_colors.items():
+    for cell_type in cell_types:
         cell_type_gids = np.unique(spike_gids[spike_types == cell_type])
         cell_type_times, cell_type_ypos = [], []
 
@@ -827,6 +827,9 @@ def plot_spikes_raster(
             cell_type_times.append(gid_time)
             cell_type_ypos.append(gid)
 
+        print(cell_colors, cell_type)
+
+        color = cell_colors.get('L2_pyramidal', "meh")
         if cell_type_times:
             events.append(
                 ax.eventplot(
@@ -838,6 +841,8 @@ def plot_spikes_raster(
                 )
             )
         else:
+
+            color = getattr(cell_colors, cell_type, "k")
             # Blank plot for no spiking
             events.append(
                 ax.eventplot(
@@ -878,10 +883,6 @@ def plot_spikes_raster(
         dipole_times = dpl[0].times
 
         # Scale dipole to fit the spike raster plot
-        if raster_max < 0:
-            raise ValueError(
-                "Dipoles cannot be overlaid on a raster plot without spikes."
-            )
         raster_midpoint = round((raster_max / 2), 0)
         raster_quarterpoint = round((raster_max / 4), 0)
 
