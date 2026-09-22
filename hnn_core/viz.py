@@ -760,7 +760,10 @@ def plot_spikes_raster(
 
     # Set colors
     if cell_type_metadata is not None and "color" in cell_type_metadata[cell_types[0]]:
-        cell_colors = {cell: cell_type_metadata.get(cell, {}).get("color", "k") for cell in cell_types}
+        cell_colors = {
+            cell: cell_type_metadata.get(cell, {}).get("color", "k")
+            for cell in cell_types
+        }
     else:
         default_colors = plt.rcParams["axes.prop_cycle"].by_key()["color"][
             : len(cell_types)
@@ -815,7 +818,6 @@ def plot_spikes_raster(
     max_gid = -1
 
     events = []
-    
 
     for cell_type, color in cell_colors.items():
         cell_type_gids = np.unique(spike_gids[spike_types == cell_type])
@@ -840,7 +842,6 @@ def plot_spikes_raster(
                 )
             )
         else:
-
             # Blank plot for no spiking
             events.append(
                 ax.eventplot(

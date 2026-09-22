@@ -668,7 +668,7 @@ class TestCellResponsePlotters:
         # case 1: no defined gid_ranges, y-axis ends at largest gid + marker_size
         fig = cell_response.plot_spikes_raster(show=False, marker_size=marker_size)
         assert fig.axes[0].get_ylim() == pytest.approx(
-            (0, max(spike_gids) + marker_size)
+            (max(spike_gids) + marker_size, 0)
         )
 
         # case 2: gid_ranges added as input, y-axis spans largest gid + marker size
@@ -676,7 +676,7 @@ class TestCellResponsePlotters:
             show=False, marker_size=marker_size, gid_ranges=gid_ranges
         )
         assert fig.axes[0].get_ylim() == pytest.approx(
-            (0, max(gid_ranges["L5_pyramidal"]) + marker_size)
+            (max(gid_ranges["L5_pyramidal"]) + marker_size, 0)
         )
 
         # case 3: plotting a subset of cell types spans the gids of those types only
@@ -687,7 +687,7 @@ class TestCellResponsePlotters:
             cell_types=["L2_basket", "L2_pyramidal"],
         )
         assert fig.axes[0].get_ylim() == pytest.approx(
-            (0, max(gid_ranges["L2_pyramidal"]) + marker_size)
+            (max(gid_ranges["L2_pyramidal"]) + marker_size, 0)
         )
 
     # smoke test for raster plot input arguments
