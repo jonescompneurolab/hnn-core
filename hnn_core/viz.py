@@ -753,15 +753,6 @@ def plot_spikes_raster(
 
     # validate gid_ranges argument
     _validate_type(gid_ranges, (dict, None), "gid_ranges", "dict")
-    if gid_ranges is not None:
-        missing_types = [
-            cell_type for cell_type in cell_types if cell_type not in gid_ranges
-        ]
-        if missing_types:
-            raise ValueError(
-                "gid_ranges must contain all plotted cell types. "
-                f"Missing {missing_types}"
-            )
 
     cell_type_metadata = getattr(cell_response, "_cell_type_metadata", None)
     # validate colors argument
