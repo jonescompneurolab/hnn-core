@@ -35,11 +35,42 @@ def cleanup_matplotlib():
 
 
 @pytest.fixture
-def setup_net(fix_default_params):
-    params = fix_default_params
-    net = neymotin_2020_model(params, mesh_shape=(3, 3))
+def fix_sim_no_spikes(self, fix_net_model, request):
+    net_model = request.getfixturevalue(fix_net_model)
+    net = net_model(reduced=True)
+    weights_ampa = {"L2_pyramidal": 5.4e-5, "L5_pyramidal": 5.4e-5}
+    syn_delays = {"L2_pyramidal": 0.1, "L5_pyramidal": 1.0}
 
-    return net
+    net.add_bursty_drive(
+        "beta_prox",
+        tstart=0.0,
+        burst_rate=25,
+        burst_std=5,
+        numspikes=1,
+        spike_isi=0,
+        n_drive_cells=11,
+        location="proximal",
+        weights_ampa=weights_ampa,
+        synaptic_delays=syn_delays,
+        event_seed=14,
+    )
+
+    net.add_bursty_drive(
+        "beta_dist",
+        tstart=0.0,
+        burst_rate=25,
+        burst_std=5,
+        numspikes=1,
+        spike_isi=0,
+        n_drive_cells=11,
+        location="distal",
+        weights_ampa=weights_ampa,
+        synaptic_delays=syn_delays,
+        event_seed=14,
+    )
+
+    dpl = simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
+    return net, dpl
 
 
 def _fake_click(fig, ax, point, button=1):
@@ -51,9 +82,17 @@ def _fake_click(fig, ax, point, button=1):
     fig.canvas.callbacks.process("button_press_event", button_press_event)
 
 
-def test_network_visualization(setup_net):
+@pytest.mark.parametrize(
+    "fix_net_model, inh_name",
+    [
+        ("fix_net_neymotin_2020", "basket"),
+        ("fix_net_duecker_ET", "inhibitory"),
+    ],
+)
+def test_network_visualization(fix_net_model, inh_name, request):
     """Test network visualisations."""
-    net = setup_net
+    net_model = request.getfixturevalue(fix_net_model)
+    net = net_model(reduced=True)
     plot_cells(net)
     ax = net.cell_types["L2_pyramidal"]["cell_object"].plot_morphology()
     assert len(ax.lines) == 8
@@ -93,7 +132,7 @@ def test_network_visualization(setup_net):
         section_color = {sect_name: f"C{idx}" for idx, sect_name in enumerate(sections)}
         cell_type["cell_object"].plot_morphology(color=section_color)
 
-    cell_type = net.cell_types["L2_basket"]
+    cell_type = net.cell_types[f"L2_{inh_name}"]
     with pytest.raises(ValueError):
         cell_type["cell_object"].plot_morphology(color="z")
     with pytest.raises(ValueError):
@@ -134,7 +173,7 @@ def test_network_visualization(setup_net):
     conn_idx = 15
     net.add_connection(
         net.gid_ranges["L2_pyramidal"][::2],
-        "L5_basket",
+        f"L5_{inh_name}",
         "soma",
         "ampa",
         0.00025,
@@ -153,8 +192,8 @@ def test_network_visualization(setup_net):
 
 class TestDipoleViz:
     @pytest.fixture
-    def run_simulation(self, setup_net):
-        net = setup_net
+    def run_simulation(self, fix_net_neymotin_2020):
+        net = fix_net_neymotin_2020(reduced=True)
         weights_ampa = {"L2_pyramidal": 5.4e-5, "L5_pyramidal": 5.4e-5}
         syn_delays = {"L2_pyramidal": 0.1, "L5_pyramidal": 1.0}
 
@@ -189,9 +228,12 @@ class TestDipoleViz:
         dpl = simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
         return net, dpl
 
-    def test_decimation_time_options(self, run_simulation):
+    @pytest.mark.parametrize(
+        "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+    )
+    def test_decimation_time_options(self, fix_sim_no_spikes, fix_net_model):
         """Test basic dipole visualisations, decimation, and time args."""
-        _, dpls = run_simulation
+        _, dpls = fix_sim_no_spikes(fix_net_model)
         fig = dpls[0].plot()  # plot the first dipole alone
         axes = fig.get_axes()[0]
         dpls[0].copy().smooth(window_len=10).plot(ax=axes)  # add smoothed versions
@@ -264,13 +306,17 @@ class TestDipoleViz:
             plot_psd([dpls[0], dpl_sfreq])
 
 
-def test_drive_strength(setup_net):
+def test_drive_strength(fix_net_neymotin_2020):
     """Adds empty external drives to check there strength across each cell types"""
-    net = setup_net
+    net = fix_net_neymotin_2020(reduced=True)
 
-    weights_ampa = {"L2_pyramidal": 0.0, "L5_pyramidal": 0.0, "L2_basket": 0.0}
-    synaptic_delays = {"L2_pyramidal": 0.0, "L5_pyramidal": 0.0, "L2_basket": 0.0}
-    rate_constant = {"L2_pyramidal": 140.0, "L5_pyramidal": 40.0, "L2_basket": 100.0}
+    weights_ampa = {"L2_pyramidal": 0.0, "L5_pyramidal": 0.0, f"L2_{inh_name}": 0.0}
+    synaptic_delays = {"L2_pyramidal": 0.0, "L5_pyramidal": 0.0, f"L2_{inh_name}": 0.0}
+    rate_constant = {
+        "L2_pyramidal": 140.0,
+        "L5_pyramidal": 40.0,
+        f"L2_{inh_name}": 100.0,
+    }
 
     net.add_poisson_drive(
         "poisson",
@@ -307,14 +353,6 @@ def test_drive_strength(setup_net):
 class TestCellResponsePlotters:
     """Tests plotting methods of the CellResponse class"""
 
-    @pytest.fixture
-    def class_setup_net(self, fix_default_params):
-        """Creates a base network for tests within this class"""
-        params = fix_default_params
-        net = neymotin_2020_model(params, mesh_shape=(3, 3))
-
-        return net
-
     # AES Had to remove scope=class because we do NOT want only one instance of the
     # fixture per class anymore
     @pytest.fixture(
@@ -323,9 +361,9 @@ class TestCellResponsePlotters:
             default_cell_metadata,
         ],
     )
-    def base_simulation_spikes(self, class_setup_net, request):
+    def base_simulation_spikes(self, fix_net_neymotin_2020, request):
         """Adds drives with spikes for testing of spike visualizations"""
-        net = class_setup_net
+        net = fix_net_neymotin_2020(reduced=True)
         weights_ampa = {"L2_pyramidal": 0.1, "L5_pyramidal": 1.0}
         syn_delays = {"L2_pyramidal": 0.1, "L5_pyramidal": 1.0}
         net.add_bursty_drive(
@@ -432,9 +470,9 @@ class TestCellResponsePlotters:
 
         # Colors as dict mapping
         dict_mapping = {
-            "L2_basket": "#daf7a6",
+            f"L2_{inh_name}": "#daf7a6",
             "L2_pyramidal": "#ffc300",
-            "L5_basket": "#ff5733",
+            f"L5_{inh_name}": "#ff5733",
             "L5_pyramidal": "#c70039",
         }
         fig = net.cell_response.plot_spikes_raster(
@@ -505,9 +543,9 @@ class TestCellResponsePlotters:
 
         # Colors as a dict mapping every cell type
         dict_mapping = {
-            "L2_basket": "#daf7a6",
+            f"L2_{inh_name}": "#daf7a6",
             "L2_pyramidal": "#ffc300",
-            "L5_basket": "#ff5733",
+            f"L5_{inh_name}": "#ff5733",
             "L5_pyramidal": "#c70039",
         }
         axes = cell_response.plot_firing_rate_time(
@@ -645,7 +683,12 @@ class TestCellResponsePlotters:
             net.cell_response.write(op.join(tmp_dir_name, "spk_%d.txt"))
             cell_response = read_spikes(op.join(tmp_dir_name, "spk_*.txt"))
 
-        cell_type_names = ["L2_basket", "L2_pyramidal", "L5_basket", "L5_pyramidal"]
+        cell_type_names = [
+            f"L2_{inh_name}",
+            "L2_pyramidal",
+            f"L5_{inh_name}",
+            "L5_pyramidal",
+        ]
         n_cell_spikes = sum(
             sum(1 for spike_type in trial if spike_type in cell_type_names)
             for trial in cell_response.spike_types
@@ -691,9 +734,9 @@ class TestCellResponsePlotters:
             f"{n_plotted_raster_overlay}"
         )
 
-    def test_no_data_in_raster_plt(self, setup_net):
+    def test_no_data_in_raster_plt(self, fix_net_neymotin_2020):
         """Test that the raster plot contains no data."""
-        net = setup_net
+        net = fix_net_neymotin_2020(reduced=True)
         _ = simulate_dipole(net, tstop=100.0, n_trials=2)
         fig = net.cell_response.plot_spikes_raster(trial_idx=[0, 1], show=False)
 
@@ -801,9 +844,9 @@ class TestCellResponsePlotters:
         _check_inverted_spike_axes(fig)
 
 
-def test_network_plotter_init(setup_net):
+def test_network_plotter_init(fix_net_neymotin_2020):
     """Test init keywords of NetworkPlotter class."""
-    net = setup_net
+    net = fix_net_neymotin_2020(reduced=True)
     # test NetworkPlotter class
     args = [
         "xlim",
@@ -828,9 +871,9 @@ def test_network_plotter_init(setup_net):
     assert net_plot._vsec_recorded is False
 
 
-def test_network_plotter_simulation(setup_net):
+def test_network_plotter_simulation(fix_net_neymotin_2020):
     """Test NetworkPlotter class simulation warnings."""
-    net = setup_net
+    net = fix_net_neymotin_2020(reduced=True)
     net_plot = NetworkPlotter(net)
     # Errors if vsec isn't recorded
     with pytest.raises(RuntimeError, match="Network must be simulated"):
@@ -847,7 +890,7 @@ def test_network_plotter_simulation(setup_net):
     with pytest.raises(RuntimeError, match="Network must be simulated"):
         net_plot.export_movie("demo.gif", dpi=200)
 
-    net = setup_net
+    net = fix_net_neymotin_2020(reduced=True)
     _ = simulate_dipole(net, dt=0.5, tstop=10, record_vsec="all", n_trials=2)
     net_plot = NetworkPlotter(net)
     # setter/getter test for time_idx and trial_idx
@@ -862,9 +905,9 @@ def test_network_plotter_simulation(setup_net):
     assert isinstance(net_plot._cbar, Colorbar)
 
 
-def test_network_plotter_setter(setup_net):
+def test_network_plotter_setter(fix_net_neymotin_2020):
     """Test NetworkPlotter class setters and getters."""
-    net = setup_net
+    net = fix_net_neymotin_2020(reduced=True)
     net_plot = NetworkPlotter(net)
     # Type check errors
     args = [
@@ -911,9 +954,9 @@ def test_network_plotter_setter(setup_net):
         net_plot.trial_idx = 1
 
 
-def test_network_plotter_export(tmp_path, setup_net):
+def test_network_plotter_export(tmp_path, fix_net_neymotin_2020):
     """Test NetworkPlotter class export methods."""
-    net = setup_net
+    net = fix_net_neymotin_2020(reduced=True)
     _ = simulate_dipole(net, dt=0.5, tstop=10, n_trials=1, record_vsec="all")
     net_plot = NetworkPlotter(net)
 
