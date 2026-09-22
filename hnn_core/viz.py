@@ -760,7 +760,7 @@ def plot_spikes_raster(
 
     # Set colors
     if cell_type_metadata is not None and "color" in cell_type_metadata[cell_types[0]]:
-        cell_colors = {cell: meta["color"] for cell, meta in cell_type_metadata.items()}
+        cell_colors = {cell: cell_type_metadata.get(cell, {}).get("color", "k") for cell in cell_types}
     else:
         default_colors = plt.rcParams["axes.prop_cycle"].by_key()["color"][
             : len(cell_types)
@@ -815,7 +815,9 @@ def plot_spikes_raster(
     max_gid = -1
 
     events = []
-    for cell_type in cell_types:
+    
+
+    for cell_type, color in cell_colors.items():
         cell_type_gids = np.unique(spike_gids[spike_types == cell_type])
         cell_type_times, cell_type_ypos = [], []
 
@@ -827,9 +829,6 @@ def plot_spikes_raster(
             cell_type_times.append(gid_time)
             cell_type_ypos.append(gid)
 
-        print(cell_colors, cell_type)
-
-        color = cell_colors.get('L2_pyramidal', "meh")
         if cell_type_times:
             events.append(
                 ax.eventplot(
@@ -842,7 +841,6 @@ def plot_spikes_raster(
             )
         else:
 
-            color = getattr(cell_colors, cell_type, "k")
             # Blank plot for no spiking
             events.append(
                 ax.eventplot(
@@ -961,7 +959,7 @@ def plot_spikes_raster(
     ax.set_ylabel(ylabel)
     ax.set_xlabel(xlabel)
     ax.set_ylim([0, raster_max + marker_size])
-
+    ax.invert_yaxis()
     # add title
     ax.set_title(title)
 
