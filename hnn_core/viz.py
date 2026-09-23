@@ -364,11 +364,7 @@ def plot_drive_arrows(
             tmax = x_right
 
     markers = _collect_drive_arrow_markers(net)
-    visible_markers = [
-        marker
-        for marker in markers
-        if tmin <= marker["time"] <= tmax
-    ]
+    visible_markers = [marker for marker in markers if tmin <= marker["time"] <= tmax]
     if not visible_markers:
         return ax
 
