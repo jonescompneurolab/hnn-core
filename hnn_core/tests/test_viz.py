@@ -300,7 +300,7 @@ class TestDipoleViz:
         ]
         assert proximal_arrows
         assert all(ann.xy[1] > ann.xyann[1] for ann in proximal_arrows)
-        assert proximal_arrows[0].arrow_patch.get_linewidth() == 2.0
+        assert proximal_arrows[0].arrow_patch.get_linewidth() == 3.0
         guide_lines = [
             line
             for line in ax.lines

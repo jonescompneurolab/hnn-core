@@ -318,7 +318,7 @@ def _add_arrows_to_dipole(
     tmin=None,
     tmax=None,
     show_labels=False,
-    line_width=2.0,
+    line_width=3.0,
     arrow_height=1.75,
 ):
     """Add drive-timing arrows and guide lines to an existing dipole axis."""
@@ -451,7 +451,7 @@ def plot_dipole(
     average=False,
     net=None,
     show_drive_arrows=False,
-    line_width=2.0,
+    line_width=3.0,
     arrow_height=1.75,
     show=True,
 ):
@@ -487,7 +487,7 @@ def plot_dipole(
     show_drive_arrows : bool, default=False
         If True, draw arrows on each axis marking evoked / bursty drive times.
         Requires ``net``.
-    line_width : float, default=2.0
+    line_width : float, default=3.0
         Line width for drive timing arrows when ``show_drive_arrows=True``.
     arrow_height : float, default=1.75
         Vertical scale for drive timing arrows when ``show_drive_arrows=True``.
