@@ -269,15 +269,6 @@ def plot_laminar_lfp(
     return ax.get_figure()
 
 
-def _drive_arrow_label(drive_name):
-    """Short display label for default ERP drive name patterns."""
-    if "evdist" in drive_name:
-        return "evdist"
-    if "evprox" in drive_name:
-        return "evprox"
-    return drive_name
-
-
 def _collect_drive_arrow_markers(net):
     """Return sorted drive time markers for overlay on dipole plots."""
     from hnn_core.network_models import default_drive_colors
@@ -303,15 +294,14 @@ def _collect_drive_arrow_markers(net):
         if event_time is None:
             continue
 
-        label = _drive_arrow_label(drive_name)
-        key = (label, round(float(event_time), 4))
+        key = (drive_name, round(float(event_time), 4))
         if key in seen:
             continue
         seen.add(key)
         markers.append(
             {
                 "time": float(event_time),
-                "label": label,
+                "label": drive_name,
                 "color": color,
                 "location": location,
             }
