@@ -311,7 +311,7 @@ def _collect_drive_arrow_markers(net):
     return markers
 
 
-def plot_drive_arrows(
+def _add_arrows_to_dipole(
     ax,
     net,
     *,
@@ -321,37 +321,7 @@ def plot_drive_arrows(
     line_width=2.0,
     arrow_height=1.75,
 ):
-    """Mark external drive times on a dipole axis with colored arrows.
-
-    Arrows are drawn at the mean onset time of evoked (and Gaussian) drives
-    and at the start time of bursty drives, using colors from
-    :data:`~hnn_core.network_models.default_drive_colors`. Proximal drives
-    use short arrows below the trace (pointing up); distal drives use arrows
-    above the trace (pointing down). A faint dashed vertical line at each
-    drive time marks where that input crosses the dipole waveform.
-
-    Parameters
-    ----------
-    ax : matplotlib.axes.Axes
-        Axis containing a dipole time series.
-    net : instance of Network
-        Network whose ``external_drives`` define the markers.
-    tmin, tmax : float | None
-        Time window (ms). Markers outside the window are skipped. If None,
-        the current x-axis limits of ``ax`` are used.
-    show_labels : bool, default=False
-        If True, label each arrow with the external drive name.
-    line_width : float, default=2.0
-        Line width of the arrow shaft and head outline (matplotlib ``lw``).
-    arrow_height : float, default=1.75
-        Scale for arrow shaft length and the margin bands above/below the
-        dipole trace (1.0 matches the first prototype sizing).
-
-    Returns
-    -------
-    ax : matplotlib.axes.Axes
-        The axis with arrows added.
-    """
+    """Add drive-timing arrows and guide lines to an existing dipole axis."""
     from hnn_core.network import Network
 
     _validate_type(net, Network, "net", "Network")
@@ -506,10 +476,8 @@ def plot_dipole(
         Requires ``net``.
     line_width : float, default=2.0
         Line width for drive timing arrows when ``show_drive_arrows=True``.
-        Passed to :func:`plot_drive_arrows`.
     arrow_height : float, default=1.75
         Vertical scale for drive timing arrows when ``show_drive_arrows=True``.
-        Passed to :func:`plot_drive_arrows`.
     show : bool, default=True
         If True, show the figure.
 
@@ -600,7 +568,7 @@ def plot_dipole(
             if net is None:
                 raise ValueError("net must be provided when show_drive_arrows=True")
             _validate_type(net, Network, "net", "Network")
-            plot_drive_arrows(
+            _add_arrows_to_dipole(
                 ax,
                 net,
                 tmin=tmin,

@@ -98,7 +98,6 @@ Visualization (:py:mod:`hnn_core.viz`):
    plot_laminar_lfp
    plot_laminar_csd
    plot_drive_strength
-   plot_drive_arrows
    NetworkPlotter
 
 Parallel backends (:py:mod:`hnn_core.parallel_backends`):

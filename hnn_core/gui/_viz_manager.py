@@ -28,7 +28,7 @@ from ipywidgets import (
 from hnn_core.dipole import _anticorr, _rmse, average_dipoles
 from hnn_core.gui._logging import logger
 from hnn_core.network_models import default_drive_colors
-from hnn_core.viz import plot_drive_arrows, plot_dipole, plot_tfr_morlet
+from hnn_core.viz import _add_arrows_to_dipole, plot_dipole, plot_tfr_morlet
 from hnn_core.gui._data_store import data_store
 from enum import Enum
 
@@ -446,7 +446,7 @@ def _update_ax(fig, ax, data, data_name, plot_type, plot_config):
                     show=False,
                 )
             if plot_config.get("overlay_drive_arrows", False) and net_copied:
-                plot_drive_arrows(ax, net_copied)
+                _add_arrows_to_dipole(ax, net_copied)
         else:
             print("No dipole data")
 

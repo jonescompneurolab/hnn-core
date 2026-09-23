@@ -18,12 +18,12 @@ from hnn_core.network_models import default_cell_metadata
 from hnn_core.viz import (
     plot_cells,
     plot_dipole,
-    plot_drive_arrows,
     plot_psd,
     plot_tfr_morlet,
     plot_connectivity_matrix,
     plot_cell_connectivity,
     plot_drive_strength,
+    _add_arrows_to_dipole,
     _collect_drive_arrow_markers,
     NetworkPlotter,
 )
@@ -315,13 +315,13 @@ class TestDipoleViz:
             plot_dipole(dpls[0], show=False, show_drive_arrows=True)
 
         _, ax = plt.subplots()
-        plot_drive_arrows(ax, net)
+        _add_arrows_to_dipole(ax, net)
         assert any(
             isinstance(child, matplotlib.text.Annotation) for child in ax.get_children()
         )
         custom_lw = 3.5
         _, ax = plt.subplots()
-        plot_drive_arrows(ax, net, line_width=custom_lw)
+        _add_arrows_to_dipole(ax, net, line_width=custom_lw)
         ann = next(
             child
             for child in ax.get_children()
@@ -332,7 +332,7 @@ class TestDipoleViz:
 
         _, ax = plt.subplots()
         plot_dipole(dpls[0], ax=ax, show=False)
-        plot_drive_arrows(ax, net, show_labels=True)
+        _add_arrows_to_dipole(ax, net, show_labels=True)
         assert "ev_test" in [text.get_text() for text in ax.texts]
         plt.close("all")
 
