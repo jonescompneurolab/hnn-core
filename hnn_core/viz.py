@@ -340,8 +340,7 @@ def plot_drive_arrows(
         Time window (ms). Markers outside the window are skipped. If None,
         the current x-axis limits of ``ax`` are used.
     show_labels : bool, default=False
-        If True, label each arrow with the drive name (or ``evprox`` /
-        ``evdist`` for default ERP drives).
+        If True, label each arrow with the external drive name.
     line_width : float, default=2.0
         Line width of the arrow shaft and head outline (matplotlib ``lw``).
     arrow_height : float, default=1.75
