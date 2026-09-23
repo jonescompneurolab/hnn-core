@@ -343,19 +343,15 @@ def _add_arrows_to_dipole(
     if y_span == 0:
         y_span = 1.0
 
-    # Short arrows in bands above/below the trace (legacy HNN / eLife Fig 4).
-    headroom_frac = 0.12 * arrow_height
-    tip_inset = 0.015 * y_span * arrow_height
-    anchor_inset = 0.008 * y_span * arrow_height
-    stack_step = 0.035 * y_span * arrow_height
+    # Same shaft length (in data units) for proximal and distal markers.
+    arrow_length_y = 0.028 * y_span * arrow_height
+    label_gap_y = 0.012 * y_span * arrow_height
+    margin_y = arrow_length_y + (label_gap_y if show_labels else 0.0)
+
     has_proximal = any(marker["location"] == "proximal" for marker in visible_markers)
     has_distal = any(marker["location"] == "distal" for marker in visible_markers)
-    ymin_plot = ymin_data
-    ymax_plot = ymax_data
-    if has_proximal:
-        ymin_plot = ymin_data - headroom_frac * y_span
-    if has_distal:
-        ymax_plot = ymax_data + headroom_frac * y_span
+    ymin_plot = ymin_data - margin_y if has_proximal else ymin_data
+    ymax_plot = ymax_data + margin_y if has_distal else ymax_data
     ax.set_ylim(ymin_plot, ymax_plot)
 
     for guide_time in sorted({marker["time"] for marker in visible_markers}):
@@ -367,61 +363,77 @@ def _add_arrows_to_dipole(
             zorder=0,
         )
 
-    time_offsets_top = dict()
-    time_offsets_bottom = dict()
-
     arrow_head_scale = 6.0 * line_width
+    arrowprops_template = dict(
+        arrowstyle="-|>",
+        lw=line_width,
+        mutation_scale=arrow_head_scale,
+        shrinkA=0,
+        shrinkB=0,
+    )
 
-    def _arrowprops(color):
-        return dict(
-            arrowstyle="-|>",
-            color=color,
-            lw=line_width,
-            mutation_scale=arrow_head_scale,
-            shrinkA=0,
-            shrinkB=0,
-        )
+    drawn_at_time_and_location = set()
 
     for marker in visible_markers:
-        event_time = marker["time"]
+        drive_time = marker["time"]
+        location = marker["location"]
+        marker_key = (drive_time, location)
+        if marker_key in drawn_at_time_and_location:
+            continue
+        drawn_at_time_and_location.add(marker_key)
+
         label = marker["label"] if show_labels else ""
         color = marker["color"]
+        arrowprops = {**arrowprops_template, "color": color}
 
-        if marker["location"] == "proximal":
-            offset_idx = time_offsets_bottom.get(event_time, 0)
-            time_offsets_bottom[event_time] = offset_idx + 1
-            time_plot = event_time + offset_idx * 1.5
-            arrow_tip_y = ymin_data + tip_inset
-            label_y = ymin_plot + anchor_inset + offset_idx * stack_step
+        if location == "proximal":
+            arrow_tip_y = ymin_data
+            arrow_tail_y = ymin_data - arrow_length_y
             ax.annotate(
-                label,
-                xy=(time_plot, arrow_tip_y),
-                xytext=(time_plot, label_y),
+                "",
+                xy=(drive_time, arrow_tip_y),
+                xytext=(drive_time, arrow_tail_y),
                 ha="center",
                 va="bottom",
                 color=color,
-                fontsize=7,
                 annotation_clip=True,
-                arrowprops=_arrowprops(color),
+                arrowprops=arrowprops,
             )
+            if show_labels:
+                ax.text(
+                    drive_time,
+                    arrow_tail_y - label_gap_y,
+                    label,
+                    ha="center",
+                    va="top",
+                    color=color,
+                    fontsize=7,
+                    clip_on=True,
+                )
         else:
-            offset_idx = time_offsets_top.get(event_time, 0)
-            time_offsets_top[event_time] = offset_idx + 1
-            time_plot = event_time + offset_idx * 1.5
-            stack_y = offset_idx * stack_step
-            arrow_tip_y = ymax_data + tip_inset
-            label_y = ymax_plot - anchor_inset - stack_y
+            arrow_tip_y = ymax_data
+            arrow_tail_y = ymax_data + arrow_length_y
             ax.annotate(
-                label,
-                xy=(time_plot, arrow_tip_y),
-                xytext=(time_plot, label_y),
+                "",
+                xy=(drive_time, arrow_tip_y),
+                xytext=(drive_time, arrow_tail_y),
                 ha="center",
                 va="top",
                 color=color,
-                fontsize=7,
                 annotation_clip=True,
-                arrowprops=_arrowprops(color),
+                arrowprops=arrowprops,
             )
+            if show_labels:
+                ax.text(
+                    drive_time,
+                    arrow_tail_y + label_gap_y,
+                    label,
+                    ha="center",
+                    va="bottom",
+                    color=color,
+                    fontsize=7,
+                    clip_on=True,
+                )
 
     return ax
 
