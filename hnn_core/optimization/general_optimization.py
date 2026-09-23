@@ -156,6 +156,9 @@ class Optimizer:
                     raise ValueError(
                         f"Initial parameter '{key}' with value {initial_params[key]} is out of bounds {self.constraints[key]}."
                     )
+
+            # ensure keys initial params and constraints are in the same order
+            initial_params = {key: initial_params[key] for key in constraints}
             self.initial_params = initial_params
         else:
             self.initial_params = _get_initial_params(self.constraints)
