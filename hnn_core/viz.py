@@ -343,8 +343,9 @@ def _add_arrows_to_dipole(
     if y_span == 0:
         y_span = 1.0
 
-    # Same shaft length (in data units) for proximal and distal markers.
-    arrow_length_y = 0.028 * y_span * arrow_height
+    # Same shaft length for proximal and distal; 0.127 matches pre-refactor
+    # proximal arrow size at default arrow_height (0.12 + 0.015 - 0.008 headroom terms).
+    arrow_length_y = 0.127 * y_span * arrow_height
     label_gap_y = 0.012 * y_span * arrow_height
     margin_y = arrow_length_y + (label_gap_y if show_labels else 0.0)
 
