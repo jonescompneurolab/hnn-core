@@ -302,6 +302,58 @@ def test_initial_params(solver):
 
 
 @pytest.mark.parametrize("solver", ["bayesian", "cobyla", "cma"])
+def test_initial_params_ordering(solver):
+    """Test that initial_params are reordered to match constraints."""
+
+    tstop = 10.0
+    net_offset = neymotin_2020_model(mesh_shape=(3, 3))
+
+    def set_params(net_offset, params):
+        net_offset.add_evoked_drive(
+            "evprox",
+            mu=params["mu"],
+            sigma=params["sigma"],
+            numspikes=params["numspikes"],
+            location="proximal",
+            weights_ampa={
+                "L2_basket": 0.5,
+                "L2_pyramidal": 0.5,
+                "L5_basket": 0.5,
+                "L5_pyramidal": 0.5,
+            },
+            synaptic_delays={
+                "L2_basket": 0.1,
+                "L2_pyramidal": 0.1,
+                "L5_basket": 1.0,
+                "L5_pyramidal": 1.0,
+            },
+        )
+
+    constraints = {"mu": (1, 10), "sigma": (20, 30), "numspikes": (40, 50)}
+    # initial_params in a different order than constraints
+    initial_params = {"numspikes": 45, "mu": 5, "sigma": 25}
+
+    optim = Optimizer(
+        net_offset,
+        tstop=tstop,
+        constraints=constraints,
+        set_params=set_params,
+        solver=solver,
+        obj_fun="dipole_rmse",
+        max_iter=2,
+        initial_params=initial_params,
+    )
+
+    # test that keys in initial_params are re-ordered to match constraints
+    # this is possible because list(x.keys()) == list(y.keys()) cares about order
+    # whereas x.keys() == y.keys() doesn't
+    assert list(optim.initial_params.keys()) == list(optim.constraints.keys())
+    assert optim.initial_params["mu"] == 5
+    assert optim.initial_params["sigma"] == 25
+    assert optim.initial_params["numspikes"] == 45
+
+
+@pytest.mark.parametrize("solver", ["bayesian", "cobyla", "cma"])
 @pytest.mark.parametrize(
     "initial_params, error_type",
     [
