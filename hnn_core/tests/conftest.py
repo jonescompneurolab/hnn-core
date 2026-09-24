@@ -522,30 +522,25 @@ def _base_simulation_cached():
 
 @pytest.fixture(
     scope="function",
-    params=["fix_net_neymotin_2020", "fix_net_duecker_ET"],
+    params=[
+        (net_model_name, variation)
+        for net_model_name in ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+        for variation in ["yes_spikes", "no_spikes"]
+    ],
+    ids=lambda param: f"{param[0]}-{param[1]}",
 )
-def fix_use_cached_sim_yes_spikes(_base_simulation_cached, request):
-    """Copy of the cached simulation, for spike visualization tests"""
-    net_model_name = request.param
+def fix_use_cached_sims(_base_simulation_cached, request):
+    """Copy of the cached simulation, for both the spiking and non-spiking variations
+
+    Returns ``(net, dpls, inh_name, variation)``, where ``variation`` is either
+    ``"yes_spikes"`` or ``"no_spikes"``.
+    """
+    net_model_name, variation = request.param
     net_model = request.getfixturevalue(net_model_name)
     net, dpls, inh_name = _base_simulation_cached(
-        net_model_name, net_model, variation="yes_spikes"
+        net_model_name, net_model, variation=variation
     )
-    return net, dpls, inh_name
-
-
-@pytest.fixture(
-    scope="function",
-    params=["fix_net_neymotin_2020", "fix_net_duecker_ET"],
-)
-def fix_use_cached_sim_no_spikes(_base_simulation_cached, request):
-    """Copy of the cached simulation, for spike visualization tests"""
-    net_model_name = request.param
-    net_model = request.getfixturevalue(net_model_name)
-    net, dpls, inh_name = _base_simulation_cached(
-        net_model_name, net_model, variation="no_spikes"
-    )
-    return net, dpls, inh_name
+    return net, dpls, inh_name, variation
 
 
 @pytest.fixture(scope="module")
