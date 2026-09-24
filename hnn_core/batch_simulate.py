@@ -80,20 +80,24 @@ class BatchSimulate(object):
     record_isec : {False, 'all', 'soma'}
         Option to record voltages from all sections ('all'), or just
         the soma ('soma'). Default: False.
-    postproc : bool, optional
-        If True, smoothing (``dipole_smooth_win``) and scaling
-        (``dipole_scalefctr``) values are read from the parameter file, and
-        applied to the dipole objects before returning.
-        Default: False.
+    postproc : bool, default=False
+        Deprecated. If True, smoothing (``dipole_smooth_win``) and scaling
+        (``dipole_scalefctr``) values are read from the ``Network``'s parameter file,
+        and applied to the dipole objects before returning (the default ``Network``
+        parameter file, `hnn_core/param/default.json`, uses a smoothing value of 30 ms
+        and a scaling factor of 3000). Note that this setting only affects the dipole
+        waveforms, and not somatic voltages, possible extracellular recordings etc. The
+        preferred way is to use the :meth:`~hnn_core.dipole.Dipole.smooth` and
+        :meth:`~hnn_core.dipole.Dipole.scale` methods instead.
     clear_cache : bool, optional
         Whether to clear the results cache after saving each batch.
         Default is False.
     summary_func : func, optional
         A function to calculate summary statistics from the simulation
         results. Default is None.
-    bsl_cor : {"jones", "duecker"}, default="jones"
-        Baseline correction method. For neymotin_2020_model and law_2021_model, use
-        method 'jones' (manual correction). For duecker_ET_model, use method 'duecker'.
+    baseline_correction : bool, default=True
+        Whether to apply the ``Network``'s baseline correction method, which is
+        determined by ``Network._model_variant``.
 
     Notes
     -----
@@ -128,7 +132,7 @@ class BatchSimulate(object):
         postproc=False,
         clear_cache=False,
         summary_func=None,
-        bsl_cor="jones",
+        baseline_correction=True,
     ):
         _validate_type(net, Network, "net", "Network")
         _validate_type(tstop, types="numeric", item_name="tstop")
@@ -174,7 +178,7 @@ class BatchSimulate(object):
         self.clear_cache = clear_cache
         self.summary_func = summary_func
         self._verbose = True
-        self.bsl_cor = bsl_cor
+        self.baseline_correction = baseline_correction
 
     def run(
         self,
@@ -341,7 +345,7 @@ class BatchSimulate(object):
                 record_isec=self.record_isec,
                 postproc=self.postproc,
                 verbose=self._verbose,
-                bsl_cor=self.bsl_cor,
+                baseline_correction=self.baseline_correction,
             )
             results["dpl"] = dpl
 

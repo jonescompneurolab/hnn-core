@@ -487,6 +487,7 @@ class Network:
         self.gid_ranges = OrderedDict()
         self._n_gids = 0  # utility: keep track of last GID
         self._verbose = True
+        self._baseline_correction_applied = False
 
         # XXX this can be removed once tests are made independent of HNN GUI
         # creates nc_dict-entries for ALL cell types

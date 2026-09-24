@@ -642,3 +642,93 @@ def test_cobyla_best():
         f"opt_params_ should equal params from the best objective call "
         f"(call index {best_call_idx}), not the final iterate"
     )
+
+
+@pytest.mark.parametrize("baseline_correction", [True, False])
+def test_optimize_options_baseline_correction(baseline_correction):
+    """Smoke test to make sure that optimization works with baseline_correction options.."""
+
+    max_iter = 2
+    tstop = 10.0
+    n_trials = 1
+
+    # simulate a dipole to establish ground-truth drive parameters
+    net_orig = neymotin_2020_model(mesh_shape=(3, 3))
+
+    mu_orig = 2.0
+    weights_ampa = {
+        "L2_basket": 0.5,
+        "L2_pyramidal": 0.5,
+        "L5_basket": 0.5,
+        "L5_pyramidal": 0.5,
+    }
+    synaptic_delays = {
+        "L2_basket": 0.1,
+        "L2_pyramidal": 0.1,
+        "L5_basket": 1.0,
+        "L5_pyramidal": 1.0,
+    }
+    net_orig.add_evoked_drive(
+        "evprox",
+        mu=mu_orig,
+        sigma=1,
+        numspikes=1,
+        location="proximal",
+        weights_ampa=weights_ampa,
+        synaptic_delays=synaptic_delays,
+    )
+    dpl_orig = simulate_dipole(net_orig, tstop=tstop, n_trials=n_trials)[0]
+
+    # define set_params function and constraints
+    net_offset = neymotin_2020_model(mesh_shape=(3, 3))
+
+    def set_params(net_offset, params):
+        weights_ampa = {
+            "L2_basket": 0.5,
+            "L2_pyramidal": 0.5,
+            "L5_basket": 0.5,
+            "L5_pyramidal": 0.5,
+        }
+        synaptic_delays = {
+            "L2_basket": 0.1,
+            "L2_pyramidal": 0.1,
+            "L5_basket": 1.0,
+            "L5_pyramidal": 1.0,
+        }
+        net_offset.add_evoked_drive(
+            "evprox",
+            mu=params["mu"],
+            sigma=params["sigma"],
+            numspikes=1,
+            location="proximal",
+            weights_ampa=weights_ampa,
+            synaptic_delays=synaptic_delays,
+        )
+
+    # define constraints
+    constraints = dict()
+    constraints.update({"mu": (1, 6), "sigma": (1, 3)})
+
+    optim = Optimizer(
+        net_offset,
+        tstop=tstop,
+        constraints=constraints,
+        set_params=set_params,
+        solver="cma",
+        obj_fun="dipole_corr",
+        max_iter=max_iter,
+    )
+
+    # test repr before fitting
+    assert "fit=False" in repr(optim), "optimizer is already fit"
+
+    optim.fit(
+        target=dpl_orig,
+        n_trials=3,
+        scale_factor=3000,
+        smooth_window_len=1,
+        baseline_correction=baseline_correction,
+    )
+
+    # test repr after fitting
+    assert "fit=True" in repr(optim), "optimizer was not fit"

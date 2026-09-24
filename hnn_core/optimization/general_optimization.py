@@ -219,8 +219,11 @@ class Optimizer:
             The dipole scale factor to use after every optimization iteration before
             data comparison. There is no scaling applied by default, so you must pass a
             value if you want any scaling.
-        baseline_correction : bool
-                If True, applies baseline correction to simulated dipole (depends on net._model_variant)
+        baseline_correction : bool, default=True
+            Whether to apply the baseline correction to the simulated dipole after every
+            optimization iteration (which correction is used depends on
+            ``Network._model_variant``). Defaults to True, applying the appropriate
+            correction.
         smooth_window_len : float, optional
             The smooth window length to use after every optimization iteration before
             data comparison. There is no smoothing applied by default, so you must pass

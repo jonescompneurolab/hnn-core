@@ -106,7 +106,10 @@ def _calculate_obj_fun(
         n_trials : int, default=1
             Number of trials to simulate and average.
         baseline_correction : bool
-                If True, applies baseline correction to simulated dipole (depends on net._model_variant)
+            Whether to apply the baseline correction to the simulated dipole after every
+            optimization iteration (which correction is used depends on
+            ``Network._model_variant``). Defaults to True, applying the appropriate
+            correction.
 
     best : dict, optional
         Dictionary with keys "obj" and "params" to store the best objective value and

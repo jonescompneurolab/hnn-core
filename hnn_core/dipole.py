@@ -16,6 +16,7 @@ from scipy.stats import pearsonr
 
 import hnn_core
 from .externals.mne import _check_option
+
 from .utils import _savgol_filter, smooth_waveform
 from .viz import plot_dipole, plot_psd, plot_tfr_morlet
 
@@ -37,36 +38,38 @@ def simulate_dipole(
     Parameters
     ----------
     net : Network object
-        The Network object specifying how cells are
-        connected.
+        The Network object specifying how cells are connected.
     tstop : float
         The simulation stop time (ms).
-    dt : float
+    dt : float, default=0.025
         The integration time step of h.CVode (ms)
-    n_trials : int | None
-        The number of trials to simulate. If None, the 'N_trials' value
-        of the ``params`` used to create ``net`` is used (must be >0)
-    record_vsec : 'all' | 'soma' | False
+    n_trials : int | None, default=None
+        The number of trials to simulate. If None (the default), the 'N_trials' value of
+        the ``params`` used to create ``net`` is used (must be >0)
+    record_vsec : 'all' | 'soma' | False, default=False
         Option to record voltages from all sections ('all'), or just
-        the soma ('soma'). Default: False.
-    record_isec : 'all' | 'soma' | False
+        the soma ('soma').
+    record_isec : 'all' | 'soma' | False, default=False
         Option to record synaptic currents from all sections ('all'), or just
-        the soma ('soma'). Default: False.
-    record_ca : 'all' | 'soma' | False
+        the soma ('soma').
+    record_ca : 'all' | 'soma' | False, default=False
         Option to record calcium concentration from all sections ('all'),
-        or just the soma ('soma'). Default: False.
-    postproc : bool
-        If True, smoothing (``dipole_smooth_win``) and scaling
-        (``dipole_scalefctr``) values are read from the parameter file, and
-        applied to the dipole objects before returning. Note that this setting
-        only affects the dipole waveforms, and not somatic voltages, possible
-        extracellular recordings etc. The preferred way is to use the
-        :meth:`~hnn_core.dipole.Dipole.smooth` and
-        :meth:`~hnn_core.dipole.Dipole.scale` methods instead. Default: False.
-    verbose : bool
-        If True, print build steps and simulation progress to console. Default: True.
-    baseline_correction : bool
-        If True, applies baseline correction to simulated dipole (depends on net._model_variant)
+        or just the soma ('soma').
+    postproc : bool, default=False
+        Deprecated. If True, smoothing (``dipole_smooth_win``) and scaling
+        (``dipole_scalefctr``) values are read from the ``Network``'s parameter file,
+        and applied to the dipole objects before returning (the default ``Network``
+        parameter file, `hnn_core/param/default.json`, uses a smoothing value of 30 ms
+        and a scaling factor of 3000). Note that this setting only affects the dipole
+        waveforms, and not somatic voltages, possible extracellular recordings etc. The
+        preferred way is to use the :meth:`~hnn_core.dipole.Dipole.smooth` and
+        :meth:`~hnn_core.dipole.Dipole.scale` methods instead.
+    verbose : bool, default=True
+        If True, print build steps and simulation progress to console.
+    baseline_correction : bool, default=True
+        Whether to apply the baseline correction after simulation (which correction is
+        used depends on ``Network._model_variant``). Defaults to True, applying the
+        appropriate correction.
 
     Returns
     -------
@@ -150,6 +153,9 @@ def simulate_dipole(
 def _read_dipole_txt(fname, extension=".txt"):
     """Read dipole values from a txt file and create a Dipole instance.
 
+    All Dipoles read this way are assumed to be of the "neymotin_2020_model" variant
+    type, and not the "duecker_ET_model" variant type.
+
     Parameters
     ----------
     fname : str or io.StringIO
@@ -176,6 +182,9 @@ def _read_dipole_txt(fname, extension=".txt"):
 
 def _read_dipole_hdf5(fname):
     """Read dipole values from a hdf5 file and create a Dipole instance.
+
+    All Dipoles read this way are assumed to be of the "neymotin_2020_model" variant
+    type, and not the "duecker_ET_model" variant type.
 
     Parameters
     ----------
@@ -357,10 +366,6 @@ def _rmse(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
     return np.sqrt((weights * ((dpl1 - dpl2) ** 2)).sum() / weights.sum())
 
 
-def exp_decay(t, A, C, b):
-    return ((C - A) * np.exp(-b * (t))) + A
-
-
 def _anticorr(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
     """Calculates Anticorrelation (1 - corr) between data in dpl and exp_dpl
 
@@ -375,9 +380,9 @@ def _anticorr(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
     tstop : None | float
         Time at end of range over which to calculate Anticorrelation
     weights : None | array
-        An array of weights to be applied to each point in
-        simulated dpl. Must have length >= dpl.data . If None, weights will be replaced with 1's for typical Anticorrelation
-        calculation.
+        An array of weights to be applied to each point in simulated dpl. Must have
+        length >= dpl.data . If None, weights will be replaced with 1's for typical
+        Anticorrelation calculation.
 
     Returns
     -------
@@ -471,6 +476,135 @@ def _rmse_corr(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
     return err if np.isfinite(err) else 1e6
 
 
+def _correct_baseline_dueckerET(dpl, N_pyr_x, N_pyr_y):
+    """Correct the baseline of the dipole based on the Duecker ET model.
+
+    Due to the unequal distribution of particular ion channels across the L2 and L5
+    pyramidal cells, the dipole moment's zero point needs to be corrected. This function
+    applies a correction based on the the results from Duecker model simulations without
+    external drives.
+
+    This assumes the dipole is currently in units of fAm. After this function is run,
+    the dipole is expected to be converted to units of nAm using
+    `Dipole._convert_fAm_to_nAm`.
+
+    This should be called via `Dipole._correct_baseline(N_pyr_x, N_pyr_y)`, not
+    independently. `Dipole` will use the correct version of the function based on
+    `Network._model_variant`.
+
+    Parameters
+    ----------
+    dpl : Dipole
+        The instance of Dipole class
+    N_pyr_x : int
+        Number of cells in the network along the x-axis (assuming a grid)
+    N_pyr_y : int
+        Number of cells in the network along the y-axis (assuming a grid)
+    """
+
+    # exponential decay function
+    def _exp_decay(t, A, C, b):
+        return ((C - A) * np.exp(-b * t)) + A
+
+    hnn_core_root = Path(hnn_core.__file__).parent
+    # load the baseline dipole
+    with open(hnn_core_root / "param" / "bsl_corr_duecker_ET.json", "r") as f:
+        bsl_dpl = json.load(f)
+
+    scale = N_pyr_x * N_pyr_y / bsl_dpl["N_pyr_ref"]
+
+    A_L2 = bsl_dpl["L2"][-1] * scale
+    A_L5 = bsl_dpl["L5"][-1] * scale
+
+    C_L2 = bsl_dpl["L2"][1] * scale
+    C_L5 = bsl_dpl["L5"][1] * scale
+
+    exp_fit_l2 = _exp_decay(np.array(dpl.times[1:]), A_L2, C_L2, bsl_dpl["popt_l2"][0])
+    exp_fit_l5 = _exp_decay(np.array(dpl.times[1:]), A_L5, C_L5, bsl_dpl["popt_l5"][0])
+
+    dpl.data["L2"][1:] -= exp_fit_l2
+    dpl.data["L5"][1:] -= exp_fit_l5
+
+    dpl.data["agg"] = dpl.data["L2"] + dpl.data["L5"]
+
+    return dpl
+
+
+def _correct_baseline_neymotin2020(dpl, N_pyr_x, N_pyr_y):
+    """Correct the baseline of the dipole based on the Neymotin 2020 model.
+
+    Due to the unequal distribution of particular ion channels across the L2 and L5
+    pyramidal cells, the dipole moment's zero point needs to be corrected. This function
+    applies a correction based on the Jones 2009 [1]_ and Neymotin 2020 [2]_ models.
+
+    This assumes the dipole is currently in units of fAm. After this function is run,
+    the dipole is expected to be converted to units of nAm using
+    `Dipole._convert_fAm_to_nAm`.
+
+    This should be called via `Dipole._correct_baseline(N_pyr_x, N_pyr_y)`, not
+    independently. `Dipole` will use the correct version of the function based on
+    `Network._model_variant`.
+
+    .. [1] Jones, Stephanie R., et al. "Quantitative Analysis and
+           Biophysically Realistic Neural Modeling of the MEG Mu Rhythm:
+           Rhythmogenesis and Modulation of Sensory-Evoked Responses."
+           Journal of Neurophysiology 102, 3554–3572 (2009).
+           https://doi.org/10.1152/jn.00535.2009
+
+    .. [2] Neymotin, Samuel A, et al. 2020. "Human Neocortical Neurosolver (HNN), a New
+           Software Tool for Interpreting the Cellular and Network Origin of Human
+           MEG/EEG Data." eLife 9 (January):e51214. https://doi.org/10.7554/eLife.51214
+
+    Parameters
+    ----------
+    dpl : Dipole
+        The instance of Dipole class
+    N_pyr_x : int
+        Number of cells in the network along the x-axis (assuming a grid)
+    N_pyr_y : int
+        Number of cells in the network along the y-axis (assuming a grid)
+    """
+    # N_pyr cells in grid. This is PER LAYER
+    N_pyr = N_pyr_x * N_pyr_y
+    # dipole offset calculation: increasing number of pyr
+    # cells (L2 and L5, simultaneously)
+    # with no inputs resulted in an aggregate dipole over the
+    # interval [50., 1000.] ms that
+    # eventually plateaus at -48 fAm. The range over this interval
+    # is something like 3 fAm
+    # so the resultant correction is here, per dipole
+    dpl_offset = {
+        # these values will be subtracted
+        "L2": N_pyr * 0.0443,
+        "L5": N_pyr * -49.0502,
+    }
+    # L2 dipole offset can be roughly baseline shifted over
+    # the entire range of t
+    dpl.data["L2"] -= dpl_offset["L2"]
+    # L5 dipole offset should be different for interval [50., 500.]
+    # and then it can be offset
+    # slope (m) and intercept (b) params for L5 dipole offset
+    # uncorrected for N_cells
+    # these values were fit over the range [37., 750.)
+    m = 3.4770508e-3
+    b = -51.231085
+    # these values were fit over the range [750., 5000]
+    t1 = 750.0
+    m1 = 1.01e-4
+    b1 = -48.412078
+    # piecewise normalization
+    dpl.data["L5"][dpl.times <= 37.0] -= dpl_offset["L5"]
+    dpl.data["L5"][(dpl.times > 37.0) & (dpl.times < t1)] -= N_pyr * (
+        m * dpl.times[(dpl.times > 37.0) & (dpl.times < t1)] + b
+    )
+    dpl.data["L5"][dpl.times >= t1] -= N_pyr * (m1 * dpl.times[dpl.times >= t1] + b1)
+    # recalculate the aggregate dipole based on the baseline
+    # normalized ones
+    dpl.data["agg"] = dpl.data["L2"] + dpl.data["L5"]
+
+    return dpl
+
+
 class Dipole(object):
     """Dipole class.
 
@@ -506,7 +640,16 @@ class Dipole(object):
         :meth:`~hnn_core.dipole.Dipole.scale`).
     """
 
-    def __init__(self, times, data, nave=1):  # noqa: D102
+    def __init__(self, times, data, nave=1, model_variant=None):  # noqa: D102
+        from .network_models import MODEL_VARIANT_MAPPING
+
+        if model_variant not in MODEL_VARIANT_MAPPING:
+            raise ValueError(
+                "model_variant must be one of "
+                f"{sorted(k for k in MODEL_VARIANT_MAPPING if k is not None)}, "
+                f"got {model_variant}"
+            )
+
         self.times = np.array(times)
 
         if isinstance(data, dict):
@@ -522,6 +665,22 @@ class Dipole(object):
         self.nave = nave
         self.sfreq = 1000.0 / (times[1] - times[0])  # NB assumes len > 1
         self.scale_applied = 1  # for visualisation
+        self._model_variant = model_variant
+        self._baseline_correction_applied = False
+
+    def _correct_baseline(self, N_pyr_x, N_pyr_y):
+        """Apply the baseline correction appropriate to this model variant.
+
+        Parameters
+        ----------
+        N_pyr_x : int
+            Nr of cells (x)
+        N_pyr_y : int
+            Nr of cells (y)
+        """
+        from .network_models import MODEL_VARIANT_MAPPING
+
+        return MODEL_VARIANT_MAPPING[self._model_variant](self, N_pyr_x, N_pyr_y)
 
     def copy(self):
         """Return a copy of the Dipole instance
@@ -551,7 +710,7 @@ class Dipole(object):
     def _convert_fAm_to_nAm(self):
         """The NEURON simulator output is in fAm, convert to nAm
 
-        NB! Must be run `after` :meth:`Dipole.baseline_renormalization`
+        NB! Must be run `after` :meth:`Dipole.correct_baseline`
         """
         for key in self.data.keys():
             self.data[key] *= 1e-6
@@ -904,96 +1063,3 @@ class Dipole(object):
                 "File extension should be either txt or hdf5, but "
                 f"the given extension is {file_extension}."
             )
-
-
-# model-specific baseline corrections
-
-
-# duecker_ET_model
-def _baseline_renormalize_dueckerET(dpl, N_pyr_x, N_pyr_y):
-    """Baseline correction based on Duecker model without drives"""
-
-    # exponential decay function
-    def _exp_decay(t, A, C, b):
-        return ((C - A) * np.exp(-b * (t))) + A
-
-    hnn_core_root = Path(hnn_core.__file__).parent
-    # load the baseline dipole
-    with open(hnn_core_root / "param" / "bsl_corr_duecker_ET.json", "r") as f:
-        bsl_dpl = json.load(f)
-
-    scale = N_pyr_x * N_pyr_y / bsl_dpl["N_pyr_ref"]
-
-    A_L2 = bsl_dpl["L2"][-1] * scale
-    A_L5 = bsl_dpl["L5"][-1] * scale
-
-    C_L2 = bsl_dpl["L2"][1] * scale
-    C_L5 = bsl_dpl["L5"][1] * scale
-
-    exp_fit_l2 = _exp_decay(np.array(dpl.times[1:]), A_L2, C_L2, bsl_dpl["popt_l2"][0])
-    exp_fit_l5 = _exp_decay(np.array(dpl.times[1:]), A_L5, C_L5, bsl_dpl["popt_l5"][0])
-
-    dpl.data["L2"][1:] -= exp_fit_l2
-    dpl.data["L5"][1:] -= exp_fit_l5
-
-    dpl.data["agg"] = dpl.data["L2"] + dpl.data["L5"]
-    dpl.baseline_applied = "duecker_ET_model"
-
-    return dpl
-
-
-# neymotin_2020_model
-def _baseline_renormalize_neymotin2020(dpl, N_pyr_x, N_pyr_y):
-    """Only baseline renormalize if the units are fAm.
-
-    Parameters
-    ----------
-    N_pyr_x : int
-        Nr of cells (x)
-    N_pyr_y : int
-        Nr of cells (y)
-    """
-    # N_pyr cells in grid. This is PER LAYER
-    N_pyr = N_pyr_x * N_pyr_y
-    # dipole offset calculation: increasing number of pyr
-    # cells (L2 and L5, simultaneously)
-    # with no inputs resulted in an aggregate dipole over the
-    # interval [50., 1000.] ms that
-    # eventually plateaus at -48 fAm. The range over this interval
-    # is something like 3 fAm
-    # so the resultant correction is here, per dipole
-    # dpl_offset = N_pyr * 50.207
-    dpl_offset = {
-        # these values will be subtracted
-        "L2": N_pyr * 0.0443,
-        "L5": N_pyr * -49.0502,
-        # 'L5': N_pyr * -48.3642,
-        # will be calculated next, this is a placeholder
-        # 'agg': None,
-    }
-    # L2 dipole offset can be roughly baseline shifted over
-    # the entire range of t
-    dpl.data["L2"] -= dpl_offset["L2"]
-    # L5 dipole offset should be different for interval [50., 500.]
-    # and then it can be offset
-    # slope (m) and intercept (b) params for L5 dipole offset
-    # uncorrected for N_cells
-    # these values were fit over the range [37., 750.)
-    m = 3.4770508e-3
-    b = -51.231085
-    # these values were fit over the range [750., 5000]
-    t1 = 750.0
-    m1 = 1.01e-4
-    b1 = -48.412078
-    # piecewise normalization
-    dpl.data["L5"][dpl.times <= 37.0] -= dpl_offset["L5"]
-    dpl.data["L5"][(dpl.times > 37.0) & (dpl.times < t1)] -= N_pyr * (
-        m * dpl.times[(dpl.times > 37.0) & (dpl.times < t1)] + b
-    )
-    dpl.data["L5"][dpl.times >= t1] -= N_pyr * (m1 * dpl.times[dpl.times >= t1] + b1)
-    # recalculate the aggregate dipole based on the baseline
-    # normalized ones
-    dpl.data["agg"] = dpl.data["L2"] + dpl.data["L5"]
-    dpl.baseline_applied = "neymotin_2020_model"
-
-    return dpl
