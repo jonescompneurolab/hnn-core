@@ -4,6 +4,7 @@ https://pytest.org/en/stable/example/simple.html#incremental-testing-test-steps
 """
 
 from typing import Dict, Tuple
+import copy
 import pytest
 import pickle
 
@@ -464,6 +465,87 @@ def fix_run_simulation():
         return dpls, net
 
     return _fix_run_simulation
+
+
+@pytest.fixture(scope="module")
+def _base_simulation_cached():
+    """Adds bursty drives and simulates once per network model and variation"""
+    cache = {}
+    # AMPA weights of the bursty drives for each variation
+    variation_weights_ampa = {
+        "yes_spikes": {"L2_pyramidal": 0.1, "L5_pyramidal": 1.0},
+        "no_spikes": {"L2_pyramidal": 5.4e-5, "L5_pyramidal": 5.4e-5},
+    }
+
+    def _get_simulation(net_model_name, net_model, variation):
+        key = (net_model_name, variation)
+        if key not in cache:
+            net = net_model(reduced=True)
+            # Account for Duecker name variations
+            inh_name = "basket" if "L2_basket" in net.cell_types else "inhibitory"
+            weights_ampa = variation_weights_ampa[variation]
+            syn_delays = {"L2_pyramidal": 0.1, "L5_pyramidal": 1.0}
+            net.add_bursty_drive(
+                "beta_prox",
+                tstart=0.0,
+                burst_rate=25,
+                burst_std=5,
+                numspikes=1,
+                spike_isi=0,
+                n_drive_cells=11,
+                location="proximal",
+                weights_ampa=weights_ampa,
+                synaptic_delays=syn_delays,
+                event_seed=14,
+            )
+
+            net.add_bursty_drive(
+                "beta_dist",
+                tstart=0.0,
+                burst_rate=25,
+                burst_std=5,
+                numspikes=1,
+                spike_isi=0,
+                n_drive_cells=11,
+                location="distal",
+                weights_ampa=weights_ampa,
+                synaptic_delays=syn_delays,
+                event_seed=14,
+            )
+            dpls = simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
+            cache[key] = (net, dpls, inh_name)
+        # Deepcopy so each caller gets its own net and dpls
+        return copy.deepcopy(cache[key])
+
+    return _get_simulation
+
+
+@pytest.fixture(
+    scope="function",
+    params=["fix_net_neymotin_2020", "fix_net_duecker_ET"],
+)
+def fix_use_cached_sim_yes_spikes(_base_simulation_cached, request):
+    """Copy of the cached simulation, for spike visualization tests"""
+    net_model_name = request.param
+    net_model = request.getfixturevalue(net_model_name)
+    net, dpls, inh_name = _base_simulation_cached(
+        net_model_name, net_model, variation="yes_spikes"
+    )
+    return net, dpls, inh_name
+
+
+@pytest.fixture(
+    scope="function",
+    params=["fix_net_neymotin_2020", "fix_net_duecker_ET"],
+)
+def fix_use_cached_sim_no_spikes(_base_simulation_cached, request):
+    """Copy of the cached simulation, for spike visualization tests"""
+    net_model_name = request.param
+    net_model = request.getfixturevalue(net_model_name)
+    net, dpls, inh_name = _base_simulation_cached(
+        net_model_name, net_model, variation="no_spikes"
+    )
+    return net, dpls, inh_name
 
 
 @pytest.fixture(scope="module")
