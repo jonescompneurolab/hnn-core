@@ -1,5 +1,5 @@
-import os.path as op
-import tempfile
+# import os.path as op
+# import tempfile
 
 import matplotlib
 from matplotlib import backend_bases
@@ -9,7 +9,7 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
-from hnn_core import read_spikes
+# from hnn_core import read_spikes
 from hnn_core.dipole import simulate_dipole
 from hnn_core.viz import (
     plot_cells,
