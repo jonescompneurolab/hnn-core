@@ -286,9 +286,6 @@ def _collect_drive_arrow_markers(net):
             continue
         event_time = dynamics["mu"]
 
-        if event_time is None:
-            continue
-
         key = (drive_name, round(float(event_time), 4))
         if key in seen:
             continue

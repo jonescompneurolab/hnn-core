@@ -1133,9 +1133,9 @@ def test_dipole_data_overlay(setup_gui):
     ax = gui.viz_manager.figs[figid].axes[1]
 
     # Check number of lines
-    # 2 trials, 1 average, 1 experimental data trace, plus 2 dashed vertical
-    # guides at evoked drive onsets (evprox1, evdist1) when overlay is on.
-    assert len(ax.lines) == 7
+    # 2 trials, 1 average, 1 experimental data trace, plus 3 dashed vertical
+    # guides at evoked drive onsets (evprox1, evdist1, evprox2) when overlay is on.
+    assert len(ax.lines) == 8
     assert len(ax.legend_.texts) == 2
     assert ax.legend_.texts[0]._text == "default: average"
     assert ax.legend_.texts[1]._text == "test_default"
