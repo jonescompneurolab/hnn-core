@@ -757,7 +757,11 @@ def plot_spikes_raster(
                 f"Got {cell_types}"
             )
     else:
-        cell_types = cell_response._cell_type_names
+        cell_types = (
+            cell_response._cell_type_names
+            if cell_response._cell_type_names
+            else unique_spike_types
+        )
 
     # validate gid_ranges argument
     _validate_type(gid_ranges, (dict, None), "gid_ranges", "dict")
@@ -895,6 +899,10 @@ def plot_spikes_raster(
         dipole_times = dpl[0].times
 
         # Scale dipole to fit the spike raster plot
+        if len(cell_type_gids) == 0:
+            raster_max = max(spike_gids)
+        else:
+            raster_max = max(cell_type_gids)
         raster_midpoint = round((raster_max / 2), 0)
         raster_quarterpoint = round((raster_max / 4), 0)
 
