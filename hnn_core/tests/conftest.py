@@ -201,7 +201,10 @@ def fix_net_duecker_ET():
             for name, positions in electrode_array.items():
                 net.add_electrode_array(name, positions)
 
-        return net
+        # Account for Duecker name variations
+        inh_name = "basket" if "L2_basket" in net.cell_types else "inhibitory"
+
+        return net, inh_name
 
     return _fix_net_duecker_ET
 
@@ -344,7 +347,10 @@ def fix_net_neymotin_2020():
             electrode_pos = [(1, 2, 3), (-1, -2, -3)]
             net.add_electrode_array("arr1", electrode_pos)
 
-        return net
+        # Account for Duecker name variations
+        inh_name = "basket" if "L2_basket" in net.cell_types else "inhibitory"
+
+        return net, inh_name
 
     return _fix_net_neymotin_2020
 
@@ -352,7 +358,7 @@ def fix_net_neymotin_2020():
 @pytest.fixture(scope="module")
 def fix_load_featureful_tmp_path(tmp_path_factory, fix_net_neymotin_2020):
     """Load the featureful reduced Neymotin 2020 network from the fixture."""
-    net = fix_net_neymotin_2020(featureful_reduced_network=True)
+    net, _ = fix_net_neymotin_2020(featureful_reduced_network=True)
     net_path = (
         tmp_path_factory.mktemp("network") / "neymotin_2020_featureful_reduced.json"
     )
@@ -387,7 +393,10 @@ def fix_net_calcium():
             for name, positions in electrode_array.items():
                 net.add_electrode_array(name, positions)
 
-        return net
+        # Account for Duecker name variations
+        inh_name = "basket" if "L2_basket" in net.cell_types else "inhibitory"
+
+        return net, inh_name
 
     return _fix_net_calcium
 
@@ -480,9 +489,7 @@ def _base_simulation_cached():
     def _get_simulation(net_model_name, net_model, variation):
         key = (net_model_name, variation)
         if key not in cache:
-            net = net_model(reduced=True)
-            # Account for Duecker name variations
-            inh_name = "basket" if "L2_basket" in net.cell_types else "inhibitory"
+            net, inh_name = net_model(reduced=True)
             weights_ampa = variation_weights_ampa[variation]
             syn_delays = {"L2_pyramidal": 0.1, "L5_pyramidal": 1.0}
             net.add_bursty_drive(

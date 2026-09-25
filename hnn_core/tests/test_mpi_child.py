@@ -82,7 +82,7 @@ def test_extract_data_length():
 
 def test_str_to_net(fix_net_neymotin_2020):
     """Test reading the network via a string"""
-    net = fix_net_neymotin_2020()
+    net, _ = fix_net_neymotin_2020()
 
     pickled_net = base64.b64encode(pickle.dumps(net))
 
@@ -117,7 +117,7 @@ def test_str_to_net(fix_net_neymotin_2020):
 def test_child_run(fix_net_model, request):
     """Test running the child process without MPI"""
     net_model = request.getfixturevalue(fix_net_model)
-    net_reduced = net_model(add_drives_from_params=True, reduced=True)
+    net_reduced, _ = net_model(add_drives_from_params=True, reduced=True)
     tstop, n_trials = 25, 2
     net_reduced._instantiate_drives(tstop=tstop, n_trials=n_trials)
 

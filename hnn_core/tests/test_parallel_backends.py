@@ -43,16 +43,12 @@ def _terminate_mpibackend(event, backend):
 
 
 @pytest.mark.parametrize(
-    "fix_net_model, inh_name",
-    [
-        ("fix_net_neymotin_2020", "basket"),
-        ("fix_net_duecker_ET", "inhibitory"),
-    ],
+    "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
 )
-def test_gid_assignment(fix_net_model, inh_name, request):
+def test_gid_assignment(fix_net_model, request):
     """Test that gids are assigned without overlap across ranks"""
     net_model = request.getfixturevalue(fix_net_model)
-    net = net_model()
+    net, inh_name = net_model()
     weights_ampa = {f"L2_{inh_name}": 1.0, "L2_pyramidal": 2.0, "L5_pyramidal": 3.0}
     syn_delays = {f"L2_{inh_name}": 0.1, "L2_pyramidal": 0.2, "L5_pyramidal": 0.3}
 
@@ -109,7 +105,7 @@ class TestParallelBackends:
     def test_run_default(self, fix_net_neymotin_2020, fix_run_simulation):
         """Test consistency between default backend simulation and master"""
         global dpls_reduced_default
-        net = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+        net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
         dpls_reduced_default, _ = fix_run_simulation(net, tstop=40, backend=None)
         # test consistency across all parallel backends for multiple trials
         assert_raises(
@@ -123,7 +119,7 @@ class TestParallelBackends:
         """Test consistency between joblib backend simulation with master"""
         global dpls_reduced_default, dpls_reduced_joblib
 
-        net = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+        net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
         dpls_reduced_joblib, _ = fix_run_simulation(
             net, tstop=40, backend="joblib", n_jobs=2
         )
@@ -167,7 +163,7 @@ class TestParallelBackends:
     def test_run_mpibackend(self, fix_net_neymotin_2020, fix_run_simulation):
         """Test running a MPIBackend on reduced model"""
         global dpls_reduced_default, dpls_reduced_mpi
-        net = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+        net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
         dpls_reduced_mpi, _ = fix_run_simulation(net, tstop=40, backend="mpi")
         for trial_idx in range(len(dpls_reduced_default)):
             # account for rounding error incured during MPI parallelization
@@ -182,7 +178,7 @@ class TestParallelBackends:
     @requires_psutil
     def test_terminate_mpibackend(self, fix_net_neymotin_2020):
         """Test terminating MPIBackend from thread"""
-        net = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+        net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
         with MPIBackend() as backend:
             event = Event()
             # start background thread that will kill all MPIBackends
@@ -312,7 +308,7 @@ class TestParallelBackends:
         fix_net_neymotin_2020,
     ):
         """Test running MPIBackend with oversubscribed number of procs"""
-        net = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+        net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
 
         n_procs = 2
         # Test that the network runs at all
@@ -329,7 +325,7 @@ class TestParallelBackends:
 
         # Possibly needed to prevent MPIBackend failures to exit processes
         del net
-        net = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+        net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
 
         with MPIBackend(
             n_procs=n_procs,
@@ -360,7 +356,7 @@ class TestParallelBackends:
 
         # Possibly needed to prevent MPIBackend failures to exit processes
         del net
-        net = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+        net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
 
         with MPIBackend(
             n_procs=n_procs,
@@ -389,7 +385,7 @@ class TestParallelBackends:
         dpl_master = loadtxt("dpl.txt")
 
         # TODO AES: CURRENTLY NEEDS LEGACY MODE
-        net = fix_net_neymotin_2020(legacy_mode=True, add_drives_from_params=True)
+        net, _ = fix_net_neymotin_2020(legacy_mode=True, add_drives_from_params=True)
         dpls, net = fix_run_simulation(net, tstop=170, backend=backend)
         dpl = dpls[0].smooth(30).scale(3000)
 
@@ -432,7 +428,7 @@ def test_mpi_failure(fix_net_neymotin_2020, fix_run_simulation):
     # this MPI parameter will cause a MPI job to fail
     environ["OMPI_MCA_btl"] = "self"
 
-    net = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+    net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
     with pytest.warns(UserWarning) as record:
         with io.StringIO() as buf, redirect_stdout(buf):
             with pytest.raises(RuntimeError, match="MPI simulation failed"):

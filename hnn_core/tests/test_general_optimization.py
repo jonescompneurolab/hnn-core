@@ -14,13 +14,9 @@ import pytest
 @pytest.mark.parametrize("solver", ["bayesian", "cobyla", "cma"])
 @pytest.mark.parametrize("obj_fun", ["dipole_corr", "dipole_rmse", "dipole_rmse_corr"])
 @pytest.mark.parametrize(
-    "fix_net_model, inh_name",
-    [
-        ("fix_net_neymotin_2020", "basket"),
-        ("fix_net_duecker_ET", "inhibitory"),
-    ],
+    "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
 )
-def test_optimize_evoked(solver, obj_fun, fix_net_model, inh_name, request):
+def test_optimize_evoked(solver, obj_fun, fix_net_model, request):
     """Test optimization routines for evoked drives in a reduced network."""
 
     max_iter = 2
@@ -29,7 +25,7 @@ def test_optimize_evoked(solver, obj_fun, fix_net_model, inh_name, request):
 
     # simulate a dipole to establish ground-truth drive parameters
     net_model = request.getfixturevalue(fix_net_model)
-    net_orig = net_model(reduced=True)
+    net_orig, inh_name = net_model(reduced=True)
 
     mu_orig = 2.0
     weights_ampa = {
@@ -56,7 +52,7 @@ def test_optimize_evoked(solver, obj_fun, fix_net_model, inh_name, request):
     dpl_orig = simulate_dipole(net_orig, tstop=tstop, n_trials=n_trials)[0]
 
     # define set_params function and constraints
-    net_offset = net_model(reduced=True)
+    net_offset, _ = net_model(reduced=True)
 
     def set_params(net_offset, params):
         weights_ampa = {
@@ -121,13 +117,9 @@ def test_optimize_evoked(solver, obj_fun, fix_net_model, inh_name, request):
 @pytest.mark.parametrize("solver", ["bayesian", "cobyla", "cma"])
 @pytest.mark.parametrize("relative_bandpower", [[1, 2], 0.5])
 @pytest.mark.parametrize(
-    "fix_net_model, inh_name",
-    [
-        ("fix_net_neymotin_2020", "basket"),
-        ("fix_net_duecker_ET", "inhibitory"),
-    ],
+    "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
 )
-def test_rhythmic(solver, relative_bandpower, fix_net_model, inh_name, request):
+def test_rhythmic(solver, relative_bandpower, fix_net_model, request):
     """Test optimization routines for rhythmic drives in a reduced network."""
 
     max_iter = 2
@@ -135,7 +127,7 @@ def test_rhythmic(solver, relative_bandpower, fix_net_model, inh_name, request):
 
     # simulate a dipole to establish ground-truth drive parameters
     net_model = request.getfixturevalue(fix_net_model)
-    net_offset = net_model(reduced=True)
+    net_offset, inh_name = net_model(reduced=True)
 
     # define set_params function and constraints
     def set_params(net_offset, params):
@@ -238,7 +230,7 @@ def test_initial_params(solver, fix_net_neymotin_2020):
     n_trials = 1
 
     # simulate a dipole to establish ground-truth drive parameters
-    net_orig = fix_net_neymotin_2020(reduced=True)
+    net_orig, _ = fix_net_neymotin_2020(reduced=True)
 
     mu_orig = 2.0
     sigma_orig = 1.0
@@ -266,7 +258,7 @@ def test_initial_params(solver, fix_net_neymotin_2020):
     dpl_orig = simulate_dipole(net_orig, tstop=tstop, n_trials=n_trials)[0]
 
     # define set_params function and constraints
-    net_offset = fix_net_neymotin_2020(reduced=True)
+    net_offset, _ = fix_net_neymotin_2020(reduced=True)
 
     def set_params(net_offset, params):
         weights_ampa = {
@@ -337,7 +329,7 @@ def test_initial_params_validation(
     """Test initial_params validation."""
 
     tstop = 10.0
-    net_offset = fix_net_neymotin_2020(reduced=True)
+    net_offset, _ = fix_net_neymotin_2020(reduced=True)
 
     def set_params(net_offset, params):
         weights_ampa = {
@@ -381,7 +373,7 @@ def test_initial_params_validation(
 
 def test_cma_validation(fix_net_neymotin_2020):
     """Test validation of CMA specific parameters"""
-    net = fix_net_neymotin_2020(reduced=True)
+    net, _ = fix_net_neymotin_2020(reduced=True)
     tstop = 10.0
     constraints = {"mu": (1, 10), "sigma": (1, 10)}
     solver = "cma"
@@ -450,14 +442,14 @@ def test_cma_seed(fix_net_neymotin_2020):
         )
 
     # Simulate a dipole to establish the target
-    net_target = fix_net_neymotin_2020(reduced=True)
+    net_target, _ = fix_net_neymotin_2020(reduced=True)
     params_target = {"mu": 2.0, "sigma": 1.0}
 
     set_params(net_target, params_target)
     dpl_target = simulate_dipole(net_target, tstop=tstop, dt=dt, n_trials=n_trials)[0]
 
     # define set_params function and constraints
-    net_opt = fix_net_neymotin_2020(reduced=True)
+    net_opt, _ = fix_net_neymotin_2020(reduced=True)
 
     # define constraints
     constraints = dict()
@@ -503,7 +495,7 @@ def test_custom_loss_fun(solver, fix_net_neymotin_2020):
     n_trials = 1
 
     # simulate a dipole to establish ground-truth drive parameters
-    net_orig = fix_net_neymotin_2020(reduced=True)
+    net_orig, _ = fix_net_neymotin_2020(reduced=True)
 
     mu_orig = 2.0
     weights_ampa = {
@@ -530,7 +522,7 @@ def test_custom_loss_fun(solver, fix_net_neymotin_2020):
     dpl_orig = simulate_dipole(net_orig, tstop=tstop, n_trials=n_trials)[0]
 
     # define set_params function and constraints
-    net_offset = fix_net_neymotin_2020(reduced=True)
+    net_offset, _ = fix_net_neymotin_2020(reduced=True)
 
     def set_params(net_offset, params):
         weights_ampa = {
@@ -602,7 +594,7 @@ def test_cobyla_best(fix_net_neymotin_2020):
     """
     max_iter = 5
     tstop = 10.0
-    net = fix_net_neymotin_2020(reduced=True)
+    net, _ = fix_net_neymotin_2020(reduced=True)
 
     def set_params(net, params):
         pass

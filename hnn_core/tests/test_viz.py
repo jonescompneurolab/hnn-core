@@ -575,16 +575,12 @@ def _fake_click(fig, ax, point, button=1):
 
 
 @pytest.mark.parametrize(
-    "fix_net_model, inh_name",
-    [
-        ("fix_net_neymotin_2020", "basket"),
-        ("fix_net_duecker_ET", "inhibitory"),
-    ],
+    "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
 )
-def test_network_visualization(fix_net_model, inh_name, request):
+def test_network_visualization(fix_net_model, request):
     """Test network visualisations."""
     net_model = request.getfixturevalue(fix_net_model)
-    net = net_model(reduced=True)
+    net, inh_name = net_model(reduced=True)
     plot_cells(net)
     ax = net.cell_types["L2_pyramidal"]["cell_object"].plot_morphology()
     assert len(ax.lines) == 8
@@ -683,16 +679,12 @@ def test_network_visualization(fix_net_model, inh_name, request):
 
 
 @pytest.mark.parametrize(
-    "fix_net_model, inh_name",
-    [
-        ("fix_net_neymotin_2020", "basket"),
-        ("fix_net_duecker_ET", "inhibitory"),
-    ],
+    "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
 )
-def test_drive_strength(fix_net_model, inh_name, request):
+def test_drive_strength(fix_net_model, request):
     """Adds empty external drives to check there strength across each cell types"""
     net_model = request.getfixturevalue(fix_net_model)
-    net = net_model(reduced=True)
+    net, inh_name = net_model(reduced=True)
 
     weights_ampa = {"L2_pyramidal": 0.0, "L5_pyramidal": 0.0, f"L2_{inh_name}": 0.0}
     synaptic_delays = {"L2_pyramidal": 0.0, "L5_pyramidal": 0.0, f"L2_{inh_name}": 0.0}
@@ -736,7 +728,7 @@ def test_drive_strength(fix_net_model, inh_name, request):
 
 def test_network_plotter_init(fix_net_neymotin_2020):
     """Test init keywords of NetworkPlotter class."""
-    net = fix_net_neymotin_2020(reduced=True)
+    net, _ = fix_net_neymotin_2020(reduced=True)
     # test NetworkPlotter class
     args = [
         "xlim",
@@ -763,7 +755,7 @@ def test_network_plotter_init(fix_net_neymotin_2020):
 
 def test_network_plotter_simulation(fix_net_neymotin_2020):
     """Test NetworkPlotter class simulation warnings."""
-    net = fix_net_neymotin_2020(reduced=True)
+    net, _ = fix_net_neymotin_2020(reduced=True)
     net_plot = NetworkPlotter(net)
     # Errors if vsec isn't recorded
     with pytest.raises(RuntimeError, match="Network must be simulated"):
@@ -780,7 +772,7 @@ def test_network_plotter_simulation(fix_net_neymotin_2020):
     with pytest.raises(RuntimeError, match="Network must be simulated"):
         net_plot.export_movie("demo.gif", dpi=200)
 
-    net = fix_net_neymotin_2020(reduced=True)
+    net, _ = fix_net_neymotin_2020(reduced=True)
     _ = simulate_dipole(net, dt=0.5, tstop=10, record_vsec="all", n_trials=2)
     net_plot = NetworkPlotter(net)
     # setter/getter test for time_idx and trial_idx
@@ -797,7 +789,7 @@ def test_network_plotter_simulation(fix_net_neymotin_2020):
 
 def test_network_plotter_setter(fix_net_neymotin_2020):
     """Test NetworkPlotter class setters and getters."""
-    net = fix_net_neymotin_2020(reduced=True)
+    net, _ = fix_net_neymotin_2020(reduced=True)
     net_plot = NetworkPlotter(net)
     # Type check errors
     args = [
@@ -846,7 +838,7 @@ def test_network_plotter_setter(fix_net_neymotin_2020):
 
 def test_network_plotter_export(tmp_path, fix_net_neymotin_2020):
     """Test NetworkPlotter class export methods."""
-    net = fix_net_neymotin_2020(reduced=True)
+    net, _ = fix_net_neymotin_2020(reduced=True)
     _ = simulate_dipole(net, dt=0.5, tstop=10, n_trials=1, record_vsec="all")
     net_plot = NetworkPlotter(net)
 

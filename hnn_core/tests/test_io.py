@@ -32,8 +32,8 @@ assets_path = Path(hnn_core_root, "tests", "assets")
 
 
 def test_eq(fix_net_neymotin_2020, fix_net_calcium):
-    net_neymotin = fix_net_neymotin_2020(featureful_reduced_network=True)
-    net_calcium = fix_net_calcium(add_drives_from_params=True, reduced=True)
+    net_neymotin, _ = fix_net_neymotin_2020(featureful_reduced_network=True)
+    net_calcium, _ = fix_net_calcium(add_drives_from_params=True, reduced=True)
 
     # Check eq of same network
     assert net_neymotin == net_neymotin
@@ -57,7 +57,7 @@ def test_eq(fix_net_neymotin_2020, fix_net_calcium):
 
 
 def test_eq_conn(fix_net_neymotin_2020):
-    net1 = fix_net_neymotin_2020(featureful_reduced_network=True)
+    net1, _ = fix_net_neymotin_2020(featureful_reduced_network=True)
 
     # Check a change in connectivity
     net1_clear_conn = net1.copy()
@@ -90,7 +90,7 @@ def test_eq_conn(fix_net_neymotin_2020):
 def test_write_configuration(tmp_path, fix_net_neymotin_2020):
     """Tests that a json file is written"""
 
-    net = fix_net_neymotin_2020(featureful_reduced_network=True)
+    net, _ = fix_net_neymotin_2020(featureful_reduced_network=True)
     simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
 
     # Check no file is already written
@@ -124,7 +124,7 @@ def test_write_configuration(tmp_path, fix_net_neymotin_2020):
 
 def test_cell_response_to_dict(fix_net_neymotin_2020):
     """Tests _cell_response_to_dict function"""
-    net = fix_net_neymotin_2020(featureful_reduced_network=True)
+    net, _ = fix_net_neymotin_2020(featureful_reduced_network=True)
 
     # When a simulation hasn't been run, return an empty dict
     result1 = _cell_response_to_dict(net, write_output=True)
@@ -143,7 +143,7 @@ def test_cell_response_to_dict(fix_net_neymotin_2020):
 
 def test_rec_array_to_dict(fix_net_neymotin_2020):
     """Tests _rec_array_to_dict function"""
-    net = fix_net_neymotin_2020(featureful_reduced_network=True)
+    net, _ = fix_net_neymotin_2020(featureful_reduced_network=True)
 
     # Check rec array times and voltages are in dict after simulation
     simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
@@ -173,7 +173,7 @@ def test_rec_array_to_dict(fix_net_neymotin_2020):
 
 def test_conn_to_dict(fix_net_neymotin_2020):
     """Tests _connectivity_to_list_of_dicts function"""
-    net = fix_net_neymotin_2020(featureful_reduced_network=True)
+    net, _ = fix_net_neymotin_2020(featureful_reduced_network=True)
 
     result = _conn_to_dict(net.connectivity[0])
     assert isinstance(result, dict)
@@ -201,7 +201,7 @@ def test_conn_to_dict(fix_net_neymotin_2020):
 
 def test_external_drive_to_dict(fix_net_neymotin_2020):
     """Tests _external_drive_to_dict function"""
-    net = fix_net_neymotin_2020(featureful_reduced_network=True)
+    net, _ = fix_net_neymotin_2020(featureful_reduced_network=True)
 
     simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
     first_key = list(net.external_drives.keys())[0]
@@ -246,7 +246,7 @@ def test_str_to_node():
 
 def test_order_drives(fix_net_neymotin_2020):
     """Reorders drive dict by ascending range order"""
-    net = fix_net_neymotin_2020(featureful_reduced_network=True)
+    net, _ = fix_net_neymotin_2020(featureful_reduced_network=True)
     drive_names = list(net.external_drives.keys())
     drive_names_alpha = sorted(drive_names)
     drives_reordered = {name: net.external_drives for name in drive_names_alpha}
@@ -270,7 +270,7 @@ def test_order_drives(fix_net_neymotin_2020):
 
 def test_read_configuration_json(fix_net_neymotin_2020, fix_load_featureful_tmp_path):
     """Read-in of a hierarchical JSON Network file"""
-    net_call = fix_net_neymotin_2020(featureful_reduced_network=True)
+    net_call, _ = fix_net_neymotin_2020(featureful_reduced_network=True)
     net_load = read_network_configuration(fix_load_featureful_tmp_path)
     assert net_call == net_load
 
@@ -388,7 +388,7 @@ def test_read_model_variant_cell_types(tmp_path):
 
 def test_network_serialization_metadata(fix_net_neymotin_2020, tmp_path):
     """Test saving and loading a network with the cell_metadata structure."""
-    net_original = fix_net_neymotin_2020(featureful_reduced_network=True)
+    net_original, _ = fix_net_neymotin_2020(featureful_reduced_network=True)
     net_original.add_evoked_drive(
         "evd1",
         mu=5,
