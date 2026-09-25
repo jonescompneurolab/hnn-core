@@ -19,8 +19,9 @@ def rerun_and_save_duecker_model(suffix="new", backend="mpi"):
 
     https://github.com/jonescompneurolab/hnn-tuning/blob/duecker_ET_model/new_model_HNN/ERP/handtune_new_syn.ipynb
 
-    then runs a single 170 ms simulation with the ``"duecker"`` baseline correction,
-    then writes the results to the current working directory depending on ``suffix``.
+    then runs a single 170 ms simulation with the Duecker baseline correction (see
+    ``simulate_dipole(..., baseline_correction=True)``) and then writes the results to
+    the current working directory depending on ``suffix``.
 
     If ``suffix="old"`` then this will OVERWRITE existing output data files that are
     used as the "ground truth" for tests involving whether a recent code change has
@@ -144,9 +145,9 @@ def rerun_and_save_duecker_model(suffix="new", backend="mpi"):
     # --------------------------------------------------------------------------------------
     if backend == "mpi":
         with MPIBackend(mpi_cmd="mpiexec"):
-            dpls = simulate_dipole(net, tstop=170.0, bsl_cor="duecker")
+            dpls = simulate_dipole(net, tstop=170.0, baseline_correction=True)
     elif backend == "joblib":
-        dpls = simulate_dipole(net, tstop=170.0, bsl_cor="duecker")
+        dpls = simulate_dipole(net, tstop=170.0, baseline_correction=True)
     else:
         raise ValueError(f"backend must be either 'mpi' or 'joblib', got '{backend}'")
 
