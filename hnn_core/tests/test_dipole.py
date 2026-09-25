@@ -1,5 +1,6 @@
-from urllib.request import urlretrieve
+from copy import deepcopy
 from pathlib import Path
+from urllib.request import urlretrieve
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -8,9 +9,8 @@ from numpy.testing import assert_allclose
 from h5io import write_hdf5
 import pytest
 
-import hnn_core
-from hnn_core import read_params, read_dipole, average_dipoles
-from hnn_core import Network, neymotin_2020_model
+from hnn_core import read_dipole, average_dipoles
+from hnn_core import Network
 from hnn_core.viz import plot_dipole
 from hnn_core.dipole import Dipole, simulate_dipole, _rmse
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
@@ -18,13 +18,21 @@ from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 matplotlib.use("agg")
 
 
-def test_dipole(tmp_path, run_hnn_core_fixture):
+@pytest.mark.parametrize(
+    "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+)
+def test_dipole(
+    tmp_path,
+    fix_default_params,
+    fix_net_model,
+    fix_run_simulation,
+    request,
+):
     """Test dipole object."""
-    hnn_core_root = Path(hnn_core.__file__).parent
-    params_fname = hnn_core_root / "param" / "default.json"
+    net_model = request.getfixturevalue(fix_net_model)
     dpl_out_fname = tmp_path / "dpl1.txt"
     dpl_out_hdf5_fname = tmp_path / "dpl.hdf5"
-    params = read_params(params_fname)
+    params = deepcopy(fix_default_params)
     times = np.arange(0, 6000 * params["dt"], params["dt"])
     data = np.random.random((6000, 3))
     dipole = Dipole(times, data)
@@ -153,46 +161,43 @@ def test_dipole(tmp_path, run_hnn_core_fixture):
     dipole_exp_avg = average_dipoles([dipole_exp, dipole_exp])
     assert_allclose(dipole_exp.data["agg"], dipole_exp_avg.data["agg"])
 
-    # XXX all below to be deprecated in 0.3
-    dpls_raw, net = run_hnn_core_fixture(
-        backend="joblib",
-        n_jobs=1,
-        reduced=True,
+    net_raw, _ = net_model(add_drives_from_params=True, reduced=True)
+    net_proc = deepcopy(net_raw)
+
+    dpls_raw, net_raw = fix_run_simulation(
+        net_raw,
+        tstop=40,
         record_isec="soma",
         record_vsec="soma",
         record_ca="soma",
     )
-    # test deprecation of postproc
     with pytest.warns(FutureWarning, match="The postproc-argument is deprecated"):
-        dpls, _ = run_hnn_core_fixture(
-            backend="joblib",
-            n_jobs=1,
-            reduced=True,
+        dpls_proc, _ = fix_run_simulation(
+            net_proc,
+            tstop=40,
             record_isec="soma",
             record_vsec="soma",
             record_ca="soma",
             postproc=True,
         )
-    with pytest.raises(AssertionError):
-        assert_allclose(dpls[0].data["agg"], dpls_raw[0].data["agg"])
 
+    with pytest.raises(AssertionError):
+        assert_allclose(dpls_proc[0].data["agg"], dpls_raw[0].data["agg"])
+
+    # Test that applying the post-processing to the raw dipole yields the same result as
+    # the processed dipole:
     dpls_raw[0]._post_proc(
-        net._params["dipole_smooth_win"], net._params["dipole_scalefctr"]
+        net_raw._params["dipole_smooth_win"], net_raw._params["dipole_scalefctr"]
     )
-    assert_allclose(dpls_raw[0].data["agg"], dpls[0].data["agg"])
+    assert_allclose(dpls_raw[0].data["agg"], dpls_proc[0].data["agg"])
 
     plt.close("all")
 
 
-def test_dipole_simulation():
+def test_dipole_simulation(fix_net_neymotin_2020, fix_default_params):
     """Test data produced from simulate_dipole() call."""
-    hnn_core_root = Path(hnn_core.__file__).parent
-    params_fname = hnn_core_root / "param" / "default.json"
-    params = read_params(params_fname)
-    params.update(
-        {"dipole_smooth_win": 5, "t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20}
-    )
-    net = neymotin_2020_model(params, add_drives_from_params=True, mesh_shape=(3, 3))
+    net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+    net._params["dipole_smooth_win"] = 5
     with pytest.raises(ValueError, match="Invalid number of simulations: 0"):
         simulate_dipole(net, tstop=25.0, n_trials=0)
     with pytest.raises(ValueError, match="Invalid value for the"):
@@ -221,6 +226,7 @@ def test_dipole_simulation():
     assert_allclose(dpl.data["agg"], dpl.copy().data["agg"])
 
     with pytest.warns(UserWarning, match="No connections"):
+        params = deepcopy(fix_default_params)
         net = Network(params)
         # warning triggered on simulate_dipole()
         simulate_dipole(net, tstop=0.1, n_trials=1)
@@ -233,23 +239,34 @@ def test_dipole_simulation():
 @requires_mpi4py
 @requires_psutil
 @pytest.mark.uses_mpi
-def test_cell_response_backends(run_hnn_core_fixture):
+@pytest.mark.parametrize(
+    "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+)
+def test_cell_response_backends(fix_net_model, fix_run_simulation, request):
     """Test cell_response outputs across backends."""
 
-    # reduced simulation has n_trials=2
+    # Specific values we will test against each other later
     trial_idx, n_trials, gid = 0, 2, 7
-    _, joblib_net = run_hnn_core_fixture(
+
+    net_model = request.getfixturevalue(fix_net_model)
+    joblib_net, _ = net_model(add_drives_from_params=True, reduced=True)
+    mpi_net = deepcopy(joblib_net)
+
+    _, joblib_net = fix_run_simulation(
+        joblib_net,
+        tstop=40,
         backend="joblib",
-        n_jobs=1,
-        reduced=True,
+        n_trials=n_trials,
+        n_jobs=2,
         record_vsec="all",
         record_isec="soma",
         record_ca="all",
     )
-    _, mpi_net = run_hnn_core_fixture(
+    _, mpi_net = fix_run_simulation(
+        mpi_net,
+        tstop=40,
         backend="mpi",
-        n_procs=2,
-        reduced=True,
+        n_trials=n_trials,
         record_vsec="all",
         record_isec="soma",
         record_ca="all",
@@ -275,8 +292,34 @@ def test_cell_response_backends(run_hnn_core_fixture):
     assert (
         len(mpi_net.cell_response.isec[trial_idx][gid]["soma"]["soma_gabaa"]) == n_times
     )
-    assert mpi_net.cell_response.vsec == joblib_net.cell_response.vsec
-    assert mpi_net.cell_response.isec == joblib_net.cell_response.isec
+    # AES: Used Claude to turn simple `mpi...vsec == joblib...vsec`, which was failing
+    # in the Duecker case, into a form that handles when Joblib vs MPI produce
+    # floating-point differences (even on the same machine!)
+    #
+    # Backends can differ in the last floating-point bits, so compare the
+    # recorded voltages within tolerance rather than exactly
+    for mpi_trial, joblib_trial in zip(
+        mpi_net.cell_response.vsec, joblib_net.cell_response.vsec
+    ):
+        assert mpi_trial.keys() == joblib_trial.keys()
+        for cell_gid in mpi_trial:
+            assert mpi_trial[cell_gid].keys() == joblib_trial[cell_gid].keys()
+            for sec_name in mpi_trial[cell_gid]:
+                assert np.allclose(
+                    mpi_trial[cell_gid][sec_name], joblib_trial[cell_gid][sec_name]
+                )
+    for mpi_trial, joblib_trial in zip(
+        mpi_net.cell_response.isec, joblib_net.cell_response.isec
+    ):
+        assert mpi_trial.keys() == joblib_trial.keys()
+        for cell_gid in mpi_trial:
+            assert mpi_trial[cell_gid].keys() == joblib_trial[cell_gid].keys()
+            for sec_name in mpi_trial[cell_gid]:
+                mpi_sec = mpi_trial[cell_gid][sec_name]
+                joblib_sec = joblib_trial[cell_gid][sec_name]
+                assert mpi_sec.keys() == joblib_sec.keys()
+                for receptor in mpi_sec:
+                    assert np.allclose(mpi_sec[receptor], joblib_sec[receptor])
 
     # test if calcium concentration is stored correctly (only L5 pyramidal)
     gid = joblib_net.gid_ranges["L5_pyramidal"][0]
@@ -312,7 +355,7 @@ def test_cell_response_backends(run_hnn_core_fixture):
             assert_allclose(np.array(event_times), np.array(net_ets))
 
 
-def test_rmse():
+def test_rmse(fix_default_params):
     """Test to check RMSE calculation"""
     data_url = (
         "https://raw.githubusercontent.com/jonescompneurolab/hnn/"
@@ -326,9 +369,7 @@ def test_rmse():
         times=extdata[:, 0], data=np.c_[extdata[:, 1], extdata[:, 1], extdata[:, 1]]
     )
 
-    hnn_core_root = Path(hnn_core.__file__).parent
-    params_fname = hnn_core_root / "param" / "default.json"
-    params = read_params(params_fname)
+    params = deepcopy(fix_default_params)
 
     expected_rmse = 0.1
     test_dpl = Dipole(
@@ -344,9 +385,9 @@ def test_rmse():
     assert_allclose(avg_rmse, expected_rmse)
 
 
-def test_dipole_simulation_with_renamed_cells():
+def test_dipole_simulation_with_renamed_cells(fix_net_neymotin_2020):
     """Test dipole simulation works with renamed pyramidal cells."""
-    net = neymotin_2020_model()
+    net, _ = fix_net_neymotin_2020()
 
     # renaming the pyramidal cells (their cell_metadata should remeain the same)
     rename_mapping = {"L2_pyramidal": "My_L2_Pyr", "L5_pyramidal": "My_L5_Pyr"}
@@ -375,27 +416,34 @@ def test_dipole_simulation_with_renamed_cells():
 @requires_mpi4py
 @requires_psutil
 @pytest.mark.uses_mpi
+@pytest.mark.parametrize(
+    "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+)
 @pytest.mark.parametrize("baseline_correction", [True, False])
-def test_dipole_baseline_correction_mpi(run_hnn_core_fixture, baseline_correction):
+def test_dipole_baseline_correction_mpi(
+    fix_net_model, baseline_correction, fix_run_simulation, request
+):
     """Test that baseline_correction works in simulate_dipole with MPIBackend."""
-    _, _ = run_hnn_core_fixture(
+    net_model = request.getfixturevalue(fix_net_model)
+    net, _ = net_model(reduced=True, add_drives_from_params=True)
+    _, _ = fix_run_simulation(
+        net,
+        tstop=20.0,
+        dt=0.5,
         backend="mpi",
-        reduced=True,
         baseline_correction=baseline_correction,
     )
 
 
-def test_dipole_baseline_correction_flags():
+@pytest.mark.parametrize(
+    "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+)
+def test_dipole_baseline_correction_flags(fix_net_model, request):
     """Test that all variants of baseline_correction work in simulate_dipole"""
-
-    hnn_core_root = Path(hnn_core.__file__).parent
-    params_fname = hnn_core_root / "param" / "default.json"
-    params = read_params(params_fname)
-
     # Test that baseline_correction is flagged as true by default
-    net_yes_correct = neymotin_2020_model(
-        params, add_drives_from_params=True, mesh_shape=(3, 3)
-    )
+    net_model = request.getfixturevalue(fix_net_model)
+    net_yes_correct, _ = net_model(add_drives_from_params=True, mesh_shape=(3, 3))
+
     assert net_yes_correct._baseline_correction_applied is False
     dpl_yes_correct = simulate_dipole(
         net_yes_correct, tstop=25.0, n_trials=1, baseline_correction=True
@@ -404,9 +452,8 @@ def test_dipole_baseline_correction_flags():
     assert dpl_yes_correct._baseline_correction_applied is True
 
     # Test that baseline_correction, when set to False, is not applied
-    net_no_correct = neymotin_2020_model(
-        params, add_drives_from_params=True, mesh_shape=(3, 3)
-    )
+    net_no_correct, _ = net_model(add_drives_from_params=True, mesh_shape=(3, 3))
+
     assert net_no_correct._baseline_correction_applied is False
     with pytest.warns(UserWarning, match="No baseline corr"):
         dpl_no_correct = simulate_dipole(

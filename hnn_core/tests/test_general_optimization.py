@@ -3,7 +3,7 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
-from hnn_core import neymotin_2020_model, simulate_dipole
+from hnn_core import simulate_dipole
 from hnn_core.dipole import _rmse
 from hnn_core.optimization import Optimizer
 
@@ -13,7 +13,10 @@ import pytest
 
 @pytest.mark.parametrize("solver", ["bayesian", "cobyla", "cma"])
 @pytest.mark.parametrize("obj_fun", ["dipole_corr", "dipole_rmse", "dipole_rmse_corr"])
-def test_optimize_evoked(solver, obj_fun):
+@pytest.mark.parametrize(
+    "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+)
+def test_optimize_evoked(solver, obj_fun, fix_net_model, request):
     """Test optimization routines for evoked drives in a reduced network."""
 
     max_iter = 2
@@ -21,19 +24,20 @@ def test_optimize_evoked(solver, obj_fun):
     n_trials = 1
 
     # simulate a dipole to establish ground-truth drive parameters
-    net_orig = neymotin_2020_model(mesh_shape=(3, 3))
+    net_model = request.getfixturevalue(fix_net_model)
+    net_orig, inh_name = net_model(reduced=True)
 
     mu_orig = 2.0
     weights_ampa = {
-        "L2_basket": 0.5,
+        f"L2_{inh_name}": 0.5,
         "L2_pyramidal": 0.5,
-        "L5_basket": 0.5,
+        f"L5_{inh_name}": 0.5,
         "L5_pyramidal": 0.5,
     }
     synaptic_delays = {
-        "L2_basket": 0.1,
+        f"L2_{inh_name}": 0.1,
         "L2_pyramidal": 0.1,
-        "L5_basket": 1.0,
+        f"L5_{inh_name}": 1.0,
         "L5_pyramidal": 1.0,
     }
     net_orig.add_evoked_drive(
@@ -48,19 +52,19 @@ def test_optimize_evoked(solver, obj_fun):
     dpl_orig = simulate_dipole(net_orig, tstop=tstop, n_trials=n_trials)[0]
 
     # define set_params function and constraints
-    net_offset = neymotin_2020_model(mesh_shape=(3, 3))
+    net_offset, _ = net_model(reduced=True)
 
     def set_params(net_offset, params):
         weights_ampa = {
-            "L2_basket": 0.5,
+            f"L2_{inh_name}": 0.5,
             "L2_pyramidal": 0.5,
-            "L5_basket": 0.5,
+            f"L5_{inh_name}": 0.5,
             "L5_pyramidal": 0.5,
         }
         synaptic_delays = {
-            "L2_basket": 0.1,
+            f"L2_{inh_name}": 0.1,
             "L2_pyramidal": 0.1,
-            "L5_basket": 1.0,
+            f"L5_{inh_name}": 1.0,
             "L5_pyramidal": 1.0,
         }
         net_offset.add_evoked_drive(
@@ -112,14 +116,18 @@ def test_optimize_evoked(solver, obj_fun):
 
 @pytest.mark.parametrize("solver", ["bayesian", "cobyla", "cma"])
 @pytest.mark.parametrize("relative_bandpower", [[1, 2], 0.5])
-def test_rhythmic(solver, relative_bandpower):
+@pytest.mark.parametrize(
+    "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+)
+def test_rhythmic(solver, relative_bandpower, fix_net_model, request):
     """Test optimization routines for rhythmic drives in a reduced network."""
 
     max_iter = 2
     tstop = 10.0
 
     # simulate a dipole to establish ground-truth drive parameters
-    net_offset = neymotin_2020_model(mesh_shape=(3, 3))
+    net_model = request.getfixturevalue(fix_net_model)
+    net_offset, inh_name = net_model(reduced=True)
 
     # define set_params function and constraints
     def set_params(net_offset, params):
@@ -214,7 +222,7 @@ def test_rhythmic(solver, relative_bandpower):
 
 
 @pytest.mark.parametrize("solver", ["bayesian", "cobyla", "cma"])
-def test_initial_params(solver):
+def test_initial_params(solver, fix_net_neymotin_2020):
     """Test optimization routines with user-defined initial parameters."""
 
     max_iter = 2
@@ -222,7 +230,7 @@ def test_initial_params(solver):
     n_trials = 1
 
     # simulate a dipole to establish ground-truth drive parameters
-    net_orig = neymotin_2020_model(mesh_shape=(3, 3))
+    net_orig, _ = fix_net_neymotin_2020(reduced=True)
 
     mu_orig = 2.0
     sigma_orig = 1.0
@@ -250,7 +258,7 @@ def test_initial_params(solver):
     dpl_orig = simulate_dipole(net_orig, tstop=tstop, n_trials=n_trials)[0]
 
     # define set_params function and constraints
-    net_offset = neymotin_2020_model(mesh_shape=(3, 3))
+    net_offset, _ = fix_net_neymotin_2020(reduced=True)
 
     def set_params(net_offset, params):
         weights_ampa = {
@@ -302,11 +310,11 @@ def test_initial_params(solver):
 
 
 @pytest.mark.parametrize("solver", ["bayesian", "cobyla", "cma"])
-def test_initial_params_ordering(solver):
+def test_initial_params_ordering(solver, fix_net_neymotin_2020):
     """Test that initial_params are reordered to match constraints."""
 
     tstop = 10.0
-    net_offset = neymotin_2020_model(mesh_shape=(3, 3))
+    net_offset, _ = fix_net_neymotin_2020(reduced=True)
 
     def set_params(net_offset, params):
         net_offset.add_evoked_drive(
@@ -367,11 +375,13 @@ def test_initial_params_ordering(solver):
         ({"mu": 11, "sigma": 5}, ValueError),
     ],
 )
-def test_initial_params_validation(solver, initial_params, error_type):
+def test_initial_params_validation(
+    solver, initial_params, error_type, fix_net_neymotin_2020
+):
     """Test initial_params validation."""
 
     tstop = 10.0
-    net_offset = neymotin_2020_model(mesh_shape=(3, 3))
+    net_offset, _ = fix_net_neymotin_2020(reduced=True)
 
     def set_params(net_offset, params):
         weights_ampa = {
@@ -413,9 +423,9 @@ def test_initial_params_validation(solver, initial_params, error_type):
         )
 
 
-def test_cma_validation():
+def test_cma_validation(fix_net_neymotin_2020):
     """Test validation of CMA specific parameters"""
-    net = neymotin_2020_model(mesh_shape=(3, 3))
+    net, _ = fix_net_neymotin_2020(reduced=True)
     tstop = 10.0
     constraints = {"mu": (1, 10), "sigma": (1, 10)}
     solver = "cma"
@@ -449,7 +459,7 @@ def test_cma_validation():
     optim.fit(target=dpl_target, sigma0=[1, 2])
 
 
-def test_cma_seed():
+def test_cma_seed(fix_net_neymotin_2020):
     """Test random seed control during CMA optimization"""
     # Define parameters for a very short optimization run
     max_iter = 3
@@ -484,14 +494,14 @@ def test_cma_seed():
         )
 
     # Simulate a dipole to establish the target
-    net_target = neymotin_2020_model(mesh_shape=(3, 3))
+    net_target, _ = fix_net_neymotin_2020(reduced=True)
     params_target = {"mu": 2.0, "sigma": 1.0}
 
     set_params(net_target, params_target)
     dpl_target = simulate_dipole(net_target, tstop=tstop, dt=dt, n_trials=n_trials)[0]
 
     # define set_params function and constraints
-    net_opt = neymotin_2020_model(mesh_shape=(3, 3))
+    net_opt, _ = fix_net_neymotin_2020(reduced=True)
 
     # define constraints
     constraints = dict()
@@ -529,7 +539,7 @@ def test_cma_seed():
 
 
 @pytest.mark.parametrize("solver", ["bayesian", "cma", "cobyla"])
-def test_custom_loss_fun(solver):
+def test_custom_loss_fun(solver, fix_net_neymotin_2020):
     """Test optimization routines with a user-defined loss function."""
 
     max_iter = 2
@@ -537,7 +547,7 @@ def test_custom_loss_fun(solver):
     n_trials = 1
 
     # simulate a dipole to establish ground-truth drive parameters
-    net_orig = neymotin_2020_model(mesh_shape=(3, 3))
+    net_orig, _ = fix_net_neymotin_2020(reduced=True)
 
     mu_orig = 2.0
     weights_ampa = {
@@ -564,7 +574,7 @@ def test_custom_loss_fun(solver):
     dpl_orig = simulate_dipole(net_orig, tstop=tstop, n_trials=n_trials)[0]
 
     # define set_params function and constraints
-    net_offset = neymotin_2020_model(mesh_shape=(3, 3))
+    net_offset, _ = fix_net_neymotin_2020(reduced=True)
 
     def set_params(net_offset, params):
         weights_ampa = {
@@ -625,7 +635,7 @@ def test_custom_loss_fun(solver):
         ), "Optimized parameter is not in user-defined range"
 
 
-def test_cobyla_best():
+def test_cobyla_best(fix_net_neymotin_2020):
     """Verify COBYLA optimizer returns the best-seen params, not the final iterate.
 
     COBYLA does not guarantee monotonic improvement — it can move away from the best
@@ -636,7 +646,7 @@ def test_cobyla_best():
     """
     max_iter = 5
     tstop = 10.0
-    net = neymotin_2020_model(mesh_shape=(3, 3))
+    net, _ = fix_net_neymotin_2020(reduced=True)
 
     def set_params(net, params):
         pass
@@ -696,8 +706,13 @@ def test_cobyla_best():
     )
 
 
+@pytest.mark.parametrize(
+    "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+)
 @pytest.mark.parametrize("baseline_correction", [True, False])
-def test_optimize_options_baseline_correction(baseline_correction):
+def test_optimize_options_baseline_correction(
+    fix_net_model, baseline_correction, request
+):
     """Smoke test to make sure that optimization works with baseline_correction options.."""
 
     max_iter = 2
@@ -705,19 +720,20 @@ def test_optimize_options_baseline_correction(baseline_correction):
     n_trials = 1
 
     # simulate a dipole to establish ground-truth drive parameters
-    net_orig = neymotin_2020_model(mesh_shape=(3, 3))
+    net_model = request.getfixturevalue(fix_net_model)
+    net_orig, inh_name = net_model(reduced=True)
 
     mu_orig = 2.0
     weights_ampa = {
-        "L2_basket": 0.5,
+        f"L2_{inh_name}": 0.5,
         "L2_pyramidal": 0.5,
-        "L5_basket": 0.5,
+        f"L5_{inh_name}": 0.5,
         "L5_pyramidal": 0.5,
     }
     synaptic_delays = {
-        "L2_basket": 0.1,
+        f"L2_{inh_name}": 0.1,
         "L2_pyramidal": 0.1,
-        "L5_basket": 1.0,
+        f"L5_{inh_name}": 1.0,
         "L5_pyramidal": 1.0,
     }
     net_orig.add_evoked_drive(
@@ -729,22 +745,22 @@ def test_optimize_options_baseline_correction(baseline_correction):
         weights_ampa=weights_ampa,
         synaptic_delays=synaptic_delays,
     )
-    dpl_orig = simulate_dipole(net_orig, tstop=tstop, n_trials=n_trials)[0]
+    dpl_orig = simulate_dipole(net_orig, tstop=tstop, dt=0.5, n_trials=n_trials)[0]
 
     # define set_params function and constraints
-    net_offset = neymotin_2020_model(mesh_shape=(3, 3))
+    net_offset, inh_name = net_model(reduced=True)
 
     def set_params(net_offset, params):
         weights_ampa = {
-            "L2_basket": 0.5,
+            f"L2_{inh_name}": 0.5,
             "L2_pyramidal": 0.5,
-            "L5_basket": 0.5,
+            f"L5_{inh_name}": 0.5,
             "L5_pyramidal": 0.5,
         }
         synaptic_delays = {
-            "L2_basket": 0.1,
+            f"L2_{inh_name}": 0.1,
             "L2_pyramidal": 0.1,
-            "L5_basket": 1.0,
+            f"L5_{inh_name}": 1.0,
             "L5_pyramidal": 1.0,
         }
         net_offset.add_evoked_drive(
@@ -780,6 +796,7 @@ def test_optimize_options_baseline_correction(baseline_correction):
         scale_factor=3000,
         smooth_window_len=1,
         baseline_correction=baseline_correction,
+        dt=0.5,
     )
 
     # test repr after fitting

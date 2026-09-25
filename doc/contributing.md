@@ -867,27 +867,20 @@ If you ever need to make scientific or technical changes to the default network
 2. Step 2: Run the following command from the top-level of the repository:
 
     ```
-    make regenerate-networks
+    make regenerate-network
     ```
 
-    This command runs two scripts, each of which rebuild one of the "hierarchical JSON"
-    network files used in HNN-Core. These two files are described below. Note that you do
-    **not** need to make manual changes to these files; running the above command is
-    sufficient. However, you **do** need to commit the new versions of these files. The
-    two files:
+    This command runs a script which rebuilds the "hierarchical JSON" Network file
+    located at `hnn_core/param/neymotin2020_base.json`. This is the base file used for
+    the GUI. This file has been built using the code in
+    `hnn_core/params.py::convert_to_json` by way of
+    `dev_scripts/regenerate_base_network.py`. Note that you do **not** need to make
+    manual changes to this file; running the above command is sufficient. However, you
+    **do** need to commit the updated version of this file.
 
-    A. `hnn_core/param/neymotin2020_base.json`: This is the base file used for the
-       GUI. This file has been built using the code in
-       `hnn_core/params.py::convert_to_json` by way of
-       `dev_scripts/regenerate_base_network.py`.
-
-    B. `hnn_core/test/assets/neymotin2020_3x3_drives.json`: This is the base file used for
-       many tests. This file has been built using the script in
-       `hnn_core/tests/regenerate_test_network.py`.
-
-3. Step 3: Once all the above versions of the network have been updated, make sure to
-   re-run all the tests using `make test`! If the new network files break tests, then
-   that breakage needs to be fixed before we can merge your updates.
+3. Step 3: Once you've updated the network using the command above, make sure to re-run
+   all the tests using `make test`! If the new network file breaks tests, then that
+   breakage needs to be fixed before we can merge your updates.
 
 ## Publishing new releases
 

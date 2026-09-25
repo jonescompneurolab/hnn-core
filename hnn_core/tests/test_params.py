@@ -1,25 +1,25 @@
 # Authors: Mainak Jas <mainakjas@gmail.com>
 #          Blake Caldwell <blake_caldwell@brown.edu>
 
+from copy import deepcopy
 import json
 from pathlib import Path
 from urllib.request import urlretrieve
 
 import pytest
 
+import hnn_core
 from hnn_core import read_params, Params, convert_to_json
 from hnn_core.hnn_io import read_network_configuration
 from hnn_core.network_models import neymotin_2020_model
 from hnn_core.params import remove_nulled_drives
 
+hnn_core_root = Path(hnn_core.__file__).parent
 
-hnn_core_root = Path(__file__).parents[1]
 
-
-def test_read_params():
+def test_read_params(fix_default_params):
     """Test reading of params object."""
-    params_fname = hnn_core_root / "param" / "default.json"
-    params = read_params(params_fname)
+    params = deepcopy(fix_default_params)
     # Smoke test that network loads params
     _ = neymotin_2020_model(params, add_drives_from_params=True, legacy_mode=False)
     _ = neymotin_2020_model(params, add_drives_from_params=True, legacy_mode=True)
