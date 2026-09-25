@@ -575,11 +575,7 @@ We provide multiple sources of documentation (including websites) for HNN:
    API documentation is *automatically generated* from the [NumPy-style
    docstrings](https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard)
    in our Python code by [`sphinx`](https://www.sphinx-doc.org/en/master/index.html),
-   which creates nice-looking webpages to display the docstrings. This also
-   automatically executes the scripts in our `examples` directory, subsequently and
-   automatically creating webpages for the scripts (including executed output) and
-   Jupyter notebooks for the scripts (not including executed output). We are currently
-   in the process of moving this notebook execution to the Textbook repo. You can build
+   which creates nice-looking webpages to display the docstrings. You can build
    a local version of the Developer Portal (including the Public API Documentation) for
    inspection by following [this section
    below](#building-developer-documentation-locally).
@@ -650,20 +646,11 @@ The Developer Portal website, including the Public API Documentation, can be bui
 Installation" section of our Installation Guide][]), which you already did if you used
 the above installation instructions.
 
-You can build a local version of the Developer Portal, **including execution of most
-`examples` scripts**, using the following command:
+You can build a local version of the Developer Portal using the following command:
 
 ```
 cd doc/  # Unnecessary if you're already in the "hnn-core/doc" directory
 make html
-```
-
-Alternatively, if you want to build the Developer Portal website locally **without
-executing** any `examples` scripts, use the command:
-
-```
-cd doc/  # Unnecessary if you're already in the "hnn-core/doc" directory
-make html-noplot
 ```
 
 Finally, to view the website, do:

@@ -310,6 +310,58 @@ def test_initial_params(solver, fix_net_neymotin_2020):
 
 
 @pytest.mark.parametrize("solver", ["bayesian", "cobyla", "cma"])
+def test_initial_params_ordering(solver, fix_net_neymotin_2020):
+    """Test that initial_params are reordered to match constraints."""
+
+    tstop = 10.0
+    net_offset, _ = fix_net_neymotin_2020(reduced=True)
+
+    def set_params(net_offset, params):
+        net_offset.add_evoked_drive(
+            "evprox",
+            mu=params["mu"],
+            sigma=params["sigma"],
+            numspikes=params["numspikes"],
+            location="proximal",
+            weights_ampa={
+                "L2_basket": 0.5,
+                "L2_pyramidal": 0.5,
+                "L5_basket": 0.5,
+                "L5_pyramidal": 0.5,
+            },
+            synaptic_delays={
+                "L2_basket": 0.1,
+                "L2_pyramidal": 0.1,
+                "L5_basket": 1.0,
+                "L5_pyramidal": 1.0,
+            },
+        )
+
+    constraints = {"mu": (1, 10), "sigma": (20, 30), "numspikes": (40, 50)}
+    # initial_params in a different order than constraints
+    initial_params = {"numspikes": 45, "mu": 5, "sigma": 25}
+
+    optim = Optimizer(
+        net_offset,
+        tstop=tstop,
+        constraints=constraints,
+        set_params=set_params,
+        solver=solver,
+        obj_fun="dipole_rmse",
+        max_iter=2,
+        initial_params=initial_params,
+    )
+
+    # test that keys in initial_params are re-ordered to match constraints
+    # this is possible because list(x.keys()) == list(y.keys()) cares about order
+    # whereas x.keys() == y.keys() doesn't
+    assert list(optim.initial_params.keys()) == list(optim.constraints.keys())
+    assert optim.initial_params["mu"] == 5
+    assert optim.initial_params["sigma"] == 25
+    assert optim.initial_params["numspikes"] == 45
+
+
+@pytest.mark.parametrize("solver", ["bayesian", "cobyla", "cma"])
 @pytest.mark.parametrize(
     "initial_params, error_type",
     [
@@ -652,3 +704,100 @@ def test_cobyla_best(fix_net_neymotin_2020):
         f"opt_params_ should equal params from the best objective call "
         f"(call index {best_call_idx}), not the final iterate"
     )
+
+
+@pytest.mark.parametrize(
+    "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+)
+@pytest.mark.parametrize("baseline_correction", [True, False])
+def test_optimize_options_baseline_correction(
+    fix_net_model, baseline_correction, request
+):
+    """Smoke test to make sure that optimization works with baseline_correction options.."""
+
+    max_iter = 2
+    tstop = 10.0
+    n_trials = 1
+
+    # simulate a dipole to establish ground-truth drive parameters
+    net_model = request.getfixturevalue(fix_net_model)
+    net_orig, inh_name = net_model(reduced=True)
+
+    mu_orig = 2.0
+    weights_ampa = {
+        f"L2_{inh_name}": 0.5,
+        "L2_pyramidal": 0.5,
+        f"L5_{inh_name}": 0.5,
+        "L5_pyramidal": 0.5,
+    }
+    synaptic_delays = {
+        f"L2_{inh_name}": 0.1,
+        "L2_pyramidal": 0.1,
+        f"L5_{inh_name}": 1.0,
+        "L5_pyramidal": 1.0,
+    }
+    net_orig.add_evoked_drive(
+        "evprox",
+        mu=mu_orig,
+        sigma=1,
+        numspikes=1,
+        location="proximal",
+        weights_ampa=weights_ampa,
+        synaptic_delays=synaptic_delays,
+    )
+    dpl_orig = simulate_dipole(net_orig, tstop=tstop, dt=0.5, n_trials=n_trials)[0]
+
+    # define set_params function and constraints
+    net_offset, inh_name = net_model(reduced=True)
+
+    def set_params(net_offset, params):
+        weights_ampa = {
+            f"L2_{inh_name}": 0.5,
+            "L2_pyramidal": 0.5,
+            f"L5_{inh_name}": 0.5,
+            "L5_pyramidal": 0.5,
+        }
+        synaptic_delays = {
+            f"L2_{inh_name}": 0.1,
+            "L2_pyramidal": 0.1,
+            f"L5_{inh_name}": 1.0,
+            "L5_pyramidal": 1.0,
+        }
+        net_offset.add_evoked_drive(
+            "evprox",
+            mu=params["mu"],
+            sigma=params["sigma"],
+            numspikes=1,
+            location="proximal",
+            weights_ampa=weights_ampa,
+            synaptic_delays=synaptic_delays,
+        )
+
+    # define constraints
+    constraints = dict()
+    constraints.update({"mu": (1, 6), "sigma": (1, 3)})
+
+    optim = Optimizer(
+        net_offset,
+        tstop=tstop,
+        constraints=constraints,
+        set_params=set_params,
+        solver="cma",
+        obj_fun="dipole_corr",
+        max_iter=max_iter,
+    )
+
+    # test repr before fitting
+    assert "fit=False" in repr(optim), "optimizer is already fit"
+
+    optim.fit(
+        target=dpl_orig,
+        n_trials=3,
+        scale_factor=3000,
+        smooth_window_len=1,
+        baseline_correction=baseline_correction,
+        dt=0.5,
+    )
+
+    # test repr after fitting
+    assert "fit=True" in repr(optim), "optimizer was not fit"

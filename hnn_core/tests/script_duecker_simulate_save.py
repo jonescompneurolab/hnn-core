@@ -13,9 +13,9 @@ from hnn_core.hnn_io import (
 def create_duecker_model_with_drives():
     """Create a Duecker ET model network model including 3 evoked drives.
 
-        Builds the Duecker ET network in a similar way to the ``handtune_new_syn.ipynb``
-        notebook in the ``duecker_ET_model`` branch of the ``hnn-tuning`` repository at
-        (as of approximately 2026-07-15):
+    Builds the Duecker ET network in a similar way to the ``handtune_new_syn.ipynb``
+    notebook in the ``duecker_ET_model`` branch of the ``hnn-tuning`` repository at
+    (as of approximately 2026-07-15):
 
     https://github.com/jonescompneurolab/hnn-tuning/blob/duecker_ET_model/new_model_HNN/ERP/handtune_new_syn.ipynb
 
@@ -153,9 +153,9 @@ def rerun_and_save_duecker_model(suffix="new", backend="mpi"):
     # Begin simulation
     if backend == "mpi":
         with MPIBackend(mpi_cmd="mpiexec"):
-            dpls = simulate_dipole(net, tstop=170.0, bsl_cor="duecker")
+            dpls = simulate_dipole(net, tstop=170.0, baseline_correction=True)
     elif backend == "joblib":
-        dpls = simulate_dipole(net, tstop=170.0, bsl_cor="duecker")
+        dpls = simulate_dipole(net, tstop=170.0, baseline_correction=True)
     else:
         raise ValueError(f"backend must be either 'mpi' or 'joblib', got '{backend}'")
 

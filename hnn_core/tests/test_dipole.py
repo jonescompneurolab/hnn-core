@@ -36,7 +36,7 @@ def test_dipole(
     times = np.arange(0, 6000 * params["dt"], params["dt"])
     data = np.random.random((6000, 3))
     dipole = Dipole(times, data)
-    dipole._baseline_renormalize(params["N_pyr_x"], params["N_pyr_y"])
+    dipole._correct_baseline(params["N_pyr_x"], params["N_pyr_y"])
     dipole._convert_fAm_to_nAm()
 
     # test smoothing and scaling
@@ -215,13 +215,6 @@ def test_dipole_simulation(fix_net_neymotin_2020, fix_default_params):
             record_isec=False,
             record_ca="abc",
         )
-    with pytest.raises(ValueError, match="'bsl_cor' must be"):
-        simulate_dipole(
-            net,
-            tstop=25.0,
-            bsl_cor="GIGAMUNGUS",
-        )
-
     # test Network.copy() returns 'bare' network after simulating
     dpl = simulate_dipole(net, tstop=25.0, n_trials=1)[0]
     assert net._dt == 0.025
@@ -423,16 +416,60 @@ def test_dipole_simulation_with_renamed_cells(fix_net_neymotin_2020):
 @requires_mpi4py
 @requires_psutil
 @pytest.mark.uses_mpi
-def test_dipole_bsl_cor(fix_net_neymotin_2020, fix_run_simulation):
-    """Test that all values of bsl_cor work in simulate_dipole"""
-    for backend in {"joblib", "mpi"}:
-        for bsl_cor in {"jones", "duecker"}:
-            net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
-            _, _ = fix_run_simulation(
-                net,
-                tstop=40,
-                n_jobs=2,
-                backend=backend,
-                bsl_cor=bsl_cor,
-            )
-            del net
+@pytest.mark.parametrize(
+    "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+)
+@pytest.mark.parametrize("baseline_correction", [True, False])
+def test_dipole_baseline_correction_mpi(
+    fix_net_model, baseline_correction, fix_run_simulation, request
+):
+    """Test that baseline_correction works in simulate_dipole with MPIBackend."""
+    net_model = request.getfixturevalue(fix_net_model)
+    net, _ = net_model(reduced=True, add_drives_from_params=True)
+    _, _ = fix_run_simulation(
+        net,
+        tstop=20.0,
+        dt=0.5,
+        backend="mpi",
+        baseline_correction=baseline_correction,
+    )
+
+
+@pytest.mark.parametrize(
+    "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+)
+def test_dipole_baseline_correction_flags(fix_net_model, request):
+    """Test that all variants of baseline_correction work in simulate_dipole"""
+    # Test that baseline_correction is flagged as true by default
+    net_model = request.getfixturevalue(fix_net_model)
+    net_yes_correct, _ = net_model(add_drives_from_params=True, mesh_shape=(3, 3))
+
+    assert net_yes_correct._baseline_correction_applied is False
+    dpl_yes_correct = simulate_dipole(
+        net_yes_correct, tstop=25.0, n_trials=1, baseline_correction=True
+    )[0]
+    assert net_yes_correct._baseline_correction_applied is True
+    assert dpl_yes_correct._baseline_correction_applied is True
+
+    # Test that baseline_correction, when set to False, is not applied
+    net_no_correct, _ = net_model(add_drives_from_params=True, mesh_shape=(3, 3))
+
+    assert net_no_correct._baseline_correction_applied is False
+    with pytest.warns(UserWarning, match="No baseline corr"):
+        dpl_no_correct = simulate_dipole(
+            net_no_correct, tstop=25.0, n_trials=1, baseline_correction=False
+        )[0]
+    assert net_no_correct._baseline_correction_applied is False
+    assert dpl_no_correct._baseline_correction_applied is False
+    assert not np.allclose(dpl_no_correct.data["agg"], dpl_yes_correct.data["agg"])
+
+    # Test that if a network has a SECOND simulation where the first had
+    # baseline_correction=True, but the second had baseline_correction=False, the second
+    # simulation will correctly not apply baseline correction.
+    with pytest.warns(UserWarning, match="No baseline corr"):
+        dpl_second_no_correct = simulate_dipole(
+            net_yes_correct, tstop=25.0, n_trials=1, baseline_correction=False
+        )[0]
+    assert net_yes_correct._baseline_correction_applied is False
+    assert dpl_second_no_correct._baseline_correction_applied is False
+    assert np.allclose(dpl_no_correct.data["agg"], dpl_second_no_correct.data["agg"])

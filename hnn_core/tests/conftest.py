@@ -482,7 +482,7 @@ def fix_run_simulation():
         record_ca=False,
         postproc=False,
         verbose=True,
-        bsl_cor=None,
+        baseline_correction=False,
         backend=None,
         n_procs=None,
         n_jobs=1,
@@ -499,7 +499,7 @@ def fix_run_simulation():
                     record_ca=record_ca,
                     postproc=postproc,
                     verbose=verbose,
-                    bsl_cor=bsl_cor,
+                    baseline_correction=baseline_correction,
                 )
         elif backend == "joblib":
             with JoblibBackend(n_jobs=n_jobs):
@@ -513,7 +513,7 @@ def fix_run_simulation():
                     record_ca=record_ca,
                     postproc=postproc,
                     verbose=verbose,
-                    bsl_cor=bsl_cor,
+                    baseline_correction=baseline_correction,
                 )
         else:
             dpls = simulate_dipole(
@@ -526,7 +526,7 @@ def fix_run_simulation():
                 record_ca=record_ca,
                 postproc=postproc,
                 verbose=verbose,
-                bsl_cor=bsl_cor,
+                baseline_correction=baseline_correction,
             )
 
         # check that the network object is picklable after the simulation
