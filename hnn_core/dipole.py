@@ -63,7 +63,7 @@ def simulate_dipole(
         and a scaling factor of 3000). Note that this setting only affects the dipole
         waveforms, and not somatic voltages, possible extracellular recordings etc. The
         preferred way is to use the :meth:`~hnn_core.dipole.Dipole.smooth` and
-        :meth:`~hnn_core.dipole.Dipole.scale` methods instead.
+        :meth:`~hnn_core.dipole.Dipole.scale` methods after the simulation is run instead.
     verbose : bool, default=True
         If True, print build steps and simulation progress to console.
     baseline_correction : bool, default=True

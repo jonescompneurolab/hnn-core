@@ -54,7 +54,7 @@ def _gather_trial_data(sim_data, net, n_trials, postproc, baseline_correction):
         and a scaling factor of 3000). Note that this setting only affects the dipole
         waveforms, and not somatic voltages, possible extracellular recordings etc. The
         preferred way is to use the :meth:`~hnn_core.dipole.Dipole.smooth` and
-        :meth:`~hnn_core.dipole.Dipole.scale` methods instead. In all preceding
+        :meth:`~hnn_core.dipole.Dipole.scale` methods after the simulation is run instead. In all preceding
         codepaths, this defaults to False.
     baseline_correction : bool
         Whether to apply the baseline correction after simulation (which correction is
@@ -705,7 +705,7 @@ class JoblibBackend(object):
             affects the dipole waveforms, and not somatic voltages, possible
             extracellular recordings etc. The preferred way is to use the
             :meth:`~hnn_core.dipole.Dipole.smooth` and
-            :meth:`~hnn_core.dipole.Dipole.scale` methods instead.
+            :meth:`~hnn_core.dipole.Dipole.scale` methods after the simulation is run instead.
         baseline_correction : bool, default=True
             Whether to apply the baseline correction after simulation (which correction
             is used depends on ``Network._model_variant``). Defaults to True, applying
@@ -1132,7 +1132,7 @@ class MPIBackend(object):
             affects the dipole waveforms, and not somatic voltages, possible
             extracellular recordings etc. The preferred way is to use the
             :meth:`~hnn_core.dipole.Dipole.smooth` and
-            :meth:`~hnn_core.dipole.Dipole.scale` methods instead.
+            :meth:`~hnn_core.dipole.Dipole.scale` methods after the simulation is run instead.
         baseline_correction : bool, default=True
             Whether to apply the baseline correction after simulation (which correction
             is used depends on ``Network._model_variant``). Defaults to True, applying

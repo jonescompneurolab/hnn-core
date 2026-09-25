@@ -88,7 +88,7 @@ class BatchSimulate(object):
         and a scaling factor of 3000). Note that this setting only affects the dipole
         waveforms, and not somatic voltages, possible extracellular recordings etc. The
         preferred way is to use the :meth:`~hnn_core.dipole.Dipole.smooth` and
-        :meth:`~hnn_core.dipole.Dipole.scale` methods instead.
+        :meth:`~hnn_core.dipole.Dipole.scale` methods after the simulation is run instead.
     clear_cache : bool, optional
         Whether to clear the results cache after saving each batch.
         Default is False.
