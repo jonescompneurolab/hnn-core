@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -26,32 +25,27 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c43d5962" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
 
     <script src="../../_static/documentation_options.js?v=debdd0a9"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script src="../../_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/hnn_core/params';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.22.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
@@ -122,7 +116,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -170,13 +164,6 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
-    Examples
-  </a>
-</li>
-
-
-<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../api.html">
     API
   </a>
@@ -210,6 +197,13 @@
   </a>
 </li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">
+    HNN Textbook
+  </a>
+</li>
+
             <li class="nav-item dropdown">
                 <button class="btn dropdown-toggle nav-item" type="button"
                 data-bs-toggle="dropdown" aria-expanded="false"
@@ -218,13 +212,6 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-<li class=" ">
-  <a class="nav-link dropdown-item nav-external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">
-    HNN Textbook
-  </a>
-</li>
-
-
 <li class=" ">
   <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
     PyPI package
@@ -252,7 +239,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -283,15 +270,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
     <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
     <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
     <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -302,7 +289,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -342,13 +329,6 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../install.html">
     Install (Textbook)
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
-    Examples
   </a>
 </li>
 
@@ -441,15 +421,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
     <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
     <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
     <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -513,7 +493,7 @@
                 <article class="bd-article">
                   
   <h1>Source code for hnn_core.params</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Handling of parameters.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""Handling of parameters."""</span>
 
 <span class="c1"># Authors: Mainak Jas &lt;mjas@mgh.harvard.edu&gt;</span>
 <span class="c1">#          Sam Neymotin &lt;samnemo@gmail.com&gt;</span>
@@ -523,8 +503,9 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">.params_default</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_params_default</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.externals.mne</span><span class="w"> </span><span class="kn">import</span> <span class="n">_validate_type</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.params_default</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_params_default</span>
 
 
 <span class="c1"># return number of evoked inputs (proximal, distal)</span>
@@ -533,16 +514,16 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">_count_evoked_inputs</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
     <span class="n">nprox</span> <span class="o">=</span> <span class="n">ndist</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;t_&quot;</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;evprox&quot;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"t_"</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">"evprox"</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">nprox</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">elif</span> <span class="n">k</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;evdist&quot;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">k</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">"evdist"</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">ndist</span> <span class="o">+=</span> <span class="mi">1</span>
     <span class="k">return</span> <span class="n">nprox</span><span class="p">,</span> <span class="n">ndist</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_read_json</span><span class="p">(</span><span class="n">param_data</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read param values from a .json file.</span>
+<span class="w">    </span><span class="sd">"""Read param values from a .json file.</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    param_data : str</span>
@@ -552,12 +533,12 @@
 <span class="sd">    -------</span>
 <span class="sd">    params_input : dict</span>
 <span class="sd">        Dictionary of parameters</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">param_data</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_read_legacy_params</span><span class="p">(</span><span class="n">param_data</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read param values from a .param file (legacy).</span>
+<span class="w">    </span><span class="sd">"""Read param values from a .param file (legacy).</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    param_data : str</span>
@@ -567,13 +548,13 @@
 <span class="sd">    -------</span>
 <span class="sd">    params_input : dict</span>
 <span class="sd">        Dictionary of parameters</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">params_input</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">param_data</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
-        <span class="n">split_line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+        <span class="n">split_line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">":"</span><span class="p">)</span>
         <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">field</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">split_line</span><span class="p">]</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s2">&quot;.&quot;</span> <span class="ow">in</span> <span class="n">value</span> <span class="ow">or</span> <span class="s2">&quot;e&quot;</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">"."</span> <span class="ow">in</span> <span class="n">value</span> <span class="ow">or</span> <span class="s2">"e"</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
                 <span class="n">params_input</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">params_input</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
@@ -586,7 +567,7 @@
 <div class="viewcode-block" id="read_params">
 <a class="viewcode-back" href="../../generated/hnn_core.read_params.html#hnn_core.read_params">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">read_params</span><span class="p">(</span><span class="n">params_fname</span><span class="p">,</span> <span class="n">file_contents</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read param values from a file (.json or .param).</span>
+<span class="w">    </span><span class="sd">"""Read param values from a file (.json or .param).</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -600,25 +581,25 @@
 <span class="sd">    -------</span>
 <span class="sd">    params : an instance of Params</span>
 <span class="sd">        Params containing parameter values from file</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">ext</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span>
 
-    <span class="k">if</span> <span class="n">ext</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;.json&quot;</span><span class="p">,</span> <span class="s2">&quot;.param&quot;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">ext</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">".json"</span><span class="p">,</span> <span class="s2">".param"</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Unrecognized extension, expected one of&quot;</span> <span class="o">+</span> <span class="s2">&quot; .json, .param. Got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">ext</span>
+            <span class="s2">"Unrecognized extension, expected one of"</span> <span class="o">+</span> <span class="s2">" .json, .param. Got </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">ext</span>
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">file_contents</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">params_fname</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">params_fname</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
             <span class="n">file_contents</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
-    <span class="n">read_func</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;.json&quot;</span><span class="p">:</span> <span class="n">_read_json</span><span class="p">,</span> <span class="s2">&quot;.param&quot;</span><span class="p">:</span> <span class="n">_read_legacy_params</span><span class="p">}</span>
+    <span class="n">read_func</span> <span class="o">=</span> <span class="p">{</span><span class="s2">".json"</span><span class="p">:</span> <span class="n">_read_json</span><span class="p">,</span> <span class="s2">".param"</span><span class="p">:</span> <span class="n">_read_legacy_params</span><span class="p">}</span>
     <span class="n">params_dict</span> <span class="o">=</span> <span class="n">read_func</span><span class="p">[</span><span class="n">ext</span><span class="p">](</span><span class="n">file_contents</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">params_dict</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Failed to read parameters from file: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">Path</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+            <span class="s2">"Failed to read parameters from file: </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">Path</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
         <span class="p">)</span>
 
     <span class="n">params</span> <span class="o">=</span> <span class="n">Params</span><span class="p">(</span><span class="n">params_dict</span><span class="p">)</span>
@@ -629,10 +610,10 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_long_name</span><span class="p">(</span><span class="n">short_name</span><span class="p">):</span>
     <span class="n">long_name</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-        <span class="n">L2Basket</span><span class="o">=</span><span class="s2">&quot;L2_basket&quot;</span><span class="p">,</span>
-        <span class="n">L5Basket</span><span class="o">=</span><span class="s2">&quot;L5_basket&quot;</span><span class="p">,</span>
-        <span class="n">L2Pyr</span><span class="o">=</span><span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">,</span>
-        <span class="n">L5Pyr</span><span class="o">=</span><span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">,</span>
+        <span class="n">L2Basket</span><span class="o">=</span><span class="s2">"L2_basket"</span><span class="p">,</span>
+        <span class="n">L5Basket</span><span class="o">=</span><span class="s2">"L5_basket"</span><span class="p">,</span>
+        <span class="n">L2Pyr</span><span class="o">=</span><span class="s2">"L2_pyramidal"</span><span class="p">,</span>
+        <span class="n">L5Pyr</span><span class="o">=</span><span class="s2">"L5_pyramidal"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">short_name</span> <span class="ow">in</span> <span class="n">long_name</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">long_name</span><span class="p">[</span><span class="n">short_name</span><span class="p">]</span>
@@ -641,10 +622,12 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_short_name</span><span class="p">(</span><span class="n">short_name</span><span class="p">):</span>
     <span class="n">long_name</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-        <span class="n">L2_basket</span><span class="o">=</span><span class="s2">&quot;L2Basket&quot;</span><span class="p">,</span>
-        <span class="n">L5_basket</span><span class="o">=</span><span class="s2">&quot;L5Basket&quot;</span><span class="p">,</span>
-        <span class="n">L2_pyramidal</span><span class="o">=</span><span class="s2">&quot;L2Pyr&quot;</span><span class="p">,</span>
-        <span class="n">L5_pyramidal</span><span class="o">=</span><span class="s2">&quot;L5Pyr&quot;</span><span class="p">,</span>
+        <span class="n">L2_basket</span><span class="o">=</span><span class="s2">"L2Basket"</span><span class="p">,</span>
+        <span class="n">L5_basket</span><span class="o">=</span><span class="s2">"L5Basket"</span><span class="p">,</span>
+        <span class="n">L2_pyramidal</span><span class="o">=</span><span class="s2">"L2Pyr"</span><span class="p">,</span>
+        <span class="n">L5_pyramidal</span><span class="o">=</span><span class="s2">"L5Pyr"</span><span class="p">,</span>
+        <span class="n">L2_inhibitory</span><span class="o">=</span><span class="s2">"L2Inh"</span><span class="p">,</span>
+        <span class="n">L5_inhibitory</span><span class="o">=</span><span class="s2">"L5Inh"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">short_name</span> <span class="ow">in</span> <span class="n">long_name</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">long_name</span><span class="p">[</span><span class="n">short_name</span><span class="p">]</span>
@@ -652,152 +635,152 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_extract_bias_specs_from_hnn_params</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">cellname_list</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create &#39;bias specification&#39; dicts from saved parameters&quot;&quot;&quot;</span>
-    <span class="n">bias_specs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;tonic&quot;</span><span class="p">:</span> <span class="p">{}}</span>  <span class="c1"># currently only &#39;tonic&#39; biases known</span>
+<span class="w">    </span><span class="sd">"""Create 'bias specification' dicts from saved parameters"""</span>
+    <span class="n">bias_specs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"tonic"</span><span class="p">:</span> <span class="p">{}}</span>  <span class="c1"># currently only 'tonic' biases known</span>
     <span class="k">for</span> <span class="n">cellname</span> <span class="ow">in</span> <span class="n">cellname_list</span><span class="p">:</span>
         <span class="n">short_name</span> <span class="o">=</span> <span class="n">_short_name</span><span class="p">(</span><span class="n">cellname</span><span class="p">)</span>
         <span class="n">is_tonic_present</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="sa">f</span><span class="s2">&quot;Itonic_</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">short_name</span><span class="si">}</span><span class="s2">_soma&quot;</span> <span class="ow">in</span> <span class="n">params</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;t0&quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">]</span>
+            <span class="sa">f</span><span class="s2">"Itonic_</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">short_name</span><span class="si">}</span><span class="s2">_soma"</span> <span class="ow">in</span> <span class="n">params</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"A"</span><span class="p">,</span> <span class="s2">"t0"</span><span class="p">,</span> <span class="s2">"T"</span><span class="p">]</span>
         <span class="p">]</span>
         <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">is_tonic_present</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">is_tonic_present</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Tonic input must have the amplitude, &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;start time and end time specified. One &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;or more parameter may be missing for &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;cell type </span><span class="si">{</span><span class="n">cellname</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">"Tonic input must have the amplitude, "</span>
+                    <span class="sa">f</span><span class="s2">"start time and end time specified. One "</span>
+                    <span class="sa">f</span><span class="s2">"or more parameter may be missing for "</span>
+                    <span class="sa">f</span><span class="s2">"cell type </span><span class="si">{</span><span class="n">cellname</span><span class="si">}</span><span class="s2">"</span>
                 <span class="p">)</span>
-            <span class="n">bias_specs</span><span class="p">[</span><span class="s2">&quot;tonic&quot;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;amplitude&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Itonic_A_</span><span class="si">{</span><span class="n">short_name</span><span class="si">}</span><span class="s2">_soma&quot;</span><span class="p">],</span>
-                <span class="s2">&quot;t0&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Itonic_t0_</span><span class="si">{</span><span class="n">short_name</span><span class="si">}</span><span class="s2">_soma&quot;</span><span class="p">],</span>
-                <span class="s2">&quot;tstop&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Itonic_T_</span><span class="si">{</span><span class="n">short_name</span><span class="si">}</span><span class="s2">_soma&quot;</span><span class="p">],</span>
+            <span class="n">bias_specs</span><span class="p">[</span><span class="s2">"tonic"</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">"amplitude"</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="sa">f</span><span class="s2">"Itonic_A_</span><span class="si">{</span><span class="n">short_name</span><span class="si">}</span><span class="s2">_soma"</span><span class="p">],</span>
+                <span class="s2">"t0"</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="sa">f</span><span class="s2">"Itonic_t0_</span><span class="si">{</span><span class="n">short_name</span><span class="si">}</span><span class="s2">_soma"</span><span class="p">],</span>
+                <span class="s2">"tstop"</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="sa">f</span><span class="s2">"Itonic_T_</span><span class="si">{</span><span class="n">short_name</span><span class="si">}</span><span class="s2">_soma"</span><span class="p">],</span>
             <span class="p">}</span>
     <span class="k">return</span> <span class="n">bias_specs</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_extract_drive_specs_from_hnn_params</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">cellname_list</span><span class="p">,</span> <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create &#39;drive specification&#39; dicts from saved parameters&quot;&quot;&quot;</span>
-    <span class="c1"># convert legacy params-dict to legacy &quot;feeds&quot; dicts</span>
-    <span class="n">p_common</span><span class="p">,</span> <span class="n">p_unique</span> <span class="o">=</span> <span class="n">create_pext</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;tstop&quot;</span><span class="p">])</span>
+<span class="w">    </span><span class="sd">"""Create 'drive specification' dicts from saved parameters"""</span>
+    <span class="c1"># convert legacy params-dict to legacy "feeds" dicts</span>
+    <span class="n">p_common</span><span class="p">,</span> <span class="n">p_unique</span> <span class="o">=</span> <span class="n">create_pext</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="s2">"tstop"</span><span class="p">])</span>
 
-    <span class="c1"># Using &#39;feed&#39; for legacy compatibility, &#39;drives&#39; for new API</span>
+    <span class="c1"># Using 'feed' for legacy compatibility, 'drives' for new API</span>
     <span class="n">drive_specs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">ic</span><span class="p">,</span> <span class="n">par</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">p_common</span><span class="p">):</span>
-        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">legacy_mode</span><span class="p">)</span> <span class="ow">and</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;tstop&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;t0&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">legacy_mode</span><span class="p">)</span> <span class="ow">and</span> <span class="n">par</span><span class="p">[</span><span class="s2">"tstop"</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">par</span><span class="p">[</span><span class="s2">"t0"</span><span class="p">]:</span>
             <span class="k">continue</span>
-        <span class="n">feed_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;bursty</span><span class="si">{</span><span class="n">ic</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">feed_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"bursty</span><span class="si">{</span><span class="n">ic</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">"</span>
         <span class="n">drive</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;bursty&quot;</span>
-        <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;cell_specific&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;dynamics&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;tstart&quot;</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;t0&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;tstart_std&quot;</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;t0_stdev&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;tstop&quot;</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;tstop&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;burst_rate&quot;</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;f_input&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;burst_std&quot;</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;stdev&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;numspikes&quot;</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;events_per_cycle&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;n_drive_cells&quot;</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;n_drive_cells&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;spike_isi&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"bursty"</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s2">"cell_specific"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s2">"dynamics"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"tstart"</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s2">"t0"</span><span class="p">],</span>
+            <span class="s2">"tstart_std"</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s2">"t0_stdev"</span><span class="p">],</span>
+            <span class="s2">"tstop"</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s2">"tstop"</span><span class="p">],</span>
+            <span class="s2">"burst_rate"</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s2">"f_input"</span><span class="p">],</span>
+            <span class="s2">"burst_std"</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s2">"stdev"</span><span class="p">],</span>
+            <span class="s2">"numspikes"</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s2">"events_per_cycle"</span><span class="p">],</span>
+            <span class="s2">"n_drive_cells"</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s2">"n_drive_cells"</span><span class="p">],</span>
+            <span class="s2">"spike_isi"</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
         <span class="p">}</span>  <span class="c1"># not exposed in params-files</span>
-        <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;location&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;loc&quot;</span><span class="p">]</span>
-        <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;space_constant&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;lamtha&quot;</span><span class="p">]</span>
-        <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;event_seed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;prng_seedcore&quot;</span><span class="p">]</span>
-        <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;weights_ampa&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;weights_nmda&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;synaptic_delays&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s2">"location"</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s2">"loc"</span><span class="p">]</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s2">"space_constant"</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s2">"lamtha"</span><span class="p">]</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s2">"event_seed"</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s2">"prng_seedcore"</span><span class="p">]</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s2">"weights_ampa"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s2">"weights_nmda"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s2">"synaptic_delays"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="n">cellname</span> <span class="ow">in</span> <span class="n">cellname_list</span><span class="p">:</span>
-            <span class="n">cname_ampa</span> <span class="o">=</span> <span class="n">_short_name</span><span class="p">(</span><span class="n">cellname</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_ampa&quot;</span>
-            <span class="n">cname_nmda</span> <span class="o">=</span> <span class="n">_short_name</span><span class="p">(</span><span class="n">cellname</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_nmda&quot;</span>
+            <span class="n">cname_ampa</span> <span class="o">=</span> <span class="n">_short_name</span><span class="p">(</span><span class="n">cellname</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"_ampa"</span>
+            <span class="n">cname_nmda</span> <span class="o">=</span> <span class="n">_short_name</span><span class="p">(</span><span class="n">cellname</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"_nmda"</span>
             <span class="k">if</span> <span class="n">cname_ampa</span> <span class="ow">in</span> <span class="n">par</span><span class="p">:</span>
                 <span class="n">ampa_weight</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cname_ampa</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                 <span class="n">ampa_delay</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cname_ampa</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-                <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;weights_ampa&quot;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">ampa_weight</span>
+                <span class="n">drive</span><span class="p">[</span><span class="s2">"weights_ampa"</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">ampa_weight</span>
 
                 <span class="c1"># NB synaptic delay same for NMDA, read only for AMPA</span>
-                <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;synaptic_delays&quot;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">ampa_delay</span>
+                <span class="n">drive</span><span class="p">[</span><span class="s2">"synaptic_delays"</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">ampa_delay</span>
 
             <span class="k">if</span> <span class="n">cname_nmda</span> <span class="ow">in</span> <span class="n">par</span><span class="p">:</span>
                 <span class="n">nmda_weight</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cname_nmda</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;weights_nmda&quot;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">nmda_weight</span>
+                <span class="n">drive</span><span class="p">[</span><span class="s2">"weights_nmda"</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">nmda_weight</span>
 
         <span class="n">drive_specs</span><span class="p">[</span><span class="n">feed_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">drive</span>
 
     <span class="k">for</span> <span class="n">feed_name</span><span class="p">,</span> <span class="n">par</span> <span class="ow">in</span> <span class="n">p_unique</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">drive</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;cell_specific&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;weights_ampa&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;weights_nmda&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;synaptic_delays&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s2">"cell_specific"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s2">"weights_ampa"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s2">"weights_nmda"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s2">"synaptic_delays"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="n">feed_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;evprox&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">feed_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;evdist&quot;</span><span class="p">):</span>
-            <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;evoked&quot;</span>
-            <span class="k">if</span> <span class="n">feed_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;evprox&quot;</span><span class="p">):</span>
-                <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;location&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;proximal&quot;</span>
+        <span class="k">if</span> <span class="n">feed_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"evprox"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">feed_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"evdist"</span><span class="p">):</span>
+            <span class="n">drive</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"evoked"</span>
+            <span class="k">if</span> <span class="n">feed_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"evprox"</span><span class="p">):</span>
+                <span class="n">drive</span><span class="p">[</span><span class="s2">"location"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"proximal"</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;location&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;distal&quot;</span>
+                <span class="n">drive</span><span class="p">[</span><span class="s2">"location"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"distal"</span>
 
             <span class="n">cell_keys_present</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">par</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">cellname_list</span><span class="p">]</span>
             <span class="n">sigma</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cell_keys_present</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="mi">3</span><span class="p">]</span>  <span class="c1"># IID for all cells!</span>
 
-            <span class="n">n_drive_cells</span> <span class="o">=</span> <span class="s2">&quot;n_cells&quot;</span>
-            <span class="k">if</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;sync_evinput&quot;</span><span class="p">]:</span>
+            <span class="n">n_drive_cells</span> <span class="o">=</span> <span class="s2">"n_cells"</span>
+            <span class="k">if</span> <span class="n">par</span><span class="p">[</span><span class="s2">"sync_evinput"</span><span class="p">]:</span>
                 <span class="n">n_drive_cells</span> <span class="o">=</span> <span class="mi">1</span>
-                <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;cell_specific&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">drive</span><span class="p">[</span><span class="s2">"cell_specific"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
 
-            <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;dynamics&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;mu&quot;</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;t0&quot;</span><span class="p">],</span>
-                <span class="s2">&quot;sigma&quot;</span><span class="p">:</span> <span class="n">sigma</span><span class="p">,</span>
-                <span class="s2">&quot;numspikes&quot;</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;numspikes&quot;</span><span class="p">],</span>
-                <span class="s2">&quot;n_drive_cells&quot;</span><span class="p">:</span> <span class="n">n_drive_cells</span><span class="p">,</span>
+            <span class="n">drive</span><span class="p">[</span><span class="s2">"dynamics"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">"mu"</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s2">"t0"</span><span class="p">],</span>
+                <span class="s2">"sigma"</span><span class="p">:</span> <span class="n">sigma</span><span class="p">,</span>
+                <span class="s2">"numspikes"</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s2">"numspikes"</span><span class="p">],</span>
+                <span class="s2">"n_drive_cells"</span><span class="p">:</span> <span class="n">n_drive_cells</span><span class="p">,</span>
             <span class="p">}</span>
-            <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;space_constant&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;lamtha&quot;</span><span class="p">]</span>
-            <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;event_seed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;prng_seedcore&quot;</span><span class="p">]</span>
+            <span class="n">drive</span><span class="p">[</span><span class="s2">"space_constant"</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s2">"lamtha"</span><span class="p">]</span>
+            <span class="n">drive</span><span class="p">[</span><span class="s2">"event_seed"</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s2">"prng_seedcore"</span><span class="p">]</span>
             <span class="c1"># XXX Force random states to be the same as HNN-gui for the default</span>
             <span class="c1"># parameter set after increasing the number of bursty drive</span>
             <span class="c1"># gids from 2 to 20</span>
             <span class="k">if</span> <span class="n">legacy_mode</span><span class="p">:</span>
-                <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;event_seed&quot;</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">18</span>
+                <span class="n">drive</span><span class="p">[</span><span class="s2">"event_seed"</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">18</span>
             <span class="k">for</span> <span class="n">cellname</span> <span class="ow">in</span> <span class="n">cellname_list</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">cellname</span> <span class="ow">in</span> <span class="n">par</span><span class="p">:</span>
                     <span class="n">ampa_weight</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cellname</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                     <span class="n">nmda_weight</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cellname</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
                     <span class="n">synaptic_delays</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cellname</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
-                    <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;weights_ampa&quot;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">ampa_weight</span>
-                    <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;weights_nmda&quot;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">nmda_weight</span>
-                    <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;synaptic_delays&quot;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">synaptic_delays</span>
+                    <span class="n">drive</span><span class="p">[</span><span class="s2">"weights_ampa"</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">ampa_weight</span>
+                    <span class="n">drive</span><span class="p">[</span><span class="s2">"weights_nmda"</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">nmda_weight</span>
+                    <span class="n">drive</span><span class="p">[</span><span class="s2">"synaptic_delays"</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">synaptic_delays</span>
 
         <span class="c1"># Skip drive if not in legacy mode</span>
-        <span class="k">elif</span> <span class="n">feed_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;extgauss&quot;</span><span class="p">):</span>
-            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">legacy_mode</span><span class="p">)</span> <span class="ow">and</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;L2_basket&quot;</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;tstop&quot;</span><span class="p">]:</span>
+        <span class="k">elif</span> <span class="n">feed_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"extgauss"</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">legacy_mode</span><span class="p">)</span> <span class="ow">and</span> <span class="n">par</span><span class="p">[</span><span class="s2">"L2_basket"</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">params</span><span class="p">[</span><span class="s2">"tstop"</span><span class="p">]:</span>
                 <span class="k">continue</span>
-            <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;gaussian&quot;</span>
-            <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;location&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;loc&quot;</span><span class="p">]</span>
+            <span class="n">drive</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"gaussian"</span>
+            <span class="n">drive</span><span class="p">[</span><span class="s2">"location"</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s2">"loc"</span><span class="p">]</span>
 
-            <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;dynamics&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;mu&quot;</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;L2_basket&quot;</span><span class="p">][</span><span class="mi">3</span><span class="p">],</span>  <span class="c1"># NB IID</span>
-                <span class="s2">&quot;sigma&quot;</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;L2_basket&quot;</span><span class="p">][</span><span class="mi">4</span><span class="p">],</span>
-                <span class="s2">&quot;numspikes&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>  <span class="c1"># NB hard-coded in GUI!</span>
-                <span class="s2">&quot;sync_within_trial&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">drive</span><span class="p">[</span><span class="s2">"dynamics"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">"mu"</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s2">"L2_basket"</span><span class="p">][</span><span class="mi">3</span><span class="p">],</span>  <span class="c1"># NB IID</span>
+                <span class="s2">"sigma"</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s2">"L2_basket"</span><span class="p">][</span><span class="mi">4</span><span class="p">],</span>
+                <span class="s2">"numspikes"</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>  <span class="c1"># NB hard-coded in GUI!</span>
+                <span class="s2">"sync_within_trial"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
             <span class="p">}</span>
-            <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;space_constant&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;lamtha&quot;</span><span class="p">]</span>
-            <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;event_seed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;prng_seedcore&quot;</span><span class="p">]</span>
+            <span class="n">drive</span><span class="p">[</span><span class="s2">"space_constant"</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s2">"lamtha"</span><span class="p">]</span>
+            <span class="n">drive</span><span class="p">[</span><span class="s2">"event_seed"</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s2">"prng_seedcore"</span><span class="p">]</span>
 
             <span class="k">for</span> <span class="n">cellname</span> <span class="ow">in</span> <span class="n">cellname_list</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">cellname</span> <span class="ow">in</span> <span class="n">par</span><span class="p">:</span>
                     <span class="n">ampa_weight</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cellname</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                     <span class="n">synaptic_delays</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cellname</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span>
-                    <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;weights_ampa&quot;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">ampa_weight</span>
-                    <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;synaptic_delays&quot;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">synaptic_delays</span>
+                    <span class="n">drive</span><span class="p">[</span><span class="s2">"weights_ampa"</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">ampa_weight</span>
+                    <span class="n">drive</span><span class="p">[</span><span class="s2">"synaptic_delays"</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">synaptic_delays</span>
 
-            <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;weights_nmda&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>  <span class="c1"># no NMDA weights for Gaussians</span>
-        <span class="k">elif</span> <span class="n">feed_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;extpois&quot;</span><span class="p">):</span>
-            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">legacy_mode</span><span class="p">)</span> <span class="ow">and</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;t_interval&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;t_interval&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">drive</span><span class="p">[</span><span class="s2">"weights_nmda"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>  <span class="c1"># no NMDA weights for Gaussians</span>
+        <span class="k">elif</span> <span class="n">feed_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"extpois"</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">legacy_mode</span><span class="p">)</span> <span class="ow">and</span> <span class="n">par</span><span class="p">[</span><span class="s2">"t_interval"</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">par</span><span class="p">[</span><span class="s2">"t_interval"</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>
                 <span class="k">continue</span>
-            <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;poisson&quot;</span>
-            <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;location&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;loc&quot;</span><span class="p">]</span>
-            <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;space_constant&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;lamtha&quot;</span><span class="p">]</span>
-            <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;event_seed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;prng_seedcore&quot;</span><span class="p">]</span>
+            <span class="n">drive</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"poisson"</span>
+            <span class="n">drive</span><span class="p">[</span><span class="s2">"location"</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s2">"loc"</span><span class="p">]</span>
+            <span class="n">drive</span><span class="p">[</span><span class="s2">"space_constant"</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s2">"lamtha"</span><span class="p">]</span>
+            <span class="n">drive</span><span class="p">[</span><span class="s2">"event_seed"</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s2">"prng_seedcore"</span><span class="p">]</span>
 
             <span class="n">rate_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">cellname</span> <span class="ow">in</span> <span class="n">cellname_list</span><span class="p">:</span>
@@ -811,15 +794,15 @@
                     <span class="n">ampa_weight</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cellname</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                     <span class="n">nmda_weight</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cellname</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
                     <span class="n">synaptic_delays</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cellname</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
-                    <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;weights_ampa&quot;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">ampa_weight</span>
-                    <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;weights_nmda&quot;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">nmda_weight</span>
-                    <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;synaptic_delays&quot;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">synaptic_delays</span>
+                    <span class="n">drive</span><span class="p">[</span><span class="s2">"weights_ampa"</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">ampa_weight</span>
+                    <span class="n">drive</span><span class="p">[</span><span class="s2">"weights_nmda"</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">nmda_weight</span>
+                    <span class="n">drive</span><span class="p">[</span><span class="s2">"synaptic_delays"</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">synaptic_delays</span>
 
             <span class="c1"># do NOT allow negative times sometimes used in param-files</span>
-            <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;dynamics&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;tstart&quot;</span><span class="p">:</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;t_interval&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span>
-                <span class="s2">&quot;tstop&quot;</span><span class="p">:</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;t_interval&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]),</span>
-                <span class="s2">&quot;rate_constant&quot;</span><span class="p">:</span> <span class="n">rate_params</span><span class="p">,</span>
+            <span class="n">drive</span><span class="p">[</span><span class="s2">"dynamics"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">"tstart"</span><span class="p">:</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">par</span><span class="p">[</span><span class="s2">"t_interval"</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span>
+                <span class="s2">"tstop"</span><span class="p">:</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">par</span><span class="p">[</span><span class="s2">"t_interval"</span><span class="p">][</span><span class="mi">1</span><span class="p">]),</span>
+                <span class="s2">"rate_constant"</span><span class="p">:</span> <span class="n">rate_params</span><span class="p">,</span>
             <span class="p">}</span>
 
         <span class="n">drive_specs</span><span class="p">[</span><span class="n">feed_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">drive</span>
@@ -827,13 +810,13 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">Params</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Params object.</span>
+<span class="w">    </span><span class="sd">"""Params object.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    params_input : dict | None</span>
 <span class="sd">        Dictionary of parameters. If None, use default parameters.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params_input</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">params_input</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -841,25 +824,33 @@
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">params_input</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="n">nprox</span><span class="p">,</span> <span class="n">ndist</span> <span class="o">=</span> <span class="n">_count_evoked_inputs</span><span class="p">(</span><span class="n">params_input</span><span class="p">)</span>
-            <span class="c1"># create default params templated from params_input</span>
-            <span class="n">params_default</span> <span class="o">=</span> <span class="n">get_params_default</span><span class="p">(</span><span class="n">nprox</span><span class="p">,</span> <span class="n">ndist</span><span class="p">)</span>
 
-            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params_default</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params_input</span><span class="p">:</span>
+            <span class="n">params_default</span> <span class="o">=</span> <span class="n">get_params_default</span><span class="p">(</span><span class="n">nprox</span><span class="p">,</span> <span class="n">ndist</span><span class="p">)</span>
+            <span class="c1"># don't use any default values for duecker_ET_model.</span>
+            <span class="k">if</span> <span class="s2">"duecker_ET_model"</span> <span class="ow">in</span> <span class="p">(</span><span class="n">params_input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"model_variant"</span><span class="p">),):</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params_input</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                     <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">params_input</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">params_default</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params_default</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params_input</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">params_input</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">params_default</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="c1"># 'model_variant' is not part of the legacy defaults, but must</span>
+                <span class="c1"># survive so the network models can validate the param file</span>
+                <span class="k">if</span> <span class="s2">"model_variant"</span> <span class="ow">in</span> <span class="n">params_input</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="p">[</span><span class="s2">"model_variant"</span><span class="p">]</span> <span class="o">=</span> <span class="n">params_input</span><span class="p">[</span><span class="s2">"model_variant"</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;params_input must be dict or None. Got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">params_input</span><span class="p">)</span>
+                <span class="s2">"params_input must be dict or None. Got </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">params_input</span><span class="p">)</span>
             <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Display the params nicely.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Display the params nicely."""</span>
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a subset of parameters.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return a subset of parameters."""</span>
         <span class="n">keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
@@ -874,7 +865,7 @@
             <span class="k">return</span> <span class="n">params</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the value for a subset of parameters.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Set the value for a subset of parameters."""</span>
         <span class="n">keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
@@ -890,19 +881,19 @@
         <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write param values to a file.</span>
+<span class="w">        </span><span class="sd">"""Write param values to a file.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        fname : str</span>
 <span class="sd">            Full path to the output file (.json)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+<span class="sd">        """</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
             <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fp</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_validate_feed</span><span class="p">(</span><span class="n">p_ext_d</span><span class="p">,</span> <span class="n">tstop</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate external inputs that are fed to all</span>
+<span class="w">    </span><span class="sd">"""Validate external inputs that are fed to all</span>
 <span class="sd">    cells uniformly (i.e., rather than individually).</span>
 <span class="sd">    For now, this only includes rhythmic inputs.</span>
 
@@ -917,31 +908,31 @@
 <span class="sd">    -------</span>
 <span class="sd">    p_ext : list</span>
 <span class="sd">        Cumulative list of dicts with newly appended ExtFeed.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># # reset tstop if the specified tstop exceeds the</span>
     <span class="c1"># # simulation runtime</span>
 
-    <span class="k">if</span> <span class="n">p_ext_d</span><span class="p">[</span><span class="s2">&quot;tstop&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">tstop</span><span class="p">:</span>
-        <span class="n">p_ext_d</span><span class="p">[</span><span class="s2">&quot;tstop&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tstop</span>
+    <span class="k">if</span> <span class="n">p_ext_d</span><span class="p">[</span><span class="s2">"tstop"</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">tstop</span><span class="p">:</span>
+        <span class="n">p_ext_d</span><span class="p">[</span><span class="s2">"tstop"</span><span class="p">]</span> <span class="o">=</span> <span class="n">tstop</span>
 
     <span class="c1"># if stdev is zero, increase synaptic weights 5 fold to make</span>
     <span class="c1"># single input equivalent to 5 simultaneous input to prevent spiking</span>
     <span class="c1"># &lt;&lt;---- SN: WHAT IS THIS RULE!?!?!?</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">p_ext_d</span><span class="p">[</span><span class="s2">&quot;stdev&quot;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">p_ext_d</span><span class="p">[</span><span class="s2">"stdev"</span><span class="p">]:</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">p_ext_d</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;Pyr&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"Pyr"</span><span class="p">):</span>
                 <span class="n">p_ext_d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">p_ext_d</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">5.0</span><span class="p">,</span> <span class="n">p_ext_d</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
-            <span class="k">elif</span> <span class="n">key</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;Basket&quot;</span><span class="p">):</span>
+            <span class="k">elif</span> <span class="n">key</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"Basket"</span><span class="p">):</span>
                 <span class="n">p_ext_d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">p_ext_d</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">5.0</span><span class="p">,</span> <span class="n">p_ext_d</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
 
     <span class="c1"># if L5 delay is -1, use same delays as L2 unless L2 delay is 0.1 in</span>
     <span class="c1"># which case use 1. &lt;&lt;---- SN: WHAT IS THIS RULE!?!?!?</span>
-    <span class="k">if</span> <span class="n">p_ext_d</span><span class="p">[</span><span class="s2">&quot;L5Pyr_ampa&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">p_ext_d</span><span class="p">[</span><span class="s2">"L5Pyr_ampa"</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">p_ext_d</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;L5&quot;</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">p_ext_d</span><span class="p">[</span><span class="s2">&quot;L2Pyr&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mf">0.1</span><span class="p">:</span>
-                    <span class="n">p_ext_d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">p_ext_d</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">p_ext_d</span><span class="p">[</span><span class="s2">&quot;L2Pyr&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"L5"</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">p_ext_d</span><span class="p">[</span><span class="s2">"L2Pyr"</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mf">0.1</span><span class="p">:</span>
+                    <span class="n">p_ext_d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">p_ext_d</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">p_ext_d</span><span class="p">[</span><span class="s2">"L2Pyr"</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">p_ext_d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">p_ext_d</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="mf">1.0</span><span class="p">)</span>
 
@@ -952,22 +943,22 @@
     <span class="c1"># make sure ampa,nmda gbar values are in the param dict for evoked</span>
     <span class="c1"># inputs(for backwards compatibility)</span>
     <span class="c1"># evoked distal target cell types</span>
-    <span class="n">lctprox</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;L2Pyr&quot;</span><span class="p">,</span> <span class="s2">&quot;L5Pyr&quot;</span><span class="p">,</span> <span class="s2">&quot;L2Basket&quot;</span><span class="p">,</span> <span class="s2">&quot;L5Basket&quot;</span><span class="p">]</span>
+    <span class="n">lctprox</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"L2Pyr"</span><span class="p">,</span> <span class="s2">"L5Pyr"</span><span class="p">,</span> <span class="s2">"L2Basket"</span><span class="p">,</span> <span class="s2">"L5Basket"</span><span class="p">]</span>
     <span class="c1"># evoked proximal target cell types</span>
-    <span class="n">lctdist</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;L2Pyr&quot;</span><span class="p">,</span> <span class="s2">&quot;L5Pyr&quot;</span><span class="p">,</span> <span class="s2">&quot;L2Basket&quot;</span><span class="p">]</span>
-    <span class="n">lsy</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ampa&quot;</span><span class="p">,</span> <span class="s2">&quot;nmda&quot;</span><span class="p">]</span>  <span class="c1"># synapse types used in evoked inputs</span>
+    <span class="n">lctdist</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"L2Pyr"</span><span class="p">,</span> <span class="s2">"L5Pyr"</span><span class="p">,</span> <span class="s2">"L2Basket"</span><span class="p">]</span>
+    <span class="n">lsy</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"ampa"</span><span class="p">,</span> <span class="s2">"nmda"</span><span class="p">]</span>  <span class="c1"># synapse types used in evoked inputs</span>
     <span class="k">for</span> <span class="n">nev</span><span class="p">,</span> <span class="n">pref</span><span class="p">,</span> <span class="n">lct</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
-        <span class="p">[</span><span class="n">nprox</span><span class="p">,</span> <span class="n">ndist</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;evprox_&quot;</span><span class="p">,</span> <span class="s2">&quot;evdist_&quot;</span><span class="p">],</span> <span class="p">[</span><span class="n">lctprox</span><span class="p">,</span> <span class="n">lctdist</span><span class="p">]</span>
+        <span class="p">[</span><span class="n">nprox</span><span class="p">,</span> <span class="n">ndist</span><span class="p">],</span> <span class="p">[</span><span class="s2">"evprox_"</span><span class="p">,</span> <span class="s2">"evdist_"</span><span class="p">],</span> <span class="p">[</span><span class="n">lctprox</span><span class="p">,</span> <span class="n">lctdist</span><span class="p">]</span>
     <span class="p">):</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nev</span><span class="p">):</span>
             <span class="n">skey</span> <span class="o">=</span> <span class="n">pref</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">sy</span> <span class="ow">in</span> <span class="n">lsy</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">ct</span> <span class="ow">in</span> <span class="n">lct</span><span class="p">:</span>
-                    <span class="n">k</span> <span class="o">=</span> <span class="s2">&quot;gbar_&quot;</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">ct</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">sy</span>
+                    <span class="n">k</span> <span class="o">=</span> <span class="s2">"gbar_"</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">"_"</span> <span class="o">+</span> <span class="n">ct</span> <span class="o">+</span> <span class="s2">"_"</span> <span class="o">+</span> <span class="n">sy</span>
                     <span class="c1"># if the synapse-specific gbar not present, use the</span>
                     <span class="c1"># existing weight for both ampa,nmda</span>
                     <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">p</span><span class="p">:</span>
-                        <span class="n">p</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;gbar_&quot;</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">ct</span><span class="p">]</span>
+                        <span class="n">p</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s2">"gbar_"</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">"_"</span> <span class="o">+</span> <span class="n">ct</span><span class="p">]</span>
 
 
 <span class="c1">#</span>
@@ -976,11 +967,11 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">check_pois_synkeys</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
     <span class="c1"># make sure ampa,nmda gbar values are in the param dict for Poisson inputs</span>
     <span class="c1"># (for backwards compatibility)</span>
-    <span class="n">lct</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;L2Pyr&quot;</span><span class="p">,</span> <span class="s2">&quot;L5Pyr&quot;</span><span class="p">,</span> <span class="s2">&quot;L2Basket&quot;</span><span class="p">,</span> <span class="s2">&quot;L5Basket&quot;</span><span class="p">]</span>  <span class="c1"># target cell types</span>
-    <span class="n">lsy</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ampa&quot;</span><span class="p">,</span> <span class="s2">&quot;nmda&quot;</span><span class="p">]</span>  <span class="c1"># synapse types used in Poisson inputs</span>
+    <span class="n">lct</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"L2Pyr"</span><span class="p">,</span> <span class="s2">"L5Pyr"</span><span class="p">,</span> <span class="s2">"L2Basket"</span><span class="p">,</span> <span class="s2">"L5Basket"</span><span class="p">]</span>  <span class="c1"># target cell types</span>
+    <span class="n">lsy</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"ampa"</span><span class="p">,</span> <span class="s2">"nmda"</span><span class="p">]</span>  <span class="c1"># synapse types used in Poisson inputs</span>
     <span class="k">for</span> <span class="n">ct</span> <span class="ow">in</span> <span class="n">lct</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">sy</span> <span class="ow">in</span> <span class="n">lsy</span><span class="p">:</span>
-            <span class="n">k</span> <span class="o">=</span> <span class="n">ct</span> <span class="o">+</span> <span class="s2">&quot;_Pois_A_weight_&quot;</span> <span class="o">+</span> <span class="n">sy</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="n">ct</span> <span class="o">+</span> <span class="s2">"_Pois_A_weight_"</span> <span class="o">+</span> <span class="n">sy</span>
             <span class="c1"># if the synapse-specific weight not present, set it to 0 in p</span>
             <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">p</span><span class="p">:</span>
                 <span class="n">p</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
@@ -990,7 +981,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">create_pext</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">tstop</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Indexable Python list of param dicts for parallel.</span>
+<span class="w">    </span><span class="sd">"""Indexable Python list of param dicts for parallel.</span>
 
 <span class="sd">    Turn off individual feeds by commenting out relevant line here.</span>
 <span class="sd">    always valid, no matter the length.</span>
@@ -999,7 +990,7 @@
 <span class="sd">    ----------</span>
 <span class="sd">    p : dict</span>
 <span class="sd">        The parameters returned by ExpParams(f_psim).return_pdict()</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">p_common</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
     <span class="c1"># p_unique is a dict of input param types that end up going to each cell</span>
@@ -1008,37 +999,37 @@
 
     <span class="c1"># default params for common proximal inputs</span>
     <span class="n">feed_prox</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;f_input&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;f_input_prox&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;t0&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;t0_input_prox&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;tstop&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;tstop_input_prox&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;stdev&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;f_stdev_prox&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;L2Pyr_ampa&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;input_prox_A_weight_L2Pyr_ampa&quot;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;input_prox_A_delay_L2&quot;</span><span class="p">]),</span>
-        <span class="s2">&quot;L2Pyr_nmda&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;input_prox_A_weight_L2Pyr_nmda&quot;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;input_prox_A_delay_L2&quot;</span><span class="p">]),</span>
-        <span class="s2">&quot;L5Pyr_ampa&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;input_prox_A_weight_L5Pyr_ampa&quot;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;input_prox_A_delay_L5&quot;</span><span class="p">]),</span>
-        <span class="s2">&quot;L5Pyr_nmda&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;input_prox_A_weight_L5Pyr_nmda&quot;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;input_prox_A_delay_L5&quot;</span><span class="p">]),</span>
-        <span class="s2">&quot;L2Basket_ampa&quot;</span><span class="p">:</span> <span class="p">(</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;input_prox_A_weight_L2Basket_ampa&quot;</span><span class="p">],</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;input_prox_A_delay_L2&quot;</span><span class="p">],</span>
+        <span class="s2">"f_input"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"f_input_prox"</span><span class="p">],</span>
+        <span class="s2">"t0"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"t0_input_prox"</span><span class="p">],</span>
+        <span class="s2">"tstop"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"tstop_input_prox"</span><span class="p">],</span>
+        <span class="s2">"stdev"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"f_stdev_prox"</span><span class="p">],</span>
+        <span class="s2">"L2Pyr_ampa"</span><span class="p">:</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">"input_prox_A_weight_L2Pyr_ampa"</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s2">"input_prox_A_delay_L2"</span><span class="p">]),</span>
+        <span class="s2">"L2Pyr_nmda"</span><span class="p">:</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">"input_prox_A_weight_L2Pyr_nmda"</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s2">"input_prox_A_delay_L2"</span><span class="p">]),</span>
+        <span class="s2">"L5Pyr_ampa"</span><span class="p">:</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">"input_prox_A_weight_L5Pyr_ampa"</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s2">"input_prox_A_delay_L5"</span><span class="p">]),</span>
+        <span class="s2">"L5Pyr_nmda"</span><span class="p">:</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">"input_prox_A_weight_L5Pyr_nmda"</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s2">"input_prox_A_delay_L5"</span><span class="p">]),</span>
+        <span class="s2">"L2Basket_ampa"</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"input_prox_A_weight_L2Basket_ampa"</span><span class="p">],</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"input_prox_A_delay_L2"</span><span class="p">],</span>
         <span class="p">),</span>
-        <span class="s2">&quot;L2Basket_nmda&quot;</span><span class="p">:</span> <span class="p">(</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;input_prox_A_weight_L2Basket_nmda&quot;</span><span class="p">],</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;input_prox_A_delay_L2&quot;</span><span class="p">],</span>
+        <span class="s2">"L2Basket_nmda"</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"input_prox_A_weight_L2Basket_nmda"</span><span class="p">],</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"input_prox_A_delay_L2"</span><span class="p">],</span>
         <span class="p">),</span>
-        <span class="s2">&quot;L5Basket_ampa&quot;</span><span class="p">:</span> <span class="p">(</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;input_prox_A_weight_L5Basket_ampa&quot;</span><span class="p">],</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;input_prox_A_delay_L5&quot;</span><span class="p">],</span>
+        <span class="s2">"L5Basket_ampa"</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"input_prox_A_weight_L5Basket_ampa"</span><span class="p">],</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"input_prox_A_delay_L5"</span><span class="p">],</span>
         <span class="p">),</span>
-        <span class="s2">&quot;L5Basket_nmda&quot;</span><span class="p">:</span> <span class="p">(</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;input_prox_A_weight_L5Basket_nmda&quot;</span><span class="p">],</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;input_prox_A_delay_L5&quot;</span><span class="p">],</span>
+        <span class="s2">"L5Basket_nmda"</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"input_prox_A_weight_L5Basket_nmda"</span><span class="p">],</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"input_prox_A_delay_L5"</span><span class="p">],</span>
         <span class="p">),</span>
-        <span class="s2">&quot;events_per_cycle&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;events_per_cycle_prox&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;prng_seedcore&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;prng_seedcore_input_prox&quot;</span><span class="p">]),</span>
-        <span class="s2">&quot;lamtha&quot;</span><span class="p">:</span> <span class="mf">100.0</span><span class="p">,</span>
-        <span class="s2">&quot;loc&quot;</span><span class="p">:</span> <span class="s2">&quot;proximal&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;n_drive_cells&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;repeats_prox&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;t0_stdev&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;t0_input_stdev_prox&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;threshold&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;threshold&quot;</span><span class="p">],</span>
+        <span class="s2">"events_per_cycle"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"events_per_cycle_prox"</span><span class="p">],</span>
+        <span class="s2">"prng_seedcore"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">"prng_seedcore_input_prox"</span><span class="p">]),</span>
+        <span class="s2">"lamtha"</span><span class="p">:</span> <span class="mf">100.0</span><span class="p">,</span>
+        <span class="s2">"loc"</span><span class="p">:</span> <span class="s2">"proximal"</span><span class="p">,</span>
+        <span class="s2">"n_drive_cells"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"repeats_prox"</span><span class="p">],</span>
+        <span class="s2">"t0_stdev"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"t0_input_stdev_prox"</span><span class="p">],</span>
+        <span class="s2">"threshold"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"threshold"</span><span class="p">],</span>
     <span class="p">}</span>
 
     <span class="c1"># ensures time interval makes sense</span>
@@ -1046,35 +1037,35 @@
 
     <span class="c1"># default params for common distal inputs</span>
     <span class="n">feed_dist</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;f_input&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;f_input_dist&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;t0&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;t0_input_dist&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;tstop&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;tstop_input_dist&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;stdev&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;f_stdev_dist&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;L2Pyr_ampa&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;input_dist_A_weight_L2Pyr_ampa&quot;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;input_dist_A_delay_L2&quot;</span><span class="p">]),</span>
-        <span class="s2">&quot;L2Pyr_nmda&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;input_dist_A_weight_L2Pyr_nmda&quot;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;input_dist_A_delay_L2&quot;</span><span class="p">]),</span>
-        <span class="s2">&quot;L5Pyr_ampa&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;input_dist_A_weight_L5Pyr_ampa&quot;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;input_dist_A_delay_L5&quot;</span><span class="p">]),</span>
-        <span class="s2">&quot;L5Pyr_nmda&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;input_dist_A_weight_L5Pyr_nmda&quot;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;input_dist_A_delay_L5&quot;</span><span class="p">]),</span>
-        <span class="s2">&quot;L2Basket_ampa&quot;</span><span class="p">:</span> <span class="p">(</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;input_dist_A_weight_L2Basket_ampa&quot;</span><span class="p">],</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;input_dist_A_delay_L2&quot;</span><span class="p">],</span>
+        <span class="s2">"f_input"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"f_input_dist"</span><span class="p">],</span>
+        <span class="s2">"t0"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"t0_input_dist"</span><span class="p">],</span>
+        <span class="s2">"tstop"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"tstop_input_dist"</span><span class="p">],</span>
+        <span class="s2">"stdev"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"f_stdev_dist"</span><span class="p">],</span>
+        <span class="s2">"L2Pyr_ampa"</span><span class="p">:</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">"input_dist_A_weight_L2Pyr_ampa"</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s2">"input_dist_A_delay_L2"</span><span class="p">]),</span>
+        <span class="s2">"L2Pyr_nmda"</span><span class="p">:</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">"input_dist_A_weight_L2Pyr_nmda"</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s2">"input_dist_A_delay_L2"</span><span class="p">]),</span>
+        <span class="s2">"L5Pyr_ampa"</span><span class="p">:</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">"input_dist_A_weight_L5Pyr_ampa"</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s2">"input_dist_A_delay_L5"</span><span class="p">]),</span>
+        <span class="s2">"L5Pyr_nmda"</span><span class="p">:</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">"input_dist_A_weight_L5Pyr_nmda"</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s2">"input_dist_A_delay_L5"</span><span class="p">]),</span>
+        <span class="s2">"L2Basket_ampa"</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"input_dist_A_weight_L2Basket_ampa"</span><span class="p">],</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"input_dist_A_delay_L2"</span><span class="p">],</span>
         <span class="p">),</span>
-        <span class="s2">&quot;L2Basket_nmda&quot;</span><span class="p">:</span> <span class="p">(</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;input_dist_A_weight_L2Basket_nmda&quot;</span><span class="p">],</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;input_dist_A_delay_L2&quot;</span><span class="p">],</span>
+        <span class="s2">"L2Basket_nmda"</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"input_dist_A_weight_L2Basket_nmda"</span><span class="p">],</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"input_dist_A_delay_L2"</span><span class="p">],</span>
         <span class="p">),</span>
-        <span class="s2">&quot;events_per_cycle&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;events_per_cycle_dist&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;prng_seedcore&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;prng_seedcore_input_dist&quot;</span><span class="p">]),</span>
-        <span class="s2">&quot;lamtha&quot;</span><span class="p">:</span> <span class="mf">100.0</span><span class="p">,</span>
-        <span class="s2">&quot;loc&quot;</span><span class="p">:</span> <span class="s2">&quot;distal&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;n_drive_cells&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;repeats_dist&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;t0_stdev&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;t0_input_stdev_dist&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;threshold&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;threshold&quot;</span><span class="p">],</span>
+        <span class="s2">"events_per_cycle"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"events_per_cycle_dist"</span><span class="p">],</span>
+        <span class="s2">"prng_seedcore"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">"prng_seedcore_input_dist"</span><span class="p">]),</span>
+        <span class="s2">"lamtha"</span><span class="p">:</span> <span class="mf">100.0</span><span class="p">,</span>
+        <span class="s2">"loc"</span><span class="p">:</span> <span class="s2">"distal"</span><span class="p">,</span>
+        <span class="s2">"n_drive_cells"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"repeats_dist"</span><span class="p">],</span>
+        <span class="s2">"t0_stdev"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"t0_input_stdev_dist"</span><span class="p">],</span>
+        <span class="s2">"threshold"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"threshold"</span><span class="p">],</span>
     <span class="p">}</span>
 
     <span class="n">p_common</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_validate_feed</span><span class="p">(</span><span class="n">feed_dist</span><span class="p">,</span> <span class="n">tstop</span><span class="p">))</span>
 
     <span class="n">nprox</span><span class="p">,</span> <span class="n">ndist</span> <span class="o">=</span> <span class="n">_count_evoked_inputs</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
-    <span class="c1"># print(&#39;nprox,ndist evoked inputs:&#39;, nprox, ndist)</span>
+    <span class="c1"># print('nprox,ndist evoked inputs:', nprox, ndist)</span>
 
     <span class="c1"># NEW: make sure all evoked synaptic weights present</span>
     <span class="c1"># (for backwards compatibility)</span>
@@ -1082,155 +1073,155 @@
     <span class="c1"># since some nmda weights should be 0 while others &gt; 0</span>
 
     <span class="c1"># XXX dangerzone: params are modified in-place, values are imputed if</span>
-    <span class="c1"># deemed missing (e.g. if &#39;gbar_evprox_1_L2Pyr_nmda&#39; is not defined, the</span>
-    <span class="c1"># code adds it to the p-dict with value: p[&#39;gbar_evprox_1_L2Pyr&#39;])</span>
+    <span class="c1"># deemed missing (e.g. if 'gbar_evprox_1_L2Pyr_nmda' is not defined, the</span>
+    <span class="c1"># code adds it to the p-dict with value: p['gbar_evprox_1_L2Pyr'])</span>
     <span class="n">check_evoked_synkeys</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">nprox</span><span class="p">,</span> <span class="n">ndist</span><span class="p">)</span>
 
     <span class="c1"># Create proximal evoked response parameters</span>
     <span class="c1"># f_input needs to be defined as 0</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nprox</span><span class="p">):</span>
-        <span class="n">skey</span> <span class="o">=</span> <span class="s2">&quot;evprox_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">p_unique</span><span class="p">[</span><span class="s2">&quot;evprox&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;t0&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;t_&quot;</span> <span class="o">+</span> <span class="n">skey</span><span class="p">],</span>
-            <span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">:</span> <span class="p">(</span>
-                <span class="n">p</span><span class="p">[</span><span class="s2">&quot;gbar_&quot;</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">&quot;_L2Pyr_ampa&quot;</span><span class="p">],</span>
-                <span class="n">p</span><span class="p">[</span><span class="s2">&quot;gbar_&quot;</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">&quot;_L2Pyr_nmda&quot;</span><span class="p">],</span>
+        <span class="n">skey</span> <span class="o">=</span> <span class="s2">"evprox_"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">p_unique</span><span class="p">[</span><span class="s2">"evprox"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"t0"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"t_"</span> <span class="o">+</span> <span class="n">skey</span><span class="p">],</span>
+            <span class="s2">"L2_pyramidal"</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">p</span><span class="p">[</span><span class="s2">"gbar_"</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">"_L2Pyr_ampa"</span><span class="p">],</span>
+                <span class="n">p</span><span class="p">[</span><span class="s2">"gbar_"</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">"_L2Pyr_nmda"</span><span class="p">],</span>
                 <span class="mf">0.1</span><span class="p">,</span>
-                <span class="n">p</span><span class="p">[</span><span class="s2">&quot;sigma_t_&quot;</span> <span class="o">+</span> <span class="n">skey</span><span class="p">],</span>
+                <span class="n">p</span><span class="p">[</span><span class="s2">"sigma_t_"</span> <span class="o">+</span> <span class="n">skey</span><span class="p">],</span>
             <span class="p">),</span>
-            <span class="s2">&quot;L2_basket&quot;</span><span class="p">:</span> <span class="p">(</span>
-                <span class="n">p</span><span class="p">[</span><span class="s2">&quot;gbar_&quot;</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">&quot;_L2Basket_ampa&quot;</span><span class="p">],</span>
-                <span class="n">p</span><span class="p">[</span><span class="s2">&quot;gbar_&quot;</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">&quot;_L2Basket_nmda&quot;</span><span class="p">],</span>
+            <span class="s2">"L2_basket"</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">p</span><span class="p">[</span><span class="s2">"gbar_"</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">"_L2Basket_ampa"</span><span class="p">],</span>
+                <span class="n">p</span><span class="p">[</span><span class="s2">"gbar_"</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">"_L2Basket_nmda"</span><span class="p">],</span>
                 <span class="mf">0.1</span><span class="p">,</span>
-                <span class="n">p</span><span class="p">[</span><span class="s2">&quot;sigma_t_&quot;</span> <span class="o">+</span> <span class="n">skey</span><span class="p">],</span>
+                <span class="n">p</span><span class="p">[</span><span class="s2">"sigma_t_"</span> <span class="o">+</span> <span class="n">skey</span><span class="p">],</span>
             <span class="p">),</span>
-            <span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">:</span> <span class="p">(</span>
-                <span class="n">p</span><span class="p">[</span><span class="s2">&quot;gbar_&quot;</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">&quot;_L5Pyr_ampa&quot;</span><span class="p">],</span>
-                <span class="n">p</span><span class="p">[</span><span class="s2">&quot;gbar_&quot;</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">&quot;_L5Pyr_nmda&quot;</span><span class="p">],</span>
+            <span class="s2">"L5_pyramidal"</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">p</span><span class="p">[</span><span class="s2">"gbar_"</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">"_L5Pyr_ampa"</span><span class="p">],</span>
+                <span class="n">p</span><span class="p">[</span><span class="s2">"gbar_"</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">"_L5Pyr_nmda"</span><span class="p">],</span>
                 <span class="mf">1.0</span><span class="p">,</span>
-                <span class="n">p</span><span class="p">[</span><span class="s2">&quot;sigma_t_&quot;</span> <span class="o">+</span> <span class="n">skey</span><span class="p">],</span>
+                <span class="n">p</span><span class="p">[</span><span class="s2">"sigma_t_"</span> <span class="o">+</span> <span class="n">skey</span><span class="p">],</span>
             <span class="p">),</span>
-            <span class="s2">&quot;L5_basket&quot;</span><span class="p">:</span> <span class="p">(</span>
-                <span class="n">p</span><span class="p">[</span><span class="s2">&quot;gbar_&quot;</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">&quot;_L5Basket_ampa&quot;</span><span class="p">],</span>
-                <span class="n">p</span><span class="p">[</span><span class="s2">&quot;gbar_&quot;</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">&quot;_L5Basket_nmda&quot;</span><span class="p">],</span>
+            <span class="s2">"L5_basket"</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">p</span><span class="p">[</span><span class="s2">"gbar_"</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">"_L5Basket_ampa"</span><span class="p">],</span>
+                <span class="n">p</span><span class="p">[</span><span class="s2">"gbar_"</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">"_L5Basket_nmda"</span><span class="p">],</span>
                 <span class="mf">1.0</span><span class="p">,</span>
-                <span class="n">p</span><span class="p">[</span><span class="s2">&quot;sigma_t_&quot;</span> <span class="o">+</span> <span class="n">skey</span><span class="p">],</span>
+                <span class="n">p</span><span class="p">[</span><span class="s2">"sigma_t_"</span> <span class="o">+</span> <span class="n">skey</span><span class="p">],</span>
             <span class="p">),</span>
-            <span class="s2">&quot;prng_seedcore&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;prng_seedcore_&quot;</span> <span class="o">+</span> <span class="n">skey</span><span class="p">]),</span>
-            <span class="s2">&quot;lamtha&quot;</span><span class="p">:</span> <span class="mf">3.0</span><span class="p">,</span>
-            <span class="s2">&quot;loc&quot;</span><span class="p">:</span> <span class="s2">&quot;proximal&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;sync_evinput&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;sync_evinput&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;threshold&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;threshold&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;numspikes&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;numspikes_&quot;</span> <span class="o">+</span> <span class="n">skey</span><span class="p">],</span>
+            <span class="s2">"prng_seedcore"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">"prng_seedcore_"</span> <span class="o">+</span> <span class="n">skey</span><span class="p">]),</span>
+            <span class="s2">"lamtha"</span><span class="p">:</span> <span class="mf">3.0</span><span class="p">,</span>
+            <span class="s2">"loc"</span><span class="p">:</span> <span class="s2">"proximal"</span><span class="p">,</span>
+            <span class="s2">"sync_evinput"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"sync_evinput"</span><span class="p">],</span>
+            <span class="s2">"threshold"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"threshold"</span><span class="p">],</span>
+            <span class="s2">"numspikes"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"numspikes_"</span> <span class="o">+</span> <span class="n">skey</span><span class="p">],</span>
         <span class="p">}</span>
 
     <span class="c1"># Create distal evoked response parameters</span>
     <span class="c1"># f_input needs to be defined as 0</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndist</span><span class="p">):</span>
-        <span class="n">skey</span> <span class="o">=</span> <span class="s2">&quot;evdist_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">p_unique</span><span class="p">[</span><span class="s2">&quot;evdist&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;t0&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;t_&quot;</span> <span class="o">+</span> <span class="n">skey</span><span class="p">],</span>
-            <span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">:</span> <span class="p">(</span>
-                <span class="n">p</span><span class="p">[</span><span class="s2">&quot;gbar_&quot;</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">&quot;_L2Pyr_ampa&quot;</span><span class="p">],</span>
-                <span class="n">p</span><span class="p">[</span><span class="s2">&quot;gbar_&quot;</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">&quot;_L2Pyr_nmda&quot;</span><span class="p">],</span>
+        <span class="n">skey</span> <span class="o">=</span> <span class="s2">"evdist_"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">p_unique</span><span class="p">[</span><span class="s2">"evdist"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"t0"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"t_"</span> <span class="o">+</span> <span class="n">skey</span><span class="p">],</span>
+            <span class="s2">"L2_pyramidal"</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">p</span><span class="p">[</span><span class="s2">"gbar_"</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">"_L2Pyr_ampa"</span><span class="p">],</span>
+                <span class="n">p</span><span class="p">[</span><span class="s2">"gbar_"</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">"_L2Pyr_nmda"</span><span class="p">],</span>
                 <span class="mf">0.1</span><span class="p">,</span>
-                <span class="n">p</span><span class="p">[</span><span class="s2">&quot;sigma_t_&quot;</span> <span class="o">+</span> <span class="n">skey</span><span class="p">],</span>
+                <span class="n">p</span><span class="p">[</span><span class="s2">"sigma_t_"</span> <span class="o">+</span> <span class="n">skey</span><span class="p">],</span>
             <span class="p">),</span>
-            <span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">:</span> <span class="p">(</span>
-                <span class="n">p</span><span class="p">[</span><span class="s2">&quot;gbar_&quot;</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">&quot;_L5Pyr_ampa&quot;</span><span class="p">],</span>
-                <span class="n">p</span><span class="p">[</span><span class="s2">&quot;gbar_&quot;</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">&quot;_L5Pyr_nmda&quot;</span><span class="p">],</span>
+            <span class="s2">"L5_pyramidal"</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">p</span><span class="p">[</span><span class="s2">"gbar_"</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">"_L5Pyr_ampa"</span><span class="p">],</span>
+                <span class="n">p</span><span class="p">[</span><span class="s2">"gbar_"</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">"_L5Pyr_nmda"</span><span class="p">],</span>
                 <span class="mf">0.1</span><span class="p">,</span>
-                <span class="n">p</span><span class="p">[</span><span class="s2">&quot;sigma_t_&quot;</span> <span class="o">+</span> <span class="n">skey</span><span class="p">],</span>
+                <span class="n">p</span><span class="p">[</span><span class="s2">"sigma_t_"</span> <span class="o">+</span> <span class="n">skey</span><span class="p">],</span>
             <span class="p">),</span>
-            <span class="s2">&quot;L2_basket&quot;</span><span class="p">:</span> <span class="p">(</span>
-                <span class="n">p</span><span class="p">[</span><span class="s2">&quot;gbar_&quot;</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">&quot;_L2Basket_ampa&quot;</span><span class="p">],</span>
-                <span class="n">p</span><span class="p">[</span><span class="s2">&quot;gbar_&quot;</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">&quot;_L2Basket_nmda&quot;</span><span class="p">],</span>
+            <span class="s2">"L2_basket"</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">p</span><span class="p">[</span><span class="s2">"gbar_"</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">"_L2Basket_ampa"</span><span class="p">],</span>
+                <span class="n">p</span><span class="p">[</span><span class="s2">"gbar_"</span> <span class="o">+</span> <span class="n">skey</span> <span class="o">+</span> <span class="s2">"_L2Basket_nmda"</span><span class="p">],</span>
                 <span class="mf">0.1</span><span class="p">,</span>
-                <span class="n">p</span><span class="p">[</span><span class="s2">&quot;sigma_t_&quot;</span> <span class="o">+</span> <span class="n">skey</span><span class="p">],</span>
+                <span class="n">p</span><span class="p">[</span><span class="s2">"sigma_t_"</span> <span class="o">+</span> <span class="n">skey</span><span class="p">],</span>
             <span class="p">),</span>
-            <span class="s2">&quot;prng_seedcore&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;prng_seedcore_&quot;</span> <span class="o">+</span> <span class="n">skey</span><span class="p">]),</span>
-            <span class="s2">&quot;lamtha&quot;</span><span class="p">:</span> <span class="mf">3.0</span><span class="p">,</span>
-            <span class="s2">&quot;loc&quot;</span><span class="p">:</span> <span class="s2">&quot;distal&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;sync_evinput&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;sync_evinput&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;threshold&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;threshold&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;numspikes&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;numspikes_&quot;</span> <span class="o">+</span> <span class="n">skey</span><span class="p">],</span>
+            <span class="s2">"prng_seedcore"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">"prng_seedcore_"</span> <span class="o">+</span> <span class="n">skey</span><span class="p">]),</span>
+            <span class="s2">"lamtha"</span><span class="p">:</span> <span class="mf">3.0</span><span class="p">,</span>
+            <span class="s2">"loc"</span><span class="p">:</span> <span class="s2">"distal"</span><span class="p">,</span>
+            <span class="s2">"sync_evinput"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"sync_evinput"</span><span class="p">],</span>
+            <span class="s2">"threshold"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"threshold"</span><span class="p">],</span>
+            <span class="s2">"numspikes"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"numspikes_"</span> <span class="o">+</span> <span class="n">skey</span><span class="p">],</span>
         <span class="p">}</span>
 
     <span class="c1"># this needs to create many feeds</span>
     <span class="c1"># (amplitude, delay, mu, sigma). ordered this way to preserve compatibility</span>
     <span class="c1"># NEW: note double weight specification since only use ampa for gauss</span>
     <span class="c1"># inputs</span>
-    <span class="n">p_unique</span><span class="p">[</span><span class="s2">&quot;extgauss&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;stim&quot;</span><span class="p">:</span> <span class="s2">&quot;gaussian&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;L2_basket&quot;</span><span class="p">:</span> <span class="p">(</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;L2Basket_Gauss_A_weight&quot;</span><span class="p">],</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;L2Basket_Gauss_A_weight&quot;</span><span class="p">],</span>
+    <span class="n">p_unique</span><span class="p">[</span><span class="s2">"extgauss"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"stim"</span><span class="p">:</span> <span class="s2">"gaussian"</span><span class="p">,</span>
+        <span class="s2">"L2_basket"</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"L2Basket_Gauss_A_weight"</span><span class="p">],</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"L2Basket_Gauss_A_weight"</span><span class="p">],</span>
             <span class="mf">1.0</span><span class="p">,</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;L2Basket_Gauss_mu&quot;</span><span class="p">],</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;L2Basket_Gauss_sigma&quot;</span><span class="p">],</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"L2Basket_Gauss_mu"</span><span class="p">],</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"L2Basket_Gauss_sigma"</span><span class="p">],</span>
         <span class="p">),</span>
-        <span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">:</span> <span class="p">(</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;L2Pyr_Gauss_A_weight&quot;</span><span class="p">],</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;L2Pyr_Gauss_A_weight&quot;</span><span class="p">],</span>
+        <span class="s2">"L2_pyramidal"</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"L2Pyr_Gauss_A_weight"</span><span class="p">],</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"L2Pyr_Gauss_A_weight"</span><span class="p">],</span>
             <span class="mf">0.1</span><span class="p">,</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;L2Pyr_Gauss_mu&quot;</span><span class="p">],</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;L2Pyr_Gauss_sigma&quot;</span><span class="p">],</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"L2Pyr_Gauss_mu"</span><span class="p">],</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"L2Pyr_Gauss_sigma"</span><span class="p">],</span>
         <span class="p">),</span>
-        <span class="s2">&quot;L5_basket&quot;</span><span class="p">:</span> <span class="p">(</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;L5Basket_Gauss_A_weight&quot;</span><span class="p">],</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;L5Basket_Gauss_A_weight&quot;</span><span class="p">],</span>
+        <span class="s2">"L5_basket"</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"L5Basket_Gauss_A_weight"</span><span class="p">],</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"L5Basket_Gauss_A_weight"</span><span class="p">],</span>
             <span class="mf">1.0</span><span class="p">,</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;L5Basket_Gauss_mu&quot;</span><span class="p">],</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;L5Basket_Gauss_sigma&quot;</span><span class="p">],</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"L5Basket_Gauss_mu"</span><span class="p">],</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"L5Basket_Gauss_sigma"</span><span class="p">],</span>
         <span class="p">),</span>
-        <span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">:</span> <span class="p">(</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;L5Pyr_Gauss_A_weight&quot;</span><span class="p">],</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;L5Pyr_Gauss_A_weight&quot;</span><span class="p">],</span>
+        <span class="s2">"L5_pyramidal"</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"L5Pyr_Gauss_A_weight"</span><span class="p">],</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"L5Pyr_Gauss_A_weight"</span><span class="p">],</span>
             <span class="mf">1.0</span><span class="p">,</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;L5Pyr_Gauss_mu&quot;</span><span class="p">],</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;L5Pyr_Gauss_sigma&quot;</span><span class="p">],</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"L5Pyr_Gauss_mu"</span><span class="p">],</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"L5Pyr_Gauss_sigma"</span><span class="p">],</span>
         <span class="p">),</span>
-        <span class="s2">&quot;lamtha&quot;</span><span class="p">:</span> <span class="mf">100.0</span><span class="p">,</span>
-        <span class="s2">&quot;prng_seedcore&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;prng_seedcore_extgauss&quot;</span><span class="p">]),</span>
-        <span class="s2">&quot;loc&quot;</span><span class="p">:</span> <span class="s2">&quot;proximal&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;threshold&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;threshold&quot;</span><span class="p">],</span>
+        <span class="s2">"lamtha"</span><span class="p">:</span> <span class="mf">100.0</span><span class="p">,</span>
+        <span class="s2">"prng_seedcore"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">"prng_seedcore_extgauss"</span><span class="p">]),</span>
+        <span class="s2">"loc"</span><span class="p">:</span> <span class="s2">"proximal"</span><span class="p">,</span>
+        <span class="s2">"threshold"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"threshold"</span><span class="p">],</span>
     <span class="p">}</span>
 
     <span class="n">check_pois_synkeys</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
 
     <span class="c1"># Poisson distributed inputs to proximal</span>
     <span class="c1"># NEW: setting up AMPA and NMDA for Poisson inputs; why delays differ?</span>
-    <span class="n">p_unique</span><span class="p">[</span><span class="s2">&quot;extpois&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;stim&quot;</span><span class="p">:</span> <span class="s2">&quot;poisson&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;L2_basket&quot;</span><span class="p">:</span> <span class="p">(</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;L2Basket_Pois_A_weight_ampa&quot;</span><span class="p">],</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;L2Basket_Pois_A_weight_nmda&quot;</span><span class="p">],</span>
+    <span class="n">p_unique</span><span class="p">[</span><span class="s2">"extpois"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"stim"</span><span class="p">:</span> <span class="s2">"poisson"</span><span class="p">,</span>
+        <span class="s2">"L2_basket"</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"L2Basket_Pois_A_weight_ampa"</span><span class="p">],</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"L2Basket_Pois_A_weight_nmda"</span><span class="p">],</span>
             <span class="mf">1.0</span><span class="p">,</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;L2Basket_Pois_lamtha&quot;</span><span class="p">],</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"L2Basket_Pois_lamtha"</span><span class="p">],</span>
         <span class="p">),</span>
-        <span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">:</span> <span class="p">(</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;L2Pyr_Pois_A_weight_ampa&quot;</span><span class="p">],</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;L2Pyr_Pois_A_weight_nmda&quot;</span><span class="p">],</span>
+        <span class="s2">"L2_pyramidal"</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"L2Pyr_Pois_A_weight_ampa"</span><span class="p">],</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"L2Pyr_Pois_A_weight_nmda"</span><span class="p">],</span>
             <span class="mf">0.1</span><span class="p">,</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;L2Pyr_Pois_lamtha&quot;</span><span class="p">],</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"L2Pyr_Pois_lamtha"</span><span class="p">],</span>
         <span class="p">),</span>
-        <span class="s2">&quot;L5_basket&quot;</span><span class="p">:</span> <span class="p">(</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;L5Basket_Pois_A_weight_ampa&quot;</span><span class="p">],</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;L5Basket_Pois_A_weight_nmda&quot;</span><span class="p">],</span>
+        <span class="s2">"L5_basket"</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"L5Basket_Pois_A_weight_ampa"</span><span class="p">],</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"L5Basket_Pois_A_weight_nmda"</span><span class="p">],</span>
             <span class="mf">1.0</span><span class="p">,</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;L5Basket_Pois_lamtha&quot;</span><span class="p">],</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"L5Basket_Pois_lamtha"</span><span class="p">],</span>
         <span class="p">),</span>
-        <span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">:</span> <span class="p">(</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;L5Pyr_Pois_A_weight_ampa&quot;</span><span class="p">],</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;L5Pyr_Pois_A_weight_nmda&quot;</span><span class="p">],</span>
+        <span class="s2">"L5_pyramidal"</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"L5Pyr_Pois_A_weight_ampa"</span><span class="p">],</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"L5Pyr_Pois_A_weight_nmda"</span><span class="p">],</span>
             <span class="mf">1.0</span><span class="p">,</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;L5Pyr_Pois_lamtha&quot;</span><span class="p">],</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"L5Pyr_Pois_lamtha"</span><span class="p">],</span>
         <span class="p">),</span>
-        <span class="s2">&quot;lamtha&quot;</span><span class="p">:</span> <span class="mf">100.0</span><span class="p">,</span>
-        <span class="s2">&quot;prng_seedcore&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;prng_seedcore_extpois&quot;</span><span class="p">]),</span>
-        <span class="s2">&quot;t_interval&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;t0_pois&quot;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;T_pois&quot;</span><span class="p">]),</span>
-        <span class="s2">&quot;loc&quot;</span><span class="p">:</span> <span class="s2">&quot;proximal&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;threshold&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;threshold&quot;</span><span class="p">],</span>
+        <span class="s2">"lamtha"</span><span class="p">:</span> <span class="mf">100.0</span><span class="p">,</span>
+        <span class="s2">"prng_seedcore"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">"prng_seedcore_extpois"</span><span class="p">]),</span>
+        <span class="s2">"t_interval"</span><span class="p">:</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">"t0_pois"</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s2">"T_pois"</span><span class="p">]),</span>
+        <span class="s2">"loc"</span><span class="p">:</span> <span class="s2">"proximal"</span><span class="p">,</span>
+        <span class="s2">"threshold"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"threshold"</span><span class="p">],</span>
     <span class="p">}</span>
 
     <span class="k">return</span> <span class="n">p_common</span><span class="p">,</span> <span class="n">p_unique</span>
@@ -1249,9 +1240,9 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_any_positive_weights</span><span class="p">(</span><span class="n">drive</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Checks a drive for any positive weights.&quot;&quot;&quot;</span>
-    <span class="n">weights</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">drive</span><span class="p">[</span><span class="s2">&quot;weights_ampa&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span>
-        <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;weights_nmda&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">"""Checks a drive for any positive weights."""</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">drive</span><span class="p">[</span><span class="s2">"weights_ampa"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s2">"weights_nmda"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="n">val</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">weights</span><span class="p">]):</span>
         <span class="k">return</span> <span class="kc">True</span>
@@ -1260,7 +1251,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">remove_nulled_drives</span><span class="p">(</span><span class="n">net</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Removes drives from network if they have been given null parameters.</span>
+<span class="w">    </span><span class="sd">"""Removes drives from network if they have been given null parameters.</span>
 
 <span class="sd">    Legacy param files contained parameter placeholders for non-functional</span>
 <span class="sd">    drives. These drives were nulled by assigning values outside typical</span>
@@ -1276,7 +1267,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    net : Network object</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">.network</span><span class="w"> </span><span class="kn">import</span> <span class="n">pick_connection</span>
 
     <span class="n">net</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">net</span><span class="p">)</span>
@@ -1286,19 +1277,19 @@
     <span class="k">for</span> <span class="n">drive_name</span><span class="p">,</span> <span class="n">drive</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">external_drives</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">conn_indices</span> <span class="o">=</span> <span class="n">pick_connection</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">src_gids</span><span class="o">=</span><span class="n">drive_name</span><span class="p">)</span>
 
-        <span class="n">space_constant</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="n">conn_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s2">&quot;nc_dict&quot;</span><span class="p">][</span><span class="s2">&quot;lamtha&quot;</span><span class="p">]</span>
-        <span class="n">probability</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="n">conn_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s2">&quot;probability&quot;</span><span class="p">]</span>
+        <span class="n">space_constant</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="n">conn_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s2">"nc_dict"</span><span class="p">][</span><span class="s2">"lamtha"</span><span class="p">]</span>
+        <span class="n">probability</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="n">conn_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s2">"probability"</span><span class="p">]</span>
 
         <span class="n">extras</span><span class="p">[</span><span class="n">drive_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;space_constant&quot;</span><span class="p">:</span> <span class="n">space_constant</span><span class="p">,</span>
-            <span class="s2">&quot;probability&quot;</span><span class="p">:</span> <span class="n">probability</span><span class="p">,</span>
+            <span class="s2">"space_constant"</span><span class="p">:</span> <span class="n">space_constant</span><span class="p">,</span>
+            <span class="s2">"probability"</span><span class="p">:</span> <span class="n">probability</span><span class="p">,</span>
         <span class="p">}</span>
 
     <span class="n">net</span><span class="o">.</span><span class="n">clear_drives</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">drive_name</span><span class="p">,</span> <span class="n">drive</span> <span class="ow">in</span> <span class="n">drives_copy</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="c1"># Do not add drive if tstart is &gt; tstop, or negative</span>
-        <span class="n">t_start</span> <span class="o">=</span> <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;dynamics&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;tstart&quot;</span><span class="p">)</span>
-        <span class="n">t_stop</span> <span class="o">=</span> <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;dynamics&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;tstop&quot;</span><span class="p">)</span>
+        <span class="n">t_start</span> <span class="o">=</span> <span class="n">drive</span><span class="p">[</span><span class="s2">"dynamics"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"tstart"</span><span class="p">)</span>
+        <span class="n">t_stop</span> <span class="o">=</span> <span class="n">drive</span><span class="p">[</span><span class="s2">"dynamics"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"tstop"</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(</span>
             <span class="n">t_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="ow">and</span> <span class="n">t_stop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -1309,26 +1300,26 @@
         <span class="k">elif</span> <span class="ow">not</span> <span class="n">_any_positive_weights</span><span class="p">(</span><span class="n">drive</span><span class="p">):</span>
             <span class="k">continue</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># Set n_drive_cells to &#39;n_cells&#39; if equal to max number of cells</span>
-            <span class="k">if</span> <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;cell_specific&quot;</span><span class="p">]:</span>
-                <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;n_drive_cells&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;n_cells&quot;</span>
+            <span class="c1"># Set n_drive_cells to 'n_cells' if equal to max number of cells</span>
+            <span class="k">if</span> <span class="n">drive</span><span class="p">[</span><span class="s2">"cell_specific"</span><span class="p">]:</span>
+                <span class="n">drive</span><span class="p">[</span><span class="s2">"n_drive_cells"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"n_cells"</span>
             <span class="n">net</span><span class="o">.</span><span class="n">_attach_drive</span><span class="p">(</span>
-                <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span>
+                <span class="n">drive</span><span class="p">[</span><span class="s2">"name"</span><span class="p">],</span>
                 <span class="n">drive</span><span class="p">,</span>
-                <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;weights_ampa&quot;</span><span class="p">],</span>
-                <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;weights_nmda&quot;</span><span class="p">],</span>
-                <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;location&quot;</span><span class="p">],</span>
-                <span class="n">extras</span><span class="p">[</span><span class="n">drive_name</span><span class="p">][</span><span class="s2">&quot;space_constant&quot;</span><span class="p">],</span>
-                <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;synaptic_delays&quot;</span><span class="p">],</span>
-                <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;n_drive_cells&quot;</span><span class="p">],</span>
-                <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;cell_specific&quot;</span><span class="p">],</span>
-                <span class="n">extras</span><span class="p">[</span><span class="n">drive_name</span><span class="p">][</span><span class="s2">&quot;probability&quot;</span><span class="p">],</span>
+                <span class="n">drive</span><span class="p">[</span><span class="s2">"weights_ampa"</span><span class="p">],</span>
+                <span class="n">drive</span><span class="p">[</span><span class="s2">"weights_nmda"</span><span class="p">],</span>
+                <span class="n">drive</span><span class="p">[</span><span class="s2">"location"</span><span class="p">],</span>
+                <span class="n">extras</span><span class="p">[</span><span class="n">drive_name</span><span class="p">][</span><span class="s2">"space_constant"</span><span class="p">],</span>
+                <span class="n">drive</span><span class="p">[</span><span class="s2">"synaptic_delays"</span><span class="p">],</span>
+                <span class="n">drive</span><span class="p">[</span><span class="s2">"n_drive_cells"</span><span class="p">],</span>
+                <span class="n">drive</span><span class="p">[</span><span class="s2">"cell_specific"</span><span class="p">],</span>
+                <span class="n">extras</span><span class="p">[</span><span class="n">drive_name</span><span class="p">][</span><span class="s2">"probability"</span><span class="p">],</span>
             <span class="p">)</span>
     <span class="k">return</span> <span class="n">net</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">convert_to_json</span><span class="p">(</span><span class="n">params_fname</span><span class="p">,</span> <span class="n">out_fname</span><span class="p">,</span> <span class="n">include_drives</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts legacy json or param format to hierarchical json format</span>
+<span class="w">    </span><span class="sd">"""Converts legacy json or param format to hierarchical json format</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1343,25 +1334,25 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    None</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">.network_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">neymotin_2020_model</span>
 
     <span class="c1"># Validate inputs</span>
-    <span class="n">_validate_type</span><span class="p">(</span><span class="n">params_fname</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">),</span> <span class="s2">&quot;params_fname&quot;</span><span class="p">)</span>
-    <span class="n">_validate_type</span><span class="p">(</span><span class="n">out_fname</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">),</span> <span class="s2">&quot;out_fname&quot;</span><span class="p">)</span>
+    <span class="n">_validate_type</span><span class="p">(</span><span class="n">params_fname</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">),</span> <span class="s2">"params_fname"</span><span class="p">)</span>
+    <span class="n">_validate_type</span><span class="p">(</span><span class="n">out_fname</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">),</span> <span class="s2">"out_fname"</span><span class="p">)</span>
     <span class="c1"># Convert to Path</span>
     <span class="n">params_fname</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)</span>
     <span class="n">out_fname</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_fname</span><span class="p">)</span>
-    <span class="n">params_suffix</span> <span class="o">=</span> <span class="n">params_fname</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">params_suffix</span> <span class="o">=</span> <span class="n">params_fname</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="c1"># Add suffix if not supplied</span>
-    <span class="k">if</span> <span class="n">out_fname</span><span class="o">.</span><span class="n">suffix</span> <span class="o">!=</span> <span class="s2">&quot;.json&quot;</span><span class="p">:</span>
-        <span class="n">out_fname</span> <span class="o">=</span> <span class="n">out_fname</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.json&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">out_fname</span><span class="o">.</span><span class="n">suffix</span> <span class="o">!=</span> <span class="s2">".json"</span><span class="p">:</span>
+        <span class="n">out_fname</span> <span class="o">=</span> <span class="n">out_fname</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">".json"</span><span class="p">)</span>
 
     <span class="n">net</span> <span class="o">=</span> <span class="n">neymotin_2020_model</span><span class="p">(</span>
         <span class="n">params</span><span class="o">=</span><span class="n">read_params</span><span class="p">(</span><span class="n">params_fname</span><span class="p">),</span>
         <span class="n">add_drives_from_params</span><span class="o">=</span><span class="n">include_drives</span><span class="p">,</span>
-        <span class="n">legacy_mode</span><span class="o">=</span><span class="p">(</span><span class="kc">True</span> <span class="k">if</span> <span class="n">params_suffix</span> <span class="o">==</span> <span class="s2">&quot;param&quot;</span> <span class="k">else</span> <span class="kc">False</span><span class="p">),</span>
+        <span class="n">legacy_mode</span><span class="o">=</span><span class="p">(</span><span class="kc">True</span> <span class="k">if</span> <span class="n">params_suffix</span> <span class="o">==</span> <span class="s2">"param"</span> <span class="k">else</span> <span class="kc">False</span><span class="p">),</span>
     <span class="p">)</span>
 
     <span class="c1"># Remove drives that have null attributes</span>
@@ -1375,8 +1366,8 @@
 
 
 <span class="c1"># debug test function</span>
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">fparam</span> <span class="o">=</span> <span class="s2">&quot;param/debug.param&quot;</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">fparam</span> <span class="o">=</span> <span class="s2">"param/debug.param"</span>
 </pre></div>
 
                 </article>
@@ -1406,8 +1397,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1428,7 +1419,6 @@
 
   <p class="sphinx-version">
     Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
-    <br/>
   </p>
 </div>
       
@@ -1441,7 +1431,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.22.0.
 </p></div>
       
     </div>

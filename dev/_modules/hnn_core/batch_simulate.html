@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -26,32 +25,27 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c43d5962" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
 
     <script src="../../_static/documentation_options.js?v=debdd0a9"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script src="../../_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/hnn_core/batch_simulate';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.22.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
@@ -122,7 +116,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -170,13 +164,6 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
-    Examples
-  </a>
-</li>
-
-
-<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../api.html">
     API
   </a>
@@ -210,6 +197,13 @@
   </a>
 </li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">
+    HNN Textbook
+  </a>
+</li>
+
             <li class="nav-item dropdown">
                 <button class="btn dropdown-toggle nav-item" type="button"
                 data-bs-toggle="dropdown" aria-expanded="false"
@@ -218,13 +212,6 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-<li class=" ">
-  <a class="nav-link dropdown-item nav-external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">
-    HNN Textbook
-  </a>
-</li>
-
-
 <li class=" ">
   <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
     PyPI package
@@ -252,7 +239,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -283,15 +270,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
     <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
     <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
     <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -302,7 +289,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -342,13 +329,6 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../install.html">
     Install (Textbook)
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
-    Examples
   </a>
 </li>
 
@@ -441,15 +421,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
     <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
     <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
     <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -513,7 +493,7 @@
                 <article class="bd-article">
                   
   <h1>Source code for hnn_core.batch_simulate</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Batch Simulation.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""Batch Simulation."""</span>
 
 <span class="c1"># Authors: Abdul Samad Siddiqui &lt;abdulsamadsid1@gmail.com&gt;</span>
 <span class="c1">#          Nick Tolley &lt;nicholas_tolley@brown.edu&gt;</span>
@@ -534,7 +514,7 @@
 <div class="viewcode-block" id="BatchSimulate">
 <a class="viewcode-back" href="../../generated/hnn_core.batch_simulate.BatchSimulate.html#hnn_core.batch_simulate.BatchSimulate">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">BatchSimulate</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The BatchSimulate class.</span>
+<span class="w">    </span><span class="sd">"""The BatchSimulate class.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -562,7 +542,7 @@
 <span class="sd">        The number of trials for the simulation. Default is 1.</span>
 <span class="sd">    save_folder : str, optional</span>
 <span class="sd">        The path to save the simulation outputs.</span>
-<span class="sd">        Default is &#39;./sim_results&#39;.</span>
+<span class="sd">        Default is './sim_results'.</span>
 <span class="sd">    batch_size : int, optional</span>
 <span class="sd">        The maximum number of simulations saved in a single file.</span>
 <span class="sd">        Default is 100.</span>
@@ -591,23 +571,30 @@
 <span class="sd">        If True, save calcium concentrations.</span>
 <span class="sd">        Note, `save_outputs` must be True.</span>
 <span class="sd">        Default: False.</span>
-<span class="sd">    record_vsec : {False, &#39;all&#39;, &#39;soma&#39;}</span>
-<span class="sd">        Option to record voltages from all sections (&#39;all&#39;), or just</span>
-<span class="sd">        the soma (&#39;soma&#39;). Default: False.</span>
-<span class="sd">    record_isec : {False, &#39;all&#39;, &#39;soma&#39;}</span>
-<span class="sd">        Option to record voltages from all sections (&#39;all&#39;), or just</span>
-<span class="sd">        the soma (&#39;soma&#39;). Default: False.</span>
-<span class="sd">    postproc : bool, optional</span>
-<span class="sd">        If True, smoothing (``dipole_smooth_win``) and scaling</span>
-<span class="sd">        (``dipole_scalefctr``) values are read from the parameter file, and</span>
-<span class="sd">        applied to the dipole objects before returning.</span>
-<span class="sd">        Default: False.</span>
+<span class="sd">    record_vsec : {False, 'all', 'soma'}</span>
+<span class="sd">        Option to record voltages from all sections ('all'), or just</span>
+<span class="sd">        the soma ('soma'). Default: False.</span>
+<span class="sd">    record_isec : {False, 'all', 'soma'}</span>
+<span class="sd">        Option to record voltages from all sections ('all'), or just</span>
+<span class="sd">        the soma ('soma'). Default: False.</span>
+<span class="sd">    postproc : bool, default=False</span>
+<span class="sd">        Deprecated. If True, smoothing (``dipole_smooth_win``) and scaling</span>
+<span class="sd">        (``dipole_scalefctr``) values are read from the ``Network``'s parameter file,</span>
+<span class="sd">        and applied to the dipole objects before returning (the default ``Network``</span>
+<span class="sd">        parameter file, `hnn_core/param/default.json`, uses a smoothing value of 30 ms</span>
+<span class="sd">        and a scaling factor of 3000). Note that this setting only affects the dipole</span>
+<span class="sd">        waveforms, and not somatic voltages, possible extracellular recordings etc. The</span>
+<span class="sd">        preferred way is to use the :meth:`~hnn_core.dipole.Dipole.smooth` and</span>
+<span class="sd">        :meth:`~hnn_core.dipole.Dipole.scale` methods after the simulation is run instead.</span>
 <span class="sd">    clear_cache : bool, optional</span>
 <span class="sd">        Whether to clear the results cache after saving each batch.</span>
 <span class="sd">        Default is False.</span>
 <span class="sd">    summary_func : func, optional</span>
 <span class="sd">        A function to calculate summary statistics from the simulation</span>
 <span class="sd">        results. Default is None.</span>
+<span class="sd">    baseline_correction : bool, default=True</span>
+<span class="sd">        Whether to apply the ``Network``'s baseline correction method, which is</span>
+<span class="sd">        determined by ``Network._model_variant``.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -618,7 +605,7 @@
 <span class="sd">    a maximum of `batch_size` simulations, split evenly among the</span>
 <span class="sd">    available files. If ``overwrite=True``, existing files with the same name</span>
 <span class="sd">    will be overwritten.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -627,7 +614,7 @@
         <span class="n">tstop</span><span class="o">=</span><span class="mi">170</span><span class="p">,</span>
         <span class="n">dt</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span>
         <span class="n">n_trials</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">save_folder</span><span class="o">=</span><span class="s2">&quot;./sim_results&quot;</span><span class="p">,</span>
+        <span class="n">save_folder</span><span class="o">=</span><span class="s2">"./sim_results"</span><span class="p">,</span>
         <span class="n">batch_size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
         <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">save_outputs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -642,29 +629,30 @@
         <span class="n">postproc</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">clear_cache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">summary_func</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">baseline_correction</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="n">_validate_type</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">Network</span><span class="p">,</span> <span class="s2">&quot;net&quot;</span><span class="p">,</span> <span class="s2">&quot;Network&quot;</span><span class="p">)</span>
-        <span class="n">_validate_type</span><span class="p">(</span><span class="n">tstop</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="s2">&quot;numeric&quot;</span><span class="p">,</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">&quot;tstop&quot;</span><span class="p">)</span>
-        <span class="n">_validate_type</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="s2">&quot;numeric&quot;</span><span class="p">,</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">&quot;dt&quot;</span><span class="p">)</span>
-        <span class="n">_validate_type</span><span class="p">(</span><span class="n">n_trials</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">&quot;n_trials&quot;</span><span class="p">)</span>
-        <span class="n">_validate_type</span><span class="p">(</span><span class="n">save_folder</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="s2">&quot;path-like&quot;</span><span class="p">,</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">&quot;save_folder&quot;</span><span class="p">)</span>
-        <span class="n">_validate_type</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">&quot;batch_size&quot;</span><span class="p">)</span>
-        <span class="n">_validate_type</span><span class="p">(</span><span class="n">save_outputs</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="p">(</span><span class="nb">bool</span><span class="p">,),</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">&quot;save_outputs&quot;</span><span class="p">)</span>
-        <span class="n">_validate_type</span><span class="p">(</span><span class="n">save_dpl</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="p">(</span><span class="nb">bool</span><span class="p">,),</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">&quot;save_dpl&quot;</span><span class="p">)</span>
-        <span class="n">_validate_type</span><span class="p">(</span><span class="n">save_spiking</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="p">(</span><span class="nb">bool</span><span class="p">,),</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">&quot;save_spiking&quot;</span><span class="p">)</span>
-        <span class="n">_validate_type</span><span class="p">(</span><span class="n">save_lfp</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="p">(</span><span class="nb">bool</span><span class="p">,),</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">&quot;save_lfp&quot;</span><span class="p">)</span>
-        <span class="n">_validate_type</span><span class="p">(</span><span class="n">save_voltages</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="p">(</span><span class="nb">bool</span><span class="p">,),</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">&quot;save_voltages&quot;</span><span class="p">)</span>
-        <span class="n">_validate_type</span><span class="p">(</span><span class="n">save_currents</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="p">(</span><span class="nb">bool</span><span class="p">,),</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">&quot;save_currents&quot;</span><span class="p">)</span>
-        <span class="n">_validate_type</span><span class="p">(</span><span class="n">save_calcium</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="p">(</span><span class="nb">bool</span><span class="p">,),</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">&quot;save_calcium&quot;</span><span class="p">)</span>
-        <span class="n">_check_option</span><span class="p">(</span><span class="s2">&quot;record_vsec&quot;</span><span class="p">,</span> <span class="n">record_vsec</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;soma&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span>
-        <span class="n">_check_option</span><span class="p">(</span><span class="s2">&quot;record_isec&quot;</span><span class="p">,</span> <span class="n">record_isec</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;soma&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span>
-        <span class="n">_validate_type</span><span class="p">(</span><span class="n">clear_cache</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="p">(</span><span class="nb">bool</span><span class="p">,),</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">&quot;clear_cache&quot;</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">Network</span><span class="p">,</span> <span class="s2">"net"</span><span class="p">,</span> <span class="s2">"Network"</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">tstop</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="s2">"numeric"</span><span class="p">,</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">"tstop"</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="s2">"numeric"</span><span class="p">,</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">"dt"</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">n_trials</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="s2">"int"</span><span class="p">,</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">"n_trials"</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">save_folder</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="s2">"path-like"</span><span class="p">,</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">"save_folder"</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="s2">"int"</span><span class="p">,</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">"batch_size"</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">save_outputs</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="p">(</span><span class="nb">bool</span><span class="p">,),</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">"save_outputs"</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">save_dpl</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="p">(</span><span class="nb">bool</span><span class="p">,),</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">"save_dpl"</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">save_spiking</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="p">(</span><span class="nb">bool</span><span class="p">,),</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">"save_spiking"</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">save_lfp</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="p">(</span><span class="nb">bool</span><span class="p">,),</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">"save_lfp"</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">save_voltages</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="p">(</span><span class="nb">bool</span><span class="p">,),</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">"save_voltages"</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">save_currents</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="p">(</span><span class="nb">bool</span><span class="p">,),</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">"save_currents"</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">save_calcium</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="p">(</span><span class="nb">bool</span><span class="p">,),</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">"save_calcium"</span><span class="p">)</span>
+        <span class="n">_check_option</span><span class="p">(</span><span class="s2">"record_vsec"</span><span class="p">,</span> <span class="n">record_vsec</span><span class="p">,</span> <span class="p">[</span><span class="s2">"all"</span><span class="p">,</span> <span class="s2">"soma"</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span>
+        <span class="n">_check_option</span><span class="p">(</span><span class="s2">"record_isec"</span><span class="p">,</span> <span class="n">record_isec</span><span class="p">,</span> <span class="p">[</span><span class="s2">"all"</span><span class="p">,</span> <span class="s2">"soma"</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">clear_cache</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="p">(</span><span class="nb">bool</span><span class="p">,),</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">"clear_cache"</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">set_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">set_params</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;set_params must be a callable function&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"set_params must be a callable function"</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">summary_func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">summary_func</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;summary_func must be a callable function&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"summary_func must be a callable function"</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">set_params</span> <span class="o">=</span> <span class="n">set_params</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">net</span>
@@ -687,6 +675,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">clear_cache</span> <span class="o">=</span> <span class="n">clear_cache</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">summary_func</span> <span class="o">=</span> <span class="n">summary_func</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">baseline_correction</span> <span class="o">=</span> <span class="n">baseline_correction</span>
 
 <div class="viewcode-block" id="BatchSimulate.run">
 <a class="viewcode-back" href="../../generated/hnn_core.batch_simulate.BatchSimulate.html#hnn_core.batch_simulate.BatchSimulate.run">[docs]</a>
@@ -696,10 +685,10 @@
         <span class="n">return_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">combinations</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;loky&quot;</span><span class="p">,</span>
+        <span class="n">backend</span><span class="o">=</span><span class="s2">"loky"</span><span class="p">,</span>
         <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run batch simulations.</span>
+<span class="w">        </span><span class="sd">"""Run batch simulations.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -724,21 +713,21 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        results : dict</span>
-<span class="sd">            Dictionary containing &#39;summary_statistics&#39; and optionally</span>
-<span class="sd">            &#39;simulated_data&#39;. &#39;simulated_data&#39; may include keys: &#39;dpl&#39;, &#39;lfp&#39;,</span>
-<span class="sd">            &#39;spikes&#39;, &#39;voltages&#39;, &#39;param_values&#39;, &#39;net&#39;, &#39;times&#39;.</span>
+<span class="sd">            Dictionary containing 'summary_statistics' and optionally</span>
+<span class="sd">            'simulated_data'. 'simulated_data' may include keys: 'dpl', 'lfp',</span>
+<span class="sd">            'spikes', 'voltages', 'param_values', 'net', 'times'.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        Return content depends on `summary_func`, `return_output`, and</span>
 <span class="sd">        `clear_cache` settings.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">_validate_type</span><span class="p">(</span><span class="n">param_grid</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="p">(</span><span class="nb">dict</span><span class="p">,),</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">&quot;param_grid&quot;</span><span class="p">)</span>
-        <span class="n">_validate_type</span><span class="p">(</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">&quot;n_jobs&quot;</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">param_grid</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="p">(</span><span class="nb">dict</span><span class="p">,),</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">"param_grid"</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="s2">"int"</span><span class="p">,</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">"n_jobs"</span><span class="p">)</span>
         <span class="n">_check_option</span><span class="p">(</span>
-            <span class="s2">&quot;backend&quot;</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;loky&quot;</span><span class="p">,</span> <span class="s2">&quot;threading&quot;</span><span class="p">,</span> <span class="s2">&quot;multiprocessing&quot;</span><span class="p">,</span> <span class="s2">&quot;dask&quot;</span><span class="p">]</span>
+            <span class="s2">"backend"</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="p">[</span><span class="s2">"loky"</span><span class="p">,</span> <span class="s2">"threading"</span><span class="p">,</span> <span class="s2">"multiprocessing"</span><span class="p">,</span> <span class="s2">"dask"</span><span class="p">]</span>
         <span class="p">)</span>
-        <span class="n">_validate_type</span><span class="p">(</span><span class="n">verbose</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="p">(</span><span class="nb">bool</span><span class="p">,),</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">&quot;verbose&quot;</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">verbose</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="p">(</span><span class="nb">bool</span><span class="p">,),</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">"verbose"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span> <span class="o">=</span> <span class="n">verbose</span>
 
         <span class="n">param_combinations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_param_combinations</span><span class="p">(</span><span class="n">param_grid</span><span class="p">,</span> <span class="n">combinations</span><span class="p">)</span>
@@ -773,9 +762,9 @@
 
         <span class="k">if</span> <span class="n">return_output</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">clear_cache</span><span class="p">:</span>
-                <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;summary_statistics&quot;</span><span class="p">:</span> <span class="n">results</span><span class="p">}</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">"summary_statistics"</span><span class="p">:</span> <span class="n">results</span><span class="p">}</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;summary_statistics&quot;</span><span class="p">:</span> <span class="n">results</span><span class="p">,</span> <span class="s2">&quot;simulated_data&quot;</span><span class="p">:</span> <span class="n">simulated_data</span><span class="p">}</span></div>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">"summary_statistics"</span><span class="p">:</span> <span class="n">results</span><span class="p">,</span> <span class="s2">"simulated_data"</span><span class="p">:</span> <span class="n">simulated_data</span><span class="p">}</span></div>
 
 
 <div class="viewcode-block" id="BatchSimulate.simulate_batch">
@@ -784,9 +773,9 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">param_combinations</span><span class="p">,</span>
         <span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;loky&quot;</span><span class="p">,</span>
+        <span class="n">backend</span><span class="o">=</span><span class="s2">"loky"</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Simulate a batch of parameter sets in parallel.</span>
+<span class="w">        </span><span class="sd">"""Simulate a batch of parameter sets in parallel.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -810,13 +799,13 @@
 <span class="sd">            - `net`: The network model used for the simulation.</span>
 <span class="sd">            - `dpl`: The simulated dipole.</span>
 <span class="sd">            - `param_values`: The parameter values used for the simulation.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">_validate_type</span><span class="p">(</span>
-            <span class="n">param_combinations</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="p">(</span><span class="nb">list</span><span class="p">,),</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">&quot;param_combinations&quot;</span>
+            <span class="n">param_combinations</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="p">(</span><span class="nb">list</span><span class="p">,),</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">"param_combinations"</span>
         <span class="p">)</span>
-        <span class="n">_validate_type</span><span class="p">(</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">&quot;n_jobs&quot;</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="s2">"int"</span><span class="p">,</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">"n_jobs"</span><span class="p">)</span>
         <span class="n">_check_option</span><span class="p">(</span>
-            <span class="s2">&quot;backend&quot;</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;loky&quot;</span><span class="p">,</span> <span class="s2">&quot;threading&quot;</span><span class="p">,</span> <span class="s2">&quot;multiprocessing&quot;</span><span class="p">,</span> <span class="s2">&quot;dask&quot;</span><span class="p">]</span>
+            <span class="s2">"backend"</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="p">[</span><span class="s2">"loky"</span><span class="p">,</span> <span class="s2">"threading"</span><span class="p">,</span> <span class="s2">"multiprocessing"</span><span class="p">,</span> <span class="s2">"dask"</span><span class="p">]</span>
         <span class="p">)</span>
 
         <span class="k">with</span> <span class="n">parallel_config</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">):</span>
@@ -827,7 +816,7 @@
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_run_single_sim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_values</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run a single simulation.</span>
+<span class="w">        </span><span class="sd">"""Run a single simulation.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -842,12 +831,12 @@
 <span class="sd">            - `net`: The network model used for the simulation.</span>
 <span class="sd">            - `dpl`: The simulated dipole.</span>
 <span class="sd">            - `param_values`: The parameter values used for the simulation.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">net</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_params</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">param_values</span><span class="p">)</span>
 
-        <span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;net&quot;</span><span class="p">:</span> <span class="n">net</span><span class="p">,</span> <span class="s2">&quot;param_values&quot;</span><span class="p">:</span> <span class="n">param_values</span><span class="p">}</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"net"</span><span class="p">:</span> <span class="n">net</span><span class="p">,</span> <span class="s2">"param_values"</span><span class="p">:</span> <span class="n">param_values</span><span class="p">}</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dpl</span><span class="p">:</span>
             <span class="n">dpl</span> <span class="o">=</span> <span class="n">simulate_dipole</span><span class="p">(</span>
@@ -859,32 +848,33 @@
                 <span class="n">record_isec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">record_isec</span><span class="p">,</span>
                 <span class="n">postproc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">postproc</span><span class="p">,</span>
                 <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">,</span>
+                <span class="n">baseline_correction</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">baseline_correction</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="n">results</span><span class="p">[</span><span class="s2">&quot;dpl&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dpl</span>
+            <span class="n">results</span><span class="p">[</span><span class="s2">"dpl"</span><span class="p">]</span> <span class="o">=</span> <span class="n">dpl</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_spiking</span><span class="p">:</span>
-            <span class="n">results</span><span class="p">[</span><span class="s2">&quot;spiking&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;spike_times&quot;</span><span class="p">:</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">spike_times</span><span class="p">,</span>
-                <span class="s2">&quot;spike_types&quot;</span><span class="p">:</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">spike_types</span><span class="p">,</span>
-                <span class="s2">&quot;spike_gids&quot;</span><span class="p">:</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">spike_gids</span><span class="p">,</span>
+            <span class="n">results</span><span class="p">[</span><span class="s2">"spiking"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">"spike_times"</span><span class="p">:</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">spike_times</span><span class="p">,</span>
+                <span class="s2">"spike_types"</span><span class="p">:</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">spike_types</span><span class="p">,</span>
+                <span class="s2">"spike_gids"</span><span class="p">:</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">spike_gids</span><span class="p">,</span>
             <span class="p">}</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_lfp</span><span class="p">:</span>
-            <span class="n">results</span><span class="p">[</span><span class="s2">&quot;lfp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">rec_arrays</span>
+            <span class="n">results</span><span class="p">[</span><span class="s2">"lfp"</span><span class="p">]</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">rec_arrays</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_voltages</span><span class="p">:</span>
-            <span class="n">results</span><span class="p">[</span><span class="s2">&quot;voltages&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">vsec</span>
+            <span class="n">results</span><span class="p">[</span><span class="s2">"voltages"</span><span class="p">]</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">vsec</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_currents</span><span class="p">:</span>
-            <span class="n">results</span><span class="p">[</span><span class="s2">&quot;currents&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">isec</span>
+            <span class="n">results</span><span class="p">[</span><span class="s2">"currents"</span><span class="p">]</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">isec</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_calcium</span><span class="p">:</span>
-            <span class="n">results</span><span class="p">[</span><span class="s2">&quot;calcium&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">ca</span>
+            <span class="n">results</span><span class="p">[</span><span class="s2">"calcium"</span><span class="p">]</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">ca</span>
 
         <span class="k">return</span> <span class="n">results</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_generate_param_combinations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_grid</span><span class="p">,</span> <span class="n">combinations</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate combinations of parameters from the grid.</span>
+<span class="w">        </span><span class="sd">"""Generate combinations of parameters from the grid.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -899,7 +889,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        param_combinations: list</span>
 <span class="sd">            List of parameter combinations.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">keys</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">param_grid</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
         <span class="k">if</span> <span class="n">combinations</span><span class="p">:</span>
@@ -913,7 +903,7 @@
         <span class="k">return</span> <span class="n">param_combinations</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">start_idx</span><span class="p">,</span> <span class="n">end_idx</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Save simulation results to files.</span>
+<span class="w">        </span><span class="sd">"""Save simulation results to files.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -923,39 +913,39 @@
 <span class="sd">            The index of the first simulation in this batch.</span>
 <span class="sd">        end_idx : int</span>
 <span class="sd">            The index of the last simulation in this batch.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">_validate_type</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="p">(</span><span class="nb">list</span><span class="p">,),</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">&quot;results&quot;</span><span class="p">)</span>
-        <span class="n">_validate_type</span><span class="p">(</span><span class="n">start_idx</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">&quot;start_idx&quot;</span><span class="p">)</span>
-        <span class="n">_validate_type</span><span class="p">(</span><span class="n">end_idx</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">&quot;end_idx&quot;</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="p">(</span><span class="nb">list</span><span class="p">,),</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">"results"</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">start_idx</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="s2">"int"</span><span class="p">,</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">"start_idx"</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">end_idx</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="s2">"int"</span><span class="p">,</span> <span class="n">item_name</span><span class="o">=</span><span class="s2">"end_idx"</span><span class="p">)</span>
 
         <span class="n">save_folder</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_folder</span><span class="p">)</span>
         <span class="n">save_folder</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">save_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;param_values&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;param_values&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]}</span>
+        <span class="n">save_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"param_values"</span><span class="p">:</span> <span class="p">[</span><span class="n">result</span><span class="p">[</span><span class="s2">"param_values"</span><span class="p">]</span> <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]}</span>
 
         <span class="n">attributes_to_save</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;dpl&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;spiking&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;lfp&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;voltages&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;currents&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;calcium&quot;</span><span class="p">,</span>
+            <span class="s2">"dpl"</span><span class="p">,</span>
+            <span class="s2">"spiking"</span><span class="p">,</span>
+            <span class="s2">"lfp"</span><span class="p">,</span>
+            <span class="s2">"voltages"</span><span class="p">,</span>
+            <span class="s2">"currents"</span><span class="p">,</span>
+            <span class="s2">"calcium"</span><span class="p">,</span>
         <span class="p">]</span>
         <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attributes_to_save</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;save_</span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"save_</span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span> <span class="ow">and</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
                 <span class="n">save_data</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">result</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]</span>
 
         <span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
-            <span class="s2">&quot;n_trials&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_trials</span><span class="p">,</span>
-            <span class="s2">&quot;tstop&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tstop</span><span class="p">,</span>
-            <span class="s2">&quot;dt&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
+            <span class="s2">"batch_size"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
+            <span class="s2">"n_trials"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_trials</span><span class="p">,</span>
+            <span class="s2">"tstop"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tstop</span><span class="p">,</span>
+            <span class="s2">"dt"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
         <span class="p">}</span>
-        <span class="n">save_data</span><span class="p">[</span><span class="s2">&quot;metadata&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">metadata</span>
+        <span class="n">save_data</span><span class="p">[</span><span class="s2">"metadata"</span><span class="p">]</span> <span class="o">=</span> <span class="n">metadata</span>
 
-        <span class="n">file_path</span> <span class="o">=</span> <span class="n">save_folder</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;sim_run_</span><span class="si">{</span><span class="n">start_idx</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">end_idx</span><span class="si">}</span><span class="s2">.npz&quot;</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="n">save_folder</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"sim_run_</span><span class="si">{</span><span class="n">start_idx</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">end_idx</span><span class="si">}</span><span class="s2">.npz"</span>
         <span class="k">if</span> <span class="n">file_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">overwrite</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">FileExistsError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;File </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2"> already exists and overwrite is set to False.&quot;</span>
+                <span class="sa">f</span><span class="s2">"File </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2"> already exists and overwrite is set to False."</span>
             <span class="p">)</span>
 
         <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="o">**</span><span class="n">save_data</span><span class="p">)</span>
@@ -963,7 +953,7 @@
 <div class="viewcode-block" id="BatchSimulate.load_results">
 <a class="viewcode-back" href="../../generated/hnn_core.batch_simulate.BatchSimulate.html#hnn_core.batch_simulate.BatchSimulate.load_results">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">load_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">return_data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load simulation results from a file.</span>
+<span class="w">        </span><span class="sd">"""Load simulation results from a file.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -977,27 +967,27 @@
 <span class="sd">        -------</span>
 <span class="sd">        results : dict</span>
 <span class="sd">            Dictionary containing the loaded results and parameter values.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">return_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">return_data</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dpl</span><span class="p">:</span>
-                <span class="n">return_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;dpl&quot;</span><span class="p">)</span>
+                <span class="n">return_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"dpl"</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_spiking</span><span class="p">:</span>
-                <span class="n">return_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;spiking&quot;</span><span class="p">)</span>
+                <span class="n">return_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"spiking"</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_lfp</span><span class="p">:</span>
-                <span class="n">return_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;lfp&quot;</span><span class="p">)</span>
+                <span class="n">return_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"lfp"</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_voltages</span><span class="p">:</span>
-                <span class="n">return_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;voltages&quot;</span><span class="p">)</span>
+                <span class="n">return_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"voltages"</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_currents</span><span class="p">:</span>
-                <span class="n">return_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;currents&quot;</span><span class="p">)</span>
+                <span class="n">return_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"currents"</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_calcium</span><span class="p">:</span>
-                <span class="n">return_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;calcium&quot;</span><span class="p">)</span>
+                <span class="n">return_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"calcium"</span><span class="p">)</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">allow_pickle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">results</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">key</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">files</span>
-            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">return_data</span> <span class="ow">or</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;param_values&quot;</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">return_data</span> <span class="ow">or</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">"param_values"</span>
         <span class="p">}</span>
         <span class="k">return</span> <span class="n">results</span></div>
 
@@ -1005,16 +995,16 @@
 <div class="viewcode-block" id="BatchSimulate.load_all_results">
 <a class="viewcode-back" href="../../generated/hnn_core.batch_simulate.BatchSimulate.html#hnn_core.batch_simulate.BatchSimulate.load_all_results">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">load_all_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load all simulation results from the files in `self.save_folder`.</span>
+<span class="w">        </span><span class="sd">"""Load all simulation results from the files in `self.save_folder`.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        all_results : list</span>
 <span class="sd">            List of dictionaries containing all loaded simulation results.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">all_results</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">save_folder</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_folder</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="n">save_folder</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;sim_run_*.npz&quot;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="n">save_folder</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"sim_run_*.npz"</span><span class="p">):</span>
             <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_results</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
             <span class="n">all_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">all_results</span></div>
@@ -1049,8 +1039,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1071,7 +1061,6 @@
 
   <p class="sphinx-version">
     Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
-    <br/>
   </p>
 </div>
       
@@ -1084,7 +1073,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.22.0.
 </p></div>
       
     </div>

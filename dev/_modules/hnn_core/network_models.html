@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -26,32 +25,27 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c43d5962" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
 
     <script src="../../_static/documentation_options.js?v=debdd0a9"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script src="../../_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/hnn_core/network_models';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.22.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
@@ -122,7 +116,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -170,13 +164,6 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
-    Examples
-  </a>
-</li>
-
-
-<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../api.html">
     API
   </a>
@@ -210,6 +197,13 @@
   </a>
 </li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">
+    HNN Textbook
+  </a>
+</li>
+
             <li class="nav-item dropdown">
                 <button class="btn dropdown-toggle nav-item" type="button"
                 data-bs-toggle="dropdown" aria-expanded="false"
@@ -218,13 +212,6 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-<li class=" ">
-  <a class="nav-link dropdown-item nav-external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">
-    HNN Textbook
-  </a>
-</li>
-
-
 <li class=" ">
   <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
     PyPI package
@@ -252,7 +239,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -283,15 +270,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
     <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
     <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
     <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -302,7 +289,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -342,13 +329,6 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../install.html">
     Install (Textbook)
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
-    Examples
   </a>
 </li>
 
@@ -441,15 +421,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
     <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
     <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
     <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -513,20 +493,27 @@
                 <article class="bd-article">
                   
   <h1>Source code for hnn_core.network_models</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Network model functions.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""Network model functions."""</span>
 
 <span class="c1"># Authors: Nick Tolley &lt;nicholas_tolley@brown.edu&gt;</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
-
 <span class="kn">import</span><span class="w"> </span><span class="nn">hnn_core</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_params</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.network</span><span class="w"> </span><span class="kn">import</span> <span class="n">Network</span><span class="p">,</span> <span class="n">_create_cell_coords</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.params</span><span class="w"> </span><span class="kn">import</span> <span class="n">_short_name</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.cells_default</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyramidal_ca</span><span class="p">,</span> <span class="n">pyramidal</span><span class="p">,</span> <span class="n">basket</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.cells_default</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">basket</span><span class="p">,</span>
+    <span class="n">pyramidal</span><span class="p">,</span>
+    <span class="n">pyramidal_ca</span><span class="p">,</span>
+    <span class="n">pyramidal_humanL5ET</span><span class="p">,</span>
+    <span class="n">pyramidal_humanL23</span><span class="p">,</span>
+    <span class="n">human_gen_interneuron</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.externals.mne</span><span class="w"> </span><span class="kn">import</span> <span class="n">_validate_type</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.dipole</span><span class="w"> </span><span class="kn">import</span> <span class="n">_correct_baseline_dueckerET</span><span class="p">,</span> <span class="n">_correct_baseline_neymotin2020</span>
 
 <span class="c1"># Default cell metadata for the standard Jones 2009 network cell types.</span>
 <span class="c1"># Defined here at module level so that other code (e.g. JSON</span>
@@ -534,51 +521,153 @@
 <span class="c1"># a full Network object.</span>
 
 <span class="n">default_cell_metadata</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;L2_basket&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;morpho_type&quot;</span><span class="p">:</span> <span class="s2">&quot;basket&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;electro_type&quot;</span><span class="p">:</span> <span class="s2">&quot;inhibitory&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="s2">&quot;2&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;measure_dipole&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="s2">&quot;reference&quot;</span><span class="p">:</span> <span class="s2">&quot;https://doi.org/10.7554/eLife.51214&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;m&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;marker&quot;</span><span class="p">:</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span>  <span class="c1"># shape from prev viz.py line:926</span>
+    <span class="s2">"L2_basket"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"morpho_type"</span><span class="p">:</span> <span class="s2">"basket"</span><span class="p">,</span>
+        <span class="s2">"electro_type"</span><span class="p">:</span> <span class="s2">"inhibitory"</span><span class="p">,</span>
+        <span class="s2">"layer"</span><span class="p">:</span> <span class="s2">"2"</span><span class="p">,</span>
+        <span class="s2">"zdist_origin"</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span>  <span class="c1"># distance to origin in percent of layer_separation</span>
+        <span class="s2">"measure_dipole"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"reference"</span><span class="p">:</span> <span class="s2">"https://doi.org/10.7554/eLife.51214"</span><span class="p">,</span>
+        <span class="s2">"color"</span><span class="p">:</span> <span class="s2">"m"</span><span class="p">,</span>
+        <span class="s2">"marker"</span><span class="p">:</span> <span class="s2">"x"</span><span class="p">,</span>  <span class="c1"># shape from prev viz.py line:926</span>
     <span class="p">},</span>
-    <span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;morpho_type&quot;</span><span class="p">:</span> <span class="s2">&quot;pyramidal&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;electro_type&quot;</span><span class="p">:</span> <span class="s2">&quot;excitatory&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="s2">&quot;2&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;measure_dipole&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="s2">&quot;reference&quot;</span><span class="p">:</span> <span class="s2">&quot;https://doi.org/10.7554/eLife.51214&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;marker&quot;</span><span class="p">:</span> <span class="s2">&quot;^&quot;</span><span class="p">,</span>
+    <span class="s2">"L2_pyramidal"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"morpho_type"</span><span class="p">:</span> <span class="s2">"pyramidal"</span><span class="p">,</span>
+        <span class="s2">"electro_type"</span><span class="p">:</span> <span class="s2">"excitatory"</span><span class="p">,</span>
+        <span class="s2">"layer"</span><span class="p">:</span> <span class="s2">"2"</span><span class="p">,</span>
+        <span class="s2">"zdist_origin"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">"measure_dipole"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">"reference"</span><span class="p">:</span> <span class="s2">"https://doi.org/10.7554/eLife.51214"</span><span class="p">,</span>
+        <span class="s2">"color"</span><span class="p">:</span> <span class="s2">"c"</span><span class="p">,</span>
+        <span class="s2">"marker"</span><span class="p">:</span> <span class="s2">"^"</span><span class="p">,</span>
     <span class="p">},</span>
-    <span class="s2">&quot;L5_basket&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;morpho_type&quot;</span><span class="p">:</span> <span class="s2">&quot;basket&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;electro_type&quot;</span><span class="p">:</span> <span class="s2">&quot;inhibitory&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="s2">&quot;5&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;measure_dipole&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="s2">&quot;reference&quot;</span><span class="p">:</span> <span class="s2">&quot;https://doi.org/10.7554/eLife.51214&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;marker&quot;</span><span class="p">:</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span>
+    <span class="s2">"L5_basket"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"morpho_type"</span><span class="p">:</span> <span class="s2">"basket"</span><span class="p">,</span>
+        <span class="s2">"electro_type"</span><span class="p">:</span> <span class="s2">"inhibitory"</span><span class="p">,</span>
+        <span class="s2">"layer"</span><span class="p">:</span> <span class="s2">"5"</span><span class="p">,</span>
+        <span class="s2">"zdist_origin"</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+        <span class="s2">"measure_dipole"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"reference"</span><span class="p">:</span> <span class="s2">"https://doi.org/10.7554/eLife.51214"</span><span class="p">,</span>
+        <span class="s2">"color"</span><span class="p">:</span> <span class="s2">"r"</span><span class="p">,</span>
+        <span class="s2">"marker"</span><span class="p">:</span> <span class="s2">"x"</span><span class="p">,</span>
     <span class="p">},</span>
-    <span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;morpho_type&quot;</span><span class="p">:</span> <span class="s2">&quot;pyramidal&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;electro_type&quot;</span><span class="p">:</span> <span class="s2">&quot;excitatory&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="s2">&quot;5&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;measure_dipole&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="s2">&quot;reference&quot;</span><span class="p">:</span> <span class="s2">&quot;https://doi.org/10.7554/eLife.51214&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;marker&quot;</span><span class="p">:</span> <span class="s2">&quot;^&quot;</span><span class="p">,</span>
+    <span class="s2">"L5_pyramidal"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"morpho_type"</span><span class="p">:</span> <span class="s2">"pyramidal"</span><span class="p">,</span>
+        <span class="s2">"electro_type"</span><span class="p">:</span> <span class="s2">"excitatory"</span><span class="p">,</span>
+        <span class="s2">"layer"</span><span class="p">:</span> <span class="s2">"5"</span><span class="p">,</span>
+        <span class="s2">"zdist_origin"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">"measure_dipole"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">"reference"</span><span class="p">:</span> <span class="s2">"https://doi.org/10.7554/eLife.51214"</span><span class="p">,</span>
+        <span class="s2">"color"</span><span class="p">:</span> <span class="s2">"b"</span><span class="p">,</span>
+        <span class="s2">"marker"</span><span class="p">:</span> <span class="s2">"^"</span><span class="p">,</span>
     <span class="p">},</span>
 <span class="p">}</span>
 
 <span class="n">default_drive_colors</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;proximal&quot;</span><span class="p">:</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;distal&quot;</span><span class="p">:</span> <span class="s2">&quot;g&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;#8B4513&quot;</span><span class="p">,</span>
+    <span class="s2">"proximal"</span><span class="p">:</span> <span class="s2">"r"</span><span class="p">,</span>
+    <span class="s2">"distal"</span><span class="p">:</span> <span class="s2">"g"</span><span class="p">,</span>
+    <span class="s2">"default"</span><span class="p">:</span> <span class="s2">"#8B4513"</span><span class="p">,</span>
 <span class="p">}</span>
 
-<span class="c1"># ToDO -&gt; direct _cell_L2Pyr calling</span>
+
+<span class="c1"># Map of how `Network._model_variant` cases apply to different</span>
+<span class="c1"># `Dipole._correct_baseline` functions. This is applied at the time of `Dipole`</span>
+<span class="c1"># creation, but contains information about differences between network models, so it is</span>
+<span class="c1"># located here.</span>
+<span class="n">MODEL_VARIANT_MAPPING</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="kc">None</span><span class="p">:</span> <span class="n">_correct_baseline_neymotin2020</span><span class="p">,</span>
+    <span class="s2">"neymotin_2020_model"</span><span class="p">:</span> <span class="n">_correct_baseline_neymotin2020</span><span class="p">,</span>
+    <span class="s2">"jones_2009_model"</span><span class="p">:</span> <span class="n">_correct_baseline_neymotin2020</span><span class="p">,</span>
+    <span class="s2">"law_2021_model"</span><span class="p">:</span> <span class="n">_correct_baseline_neymotin2020</span><span class="p">,</span>
+    <span class="s2">"calcium_model"</span><span class="p">:</span> <span class="n">_correct_baseline_neymotin2020</span><span class="p">,</span>
+    <span class="s2">"duecker_ET_model"</span><span class="p">:</span> <span class="n">_correct_baseline_dueckerET</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_params_for_model</span><span class="p">(</span>
+    <span class="n">net</span><span class="p">,</span>
+    <span class="n">params</span><span class="p">,</span>
+    <span class="n">model_variant</span><span class="p">,</span>
+    <span class="n">alt_variants</span><span class="o">=</span><span class="p">[],</span>
+    <span class="n">require_variant</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">excluded_cells</span><span class="o">=</span><span class="p">[],</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Check that a param file matches the network model it is used for.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    net : Instance of Network object</span>
+<span class="sd">        The network the parameters are used for.</span>
+<span class="sd">    params : dict</span>
+<span class="sd">        The parameters the network was built from.</span>
+<span class="sd">    model_variant : str</span>
+<span class="sd">        Name of the network model, e.g. 'duecker_ET_model'. The</span>
+<span class="sd">        'model_variant' entry of `params` must be this name (or of one of</span>
+<span class="sd">        `alt_variants`).</span>
+<span class="sd">    alt_variants : list of str, default=[]</span>
+<span class="sd">        Further model names that are accepted in the 'model_variant' entry of `params`,</span>
+<span class="sd">        e.g. the deprecated name of a model. If `params` defines a local 'model_variant'</span>
+<span class="sd">        that is in 'alt_variants', the returned value will be the value of</span>
+<span class="sd">        'model_variant' that is passed to this function instead.</span>
+<span class="sd">    require_variant : bool, default=False</span>
+<span class="sd">        If True, raise if `params` does not define 'model_variant'. Used for</span>
+<span class="sd">        models that share no parameters with the default model, and would</span>
+<span class="sd">        otherwise silently fall back to default values.</span>
+<span class="sd">    excluded_cells : list of str, default=[]</span>
+<span class="sd">        Short names of cells that are *not* part of this network, e.g.</span>
+<span class="sd">        ('L2Basket', 'L5Basket') for a model in which basket cells are</span>
+<span class="sd">        replaced. Parameters for these cells are rejected.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    model_variant : str</span>
+<span class="sd">        The official model variant name.</span>
+<span class="sd">    """</span>
+    <span class="n">check_var</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"model_variant"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">check_var</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">require_variant</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"'model_variant' is required for simulations with "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">model_variant</span><span class="si">}</span><span class="s2">. If you are sure that you are using the "</span>
+                <span class="sa">f</span><span class="s2">"correct parameters, add 'model_variant': '</span><span class="si">{</span><span class="n">model_variant</span><span class="si">}</span><span class="s2">', "</span>
+                <span class="s2">"to the first line of the param .json file."</span>
+            <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">check_var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">model_variant</span><span class="p">]</span> <span class="o">+</span> <span class="n">alt_variants</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Parameters for </span><span class="si">{</span><span class="n">check_var</span><span class="si">}</span><span class="s2"> used for </span><span class="si">{</span><span class="n">model_variant</span><span class="si">}</span><span class="s2">."</span>
+            <span class="s2">" Ensure that your param .json file matches the network "</span>
+            <span class="sa">f</span><span class="s2">"and that your model variant is one of </span><span class="si">{</span><span class="p">[</span><span class="n">model_variant</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">alt_variants</span><span class="si">}</span><span class="s2">. "</span>
+        <span class="p">)</span>
+
+    <span class="c1"># check that the params define the cell types of this network</span>
+    <span class="n">missing_cells</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">cell_name</span>
+        <span class="k">for</span> <span class="n">cell_name</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">_short_name</span><span class="p">(</span><span class="n">cell_name</span><span class="p">)</span> <span class="ow">in</span> <span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="n">missing_cells</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"No parameters found for </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing_cells</span><span class="p">)</span><span class="si">}</span><span class="s2">."</span>
+            <span class="s2">" Ensure that your param .json file matches the network. "</span>
+            <span class="s2">" Reach out to us if this doesn't solve your problem.  "</span>
+            <span class="s2">" https://github.com/jonescompneurolab/hnn-core/discussions"</span>
+        <span class="p">)</span>
+
+    <span class="c1"># check that the params don't define cell types this network replaced</span>
+    <span class="n">unexpected_cells</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">cell_name</span>
+        <span class="k">for</span> <span class="n">cell_name</span> <span class="ow">in</span> <span class="n">excluded_cells</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">cell_name</span> <span class="ow">in</span> <span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="n">unexpected_cells</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Parameters found for </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">unexpected_cells</span><span class="p">)</span><span class="si">}</span><span class="s2">, which"</span>
+            <span class="sa">f</span><span class="s2">" are not part of </span><span class="si">{</span><span class="n">model_variant</span><span class="si">}</span><span class="s2">. Ensure that your"</span>
+            <span class="s2">" param .json file matches the network."</span>
+            <span class="s2">" Reach out to us if this doesn't solve your problem.  "</span>
+            <span class="s2">" https://github.com/jonescompneurolab/hnn-core/discussions"</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">model_variant</span>
 
 
 <div class="viewcode-block" id="neymotin_2020_model">
@@ -589,19 +678,26 @@
     <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">mesh_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Instantiate the network model described in Neymotin et al. 2020</span>
+<span class="w">    </span><span class="sd">"""Instantiate the network model described in Neymotin et al. 2020</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    params : str | dict | None</span>
-<span class="sd">        The path to the parameter file for constructing the network.</span>
-<span class="sd">        If None, parameters loaded from default.json</span>
-<span class="sd">        Default: None</span>
-<span class="sd">    add_drives_from_params : bool</span>
+<span class="sd">    params : str | Path | dict | None, default=None</span>
+<span class="sd">        Custom Network parameters to use, if any. If string or Path, it is assumed to be</span>
+<span class="sd">        a path to a legacy "flat" JSON file containing the parameters in the style of</span>
+<span class="sd">        `hnn_core/param/default.json` (NOT a modern "hierarchical" JSON file like</span>
+<span class="sd">        `hnn_core/param/neymotin2020_base.json`). If dict, it is assumed to be a</span>
+<span class="sd">        dictionary of parameters in the "flat" JSON style. If None (the default), the</span>
+<span class="sd">        default parameters are used from `hnn_core/param/default.json`. Note that if you</span>
+<span class="sd">        want to use any drives defined in the params (either your provided custom params</span>
+<span class="sd">        or the default), then you must also set `add_drives_from_params` to True. If you</span>
+<span class="sd">        pass any custom params, then no default params will be used, including for</span>
+<span class="sd">        drives.</span>
+<span class="sd">    add_drives_from_params : bool, default=False</span>
 <span class="sd">        If True, add drives as defined in the params-dict. NB this is mainly</span>
 <span class="sd">        for backward-compatibility with HNN GUI, and will be deprecated in a</span>
 <span class="sd">        future release. Default: False</span>
-<span class="sd">    legacy_mode : bool</span>
+<span class="sd">    legacy_mode : bool, default=False</span>
 <span class="sd">        Set to False by default. Enables matching HNN GUI output when drives</span>
 <span class="sd">        are added suitably. Will be deprecated in a future release.</span>
 <span class="sd">    mesh_shape : tuple of int (default: (10, 10))</span>
@@ -626,41 +722,47 @@
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
-<span class="sd">    .. [1] Jones, Stephanie R., et al. &quot;Quantitative Analysis and</span>
+<span class="sd">    .. [1] Jones, Stephanie R., et al. "Quantitative Analysis and</span>
 <span class="sd">           Biophysically Realistic Neural Modeling of the MEG Mu Rhythm:</span>
-<span class="sd">           Rhythmogenesis and Modulation of Sensory-Evoked Responses.&quot;</span>
+<span class="sd">           Rhythmogenesis and Modulation of Sensory-Evoked Responses."</span>
 <span class="sd">           Journal of Neurophysiology 102, 3554–3572 (2009).</span>
 <span class="sd">           https://doi.org/10.1152/jn.00535.2009</span>
 
-<span class="sd">    .. [2] Neymotin, Samuel A, et al. 2020. &quot;Human Neocortical Neurosolver (HNN), a New</span>
+<span class="sd">    .. [2] Neymotin, Samuel A, et al. 2020. "Human Neocortical Neurosolver (HNN), a New</span>
 <span class="sd">           Software Tool for Interpreting the Cellular and Network Origin of Human</span>
-<span class="sd">           MEG/EEG Data.&quot; eLife 9 (January):e51214. https://doi.org/10.7554/eLife.51214</span>
+<span class="sd">           MEG/EEG Data." eLife 9 (January):e51214. https://doi.org/10.7554/eLife.51214</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">hnn_core_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">hnn_core</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
+    <span class="n">_validate_type</span><span class="p">(</span>
+        <span class="n">params</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)),</span> <span class="s2">"params"</span><span class="p">,</span> <span class="s2">"str | Path | dict | None"</span>
+    <span class="p">)</span>
     <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">params</span> <span class="o">=</span> <span class="n">hnn_core_root</span> <span class="o">/</span> <span class="s2">&quot;param&quot;</span> <span class="o">/</span> <span class="s2">&quot;default.json&quot;</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">)):</span>
+        <span class="n">params_fname</span> <span class="o">=</span> <span class="n">hnn_core_root</span> <span class="o">/</span> <span class="s2">"param"</span> <span class="o">/</span> <span class="s2">"default.json"</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">read_params</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">read_params</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="c1"># If the user has provided params as a dict, then we don't need to load it from</span>
+    <span class="c1"># file, and its correctness will be checked later inside the `Network` initializer.</span>
 
     <span class="c1"># Define cell types for Jones 2009 model</span>
     <span class="c1"># data is here in metaData format</span>
     <span class="n">cell_types</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;L2_basket&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;cell_object&quot;</span><span class="p">:</span> <span class="n">basket</span><span class="p">(</span><span class="n">cell_name</span><span class="o">=</span><span class="s2">&quot;L2_basket&quot;</span><span class="p">),</span>
-            <span class="s2">&quot;cell_metadata&quot;</span><span class="p">:</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">default_cell_metadata</span><span class="p">[</span><span class="s2">&quot;L2_basket&quot;</span><span class="p">]),</span>
+        <span class="s2">"L2_basket"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"cell_object"</span><span class="p">:</span> <span class="n">basket</span><span class="p">(</span><span class="n">cell_name</span><span class="o">=</span><span class="s2">"L2_basket"</span><span class="p">),</span>
+            <span class="s2">"cell_metadata"</span><span class="p">:</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">default_cell_metadata</span><span class="p">[</span><span class="s2">"L2_basket"</span><span class="p">]),</span>
         <span class="p">},</span>
-        <span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;cell_object&quot;</span><span class="p">:</span> <span class="n">pyramidal</span><span class="p">(</span><span class="n">cell_name</span><span class="o">=</span><span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">),</span>
-            <span class="s2">&quot;cell_metadata&quot;</span><span class="p">:</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">default_cell_metadata</span><span class="p">[</span><span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">]),</span>
+        <span class="s2">"L2_pyramidal"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"cell_object"</span><span class="p">:</span> <span class="n">pyramidal</span><span class="p">(</span><span class="n">cell_name</span><span class="o">=</span><span class="s2">"L2_pyramidal"</span><span class="p">),</span>
+            <span class="s2">"cell_metadata"</span><span class="p">:</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">default_cell_metadata</span><span class="p">[</span><span class="s2">"L2_pyramidal"</span><span class="p">]),</span>
         <span class="p">},</span>
-        <span class="s2">&quot;L5_basket&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;cell_object&quot;</span><span class="p">:</span> <span class="n">basket</span><span class="p">(</span><span class="n">cell_name</span><span class="o">=</span><span class="s2">&quot;L5_basket&quot;</span><span class="p">),</span>
-            <span class="s2">&quot;cell_metadata&quot;</span><span class="p">:</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">default_cell_metadata</span><span class="p">[</span><span class="s2">&quot;L5_basket&quot;</span><span class="p">]),</span>
+        <span class="s2">"L5_basket"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"cell_object"</span><span class="p">:</span> <span class="n">basket</span><span class="p">(</span><span class="n">cell_name</span><span class="o">=</span><span class="s2">"L5_basket"</span><span class="p">),</span>
+            <span class="s2">"cell_metadata"</span><span class="p">:</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">default_cell_metadata</span><span class="p">[</span><span class="s2">"L5_basket"</span><span class="p">]),</span>
         <span class="p">},</span>
-        <span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;cell_object&quot;</span><span class="p">:</span> <span class="n">pyramidal</span><span class="p">(</span><span class="n">cell_name</span><span class="o">=</span><span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">),</span>
-            <span class="s2">&quot;cell_metadata&quot;</span><span class="p">:</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">default_cell_metadata</span><span class="p">[</span><span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">]),</span>
+        <span class="s2">"L5_pyramidal"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"cell_object"</span><span class="p">:</span> <span class="n">pyramidal</span><span class="p">(</span><span class="n">cell_name</span><span class="o">=</span><span class="s2">"L5_pyramidal"</span><span class="p">),</span>
+            <span class="s2">"cell_metadata"</span><span class="p">:</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">default_cell_metadata</span><span class="p">[</span><span class="s2">"L5_pyramidal"</span><span class="p">]),</span>
         <span class="p">},</span>
     <span class="p">}</span>
 
@@ -674,11 +776,11 @@
 
     <span class="c1"># Map cell types to layer positions</span>
     <span class="n">pos_dict</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">:</span> <span class="n">layer_dict</span><span class="p">[</span><span class="s2">&quot;L5_bottom&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">:</span> <span class="n">layer_dict</span><span class="p">[</span><span class="s2">&quot;L2_bottom&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;L5_basket&quot;</span><span class="p">:</span> <span class="n">layer_dict</span><span class="p">[</span><span class="s2">&quot;L5_mid&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;L2_basket&quot;</span><span class="p">:</span> <span class="n">layer_dict</span><span class="p">[</span><span class="s2">&quot;L2_mid&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;origin&quot;</span><span class="p">:</span> <span class="n">layer_dict</span><span class="p">[</span><span class="s2">&quot;origin&quot;</span><span class="p">],</span>
+        <span class="s2">"L5_pyramidal"</span><span class="p">:</span> <span class="n">layer_dict</span><span class="p">[</span><span class="s2">"L5_bottom"</span><span class="p">],</span>
+        <span class="s2">"L2_pyramidal"</span><span class="p">:</span> <span class="n">layer_dict</span><span class="p">[</span><span class="s2">"L2_bottom"</span><span class="p">],</span>
+        <span class="s2">"L5_basket"</span><span class="p">:</span> <span class="n">layer_dict</span><span class="p">[</span><span class="s2">"L5_mid"</span><span class="p">],</span>
+        <span class="s2">"L2_basket"</span><span class="p">:</span> <span class="n">layer_dict</span><span class="p">[</span><span class="s2">"L2_mid"</span><span class="p">],</span>
+        <span class="s2">"origin"</span><span class="p">:</span> <span class="n">layer_dict</span><span class="p">[</span><span class="s2">"origin"</span><span class="p">],</span>
     <span class="p">}</span>
 
     <span class="c1"># Create network with cell types and positions</span>
@@ -693,16 +795,18 @@
 
     <span class="n">delay</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">delay</span>
 
-    <span class="c1"># source of synapse is always at soma</span>
+    <span class="c1"># Ensure model_variant and params' cell types match current model</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">_model_variant</span> <span class="o">=</span> <span class="n">_validate_params_for_model</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="s2">"neymotin_2020_model"</span><span class="p">)</span>
 
+    <span class="c1"># source of synapse is always at soma</span>
     <span class="c1"># layer2 Pyr -&gt; layer2 Pyr</span>
     <span class="c1"># layer5 Pyr -&gt; layer5 Pyr</span>
     <span class="n">lamtha</span> <span class="o">=</span> <span class="mf">3.0</span>
-    <span class="n">loc</span> <span class="o">=</span> <span class="s2">&quot;proximal&quot;</span>
-    <span class="k">for</span> <span class="n">target_cell</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">,</span> <span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">]:</span>
-        <span class="k">for</span> <span class="n">receptor</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;nmda&quot;</span><span class="p">,</span> <span class="s2">&quot;ampa&quot;</span><span class="p">]:</span>
+    <span class="n">loc</span> <span class="o">=</span> <span class="s2">"proximal"</span>
+    <span class="k">for</span> <span class="n">target_cell</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"L2_pyramidal"</span><span class="p">,</span> <span class="s2">"L5_pyramidal"</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">receptor</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"nmda"</span><span class="p">,</span> <span class="s2">"ampa"</span><span class="p">]:</span>
             <span class="n">key</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;gbar_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">receptor</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"gbar_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">receptor</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
             <span class="n">weight</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
             <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span>
@@ -717,68 +821,68 @@
             <span class="p">)</span>
 
     <span class="c1"># layer2 Basket -&gt; layer2 Pyr</span>
-    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">&quot;L2_basket&quot;</span>
-    <span class="n">target_cell</span> <span class="o">=</span> <span class="s2">&quot;L2_pyramidal&quot;</span>
+    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">"L2_basket"</span>
+    <span class="n">target_cell</span> <span class="o">=</span> <span class="s2">"L2_pyramidal"</span>
     <span class="n">lamtha</span> <span class="o">=</span> <span class="mf">50.0</span>
-    <span class="n">loc</span> <span class="o">=</span> <span class="s2">&quot;soma&quot;</span>
-    <span class="k">for</span> <span class="n">receptor</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;gabaa&quot;</span><span class="p">,</span> <span class="s2">&quot;gabab&quot;</span><span class="p">]:</span>
-        <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;gbar_L2Basket_L2Pyr_</span><span class="si">{</span><span class="n">receptor</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">loc</span> <span class="o">=</span> <span class="s2">"soma"</span>
+    <span class="k">for</span> <span class="n">receptor</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"gabaa"</span><span class="p">,</span> <span class="s2">"gabab"</span><span class="p">]:</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"gbar_L2Basket_L2Pyr_</span><span class="si">{</span><span class="n">receptor</span><span class="si">}</span><span class="s2">"</span>
         <span class="n">weight</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
         <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">src_cell</span><span class="p">,</span> <span class="n">target_cell</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">receptor</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">)</span>
 
     <span class="c1"># layer5 Basket -&gt; layer5 Pyr</span>
-    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">&quot;L5_basket&quot;</span>
-    <span class="n">target_cell</span> <span class="o">=</span> <span class="s2">&quot;L5_pyramidal&quot;</span>
+    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">"L5_basket"</span>
+    <span class="n">target_cell</span> <span class="o">=</span> <span class="s2">"L5_pyramidal"</span>
     <span class="n">lamtha</span> <span class="o">=</span> <span class="mf">70.0</span>
-    <span class="n">loc</span> <span class="o">=</span> <span class="s2">&quot;soma&quot;</span>
-    <span class="k">for</span> <span class="n">receptor</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;gabaa&quot;</span><span class="p">,</span> <span class="s2">&quot;gabab&quot;</span><span class="p">]:</span>
-        <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;gbar_L5Basket_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">receptor</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">loc</span> <span class="o">=</span> <span class="s2">"soma"</span>
+    <span class="k">for</span> <span class="n">receptor</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"gabaa"</span><span class="p">,</span> <span class="s2">"gabab"</span><span class="p">]:</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"gbar_L5Basket_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">receptor</span><span class="si">}</span><span class="s2">"</span>
         <span class="n">weight</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
         <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">src_cell</span><span class="p">,</span> <span class="n">target_cell</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">receptor</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">)</span>
 
     <span class="c1"># layer2 Pyr -&gt; layer5 Pyr</span>
-    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">&quot;L2_pyramidal&quot;</span>
+    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">"L2_pyramidal"</span>
     <span class="n">lamtha</span> <span class="o">=</span> <span class="mf">3.0</span>
-    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">&quot;ampa&quot;</span>
-    <span class="k">for</span> <span class="n">loc</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;proximal&quot;</span><span class="p">,</span> <span class="s2">&quot;distal&quot;</span><span class="p">]:</span>
-        <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;gbar_L2Pyr_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">"ampa"</span>
+    <span class="k">for</span> <span class="n">loc</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"proximal"</span><span class="p">,</span> <span class="s2">"distal"</span><span class="p">]:</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"gbar_L2Pyr_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
         <span class="n">weight</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
         <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">src_cell</span><span class="p">,</span> <span class="n">target_cell</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">receptor</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">)</span>
 
     <span class="c1"># layer2 Basket -&gt; layer5 Pyr</span>
-    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">&quot;L2_basket&quot;</span>
+    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">"L2_basket"</span>
     <span class="n">lamtha</span> <span class="o">=</span> <span class="mf">50.0</span>
-    <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;gbar_L2Basket_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"gbar_L2Basket_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
     <span class="n">weight</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-    <span class="n">loc</span> <span class="o">=</span> <span class="s2">&quot;distal&quot;</span>
-    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">&quot;gabaa&quot;</span>
+    <span class="n">loc</span> <span class="o">=</span> <span class="s2">"distal"</span>
+    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">"gabaa"</span>
     <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">src_cell</span><span class="p">,</span> <span class="n">target_cell</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">receptor</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">)</span>
 
     <span class="c1"># xx -&gt; layer2 Basket</span>
-    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">&quot;L2_pyramidal&quot;</span>
-    <span class="n">target_cell</span> <span class="o">=</span> <span class="s2">&quot;L2_basket&quot;</span>
+    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">"L2_pyramidal"</span>
+    <span class="n">target_cell</span> <span class="o">=</span> <span class="s2">"L2_basket"</span>
     <span class="n">lamtha</span> <span class="o">=</span> <span class="mf">3.0</span>
-    <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;gbar_L2Pyr_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"gbar_L2Pyr_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
     <span class="n">weight</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-    <span class="n">loc</span> <span class="o">=</span> <span class="s2">&quot;soma&quot;</span>
-    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">&quot;ampa&quot;</span>
+    <span class="n">loc</span> <span class="o">=</span> <span class="s2">"soma"</span>
+    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">"ampa"</span>
     <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">src_cell</span><span class="p">,</span> <span class="n">target_cell</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">receptor</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">)</span>
 
-    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">&quot;L2_basket&quot;</span>
+    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">"L2_basket"</span>
     <span class="n">lamtha</span> <span class="o">=</span> <span class="mf">20.0</span>
-    <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;gbar_L2Basket_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"gbar_L2Basket_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
     <span class="n">weight</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-    <span class="n">loc</span> <span class="o">=</span> <span class="s2">&quot;soma&quot;</span>
-    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">&quot;gabaa&quot;</span>
+    <span class="n">loc</span> <span class="o">=</span> <span class="s2">"soma"</span>
+    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">"gabaa"</span>
     <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">src_cell</span><span class="p">,</span> <span class="n">target_cell</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">receptor</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">)</span>
 
     <span class="c1"># xx -&gt; layer5 Basket</span>
-    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">&quot;L5_basket&quot;</span>
-    <span class="n">target_cell</span> <span class="o">=</span> <span class="s2">&quot;L5_basket&quot;</span>
+    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">"L5_basket"</span>
+    <span class="n">target_cell</span> <span class="o">=</span> <span class="s2">"L5_basket"</span>
     <span class="n">lamtha</span> <span class="o">=</span> <span class="mf">20.0</span>
-    <span class="n">loc</span> <span class="o">=</span> <span class="s2">&quot;soma&quot;</span>
-    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">&quot;gabaa&quot;</span>
-    <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;gbar_L5Basket_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">loc</span> <span class="o">=</span> <span class="s2">"soma"</span>
+    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">"gabaa"</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"gbar_L5Basket_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
     <span class="n">weight</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
     <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span>
         <span class="n">src_cell</span><span class="p">,</span>
@@ -791,20 +895,20 @@
         <span class="n">allow_autapses</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">&quot;L5_pyramidal&quot;</span>
+    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">"L5_pyramidal"</span>
     <span class="n">lamtha</span> <span class="o">=</span> <span class="mf">3.0</span>
-    <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;gbar_L5Pyr_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"gbar_L5Pyr_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
     <span class="n">weight</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-    <span class="n">loc</span> <span class="o">=</span> <span class="s2">&quot;soma&quot;</span>
-    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">&quot;ampa&quot;</span>
+    <span class="n">loc</span> <span class="o">=</span> <span class="s2">"soma"</span>
+    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">"ampa"</span>
     <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">src_cell</span><span class="p">,</span> <span class="n">target_cell</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">receptor</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">)</span>
 
-    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">&quot;L2_pyramidal&quot;</span>
+    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">"L2_pyramidal"</span>
     <span class="n">lamtha</span> <span class="o">=</span> <span class="mf">3.0</span>
-    <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;gbar_L2Pyr_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"gbar_L2Pyr_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
     <span class="n">weight</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-    <span class="n">loc</span> <span class="o">=</span> <span class="s2">&quot;soma&quot;</span>
-    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">&quot;ampa&quot;</span>
+    <span class="n">loc</span> <span class="o">=</span> <span class="s2">"soma"</span>
+    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">"ampa"</span>
     <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">src_cell</span><span class="p">,</span> <span class="n">target_cell</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">receptor</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">net</span></div>
@@ -817,7 +921,7 @@
     <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">mesh_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Instantiate the network model described in Jones et al., 2009.</span>
+<span class="w">    </span><span class="sd">"""Instantiate the network model described in Jones et al., 2009.</span>
 
 <span class="sd">    DEPRECATED: This function is now deprecated in favor of using `neymotin_2020_model`</span>
 <span class="sd">    which is a more accurate name for the model being used. This function is still kept</span>
@@ -826,16 +930,23 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    params : str | dict | None</span>
-<span class="sd">        The path to the parameter file for constructing the network. If None, parameters</span>
-<span class="sd">        loaded from default.json Default: None</span>
-<span class="sd">    add_drives_from_params : bool</span>
-<span class="sd">        If True, add drives as defined in the params-dict. NB this is mainly for</span>
-<span class="sd">        backward-compatibility with HNN GUI, and will be deprecated in a future release.</span>
-<span class="sd">        Default: False</span>
-<span class="sd">    legacy_mode : bool</span>
-<span class="sd">        Set to False by default. Enables matching HNN GUI output when drives are added</span>
-<span class="sd">        suitably. Will be deprecated in a future release.</span>
+<span class="sd">    params : str | Path | dict | None, default=None</span>
+<span class="sd">        Custom Network parameters to use, if any. If string or Path, it is assumed to be</span>
+<span class="sd">        a path to a legacy "flat" JSON file containing the parameters in the style of</span>
+<span class="sd">        `hnn_core/param/default.json` (NOT a modern "hierarchical" JSON file like</span>
+<span class="sd">        `hnn_core/param/neymotin2020_base.json`). If dict, it is assumed to be a</span>
+<span class="sd">        dictionary of parameters in the "flat" JSON style. If None (the default), the</span>
+<span class="sd">        default parameters are used from `hnn_core/param/default.json`. Note that if you</span>
+<span class="sd">        have drive parameters included, but you ALSO set the deprecated</span>
+<span class="sd">        `add_drives_from_params` to True, the drives will be added twice if the drive</span>
+<span class="sd">        names are the same.</span>
+<span class="sd">    add_drives_from_params : bool, default=False</span>
+<span class="sd">        If True, add drives as defined in the params-dict. NB this is mainly</span>
+<span class="sd">        for backward-compatibility with HNN GUI, and will be deprecated in a</span>
+<span class="sd">        future release. Default: False</span>
+<span class="sd">    legacy_mode : bool, default=False</span>
+<span class="sd">        Set to False by default. Enables matching HNN GUI output when drives</span>
+<span class="sd">        are added suitably. Will be deprecated in a future release.</span>
 <span class="sd">    mesh_shape : tuple of int (default: (10, 10))</span>
 <span class="sd">        Defines the (n_x, n_y) shape of the grid of pyramidal cells.</span>
 
@@ -857,25 +968,25 @@
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
-<span class="sd">    .. [1] Jones, Stephanie R., et al. &quot;Quantitative Analysis and Biophysically</span>
+<span class="sd">    .. [1] Jones, Stephanie R., et al. "Quantitative Analysis and Biophysically</span>
 <span class="sd">           Realistic Neural Modeling of the MEG Mu Rhythm: Rhythmogenesis and Modulation</span>
-<span class="sd">           of Sensory-Evoked Responses.&quot; Journal of Neurophysiology 102, 3554–3572</span>
+<span class="sd">           of Sensory-Evoked Responses." Journal of Neurophysiology 102, 3554–3572</span>
 <span class="sd">           (2009). https://doi.org/10.1152/jn.00535.2009</span>
 
-<span class="sd">    .. [2] Neymotin, Samuel A, et al. 2020. &quot;Human Neocortical Neurosolver (HNN), a New</span>
+<span class="sd">    .. [2] Neymotin, Samuel A, et al. 2020. "Human Neocortical Neurosolver (HNN), a New</span>
 <span class="sd">           Software Tool for Interpreting the Cellular and Network Origin of Human</span>
-<span class="sd">           MEG/EEG Data.&quot; eLife 9 (January):e51214. https://doi.org/10.7554/eLife.51214</span>
+<span class="sd">           MEG/EEG Data." eLife 9 (January):e51214. https://doi.org/10.7554/eLife.51214</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Calling the default model with `jones_2009_model` is now deprecated. Please</span>
 <span class="sd">        update your scripts to use `neymotin_2020_model`, which is a more accurate name</span>
 <span class="sd">        for the model. `jones_2009_model` will still be made available for</span>
 <span class="sd">        backwards-compatilibity purposes.</span>
-<span class="sd">        &quot;&quot;&quot;</span><span class="p">,</span>
-        <span class="ne">DeprecationWarning</span><span class="p">,</span>
+<span class="sd">        """</span><span class="p">,</span>
+        <span class="ne">FutureWarning</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="n">net</span> <span class="o">=</span> <span class="n">neymotin_2020_model</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="p">,</span> <span class="n">legacy_mode</span><span class="p">,</span> <span class="n">mesh_shape</span><span class="p">)</span>
@@ -890,9 +1001,32 @@
     <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">mesh_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Instantiate the expansion of Jones 2009 model to study beta</span>
-<span class="sd">    modulated ERPs as described in</span>
-<span class="sd">    Law et al. Cereb. Cortex 2021 [1]_</span>
+<span class="w">    </span><span class="sd">"""Instantiate the network model described in Law et al., 2021.</span>
+
+<span class="sd">    This creates a network that is the expansion of Jones 2009 model to study beta</span>
+<span class="sd">    modulated ERPs as described in Law et al. Cereb. Cortex 2021 [1]_ .</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    params : str | Path | dict | None, default=None</span>
+<span class="sd">        Custom Network parameters to use, if any. If string or Path, it is assumed to be</span>
+<span class="sd">        a path to a legacy "flat" JSON file containing the parameters in the style of</span>
+<span class="sd">        `hnn_core/param/default.json` (NOT a modern "hierarchical" JSON file like</span>
+<span class="sd">        `hnn_core/param/neymotin2020_base.json`). If dict, it is assumed to be a</span>
+<span class="sd">        dictionary of parameters in the "flat" JSON style. If None (the default), the</span>
+<span class="sd">        default parameters are used from `hnn_core/param/default.json`. Note that if you</span>
+<span class="sd">        have drive parameters included, but you ALSO set the deprecated</span>
+<span class="sd">        `add_drives_from_params` to True, the drives will be added twice if the drive</span>
+<span class="sd">        names are the same.</span>
+<span class="sd">    add_drives_from_params : bool, default=False</span>
+<span class="sd">        If True, add drives as defined in the params-dict. NB this is mainly</span>
+<span class="sd">        for backward-compatibility with HNN GUI, and will be deprecated in a</span>
+<span class="sd">        future release. Default: False</span>
+<span class="sd">    legacy_mode : bool, default=False</span>
+<span class="sd">        Set to False by default. Enables matching HNN GUI output when drives</span>
+<span class="sd">        are added suitably. Will be deprecated in a future release.</span>
+<span class="sd">    mesh_shape : tuple of int (default: (10, 10))</span>
+<span class="sd">        Defines the (n_x, n_y) shape of the grid of pyramidal cells.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -918,56 +1052,69 @@
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
-<span class="sd">    .. [1] Law, Robert G., et al. &quot;Thalamocortical Mechanisms Regulating the</span>
+<span class="sd">    .. [1] Law, Robert G., et al. "Thalamocortical Mechanisms Regulating the</span>
 <span class="sd">           Relationship between Transient Beta Events and Human Tactile</span>
-<span class="sd">           Perception.&quot; Cerebral Cortex, 32, 668–688 (2022).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">           Perception." Cerebral Cortex, 32, 668–688 (2022).</span>
+<span class="sd">    """</span>
 
-    <span class="n">net</span> <span class="o">=</span> <span class="n">jones_2009_model</span><span class="p">(</span>
+    <span class="n">hnn_core_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">hnn_core</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
+    <span class="n">_validate_type</span><span class="p">(</span>
+        <span class="n">params</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)),</span> <span class="s2">"params"</span><span class="p">,</span> <span class="s2">"str | Path | dict | None"</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">params_fname</span> <span class="o">=</span> <span class="n">hnn_core_root</span> <span class="o">/</span> <span class="s2">"param"</span> <span class="o">/</span> <span class="s2">"default.json"</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">read_params</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">read_params</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="n">net</span> <span class="o">=</span> <span class="n">neymotin_2020_model</span><span class="p">(</span>
         <span class="n">params</span><span class="p">,</span>
         <span class="n">add_drives_from_params</span><span class="p">,</span>
         <span class="n">legacy_mode</span><span class="p">,</span>
         <span class="n">mesh_shape</span><span class="o">=</span><span class="n">mesh_shape</span><span class="p">,</span>
     <span class="p">)</span>
+    <span class="c1"># Ensure model_variant and params' cell types match current model (same cell types</span>
+    <span class="c1"># as 'neymotin_2020_model')</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">_model_variant</span> <span class="o">=</span> <span class="n">_validate_params_for_model</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="s2">"law_2021_model"</span><span class="p">)</span>
 
     <span class="c1"># Update biophysics (increase gabab duration of inhibition)</span>
-    <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">][</span><span class="s2">&quot;cell_object&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">synapses</span><span class="p">[</span><span class="s2">&quot;gabab&quot;</span><span class="p">][</span><span class="s2">&quot;tau1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">45.0</span>
-    <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">][</span><span class="s2">&quot;cell_object&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">synapses</span><span class="p">[</span><span class="s2">&quot;gabab&quot;</span><span class="p">][</span><span class="s2">&quot;tau2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">200.0</span>
-    <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">][</span><span class="s2">&quot;cell_object&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">synapses</span><span class="p">[</span><span class="s2">&quot;gabab&quot;</span><span class="p">][</span><span class="s2">&quot;tau1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">45.0</span>
-    <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">][</span><span class="s2">&quot;cell_object&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">synapses</span><span class="p">[</span><span class="s2">&quot;gabab&quot;</span><span class="p">][</span><span class="s2">&quot;tau2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">200.0</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="s2">"L2_pyramidal"</span><span class="p">][</span><span class="s2">"cell_object"</span><span class="p">]</span><span class="o">.</span><span class="n">synapses</span><span class="p">[</span><span class="s2">"gabab"</span><span class="p">][</span><span class="s2">"tau1"</span><span class="p">]</span> <span class="o">=</span> <span class="mf">45.0</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="s2">"L2_pyramidal"</span><span class="p">][</span><span class="s2">"cell_object"</span><span class="p">]</span><span class="o">.</span><span class="n">synapses</span><span class="p">[</span><span class="s2">"gabab"</span><span class="p">][</span><span class="s2">"tau2"</span><span class="p">]</span> <span class="o">=</span> <span class="mf">200.0</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="s2">"L5_pyramidal"</span><span class="p">][</span><span class="s2">"cell_object"</span><span class="p">]</span><span class="o">.</span><span class="n">synapses</span><span class="p">[</span><span class="s2">"gabab"</span><span class="p">][</span><span class="s2">"tau1"</span><span class="p">]</span> <span class="o">=</span> <span class="mf">45.0</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="s2">"L5_pyramidal"</span><span class="p">][</span><span class="s2">"cell_object"</span><span class="p">]</span><span class="o">.</span><span class="n">synapses</span><span class="p">[</span><span class="s2">"gabab"</span><span class="p">][</span><span class="s2">"tau2"</span><span class="p">]</span> <span class="o">=</span> <span class="mf">200.0</span>
 
     <span class="c1"># Decrease L5_pyramidal -&gt; L5_pyramidal nmda weight</span>
-    <span class="n">net</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="s2">&quot;nc_dict&quot;</span><span class="p">][</span><span class="s2">&quot;A_weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0004</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="s2">"nc_dict"</span><span class="p">][</span><span class="s2">"A_weight"</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0004</span>
 
     <span class="c1"># Modify L5_basket -&gt; L5_pyramidal inhibition</span>
-    <span class="n">net</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="mi">6</span><span class="p">][</span><span class="s2">&quot;nc_dict&quot;</span><span class="p">][</span><span class="s2">&quot;A_weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.02</span>  <span class="c1"># gabaa</span>
-    <span class="n">net</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="mi">7</span><span class="p">][</span><span class="s2">&quot;nc_dict&quot;</span><span class="p">][</span><span class="s2">&quot;A_weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.005</span>  <span class="c1"># gabab</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="mi">6</span><span class="p">][</span><span class="s2">"nc_dict"</span><span class="p">][</span><span class="s2">"A_weight"</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.02</span>  <span class="c1"># gabaa</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="mi">7</span><span class="p">][</span><span class="s2">"nc_dict"</span><span class="p">][</span><span class="s2">"A_weight"</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.005</span>  <span class="c1"># gabab</span>
 
     <span class="c1"># Remove L5 pyramidal somatic and basal dendrite calcium channels</span>
-    <span class="k">for</span> <span class="n">sec</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;soma&quot;</span><span class="p">,</span> <span class="s2">&quot;basal_1&quot;</span><span class="p">,</span> <span class="s2">&quot;basal_2&quot;</span><span class="p">,</span> <span class="s2">&quot;basal_3&quot;</span><span class="p">]:</span>
-        <span class="k">del</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">][</span><span class="s2">&quot;cell_object&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">sec</span><span class="p">]</span><span class="o">.</span><span class="n">mechs</span><span class="p">[</span><span class="s2">&quot;ca&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">sec</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"soma"</span><span class="p">,</span> <span class="s2">"basal_1"</span><span class="p">,</span> <span class="s2">"basal_2"</span><span class="p">,</span> <span class="s2">"basal_3"</span><span class="p">]:</span>
+        <span class="k">del</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="s2">"L5_pyramidal"</span><span class="p">][</span><span class="s2">"cell_object"</span><span class="p">]</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">sec</span><span class="p">]</span><span class="o">.</span><span class="n">mechs</span><span class="p">[</span><span class="s2">"ca"</span><span class="p">]</span>
 
     <span class="c1"># Remove L2_basket -&gt; L5_pyramidal gabaa connection</span>
     <span class="k">del</span> <span class="n">net</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span>  <span class="c1"># Original paper simply sets gbar to 0.0</span>
 
     <span class="c1"># Add L2_basket -&gt; L5_pyramidal gabab connection</span>
     <span class="n">delay</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">delay</span>
-    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">&quot;L2_basket&quot;</span>
-    <span class="n">target_cell</span> <span class="o">=</span> <span class="s2">&quot;L5_pyramidal&quot;</span>
+    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">"L2_basket"</span>
+    <span class="n">target_cell</span> <span class="o">=</span> <span class="s2">"L5_pyramidal"</span>
     <span class="n">lamtha</span> <span class="o">=</span> <span class="mf">50.0</span>
     <span class="n">weight</span> <span class="o">=</span> <span class="mf">0.0002</span>
-    <span class="n">loc</span> <span class="o">=</span> <span class="s2">&quot;distal&quot;</span>
-    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">&quot;gabab&quot;</span>
+    <span class="n">loc</span> <span class="o">=</span> <span class="s2">"distal"</span>
+    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">"gabab"</span>
     <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">src_cell</span><span class="p">,</span> <span class="n">target_cell</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">receptor</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">)</span>
 
     <span class="c1"># Add L5_basket -&gt; L5_pyramidal distal connection</span>
-    <span class="c1"># (&quot;Martinotti-like recurrent tuft connection&quot;)</span>
-    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">&quot;L5_basket&quot;</span>
-    <span class="n">target_cell</span> <span class="o">=</span> <span class="s2">&quot;L5_pyramidal&quot;</span>
+    <span class="c1"># ("Martinotti-like recurrent tuft connection")</span>
+    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">"L5_basket"</span>
+    <span class="n">target_cell</span> <span class="o">=</span> <span class="s2">"L5_pyramidal"</span>
     <span class="n">lamtha</span> <span class="o">=</span> <span class="mf">70.0</span>
-    <span class="n">loc</span> <span class="o">=</span> <span class="s2">&quot;distal&quot;</span>
-    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">&quot;gabaa&quot;</span>
-    <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;gbar_L5Basket_L5Pyr_</span><span class="si">{</span><span class="n">receptor</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">loc</span> <span class="o">=</span> <span class="s2">"distal"</span>
+    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">"gabaa"</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"gbar_L5Basket_L5Pyr_</span><span class="si">{</span><span class="n">receptor</span><span class="si">}</span><span class="s2">"</span>
     <span class="n">weight</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
     <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">src_cell</span><span class="p">,</span> <span class="n">target_cell</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">receptor</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">)</span>
 
@@ -985,9 +1132,31 @@
     <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">mesh_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Instantiate the Jones 2009 model with improved calcium dynamics in</span>
+<span class="w">    </span><span class="sd">"""Instantiate the Jones 2009 model with improved calcium dynamics in</span>
 <span class="sd">    L5 pyramidal neurons. For more details on changes to calcium dynamics</span>
 <span class="sd">    see Kohl et al. Brain Topragr 2022 [1]_</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    params : str | Path | dict | None, default=None</span>
+<span class="sd">        Custom Network parameters to use, if any. If string or Path, it is assumed to be</span>
+<span class="sd">        a path to a legacy "flat" JSON file containing the parameters in the style of</span>
+<span class="sd">        `hnn_core/param/default.json` (NOT a modern "hierarchical" JSON file like</span>
+<span class="sd">        `hnn_core/param/neymotin2020_base.json`). If dict, it is assumed to be a</span>
+<span class="sd">        dictionary of parameters in the "flat" JSON style. If None (the default), the</span>
+<span class="sd">        default parameters are used from `hnn_core/param/default.json`. Note that if you</span>
+<span class="sd">        have drive parameters included, but you ALSO set the deprecated</span>
+<span class="sd">        `add_drives_from_params` to True, the drives will be added twice if the drive</span>
+<span class="sd">        names are the same.</span>
+<span class="sd">    add_drives_from_params : bool, default=False</span>
+<span class="sd">        If True, add drives as defined in the params-dict. NB this is mainly</span>
+<span class="sd">        for backward-compatibility with HNN GUI, and will be deprecated in a</span>
+<span class="sd">        future release. Default: False</span>
+<span class="sd">    legacy_mode : bool, default=False</span>
+<span class="sd">        Set to False by default. Enables matching HNN GUI output when drives</span>
+<span class="sd">        are added suitably. Will be deprecated in a future release.</span>
+<span class="sd">    mesh_shape : tuple of int (default: (10, 10))</span>
+<span class="sd">        Defines the (n_x, n_y) shape of the grid of pyramidal cells.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1009,14 +1178,19 @@
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
-<span class="sd">    .. [1] Kohl, Carmen, et al. &quot;Neural Mechanisms Underlying Human Auditory</span>
-<span class="sd">           Evoked Responses Revealed By Human Neocortical Neurosolver.&quot;</span>
+<span class="sd">    .. [1] Kohl, Carmen, et al. "Neural Mechanisms Underlying Human Auditory</span>
+<span class="sd">           Evoked Responses Revealed By Human Neocortical Neurosolver."</span>
 <span class="sd">           Brain Topography, 35, 19–35 (2022).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">hnn_core_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">hnn_core</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
-    <span class="n">params_fname</span> <span class="o">=</span> <span class="n">hnn_core_root</span> <span class="o">/</span> <span class="s2">&quot;param&quot;</span> <span class="o">/</span> <span class="s2">&quot;default.json&quot;</span>
+    <span class="n">_validate_type</span><span class="p">(</span>
+        <span class="n">params</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)),</span> <span class="s2">"params"</span><span class="p">,</span> <span class="s2">"str | Path | dict | None"</span>
+    <span class="p">)</span>
     <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">params_fname</span> <span class="o">=</span> <span class="n">hnn_core_root</span> <span class="o">/</span> <span class="s2">"param"</span> <span class="o">/</span> <span class="s2">"default.json"</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">read_params</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">read_params</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
     <span class="n">net</span> <span class="o">=</span> <span class="n">jones_2009_model</span><span class="p">(</span>
         <span class="n">params</span><span class="p">,</span>
@@ -1025,10 +1199,14 @@
         <span class="n">mesh_shape</span><span class="o">=</span><span class="n">mesh_shape</span><span class="p">,</span>
     <span class="p">)</span>
 
+    <span class="c1"># Ensure model_variant and params' cell types match current model (same cell types</span>
+    <span class="c1"># as 'neymotin_2020_model')</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">_model_variant</span> <span class="o">=</span> <span class="n">_validate_params_for_model</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="s2">"calcium_model"</span><span class="p">)</span>
+
     <span class="c1"># Replace L5 pyramidal cell template with updated calcium</span>
-    <span class="n">cell_name</span> <span class="o">=</span> <span class="s2">&quot;L5_pyramidal&quot;</span>
-    <span class="n">pos</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="n">cell_name</span><span class="p">][</span><span class="s2">&quot;cell_object&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">pos</span>
-    <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="n">cell_name</span><span class="p">][</span><span class="s2">&quot;cell_object&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pyramidal_ca</span><span class="p">(</span>
+    <span class="n">cell_name</span> <span class="o">=</span> <span class="s2">"L5_pyramidal"</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="n">cell_name</span><span class="p">][</span><span class="s2">"cell_object"</span><span class="p">]</span><span class="o">.</span><span class="n">pos</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="n">cell_name</span><span class="p">][</span><span class="s2">"cell_object"</span><span class="p">]</span> <span class="o">=</span> <span class="n">pyramidal_ca</span><span class="p">(</span>
         <span class="n">cell_name</span><span class="o">=</span><span class="n">cell_name</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">pos</span>
     <span class="p">)</span>
 
@@ -1036,8 +1214,356 @@
 
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">duecker_ET_model</span><span class="p">(</span>
+    <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">mesh_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Initiate the Duecker model (like old calcium model and then replace with new cells)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    params : str | Path | dict | None, default=None</span>
+<span class="sd">        Custom Network parameters to use, if any. If string or Path, it is assumed to be</span>
+<span class="sd">        a path to a legacy "flat" JSON file containing the parameters in the style of</span>
+<span class="sd">        `hnn_core/param/default.json` (NOT a modern "hierarchical" JSON file like</span>
+<span class="sd">        `hnn_core/param/neymotin2020_base.json`). If dict, it is assumed to be a</span>
+<span class="sd">        dictionary of parameters in the "flat" JSON style. If None (the default), the</span>
+<span class="sd">        default parameters are used from `hnn_core/param/default.json`. Note that if you</span>
+<span class="sd">        have drive parameters included, but you ALSO set the deprecated</span>
+<span class="sd">        `add_drives_from_params` to True, the drives will be added twice if the drive</span>
+<span class="sd">        names are the same.</span>
+<span class="sd">    add_drives_from_params : bool, default=False</span>
+<span class="sd">        If True, add drives as defined in the params-dict. NB this is mainly</span>
+<span class="sd">        for backward-compatibility with HNN GUI, and will be deprecated in a</span>
+<span class="sd">        future release. Default: False</span>
+<span class="sd">    legacy_mode : bool, default=False</span>
+<span class="sd">        Set to False by default. Enables matching HNN GUI output when drives</span>
+<span class="sd">        are added suitably. Will be deprecated in a future release.</span>
+<span class="sd">    mesh_shape : tuple of int (default: (10, 10))</span>
+<span class="sd">        Defines the (n_x, n_y) shape of the grid of pyramidal cells.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    net : Instance of Network object</span>
+<span class="sd">        Network object used to store</span>
+<span class="sd">    """</span>
+
+    <span class="n">hnn_core_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">hnn_core</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
+    <span class="n">_validate_type</span><span class="p">(</span>
+        <span class="n">params</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)),</span> <span class="s2">"params"</span><span class="p">,</span> <span class="s2">"str | Path | dict | None"</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">params_fname</span> <span class="o">=</span> <span class="n">hnn_core_root</span> <span class="o">/</span> <span class="s2">"param"</span> <span class="o">/</span> <span class="s2">"default_duecker_ET.json"</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">read_params</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">read_params</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="n">cell_types</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"L2_inhibitory"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"cell_object"</span><span class="p">:</span> <span class="n">human_gen_interneuron</span><span class="p">(</span>
+                <span class="n">cell_name</span><span class="o">=</span><span class="n">_short_name</span><span class="p">(</span><span class="s2">"L2_inhibitory"</span><span class="p">),</span> <span class="n">layer</span><span class="o">=</span><span class="mi">2</span>
+            <span class="p">),</span>
+            <span class="s2">"cell_metadata"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"morpho_type"</span><span class="p">:</span> <span class="s2">"interneuron"</span><span class="p">,</span>
+                <span class="s2">"electro_type"</span><span class="p">:</span> <span class="s2">"inhibitory"</span><span class="p">,</span>
+                <span class="s2">"layer"</span><span class="p">:</span> <span class="s2">"2"</span><span class="p">,</span>
+                <span class="s2">"zdist_origin"</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span>
+                <span class="s2">"measure_dipole"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s2">"reference"</span><span class="p">:</span> <span class="s2">""</span><span class="p">,</span>
+                <span class="s2">"color"</span><span class="p">:</span> <span class="s2">"#daa69c"</span><span class="p">,</span>
+                <span class="s2">"marker"</span><span class="p">:</span> <span class="s2">"o"</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+        <span class="s2">"L2_pyramidal"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"cell_object"</span><span class="p">:</span> <span class="n">pyramidal_humanL23</span><span class="p">(</span><span class="n">cell_name</span><span class="o">=</span><span class="n">_short_name</span><span class="p">(</span><span class="s2">"L2_pyramidal"</span><span class="p">)),</span>
+            <span class="s2">"cell_metadata"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"morpho_type"</span><span class="p">:</span> <span class="s2">"pyramidal"</span><span class="p">,</span>
+                <span class="s2">"electro_type"</span><span class="p">:</span> <span class="s2">"excitatory"</span><span class="p">,</span>
+                <span class="s2">"layer"</span><span class="p">:</span> <span class="s2">"2"</span><span class="p">,</span>
+                <span class="s2">"zdist_origin"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="s2">"measure_dipole"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s2">"reference"</span><span class="p">:</span> <span class="s2">""</span><span class="p">,</span>
+                <span class="s2">"color"</span><span class="p">:</span> <span class="s2">"#a41e4f"</span><span class="p">,</span>
+                <span class="s2">"marker"</span><span class="p">:</span> <span class="s2">"^"</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+        <span class="s2">"L5_inhibitory"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"cell_object"</span><span class="p">:</span> <span class="n">human_gen_interneuron</span><span class="p">(</span>
+                <span class="n">cell_name</span><span class="o">=</span><span class="n">_short_name</span><span class="p">(</span><span class="s2">"L5_inhibitory"</span><span class="p">),</span> <span class="n">layer</span><span class="o">=</span><span class="mi">5</span>
+            <span class="p">),</span>
+            <span class="s2">"cell_metadata"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"morpho_type"</span><span class="p">:</span> <span class="s2">"interneuron"</span><span class="p">,</span>
+                <span class="s2">"electro_type"</span><span class="p">:</span> <span class="s2">"inhibitory"</span><span class="p">,</span>
+                <span class="s2">"layer"</span><span class="p">:</span> <span class="s2">"5"</span><span class="p">,</span>
+                <span class="s2">"zdist_origin"</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+                <span class="s2">"measure_dipole"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s2">"reference"</span><span class="p">:</span> <span class="s2">""</span><span class="p">,</span>
+                <span class="s2">"color"</span><span class="p">:</span> <span class="s2">"#77a1bb"</span><span class="p">,</span>
+                <span class="s2">"marker"</span><span class="p">:</span> <span class="s2">"o"</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+        <span class="s2">"L5_pyramidal"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"cell_object"</span><span class="p">:</span> <span class="n">pyramidal_humanL5ET</span><span class="p">(</span><span class="n">cell_name</span><span class="o">=</span><span class="n">_short_name</span><span class="p">(</span><span class="s2">"L5_pyramidal"</span><span class="p">)),</span>
+            <span class="s2">"cell_metadata"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"morpho_type"</span><span class="p">:</span> <span class="s2">"pyramidal"</span><span class="p">,</span>
+                <span class="s2">"electro_type"</span><span class="p">:</span> <span class="s2">"excitatory"</span><span class="p">,</span>
+                <span class="s2">"layer"</span><span class="p">:</span> <span class="s2">"5"</span><span class="p">,</span>
+                <span class="s2">"zdist_origin"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">"measure_dipole"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s2">"reference"</span><span class="p">:</span> <span class="s2">""</span><span class="p">,</span>
+                <span class="s2">"color"</span><span class="p">:</span> <span class="s2">"#5c73b7"</span><span class="p">,</span>
+                <span class="s2">"marker"</span><span class="p">:</span> <span class="s2">"^"</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Create layer positions</span>
+    <span class="n">layer_dict</span> <span class="o">=</span> <span class="n">_create_cell_coords</span><span class="p">(</span>
+        <span class="n">n_pyr_x</span><span class="o">=</span><span class="n">mesh_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">n_pyr_y</span><span class="o">=</span><span class="n">mesh_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">z_coord</span><span class="o">=</span><span class="mf">1307.4</span><span class="p">,</span>  <span class="c1"># Default layer separation</span>
+        <span class="n">inplane_distance</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>  <span class="c1"># in-plane distance appropriate for LFP recordings</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Map cell types to layer positions</span>
+    <span class="n">pos_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"L5_pyramidal"</span><span class="p">:</span> <span class="n">layer_dict</span><span class="p">[</span><span class="s2">"L5_bottom"</span><span class="p">],</span>
+        <span class="s2">"L2_pyramidal"</span><span class="p">:</span> <span class="n">layer_dict</span><span class="p">[</span><span class="s2">"L2_bottom"</span><span class="p">],</span>
+        <span class="s2">"L5_inhibitory"</span><span class="p">:</span> <span class="n">layer_dict</span><span class="p">[</span><span class="s2">"L5_mid"</span><span class="p">],</span>
+        <span class="s2">"L2_inhibitory"</span><span class="p">:</span> <span class="n">layer_dict</span><span class="p">[</span><span class="s2">"L2_mid"</span><span class="p">],</span>
+        <span class="s2">"origin"</span><span class="p">:</span> <span class="n">layer_dict</span><span class="p">[</span><span class="s2">"origin"</span><span class="p">],</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Create network with cell types and positions</span>
+    <span class="n">net</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span>
+        <span class="n">params</span><span class="p">,</span>
+        <span class="n">add_drives_from_params</span><span class="o">=</span><span class="n">add_drives_from_params</span><span class="p">,</span>
+        <span class="n">legacy_mode</span><span class="o">=</span><span class="n">legacy_mode</span><span class="p">,</span>
+        <span class="n">mesh_shape</span><span class="o">=</span><span class="n">mesh_shape</span><span class="p">,</span>
+        <span class="n">pos_dict</span><span class="o">=</span><span class="n">pos_dict</span><span class="p">,</span>
+        <span class="n">cell_types</span><span class="o">=</span><span class="n">cell_types</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># check variant and cell types. Basket cells are replaced by</span>
+    <span class="c1"># interneurons in duecker_ET_model, so their parameters are rejected</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">_model_variant</span> <span class="o">=</span> <span class="n">_validate_params_for_model</span><span class="p">(</span>
+        <span class="n">net</span><span class="p">,</span>
+        <span class="n">params</span><span class="p">,</span>
+        <span class="s2">"duecker_ET_model"</span><span class="p">,</span>
+        <span class="n">require_variant</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">excluded_cells</span><span class="o">=</span><span class="p">(</span><span class="s2">"L2Basket"</span><span class="p">,</span> <span class="s2">"L5Basket"</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">delay</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">delay</span>
+
+    <span class="c1"># layer2 Pyr -&gt; layer2 Pyr</span>
+    <span class="n">lamtha</span> <span class="o">=</span> <span class="mf">6.125</span>  <span class="c1"># calculated from human data Campganola et al. 2022</span>
+    <span class="n">loc</span> <span class="o">=</span> <span class="s2">"proximal"</span>
+    <span class="n">target_cell</span> <span class="o">=</span> <span class="s2">"L2_pyramidal"</span>
+    <span class="k">for</span> <span class="n">receptor</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"nmda"</span><span class="p">,</span> <span class="s2">"ampa"</span><span class="p">]:</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"gbar_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">receptor</span><span class="si">}</span><span class="s2">"</span>
+        <span class="n">weight</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span>
+            <span class="n">target_cell</span><span class="p">,</span>
+            <span class="n">target_cell</span><span class="p">,</span>
+            <span class="n">loc</span><span class="p">,</span>
+            <span class="n">receptor</span><span class="p">,</span>
+            <span class="n">weight</span><span class="p">,</span>
+            <span class="n">delay</span><span class="p">,</span>
+            <span class="n">lamtha</span><span class="p">,</span>
+            <span class="n">allow_autapses</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="c1"># layer5 Pyr -&gt; layer5 Pyr</span>
+    <span class="n">target_cell</span> <span class="o">=</span> <span class="s2">"L5_pyramidal"</span>
+    <span class="k">for</span> <span class="n">receptor</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"nmda"</span><span class="p">,</span> <span class="s2">"ampa"</span><span class="p">]:</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"gbar_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">receptor</span><span class="si">}</span><span class="s2">"</span>
+        <span class="n">weight</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+        <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span>
+            <span class="n">target_cell</span><span class="p">,</span>
+            <span class="n">target_cell</span><span class="p">,</span>
+            <span class="n">loc</span><span class="p">,</span>
+            <span class="n">receptor</span><span class="p">,</span>
+            <span class="n">weight</span><span class="p">,</span>
+            <span class="n">delay</span><span class="p">,</span>
+            <span class="n">lamtha</span><span class="p">,</span>
+            <span class="n">allow_autapses</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1"># layer2 inhibitory -&gt; layer2 Pyr</span>
+    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">"L2_inhibitory"</span>
+    <span class="n">target_cell</span> <span class="o">=</span> <span class="s2">"L2_pyramidal"</span>
+    <span class="n">lamtha</span> <span class="o">=</span> <span class="mf">6.125</span>  <span class="c1"># *0.8  # shorter space constant (Campagnola, 2022, mice data)</span>
+    <span class="n">loc</span> <span class="o">=</span> <span class="s2">"soma"</span>
+    <span class="k">for</span> <span class="n">receptor</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"gabaa"</span><span class="p">,</span> <span class="s2">"gabab"</span><span class="p">]:</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"gbar_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">src_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">receptor</span><span class="si">}</span><span class="s2">"</span>
+        <span class="n">weight</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">loc</span> <span class="o">=</span> <span class="s2">"soma"</span>
+        <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span>
+            <span class="n">src_cell</span><span class="p">,</span>
+            <span class="n">target_cell</span><span class="p">,</span>
+            <span class="n">loc</span><span class="p">,</span>
+            <span class="n">receptor</span><span class="p">,</span>
+            <span class="n">weight</span><span class="p">,</span>
+            <span class="n">delay</span><span class="p">,</span>
+            <span class="n">lamtha</span><span class="p">,</span>
+            <span class="n">allow_autapses</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1"># layer5 inhibitory -&gt; layer5 Pyr</span>
+    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">"L5_inhibitory"</span>
+    <span class="n">target_cell</span> <span class="o">=</span> <span class="s2">"L5_pyramidal"</span>
+    <span class="n">lamtha</span> <span class="o">=</span> <span class="mf">6.125</span>  <span class="c1"># *0.8  # shorter space constant (Campagnola, 2022, mice data)</span>
+    <span class="n">loc</span> <span class="o">=</span> <span class="s2">"soma"</span>
+    <span class="k">for</span> <span class="n">receptor</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"gabaa"</span><span class="p">,</span> <span class="s2">"gabab"</span><span class="p">]:</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"gbar_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">src_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">receptor</span><span class="si">}</span><span class="s2">"</span>
+        <span class="n">weight</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span>
+            <span class="n">src_cell</span><span class="p">,</span>
+            <span class="n">target_cell</span><span class="p">,</span>
+            <span class="n">loc</span><span class="p">,</span>
+            <span class="n">receptor</span><span class="p">,</span>
+            <span class="n">weight</span><span class="p">,</span>
+            <span class="n">delay</span><span class="p">,</span>
+            <span class="n">lamtha</span><span class="p">,</span>
+            <span class="n">allow_autapses</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1"># layer2 Pyr -&gt; layer5 Pyr</span>
+    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">"L2_pyramidal"</span>
+    <span class="n">lamtha</span> <span class="o">=</span> <span class="mf">6.125</span>
+    <span class="k">for</span> <span class="n">receptor</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"ampa"</span><span class="p">,</span> <span class="s2">"nmda"</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">loc</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"proximal"</span><span class="p">,</span> <span class="s2">"apical_2"</span><span class="p">]:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"gbar_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">src_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">receptor</span><span class="si">}</span><span class="s2">"</span>
+            <span class="n">weight</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span>
+                <span class="n">src_cell</span><span class="p">,</span> <span class="n">target_cell</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">receptor</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">lamtha</span>
+            <span class="p">)</span>
+
+    <span class="c1"># layer2 inhibitory -&gt; layer5 Pyr</span>
+    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">"L2_inhibitory"</span>
+    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">"gabaa_slow"</span>
+    <span class="n">lamtha</span> <span class="o">=</span> <span class="mf">6.125</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"gbar_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">src_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">receptor</span><span class="si">}</span><span class="s2">"</span>
+    <span class="n">weight</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="c1"># add GABAA connection to apical_2 as Martinotti-like inhibition (SST cells)</span>
+    <span class="n">loc</span> <span class="o">=</span> <span class="s2">"apical_2"</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">src_cell</span><span class="p">,</span> <span class="n">target_cell</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">receptor</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">)</span>
+
+    <span class="c1"># this connection is set to 0 as we're not simulating NGF cells.</span>
+    <span class="n">loc</span> <span class="o">=</span> <span class="s2">"apical_tuft"</span>
+    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">"gabab"</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"gbar_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">src_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">receptor</span><span class="si">}</span><span class="s2">"</span>
+    <span class="n">weight</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">src_cell</span><span class="p">,</span> <span class="n">target_cell</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">receptor</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">)</span>
+
+    <span class="c1"># xx -&gt; layer2 inhibitory</span>
+    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">"L2_pyramidal"</span>
+    <span class="n">target_cell</span> <span class="o">=</span> <span class="s2">"L2_inhibitory"</span>
+    <span class="n">lamtha</span> <span class="o">=</span> <span class="mf">6.125</span> <span class="o">*</span> <span class="mf">0.8</span>  <span class="c1"># shorter space constant (Campagnola, 2022, mice data)</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"gbar_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">src_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+    <span class="n">weight</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="n">loc</span> <span class="o">=</span> <span class="s2">"soma"</span>
+    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">"ampa"</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">src_cell</span><span class="p">,</span> <span class="n">target_cell</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">receptor</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">)</span>
+
+    <span class="n">weight</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.18</span>  <span class="c1"># see Koh 1995; Kriener 2022</span>
+    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">"nmda"</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">src_cell</span><span class="p">,</span> <span class="n">target_cell</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">receptor</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">)</span>
+
+    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">"L2_inhibitory"</span>
+    <span class="n">lamtha</span> <span class="o">=</span> <span class="mf">6.125</span>
+    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">"gabaa"</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"gbar_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">src_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">receptor</span><span class="si">}</span><span class="s2">"</span>
+    <span class="n">weight</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="n">loc</span> <span class="o">=</span> <span class="s2">"soma"</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span>
+        <span class="n">src_cell</span><span class="p">,</span>
+        <span class="n">target_cell</span><span class="p">,</span>
+        <span class="n">loc</span><span class="p">,</span>
+        <span class="n">receptor</span><span class="p">,</span>
+        <span class="n">weight</span><span class="p">,</span>
+        <span class="n">delay</span><span class="p">,</span>
+        <span class="n">lamtha</span><span class="p">,</span>
+        <span class="n">allow_autapses</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">"gabab"</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"gbar_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">src_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">receptor</span><span class="si">}</span><span class="s2">"</span>
+    <span class="n">weight</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="n">loc</span> <span class="o">=</span> <span class="s2">"soma"</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span>
+        <span class="n">src_cell</span><span class="p">,</span>
+        <span class="n">target_cell</span><span class="p">,</span>
+        <span class="n">loc</span><span class="p">,</span>
+        <span class="n">receptor</span><span class="p">,</span>
+        <span class="n">weight</span><span class="p">,</span>
+        <span class="n">delay</span><span class="p">,</span>
+        <span class="n">lamtha</span><span class="p">,</span>
+        <span class="n">allow_autapses</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># xx -&gt; layer5 Basket</span>
+    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">"L5_inhibitory"</span>
+    <span class="n">target_cell</span> <span class="o">=</span> <span class="s2">"L5_inhibitory"</span>
+    <span class="n">lamtha</span> <span class="o">=</span> <span class="mf">6.125</span>
+    <span class="n">loc</span> <span class="o">=</span> <span class="s2">"soma"</span>
+    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">"gabaa"</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"gbar_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">src_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">receptor</span><span class="si">}</span><span class="s2">"</span>
+    <span class="n">weight</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span>
+        <span class="n">src_cell</span><span class="p">,</span>
+        <span class="n">target_cell</span><span class="p">,</span>
+        <span class="n">loc</span><span class="p">,</span>
+        <span class="n">receptor</span><span class="p">,</span>
+        <span class="n">weight</span><span class="p">,</span>
+        <span class="n">delay</span><span class="p">,</span>
+        <span class="n">lamtha</span><span class="p">,</span>
+        <span class="n">allow_autapses</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">"gabab"</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"gbar_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">src_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">receptor</span><span class="si">}</span><span class="s2">"</span>
+    <span class="n">weight</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span>
+        <span class="n">src_cell</span><span class="p">,</span>
+        <span class="n">target_cell</span><span class="p">,</span>
+        <span class="n">loc</span><span class="p">,</span>
+        <span class="n">receptor</span><span class="p">,</span>
+        <span class="n">weight</span><span class="p">,</span>
+        <span class="n">delay</span><span class="p">,</span>
+        <span class="n">lamtha</span><span class="p">,</span>
+        <span class="n">allow_autapses</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">"L5_pyramidal"</span>
+    <span class="n">lamtha</span> <span class="o">=</span> <span class="mf">6.125</span> <span class="o">*</span> <span class="mf">0.8</span>  <span class="c1"># shorter space constant (Campagnola, 2022, mice data)</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"gbar_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">src_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+    <span class="n">weight</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="n">loc</span> <span class="o">=</span> <span class="s2">"soma"</span>
+    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">"ampa"</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">src_cell</span><span class="p">,</span> <span class="n">target_cell</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">receptor</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">)</span>
+
+    <span class="n">weight</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.2</span>  <span class="c1"># see Koh 1995; Kriener 2022</span>
+    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">"nmda"</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">src_cell</span><span class="p">,</span> <span class="n">target_cell</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">receptor</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">)</span>
+
+    <span class="n">src_cell</span> <span class="o">=</span> <span class="s2">"L2_pyramidal"</span>
+    <span class="n">lamtha</span> <span class="o">=</span> <span class="mf">6.125</span> <span class="o">*</span> <span class="mf">0.8</span>  <span class="c1"># shorter space constant (Campagnola, 2022, mice data)</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"gbar_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">src_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">_short_name</span><span class="p">(</span><span class="n">target_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+    <span class="n">weight</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="n">loc</span> <span class="o">=</span> <span class="s2">"soma"</span>
+    <span class="n">receptor</span> <span class="o">=</span> <span class="s2">"ampa"</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">src_cell</span><span class="p">,</span> <span class="n">target_cell</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">receptor</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">net</span>
+
+
 <span class="k">def</span><span class="w"> </span><span class="nf">add_erp_drives_to_jones_model</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">tstart</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add drives necessary for an event related potential (ERP)</span>
+<span class="w">    </span><span class="sd">"""Add drives necessary for an event related potential (ERP)</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1052,72 +1578,72 @@
 <span class="sd">    The first proximal input arrives at cortex ~20 ms after sensory</span>
 <span class="sd">    stimulus. The exact delay depends random number generator due to</span>
 <span class="sd">    random sampling of times from a gaussian.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_validate_type</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">Network</span><span class="p">,</span> <span class="s2">&quot;net&quot;</span><span class="p">,</span> <span class="s2">&quot;Network&quot;</span><span class="p">)</span>
-    <span class="n">_validate_type</span><span class="p">(</span><span class="n">tstart</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s2">&quot;tstart&quot;</span><span class="p">,</span> <span class="s2">&quot;float or int&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">_validate_type</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">Network</span><span class="p">,</span> <span class="s2">"net"</span><span class="p">,</span> <span class="s2">"Network"</span><span class="p">)</span>
+    <span class="n">_validate_type</span><span class="p">(</span><span class="n">tstart</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s2">"tstart"</span><span class="p">,</span> <span class="s2">"float or int"</span><span class="p">)</span>
 
     <span class="c1"># Add distal drive</span>
     <span class="n">weights_ampa_d1</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;L2_basket&quot;</span><span class="p">:</span> <span class="mf">0.006562</span><span class="p">,</span>
-        <span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">:</span> <span class="mf">7e-6</span><span class="p">,</span>
-        <span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">:</span> <span class="mf">0.142300</span><span class="p">,</span>
+        <span class="s2">"L2_basket"</span><span class="p">:</span> <span class="mf">0.006562</span><span class="p">,</span>
+        <span class="s2">"L2_pyramidal"</span><span class="p">:</span> <span class="mf">7e-6</span><span class="p">,</span>
+        <span class="s2">"L5_pyramidal"</span><span class="p">:</span> <span class="mf">0.142300</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="n">weights_nmda_d1</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;L2_basket&quot;</span><span class="p">:</span> <span class="mf">0.019482</span><span class="p">,</span>
-        <span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">:</span> <span class="mf">0.004317</span><span class="p">,</span>
-        <span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">:</span> <span class="mf">0.080074</span><span class="p">,</span>
+        <span class="s2">"L2_basket"</span><span class="p">:</span> <span class="mf">0.019482</span><span class="p">,</span>
+        <span class="s2">"L2_pyramidal"</span><span class="p">:</span> <span class="mf">0.004317</span><span class="p">,</span>
+        <span class="s2">"L5_pyramidal"</span><span class="p">:</span> <span class="mf">0.080074</span><span class="p">,</span>
     <span class="p">}</span>
-    <span class="n">synaptic_delays_d1</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;L2_basket&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">}</span>
+    <span class="n">synaptic_delays_d1</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"L2_basket"</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s2">"L2_pyramidal"</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s2">"L5_pyramidal"</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">}</span>
     <span class="n">net</span><span class="o">.</span><span class="n">add_evoked_drive</span><span class="p">(</span>
-        <span class="s2">&quot;evdist1&quot;</span><span class="p">,</span>
+        <span class="s2">"evdist1"</span><span class="p">,</span>
         <span class="n">mu</span><span class="o">=</span><span class="mf">63.53</span> <span class="o">+</span> <span class="n">tstart</span><span class="p">,</span>
         <span class="n">sigma</span><span class="o">=</span><span class="mf">3.85</span><span class="p">,</span>
         <span class="n">numspikes</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">weights_ampa</span><span class="o">=</span><span class="n">weights_ampa_d1</span><span class="p">,</span>
         <span class="n">weights_nmda</span><span class="o">=</span><span class="n">weights_nmda_d1</span><span class="p">,</span>
-        <span class="n">location</span><span class="o">=</span><span class="s2">&quot;distal&quot;</span><span class="p">,</span>
+        <span class="n">location</span><span class="o">=</span><span class="s2">"distal"</span><span class="p">,</span>
         <span class="n">synaptic_delays</span><span class="o">=</span><span class="n">synaptic_delays_d1</span><span class="p">,</span>
         <span class="n">event_seed</span><span class="o">=</span><span class="mi">274</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="c1"># Add proximal drives</span>
     <span class="n">weights_ampa_p1</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;L2_basket&quot;</span><span class="p">:</span> <span class="mf">0.08831</span><span class="p">,</span>
-        <span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">:</span> <span class="mf">0.01525</span><span class="p">,</span>
-        <span class="s2">&quot;L5_basket&quot;</span><span class="p">:</span> <span class="mf">0.19934</span><span class="p">,</span>
-        <span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">:</span> <span class="mf">0.00865</span><span class="p">,</span>
+        <span class="s2">"L2_basket"</span><span class="p">:</span> <span class="mf">0.08831</span><span class="p">,</span>
+        <span class="s2">"L2_pyramidal"</span><span class="p">:</span> <span class="mf">0.01525</span><span class="p">,</span>
+        <span class="s2">"L5_basket"</span><span class="p">:</span> <span class="mf">0.19934</span><span class="p">,</span>
+        <span class="s2">"L5_pyramidal"</span><span class="p">:</span> <span class="mf">0.00865</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="n">synaptic_delays_prox</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;L2_basket&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
-        <span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
-        <span class="s2">&quot;L5_basket&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
-        <span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="s2">"L2_basket"</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="s2">"L2_pyramidal"</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="s2">"L5_basket"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="s2">"L5_pyramidal"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="n">net</span><span class="o">.</span><span class="n">add_evoked_drive</span><span class="p">(</span>
-        <span class="s2">&quot;evprox1&quot;</span><span class="p">,</span>
+        <span class="s2">"evprox1"</span><span class="p">,</span>
         <span class="n">mu</span><span class="o">=</span><span class="mf">26.61</span> <span class="o">+</span> <span class="n">tstart</span><span class="p">,</span>
         <span class="n">sigma</span><span class="o">=</span><span class="mf">2.47</span><span class="p">,</span>
         <span class="n">numspikes</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">weights_ampa</span><span class="o">=</span><span class="n">weights_ampa_p1</span><span class="p">,</span>
         <span class="n">weights_nmda</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">location</span><span class="o">=</span><span class="s2">&quot;proximal&quot;</span><span class="p">,</span>
+        <span class="n">location</span><span class="o">=</span><span class="s2">"proximal"</span><span class="p">,</span>
         <span class="n">synaptic_delays</span><span class="o">=</span><span class="n">synaptic_delays_prox</span><span class="p">,</span>
         <span class="n">event_seed</span><span class="o">=</span><span class="mi">544</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="n">weights_ampa_p2</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;L2_basket&quot;</span><span class="p">:</span> <span class="mf">0.000003</span><span class="p">,</span>
-        <span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">:</span> <span class="mf">1.438840</span><span class="p">,</span>
-        <span class="s2">&quot;L5_basket&quot;</span><span class="p">:</span> <span class="mf">0.008958</span><span class="p">,</span>
-        <span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">:</span> <span class="mf">0.684013</span><span class="p">,</span>
+        <span class="s2">"L2_basket"</span><span class="p">:</span> <span class="mf">0.000003</span><span class="p">,</span>
+        <span class="s2">"L2_pyramidal"</span><span class="p">:</span> <span class="mf">1.438840</span><span class="p">,</span>
+        <span class="s2">"L5_basket"</span><span class="p">:</span> <span class="mf">0.008958</span><span class="p">,</span>
+        <span class="s2">"L5_pyramidal"</span><span class="p">:</span> <span class="mf">0.684013</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="n">net</span><span class="o">.</span><span class="n">add_evoked_drive</span><span class="p">(</span>
-        <span class="s2">&quot;evprox2&quot;</span><span class="p">,</span>
+        <span class="s2">"evprox2"</span><span class="p">,</span>
         <span class="n">mu</span><span class="o">=</span><span class="mf">137.12</span> <span class="o">+</span> <span class="n">tstart</span><span class="p">,</span>
         <span class="n">sigma</span><span class="o">=</span><span class="mf">8.33</span><span class="p">,</span>
         <span class="n">numspikes</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">weights_ampa</span><span class="o">=</span><span class="n">weights_ampa_p2</span><span class="p">,</span>
-        <span class="n">location</span><span class="o">=</span><span class="s2">&quot;proximal&quot;</span><span class="p">,</span>
+        <span class="n">location</span><span class="o">=</span><span class="s2">"proximal"</span><span class="p">,</span>
         <span class="n">synaptic_delays</span><span class="o">=</span><span class="n">synaptic_delays_prox</span><span class="p">,</span>
         <span class="n">event_seed</span><span class="o">=</span><span class="mi">814</span><span class="p">,</span>
     <span class="p">)</span>
@@ -1150,8 +1676,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1172,7 +1698,6 @@
 
   <p class="sphinx-version">
     Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
-    <br/>
   </p>
 </div>
       
@@ -1185,7 +1710,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.22.0.
 </p></div>
       
     </div>

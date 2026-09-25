@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -27,32 +26,27 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=fd6457a4" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c43d5962" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
 
     <script src="../_static/documentation_options.js?v=debdd0a9"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'generated/hnn_core.Network';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.22.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
@@ -125,7 +119,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -172,13 +166,6 @@
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../auto_examples/index.html">
-    Examples
-  </a>
-</li>
-
-
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="../api.html">
     API
@@ -213,6 +200,13 @@
   </a>
 </li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">
+    HNN Textbook
+  </a>
+</li>
+
             <li class="nav-item dropdown">
                 <button class="btn dropdown-toggle nav-item" type="button"
                 data-bs-toggle="dropdown" aria-expanded="false"
@@ -221,13 +215,6 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-<li class=" ">
-  <a class="nav-link dropdown-item nav-external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">
-    HNN Textbook
-  </a>
-</li>
-
-
 <li class=" ">
   <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
     PyPI package
@@ -255,7 +242,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -286,15 +273,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
     <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
     <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
     <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -305,7 +292,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -314,7 +301,7 @@
   
 
   
-    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
       <span class="fa-solid fa-outdent"></span>
     </button>
   
@@ -347,13 +334,6 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../install.html">
     Install (Textbook)
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../auto_examples/index.html">
-    Examples
   </a>
 </li>
 
@@ -446,15 +426,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
     <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
     <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
     <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -537,18 +517,20 @@ are added suitably. Will be deprecated in a future release.</p>
 </dd>
 <dt><strong>mesh_shape</strong><span class="classifier">tuple of int (default: (10, 10))</span></dt><dd><p>Defines the (n_x, n_y) shape of the grid of pyramidal cells.</p>
 </dd>
-<dt><strong>pos_dict</strong><span class="classifier">dict of list of tuple (x, y, z), optional</span></dt><dd><p>Dictionary containing the coordinate positions of all cells.
-Keys are ‘L2_pyramidal’, ‘L5_pyramidal’, ‘L2_basket’, ‘L5_basket’,
-or any external drive name.</p>
+<dt><strong>pos_dict</strong><span class="classifier">dict of list of tuple (x, y, z), optional</span></dt><dd><p>Dictionary containing the coordinate positions of all cells. Keys are
+‘L2_pyramidal’, ‘L5_pyramidal’, ‘L2_basket’, ‘L5_basket’, or any external drive
+name. If you specify “pos_dict”, you MUST also specify your own “cell_types”
+argument (see below).</p>
 </dd>
 <dt><strong>cell_types</strong><span class="classifier">dict of dict of (Cell | dict), optional</span></dt><dd><p>Dictionary containing names of real cell types in the network (e.g. ‘L2_basket’)
-as keys and child-dictionaries describing the cell type. The child-dictionary
-contains two keys: “cell_object” and “cell_metadata”. The value of “cell_object”
-is the corresponding Cell instance of the cell type being described, and this
-instance is used as a template for the other cells of its type in the
-population. The value of “cell_metadata” is a dictionary containing several
-key-values pairs that describe different aspects of the cell type, described
-below:</p>
+as keys and child-dictionaries describing the cell type. If you specify
+“cell_types”, you MUST also specify your own “pos_dict” argument (see
+above). The child-dictionary contains two keys: “cell_object” and
+“cell_metadata”. The value of “cell_object” is the corresponding Cell instance
+of the cell type being described, and this instance is used as a template for
+the other cells of its type in the population. The value of “cell_metadata” is a
+dictionary containing several key-values pairs that describe different aspects
+of the cell type, described below:</p>
 <blockquote>
 <div><ul class="simple">
 <li><p>“morpho_type” : either “basket” or “pyramidal”</p></li>
@@ -637,8 +619,8 @@ instances of <a class="reference internal" href="hnn_core.extracellular.Extracel
 <tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.add_spike_train_drive" title="hnn_core.Network.add_spike_train_drive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_spike_train_drive</span></code></a>(name, *, spike_data, ...)</p></td>
 <td><p>Add an external drive from explicitly defined spike trains.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.add_tonic_bias" title="hnn_core.Network.add_tonic_bias"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_tonic_bias</span></code></a>(*[, cell_type, section, ...])</p></td>
-<td><p>Attaches parameters of tonic bias input for given cell types</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.add_tonic_bias" title="hnn_core.Network.add_tonic_bias"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_tonic_bias</span></code></a>(amplitude[, bias_name, gid, ...])</p></td>
+<td><p>Adds a tonic bias input to provided cell types and/or cells</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.clear_connectivity" title="hnn_core.Network.clear_connectivity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear_connectivity</span></code></a>()</p></td>
 <td><p>Remove all connections defined in Network.connectivity</p></td>
@@ -658,16 +640,19 @@ instances of <a class="reference internal" href="hnn_core.extracellular.Extracel
 <tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.gid_to_type" title="hnn_core.Network.gid_to_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gid_to_type</span></code></a>(gid)</p></td>
 <td><p>Reverse lookup of gid to type.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.plot_cells" title="hnn_core.Network.plot_cells"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_cells</span></code></a>([ax, show])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.plot_cells" title="hnn_core.Network.plot_cells"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_cells</span></code></a>([ax, show, colors, markers])</p></td>
 <td><p>Plot the cells using Network.pos_dict.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.set_cell_positions" title="hnn_core.Network.set_cell_positions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_cell_positions</span></code></a>(*[, inplane_distance, ...])</p></td>
-<td><p>Set relative positions of cells arranged in a square grid</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.set_cell_positions" title="hnn_core.Network.set_cell_positions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_cell_positions</span></code></a>([inplane_distance, ...])</p></td>
+<td><p>Reset relative positions of cells arranged in a square grid (Deprecated)</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.set_global_synaptic_gains" title="hnn_core.Network.set_global_synaptic_gains"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_global_synaptic_gains</span></code></a>([e_e, e_i, i_e, ...])</p></td>
 <td><p>Change the synaptic gains of the celltypes in the Network.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.write_configuration" title="hnn_core.Network.write_configuration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_configuration</span></code></a>(fname[, overwrite])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.update_cell_positions" title="hnn_core.Network.update_cell_positions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_cell_positions</span></code></a>([inplane_distance, ...])</p></td>
+<td><p>Change relative positions of cells arranged in a square grid.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.write_configuration" title="hnn_core.Network.write_configuration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_configuration</span></code></a>(fname[, overwrite])</p></td>
 <td><p>Writes network configuration to a json file.</p></td>
 </tr>
 </tbody>
@@ -1032,7 +1017,7 @@ Used to randomly remove connections when probability &lt; 1.0.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Network.add_spike_train_drive">
-<span class="sig-name descname"><span class="pre">add_spike_train_drive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_ampa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_nmda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synaptic_delays</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_spike_train_drive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_spike_train_drive" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">add_spike_train_drive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_ampa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_nmda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synaptic_delays</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_spike_train_drive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_spike_train_drive" title="Link to this definition">#</a></dt>
 <dd><p>Add an external drive from explicitly defined spike trains.</p>
 <p>This method enables the target network to receive spike trains from a source
 network (e.g., another HNN simulation) or external data, driving activity in the
@@ -1103,37 +1088,106 @@ or an integer for a fixed number. Default: None (inferred from spike_data).</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Network.add_tonic_bias">
-<span class="sig-name descname"><span class="pre">add_tonic_bias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">section</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'soma'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tonic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_tonic_bias"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_tonic_bias" title="Link to this definition">#</a></dt>
-<dd><p>Attaches parameters of tonic bias input for given cell types</p>
-<dl class="field-list simple">
+<span class="sig-name descname"><span class="pre">add_tonic_bias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amplitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tonic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">section</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'soma'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_tonic_bias"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_tonic_bias" title="Link to this definition">#</a></dt>
+<dd><p>Adds a tonic bias input to provided cell types and/or cells</p>
+<dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>cell_types</strong><span class="classifier">str | None</span></dt><dd><p>The name of the cell type to add a tonic input. When supplied,
-a float value must be provided with the <em class="xref py py-obj">amplitude</em> keyword.
-Valid inputs are those listed in  <em class="xref py py-obj">net.cell_types</em>.</p>
+<dd class="field-odd"><dl>
+<dt><strong>amplitude</strong><span class="classifier">dict | int | float</span></dt><dd><p>Required parameter. All amplitudes should be given in units of nA.</p>
+<ul>
+<li><p>If given as a dictionary, keys should be cell type names (as in
+<code class="docutils literal notranslate"><span class="pre">Network.cell_types</span></code>) and values should be the amplitude of the tonic
+input for that cell type as a <em class="xref py py-obj">float</em>. An example of a valid dictionary
+input is:</p>
+<p><code class="docutils literal notranslate"><span class="pre">{'L2_pyramidal':</span> <span class="pre">1.0,</span> <span class="pre">'L5_pyramidal':</span> <span class="pre">2.0}</span></code></p>
+</li>
+<li><p>If given as an <em class="xref py py-obj">int</em> or <em class="xref py py-obj">float</em>, you must also provide the <code class="docutils literal notranslate"><span class="pre">gid</span></code>
+argument. In this case, the amplitude is applied to all cells indicated by
+the <code class="docutils literal notranslate"><span class="pre">gid</span></code> argument.</p></li>
+</ul>
 </dd>
-<dt><strong>section</strong><span class="classifier">str</span></dt><dd><p>name of cell section the bias should be applied to.
-See net.cell_types[cell_type].sections.keys()</p>
+<dt><strong>bias_name</strong><span class="classifier">str, default=”tonic”</span></dt><dd><p>The name of the bias.</p>
 </dd>
-<dt><strong>bias_name</strong><span class="classifier">str</span></dt><dd><p>The name of the bias.</p>
+<dt><strong>gid</strong><span class="classifier">int | list | dict, optional</span></dt><dd><p>Optionally specify gid(s) of cells to which the tonic bias should be
+applied. This must be specified if <code class="docutils literal notranslate"><span class="pre">amplitude</span></code> is an <em class="xref py py-obj">int</em> or <em class="xref py py-obj">float</em>. May
+be given as:</p>
+<ul>
+<li><p>a single gid (<em class="xref py py-obj">int</em>) or a list of gids (<em class="xref py py-obj">list</em> of <em class="xref py py-obj">int</em>).
+The tonic bias is connected to the provided gids, regardless of which cell
+type they belong to.</p></li>
+<li><p>a dictionary mapping cell type to gid(s). If given as a dictionary, keys
+should be cell type names (as in <code class="docutils literal notranslate"><span class="pre">Network.cell_types</span></code>). Values should be
+a single gid (<em class="xref py py-obj">int</em>), a list of gids (<em class="xref py py-obj">list</em> of <em class="xref py py-obj">int</em>), or the string
+<code class="docutils literal notranslate"><span class="pre">'all'</span></code>. Each gid must belong to the cell type it is mapped to or else
+an error will be raised. Examples of valid dictionary inputs are:</p>
+<p><code class="docutils literal notranslate"><span class="pre">{'L5_pyramidal':</span> <span class="pre">35}</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">{'L2_pyramidal':</span> <span class="pre">5,</span> <span class="pre">'L5_pyramidal':</span> <span class="pre">35}</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">{'L2_pyramidal':</span> <span class="pre">[5,</span> <span class="pre">6],</span> <span class="pre">'L5_pyramidal':</span> <span class="pre">35,</span> <span class="pre">'L5_basket':</span> <span class="pre">'all'}</span></code></p>
+</li>
+</ul>
 </dd>
-<dt><strong>amplitude: dict | float</strong></dt><dd><p>A dictionary of cell type keys (str) to amplitude values (float).
-Valid inputs for cell types are those listed in <em class="xref py py-obj">net.cell_types</em>.
-If <em class="xref py py-obj">cell_types</em> is not None, <em class="xref py py-obj">amplitude</em> should be
-a float indicating the amplitude of the tonic input
-for the specified cell type.</p>
+<dt><strong>section</strong><span class="classifier">str, default=”soma”</span></dt><dd><p>Name of cell section the bias should be applied to.
+See <code class="docutils literal notranslate"><span class="pre">Network.cell_types[cell_type].sections.keys()</span></code></p>
 </dd>
-<dt><strong>t0</strong><span class="classifier">float</span></dt><dd><p>The start time of tonic input (in ms). Default: 0 (beginning of
-simulation). This value will be applied to all the  tonic biases if
-multiple are specified with the <em class="xref py py-obj">amplitude</em> keyword.</p>
+<dt><strong>t0</strong><span class="classifier">float, default=0</span></dt><dd><p>The start time of tonic input (in ms), defaulting to the beginning of
+simulation. This value will be applied to all the tonic biases created by
+this function call, regardless of if multiple cell types are specified using
+either <code class="docutils literal notranslate"><span class="pre">amplitude</span></code> or <code class="docutils literal notranslate"><span class="pre">gid</span></code>.</p>
 </dd>
-<dt><strong>tstop</strong><span class="classifier">float</span></dt><dd><p>The end time of tonic input (in ms). Default: end of simulation.
-This value will be applied to all the  tonic biases if
-multiple are specified with the <em class="xref py py-obj">amplitude</em> keyword.</p>
+<dt><strong>tstop</strong><span class="classifier">float, optional</span></dt><dd><p>The end time of tonic input (in ms), defaulting to the end of the
+simulation. This value will be applied to all the tonic biases created by
+this function call, regardless of if multiple cell types are specified using
+either <code class="docutils literal notranslate"><span class="pre">amplitude</span></code> or <code class="docutils literal notranslate"><span class="pre">gid</span></code>.</p>
+</dd>
+<dt><strong>cell_type</strong><span class="classifier">str, optional</span></dt><dd><p>DEPRECATED. The name of the cell type to add a tonic input. Valid inputs are
+those listed in <code class="docutils literal notranslate"><span class="pre">Network.cell_types</span></code>. When supplied, the <code class="docutils literal notranslate"><span class="pre">amplitude</span></code>
+keyword must be provided as a <em class="xref py py-obj">float</em>. This argument will be removed in
+future releases.</p>
 </dd>
 </dl>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<p>Apply the same amplitude to all cells of two cell types:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">add_tonic_bias</span><span class="p">(</span><span class="n">amplitude</span><span class="o">=</span><span class="p">{</span><span class="s1">'L2_pyramidal'</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">'L5_pyramidal'</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>Apply a single amplitude to a single cell, specified by providing that cell’s
+GID to <code class="docutils literal notranslate"><span class="pre">gid</span></code> as an <em class="xref py py-obj">int</em>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">add_tonic_bias</span><span class="p">(</span><span class="n">amplitude</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">gid</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Apply a single amplitude to several cells, specified by <code class="docutils literal notranslate"><span class="pre">gid</span></code> as a <em class="xref py py-obj">list</em> of
+<em class="xref py py-obj">int</em>, regardless of the cell type(s) they belong to (this will NOT check
+whether the gids belong to the same cell type):</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">add_tonic_bias</span><span class="p">(</span><span class="n">amplitude</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">gid</span><span class="o">=</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">35</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Apply a single amplitude to several cells, specified by <code class="docutils literal notranslate"><span class="pre">gid</span></code> as a dictionary
+of per-cell-type GIDs (this WILL check whether the gids belong to the cell type
+they are mapped to):</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">add_tonic_bias</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">amplitude</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">gid</span><span class="o">=</span><span class="p">{</span><span class="s1">'L2_pyramidal'</span><span class="p">:</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="s1">'L5_pyramidal'</span><span class="p">:</span> <span class="mi">35</span><span class="p">},</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Apply per-cell-type amplitudes, restricting each to specific gids using a
+dictionary for <code class="docutils literal notranslate"><span class="pre">gid</span></code>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">add_tonic_bias</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">amplitude</span><span class="o">=</span><span class="p">{</span><span class="s1">'L2_pyramidal'</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">'L5_pyramidal'</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="n">gid</span><span class="o">=</span><span class="p">{</span><span class="s1">'L2_pyramidal'</span><span class="p">:</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="s1">'L5_pyramidal'</span><span class="p">:</span> <span class="mi">35</span><span class="p">},</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Apply per-cell-type amplitudes, using the string <code class="docutils literal notranslate"><span class="pre">'all'</span></code> in the <code class="docutils literal notranslate"><span class="pre">gid</span></code>
+dictionary to apply the bias to every cell of that type:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">add_tonic_bias</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">amplitude</span><span class="o">=</span><span class="p">{</span><span class="s1">'L2_pyramidal'</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">'L5_pyramidal'</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="n">gid</span><span class="o">=</span><span class="p">{</span><span class="s1">'L2_pyramidal'</span><span class="p">:</span> <span class="s1">'all'</span><span class="p">,</span> <span class="s1">'L5_pyramidal'</span><span class="p">:</span> <span class="mi">35</span><span class="p">},</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -1214,7 +1268,7 @@ and their corresponding gain values.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Network.plot_cells">
-<span class="sig-name descname"><span class="pre">plot_cells</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.plot_cells"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.plot_cells" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">plot_cells</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">markers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.plot_cells"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.plot_cells" title="Link to this definition">#</a></dt>
 <dd><p>Plot the cells using Network.pos_dict.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1223,6 +1277,12 @@ and their corresponding gain values.</p>
 a new figure is created.</p>
 </dd>
 <dt><strong>show</strong><span class="classifier">bool</span></dt><dd><p>If True, show the figure.</p>
+</dd>
+<dt><strong>colors</strong><span class="classifier">dict | None</span></dt><dd><p>Dictionary mapping cell type names to colors. If None,
+colors are assigned automatically from the default color cycle.</p>
+</dd>
+<dt><strong>markers</strong><span class="classifier">dict | None</span></dt><dd><p>Dictionary mapping cell type names to markers. If None,
+markers are assigned based on <code class="docutils literal notranslate"><span class="pre">morpho_type</span></code> in cell metadata.</p>
 </dd>
 </dl>
 </dd>
@@ -1237,18 +1297,18 @@ a new figure is created.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Network.set_cell_positions">
-<span class="sig-name descname"><span class="pre">set_cell_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplane_distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_separation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.set_cell_positions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.set_cell_positions" title="Link to this definition">#</a></dt>
-<dd><p>Set relative positions of cells arranged in a square grid</p>
-<p>Note that it is possible to change only a subset of the parameters
-(the default value of each is None, which implies no change).</p>
+<span class="sig-name descname"><span class="pre">set_cell_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inplane_distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_separation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.set_cell_positions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.set_cell_positions" title="Link to this definition">#</a></dt>
+<dd><p>Reset relative positions of cells arranged in a square grid (Deprecated)</p>
+<p>This function is deprecated in favor of <a class="reference internal" href="#hnn_core.Network.update_cell_positions" title="hnn_core.Network.update_cell_positions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Network.update_cell_positions</span></code></a>. Note
+that it is possible to change one of the parameters without changing the other.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>inplane_distance</strong><span class="classifier">float</span></dt><dd><p>The in plane-distance (in um) between pyramidal cell somas in the
+<dt><strong>inplane_distance</strong><span class="classifier">float, optional</span></dt><dd><p>The in plane-distance (in um) between pyramidal cell somas in the
 square grid. Note that this parameter does not affect the amplitude
 of the dipole moment.</p>
 </dd>
-<dt><strong>layer_separation</strong><span class="classifier">float</span></dt><dd><p>The separation of pyramidal cell soma layers 2/3 and 5. Note that
+<dt><strong>layer_separation</strong><span class="classifier">float, optional</span></dt><dd><p>The separation of pyramidal cell soma layers 2/3 and 5. Note that
 this parameter does not affect the amplitude of the dipole moment.</p>
 </dd>
 </dl>
@@ -1291,6 +1351,27 @@ updated if a float value is provided. If None is provided
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.Network.update_cell_positions">
+<span class="sig-name descname"><span class="pre">update_cell_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inplane_distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_separation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.update_cell_positions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.update_cell_positions" title="Link to this definition">#</a></dt>
+<dd><p>Change relative positions of cells arranged in a square grid.</p>
+<p>Note that it is possible to change one of the parameters without changing the
+other. You must pass at least one argument.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>inplane_distance</strong><span class="classifier">float, optional</span></dt><dd><p>The in plane-distance (in um) between pyramidal cell somas in the
+square grid. Note that this parameter does not affect the amplitude
+of the dipole moment.</p>
+</dd>
+<dt><strong>layer_separation</strong><span class="classifier">float, optional</span></dt><dd><p>The separation of pyramidal cell soma layers 2/3 and 5. Note that
+this parameter does not affect the amplitude of the dipole moment.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Network.write_configuration">
 <span class="sig-name descname"><span class="pre">write_configuration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.write_configuration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.write_configuration" title="Link to this definition">#</a></dt>
 <dd><p>Writes network configuration to a json file.</p>
@@ -1318,7 +1399,7 @@ voltages are not saved due to size.</p>
 
 </dd></dl>
 
-<span class="target" id="sphx-glr-backreferences-hnn-core-network"></span></section>
+</section>
 
 
                 </article>
@@ -1385,6 +1466,7 @@ voltages are not saved due to size.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.plot_cells"><code class="docutils literal notranslate"><span class="pre">Network.plot_cells()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.set_cell_positions"><code class="docutils literal notranslate"><span class="pre">Network.set_cell_positions()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.set_global_synaptic_gains"><code class="docutils literal notranslate"><span class="pre">Network.set_global_synaptic_gains()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.update_cell_positions"><code class="docutils literal notranslate"><span class="pre">Network.update_cell_positions()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.write_configuration"><code class="docutils literal notranslate"><span class="pre">Network.write_configuration()</span></code></a></li>
 </ul>
 </li>
@@ -1413,8 +1495,8 @@ voltages are not saved due to size.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1435,7 +1517,6 @@ voltages are not saved due to size.</p>
 
   <p class="sphinx-version">
     Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
-    <br/>
   </p>
 </div>
       
@@ -1448,7 +1529,7 @@ voltages are not saved due to size.</p>
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.22.0.
 </p></div>
       
     </div>

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -26,32 +25,27 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c43d5962" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
 
     <script src="../../_static/documentation_options.js?v=debdd0a9"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script src="../../_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/hnn_core/cell';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.22.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
@@ -122,7 +116,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -170,13 +164,6 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
-    Examples
-  </a>
-</li>
-
-
-<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../api.html">
     API
   </a>
@@ -210,6 +197,13 @@
   </a>
 </li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">
+    HNN Textbook
+  </a>
+</li>
+
             <li class="nav-item dropdown">
                 <button class="btn dropdown-toggle nav-item" type="button"
                 data-bs-toggle="dropdown" aria-expanded="false"
@@ -218,13 +212,6 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-<li class=" ">
-  <a class="nav-link dropdown-item nav-external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">
-    HNN Textbook
-  </a>
-</li>
-
-
 <li class=" ">
   <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
     PyPI package
@@ -252,7 +239,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -283,15 +270,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
     <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
     <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
     <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -302,7 +289,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -342,13 +329,6 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../install.html">
     Install (Textbook)
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
-    Examples
   </a>
 </li>
 
@@ -441,15 +421,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
     <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
     <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
     <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -513,7 +493,7 @@
                 <article class="bd-article">
                   
   <h1>Source code for hnn_core.cell</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Establish class def for general cell features.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""Establish class def for general cell features."""</span>
 
 <span class="c1"># Authors: Mainak Jas &lt;mjas@mgh.harvard.edu&gt;</span>
 <span class="c1">#          Sam Neymotin &lt;samnemo@gmail.com&gt;</span>
@@ -533,7 +513,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_get_cos_theta</span><span class="p">(</span><span class="n">sections</span><span class="p">,</span> <span class="n">sec_name_apical</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get cos(theta) to compute dipole along the apical dendrite.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Get cos(theta) to compute dipole along the apical dendrite."""</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sections</span><span class="p">[</span><span class="n">sec_name_apical</span><span class="p">]</span><span class="o">.</span><span class="n">end_pts</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
         <span class="n">sections</span><span class="p">[</span><span class="n">sec_name_apical</span><span class="p">]</span><span class="o">.</span><span class="n">end_pts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="p">)</span>
@@ -545,7 +525,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_gaussian</span><span class="p">(</span><span class="n">x_val</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return height of gaussian at x_val.</span>
+<span class="w">    </span><span class="sd">"""Return height of gaussian at x_val.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -565,14 +545,14 @@
 <span class="sd">    -----</span>
 <span class="sd">    Gaussian curve is centered at zero and has a fixed peak height</span>
 <span class="sd">    such the _calculate_gaussian(0, lamtha) returns 1 for all lamtha.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">x_height</span> <span class="o">=</span> <span class="n">height</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">x_val</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">lamtha</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">x_height</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_get_gaussian_connection</span><span class="p">(</span><span class="n">src_pos</span><span class="p">,</span> <span class="n">target_pos</span><span class="p">,</span> <span class="n">nc_dict</span><span class="p">,</span> <span class="n">inplane_distance</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate distance dependent connection properties.</span>
+<span class="w">    </span><span class="sd">"""Calculate distance dependent connection properties.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -597,23 +577,23 @@
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    Distance in xy plane is used for gaussian decay.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">x_dist</span> <span class="o">=</span> <span class="n">target_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">src_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">y_dist</span> <span class="o">=</span> <span class="n">target_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">src_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">cell_dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x_dist</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">y_dist</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
-    <span class="n">scaled_lamtha</span> <span class="o">=</span> <span class="n">nc_dict</span><span class="p">[</span><span class="s2">&quot;lamtha&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">inplane_distance</span>
+    <span class="n">scaled_lamtha</span> <span class="o">=</span> <span class="n">nc_dict</span><span class="p">[</span><span class="s2">"lamtha"</span><span class="p">]</span> <span class="o">*</span> <span class="n">inplane_distance</span>
 
-    <span class="n">weight</span> <span class="o">=</span> <span class="n">_calculate_gaussian</span><span class="p">(</span><span class="n">cell_dist</span><span class="p">,</span> <span class="n">nc_dict</span><span class="p">[</span><span class="s2">&quot;A_weight&quot;</span><span class="p">],</span> <span class="n">scaled_lamtha</span><span class="p">)</span>
-    <span class="n">delay</span> <span class="o">=</span> <span class="n">nc_dict</span><span class="p">[</span><span class="s2">&quot;A_delay&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">_calculate_gaussian</span><span class="p">(</span><span class="n">cell_dist</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">scaled_lamtha</span><span class="p">)</span>
+    <span class="n">weight</span> <span class="o">=</span> <span class="n">_calculate_gaussian</span><span class="p">(</span><span class="n">cell_dist</span><span class="p">,</span> <span class="n">nc_dict</span><span class="p">[</span><span class="s2">"A_weight"</span><span class="p">],</span> <span class="n">scaled_lamtha</span><span class="p">)</span>
+    <span class="n">delay</span> <span class="o">=</span> <span class="n">nc_dict</span><span class="p">[</span><span class="s2">"A_delay"</span><span class="p">]</span> <span class="o">/</span> <span class="n">_calculate_gaussian</span><span class="p">(</span><span class="n">cell_dist</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">scaled_lamtha</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">weight</span><span class="p">,</span> <span class="n">delay</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">node_to_str</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">node</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">node</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">node</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">","</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">node</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_ArtificialCell</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The ArtificialCell class for initializing a NEURON feed source.</span>
+<span class="w">    </span><span class="sd">"""The ArtificialCell class for initializing a NEURON feed source.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -623,7 +603,7 @@
 <span class="sd">    threshold : float</span>
 <span class="sd">        Membrane potential threshold that demarks a spike.</span>
 <span class="sd">    gid : int or None (optional)</span>
-<span class="sd">        Each cell in a network is uniquely identified by it&#39;s &quot;global ID&quot;: GID.</span>
+<span class="sd">        Each cell in a network is uniquely identified by it's "global ID": GID.</span>
 <span class="sd">        The GID is an integer from 0 to n_cells, or None if the cell is not</span>
 <span class="sd">        yet attached to a network. Once the GID is set, it cannot be changed.</span>
 
@@ -639,7 +619,7 @@
 <span class="sd">        source-to-target references for nrn_vecstim.</span>
 <span class="sd">    gid : int</span>
 <span class="sd">        GID of the cell in a network (or None if not yet assigned)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_times</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">gid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># Convert event times into nrn vector</span>
@@ -665,11 +645,11 @@
     <span class="nd">@gid</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">gid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gid</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;gid must be an integer&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"gid must be an integer"</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_gid</span> <span class="o">=</span> <span class="n">gid</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Global ID for this cell already assigned!&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"Global ID for this cell already assigned!"</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_get_nseg</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
@@ -683,7 +663,7 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">Section</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Section class.</span>
+<span class="w">    </span><span class="sd">"""Section class.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -705,7 +685,7 @@
 <span class="sd">    mechs : dict</span>
 <span class="sd">        Mechanisms to insert in this section. The keys</span>
 <span class="sd">        are the names of the mechanisms and values</span>
-<span class="sd">        are the properties. For e.g., {&#39;ca&#39;: {&#39;gbar_ca&#39;: 60}}</span>
+<span class="sd">        are the properties. For e.g., {'ca': {'gbar_ca': 60}}</span>
 <span class="sd">    syns : list of str</span>
 <span class="sd">        The synaptic mechanisms to add in this section</span>
 <span class="sd">    end_pts : list of [x, y, z]</span>
@@ -722,7 +702,7 @@
 <span class="sd">        Initial value for membrane potential in millivolts.</span>
 <span class="sd">    nseg : int</span>
 <span class="sd">        Number of segments in the section</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">diam</span><span class="p">,</span> <span class="n">Ra</span><span class="p">,</span> <span class="n">cm</span><span class="p">,</span> <span class="n">v0</span><span class="o">=-</span><span class="mi">65</span><span class="p">,</span> <span class="n">end_pts</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_L</span> <span class="o">=</span> <span class="n">L</span>
@@ -741,7 +721,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">nseg</span> <span class="o">=</span> <span class="n">_get_nseg</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;L=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="si">}</span><span class="s2">, diam=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">diam</span><span class="si">}</span><span class="s2">, cm=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cm</span><span class="si">}</span><span class="s2">, Ra=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">Ra</span><span class="si">}</span><span class="s2">, v0=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">v0</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"L=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="si">}</span><span class="s2">, diam=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">diam</span><span class="si">}</span><span class="s2">, cm=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cm</span><span class="si">}</span><span class="s2">, Ra=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">Ra</span><span class="si">}</span><span class="s2">, v0=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">v0</span><span class="si">}</span><span class="s2">"</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Section</span><span class="p">):</span>
@@ -761,8 +741,8 @@
                 <span class="k">return</span> <span class="kc">False</span>
 
         <span class="n">all_attrs</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="n">attrs_to_ignore</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">all_attrs</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)]</span>
-        <span class="n">attrs_to_ignore</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;end_pts&quot;</span><span class="p">,</span> <span class="s2">&quot;mechs&quot;</span><span class="p">,</span> <span class="s2">&quot;to_dict&quot;</span><span class="p">])</span>
+        <span class="n">attrs_to_ignore</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">all_attrs</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"_"</span><span class="p">)]</span>
+        <span class="n">attrs_to_ignore</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">"end_pts"</span><span class="p">,</span> <span class="s2">"mechs"</span><span class="p">,</span> <span class="s2">"to_dict"</span><span class="p">])</span>
         <span class="n">attrs_to_check</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">all_attrs</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">attrs_to_ignore</span><span class="p">]</span>
 
         <span class="c1"># Check all other attributes</span>
@@ -773,24 +753,24 @@
         <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts an object of Section class to a dictionary.</span>
+<span class="w">        </span><span class="sd">"""Converts an object of Section class to a dictionary.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        dictionary form of an object of Section class.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">section_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="n">section_data</span><span class="p">[</span><span class="s2">&quot;L&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span>
-        <span class="n">section_data</span><span class="p">[</span><span class="s2">&quot;diam&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">diam</span>
-        <span class="n">section_data</span><span class="p">[</span><span class="s2">&quot;cm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cm</span>
-        <span class="n">section_data</span><span class="p">[</span><span class="s2">&quot;Ra&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ra</span>
-        <span class="n">section_data</span><span class="p">[</span><span class="s2">&quot;end_pts&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_pts</span>
-        <span class="n">section_data</span><span class="p">[</span><span class="s2">&quot;nseg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nseg</span>
-        <span class="n">section_data</span><span class="p">[</span><span class="s2">&quot;v0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v0</span>
+        <span class="n">section_data</span><span class="p">[</span><span class="s2">"L"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span>
+        <span class="n">section_data</span><span class="p">[</span><span class="s2">"diam"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">diam</span>
+        <span class="n">section_data</span><span class="p">[</span><span class="s2">"cm"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cm</span>
+        <span class="n">section_data</span><span class="p">[</span><span class="s2">"Ra"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ra</span>
+        <span class="n">section_data</span><span class="p">[</span><span class="s2">"end_pts"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_pts</span>
+        <span class="n">section_data</span><span class="p">[</span><span class="s2">"nseg"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nseg</span>
+        <span class="n">section_data</span><span class="p">[</span><span class="s2">"v0"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v0</span>
         <span class="c1"># Need to solve the partial function problem</span>
         <span class="c1"># in mechs</span>
-        <span class="n">section_data</span><span class="p">[</span><span class="s2">&quot;mechs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mechs</span>
-        <span class="n">section_data</span><span class="p">[</span><span class="s2">&quot;syns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">syns</span>
+        <span class="n">section_data</span><span class="p">[</span><span class="s2">"mechs"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mechs</span>
+        <span class="n">section_data</span><span class="p">[</span><span class="s2">"syns"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">syns</span>
         <span class="k">return</span> <span class="n">section_data</span>
 
     <span class="nd">@property</span>
@@ -821,7 +801,7 @@
 <div class="viewcode-block" id="Cell">
 <a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Cell</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a cell object.</span>
+<span class="w">    </span><span class="sd">"""Create a cell object.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -833,17 +813,17 @@
 <span class="sd">        Dictionary with keys as section name.</span>
 <span class="sd">    synapses : dict of dict</span>
 <span class="sd">        Keys are name of synaptic mechanism. Each synaptic mechanism dict has keys for</span>
-<span class="sd">        parameters of the mechanism, e.g., &#39;e&#39;, &#39;tau1&#39;, &#39;tau2&#39;.  sections.</span>
+<span class="sd">        parameters of the mechanism, e.g., 'e', 'tau1', 'tau2'.  sections.</span>
 <span class="sd">    sect_loc : dict of list</span>
-<span class="sd">        Can have keys &#39;proximal&#39; or &#39;distal&#39; each containing</span>
+<span class="sd">        Can have keys 'proximal' or 'distal' each containing</span>
 <span class="sd">        names of section locations that are proximal or distal.</span>
 <span class="sd">    gid : int or None (optional)</span>
-<span class="sd">        Each cell in a network is uniquely identified by it&#39;s &quot;global ID&quot;: GID.</span>
+<span class="sd">        Each cell in a network is uniquely identified by it's "global ID": GID.</span>
 <span class="sd">        The GID is an integer from 0 to n_cells, or None if the cell is not</span>
 <span class="sd">        yet attached to a network. Once the GID is set, it cannot be changed.</span>
 <span class="sd">    cell_tree : dict of list</span>
 <span class="sd">        Stores the tree representation of a cell.</span>
-<span class="sd">        Root is the 0 end of &#39;soma&#39;. Nodes are a tuple (sec_name, node_pos)</span>
+<span class="sd">        Root is the 0 end of 'soma'. Nodes are a tuple (sec_name, node_pos)</span>
 <span class="sd">        where sec_name is the name of the section and node_pos is the 0 end</span>
 <span class="sd">        or 1 end. The data structure is the adjacency list representation of a</span>
 <span class="sd">        tree. The keys of the dict are the parent nodes. The value is the</span>
@@ -880,11 +860,11 @@
 <span class="sd">    gid : int</span>
 <span class="sd">        GID of the cell in a network (or None if not yet assigned)</span>
 <span class="sd">    sect_loc : dict of list</span>
-<span class="sd">        Can have keys &#39;proximal&#39; or &#39;distal&#39; each containing</span>
+<span class="sd">        Can have keys 'proximal' or 'distal' each containing</span>
 <span class="sd">        names of section locations that are proximal or distal.</span>
 <span class="sd">    cell_tree : dict of list</span>
 <span class="sd">        Stores the tree representation of a cell.</span>
-<span class="sd">        Root is the 0 end of &#39;soma&#39;. Nodes are a tuple (sec_name, node_pos)</span>
+<span class="sd">        Root is the 0 end of 'soma'. Nodes are a tuple (sec_name, node_pos)</span>
 <span class="sd">        where sec_name is the name of the section and node_pos is the 0 end</span>
 <span class="sd">        or 1 end. The data structure is the adjacency list representation of a</span>
 <span class="sd">        tree. The keys of the dict are the parent nodes. The value is the</span>
@@ -899,7 +879,7 @@
 <span class="sd">            Ra=200.,</span>
 <span class="sd">            end_pts=[[0, 0, 0], [0, 39., 0]]</span>
 <span class="sd">        )</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">sections</span><span class="p">,</span> <span class="n">synapses</span><span class="p">,</span> <span class="n">sect_loc</span><span class="p">,</span> <span class="n">cell_tree</span><span class="p">,</span> <span class="n">gid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
@@ -907,8 +887,8 @@
         <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">sections</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">Section</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Items in section must be instances&quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot; of Section. Got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">section</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">"Items in section must be instances"</span>
+                    <span class="sa">f</span><span class="s2">" of Section. Got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">section</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
                 <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sections</span> <span class="o">=</span> <span class="n">sections</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">synapses</span> <span class="o">=</span> <span class="n">synapses</span>
@@ -937,7 +917,7 @@
 <a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.__repr__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">class_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="n">class_name</span><span class="si">}</span><span class="s2"> | gid=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_gid</span><span class="si">}</span><span class="s2">&gt;&quot;</span></div>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"&lt;</span><span class="si">{</span><span class="n">class_name</span><span class="si">}</span><span class="s2"> | gid=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_gid</span><span class="si">}</span><span class="s2">&gt;"</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -945,24 +925,23 @@
             <span class="k">return</span> <span class="bp">NotImplemented</span>
 
         <span class="n">all_attrs</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="n">attrs_to_ignore</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">all_attrs</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)]</span>
+        <span class="n">attrs_to_ignore</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">all_attrs</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"_"</span><span class="p">)]</span>
         <span class="n">attrs_to_ignore</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
             <span class="p">[</span>
-                <span class="s2">&quot;build&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;copy&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;create_tonic_bias&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;define_shape&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;distance_section&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;gid&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;list_IClamp&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;modify_section&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;parconnect_from_src&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;plot_morphology&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;record&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;sections&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;setup_source_netcon&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;syn_create&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;to_dict&quot;</span><span class="p">,</span>
+                <span class="s2">"build"</span><span class="p">,</span>
+                <span class="s2">"copy"</span><span class="p">,</span>
+                <span class="s2">"define_shape"</span><span class="p">,</span>
+                <span class="s2">"distance_section"</span><span class="p">,</span>
+                <span class="s2">"gid"</span><span class="p">,</span>
+                <span class="s2">"list_IClamp"</span><span class="p">,</span>
+                <span class="s2">"modify_section"</span><span class="p">,</span>
+                <span class="s2">"parconnect_from_src"</span><span class="p">,</span>
+                <span class="s2">"plot_morphology"</span><span class="p">,</span>
+                <span class="s2">"record"</span><span class="p">,</span>
+                <span class="s2">"sections"</span><span class="p">,</span>
+                <span class="s2">"setup_source_netcon"</span><span class="p">,</span>
+                <span class="s2">"syn_create"</span><span class="p">,</span>
+                <span class="s2">"to_dict"</span><span class="p">,</span>
             <span class="p">]</span>
         <span class="p">)</span>
         <span class="n">attrs_to_check</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">all_attrs</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">attrs_to_ignore</span><span class="p">]</span>
@@ -984,22 +963,22 @@
 <div class="viewcode-block" id="Cell.to_dict">
 <a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.to_dict">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts an object of Cell class to a dictionary.</span>
+<span class="w">        </span><span class="sd">"""Converts an object of Cell class to a dictionary.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        dictionary form of an object of Cell class.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">cell_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="n">cell_data</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
-        <span class="n">cell_data</span><span class="p">[</span><span class="s2">&quot;pos&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos</span>
-        <span class="n">cell_data</span><span class="p">[</span><span class="s2">&quot;sections&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">cell_data</span><span class="p">[</span><span class="s2">"name"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">cell_data</span><span class="p">[</span><span class="s2">"pos"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos</span>
+        <span class="n">cell_data</span><span class="p">[</span><span class="s2">"sections"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">:</span>
-            <span class="n">cell_data</span><span class="p">[</span><span class="s2">&quot;sections&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
-        <span class="n">cell_data</span><span class="p">[</span><span class="s2">&quot;synapses&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">synapses</span>
-        <span class="c1"># cell_data[&#39;cell_tree&#39;] = self.cell_tree</span>
+            <span class="n">cell_data</span><span class="p">[</span><span class="s2">"sections"</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+        <span class="n">cell_data</span><span class="p">[</span><span class="s2">"synapses"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">synapses</span>
+        <span class="c1"># cell_data['cell_tree'] = self.cell_tree</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_tree</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">cell_data</span><span class="p">[</span><span class="s2">&quot;cell_tree&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">cell_data</span><span class="p">[</span><span class="s2">"cell_tree"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">cell_tree_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">parent</span><span class="p">,</span> <span class="n">children</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_tree</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -1008,14 +987,14 @@
                 <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">children</span><span class="p">:</span>
                     <span class="n">value</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node_to_str</span><span class="p">(</span><span class="n">child</span><span class="p">))</span>
                 <span class="n">cell_tree_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
-            <span class="n">cell_data</span><span class="p">[</span><span class="s2">&quot;cell_tree&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell_tree_dict</span>
-        <span class="n">cell_data</span><span class="p">[</span><span class="s2">&quot;sect_loc&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sect_loc</span>
-        <span class="n">cell_data</span><span class="p">[</span><span class="s2">&quot;gid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gid</span>
-        <span class="n">cell_data</span><span class="p">[</span><span class="s2">&quot;dipole_pp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dipole_pp</span>
-        <span class="n">cell_data</span><span class="p">[</span><span class="s2">&quot;vsec&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vsec</span>
-        <span class="n">cell_data</span><span class="p">[</span><span class="s2">&quot;isec&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">isec</span>
-        <span class="n">cell_data</span><span class="p">[</span><span class="s2">&quot;ca&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ca</span>
-        <span class="n">cell_data</span><span class="p">[</span><span class="s2">&quot;tonic_biases&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tonic_biases</span>
+            <span class="n">cell_data</span><span class="p">[</span><span class="s2">"cell_tree"</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell_tree_dict</span>
+        <span class="n">cell_data</span><span class="p">[</span><span class="s2">"sect_loc"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sect_loc</span>
+        <span class="n">cell_data</span><span class="p">[</span><span class="s2">"gid"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gid</span>
+        <span class="n">cell_data</span><span class="p">[</span><span class="s2">"dipole_pp"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dipole_pp</span>
+        <span class="n">cell_data</span><span class="p">[</span><span class="s2">"vsec"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vsec</span>
+        <span class="n">cell_data</span><span class="p">[</span><span class="s2">"isec"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">isec</span>
+        <span class="n">cell_data</span><span class="p">[</span><span class="s2">"ca"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ca</span>
+        <span class="n">cell_data</span><span class="p">[</span><span class="s2">"tonic_biases"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tonic_biases</span>
         <span class="k">return</span> <span class="n">cell_data</span></div>
 
 
@@ -1026,16 +1005,16 @@
     <span class="nd">@gid</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">gid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gid</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;gid must be an integer&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"gid must be an integer"</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_gid</span> <span class="o">=</span> <span class="n">gid</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Global ID for this cell already assigned!&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"Global ID for this cell already assigned!"</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Cell.distance_section">
 <a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.distance_section">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">distance_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_sec_name</span><span class="p">,</span> <span class="n">curr_node</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find distance between the current node and the target section.</span>
+<span class="w">        </span><span class="sd">"""Find distance between the current node and the target section.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1049,11 +1028,11 @@
 <span class="sd">        -------</span>
 <span class="sd">        distance : float</span>
 <span class="sd">            Path distance between source node and mid of the target section.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># Python version of the Neuron distance function</span>
         <span class="c1"># https://nrn.readthedocs.io/en/latest/python/modelspec/programmatic/topology/geometry.html#distance  # noqa</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_tree</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;distance_section() cannot work with cell_tree as None.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"distance_section() cannot work with cell_tree as None."</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">curr_node</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_tree</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
@@ -1090,7 +1069,7 @@
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_set_biophysics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sections</span><span class="p">):</span>
-        <span class="s2">&quot;Set the biophysics for the cell.&quot;</span>
+        <span class="s2">"Set the biophysics for the cell."</span>
 
         <span class="c1"># neuron syntax is used to set values for mechanisms</span>
         <span class="c1"># sec.gbar_mech = x sets value of gbar for mech to x for all segs</span>
@@ -1103,7 +1082,7 @@
         <span class="c1"># and set attribute depending on h.distance(seg.x), which returns</span>
         <span class="c1"># distance from the soma to this point on the CURRENTLY ACCESSED</span>
         <span class="c1"># SECTION!!!</span>
-        <span class="n">h</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">sec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_sections</span><span class="p">[</span><span class="s2">&quot;soma&quot;</span><span class="p">])</span>
+        <span class="n">h</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">sec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_sections</span><span class="p">[</span><span class="s2">"soma"</span><span class="p">])</span>
         <span class="k">for</span> <span class="n">sec_name</span><span class="p">,</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">sections</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">sec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_sections</span><span class="p">[</span><span class="n">sec_name</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">mech_name</span><span class="p">,</span> <span class="n">p_mech</span> <span class="ow">in</span> <span class="n">section</span><span class="o">.</span><span class="n">mechs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -1121,9 +1100,9 @@
         <span class="k">for</span> <span class="n">sec_name</span><span class="p">,</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">sections</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">mech_name</span><span class="p">,</span> <span class="n">p_mech</span> <span class="ow">in</span> <span class="n">section</span><span class="o">.</span><span class="n">mechs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">for</span> <span class="n">attr</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">p_mech</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="s2">&quot;__call__&quot;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="s2">"__call__"</span><span class="p">):</span>
                         <span class="n">seg_xs</span><span class="p">,</span> <span class="n">seg_vals</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(),</span> <span class="nb">list</span><span class="p">()</span>
-                        <span class="n">section_distance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distance_section</span><span class="p">(</span><span class="n">sec_name</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;soma&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+                        <span class="n">section_distance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distance_section</span><span class="p">(</span><span class="n">sec_name</span><span class="p">,</span> <span class="p">(</span><span class="s2">"soma"</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
                         <span class="n">seg_centers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">section</span><span class="o">.</span><span class="n">nseg</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span>
 
                         <span class="k">for</span> <span class="n">seg_x</span> <span class="ow">in</span> <span class="n">seg_centers</span><span class="p">:</span>
@@ -1136,27 +1115,27 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_create_synapses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sections</span><span class="p">,</span> <span class="n">synapses</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create synapses.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Create synapses."""</span>
         <span class="k">for</span> <span class="n">sec_name</span> <span class="ow">in</span> <span class="n">sections</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">receptor</span> <span class="ow">in</span> <span class="n">sections</span><span class="p">[</span><span class="n">sec_name</span><span class="p">]</span><span class="o">.</span><span class="n">syns</span><span class="p">:</span>
-                <span class="n">syn_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sec_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">receptor</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">syn_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">sec_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">receptor</span><span class="si">}</span><span class="s2">"</span>
                 <span class="n">seg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_sections</span><span class="p">[</span><span class="n">sec_name</span><span class="p">](</span><span class="mf">0.5</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_synapses</span><span class="p">[</span><span class="n">syn_key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">syn_create</span><span class="p">(</span><span class="n">seg</span><span class="p">,</span> <span class="o">**</span><span class="n">synapses</span><span class="p">[</span><span class="n">receptor</span><span class="p">])</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_create_sections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sections</span><span class="p">,</span> <span class="n">cell_tree</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create soma and set geometry.</span>
+<span class="w">        </span><span class="sd">"""Create soma and set geometry.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        By default neuron uses xy plane</span>
 <span class="sd">        for height and xz plane for depth. This is opposite for model as a</span>
 <span class="sd">        whole, but convention is followed in this function ease use of gui.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="s2">&quot;soma&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;soma must be defined for cell&quot;</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="s2">"soma"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">"soma must be defined for cell"</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">sec_name</span> <span class="ow">in</span> <span class="n">sections</span><span class="p">:</span>
-            <span class="n">sec</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Section</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">sec_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">sec</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Section</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">sec_name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_sections</span><span class="p">[</span><span class="n">sec_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">sec</span>
 
             <span class="n">h</span><span class="o">.</span><span class="n">pt3dclear</span><span class="p">(</span><span class="n">sec</span><span class="o">=</span><span class="n">sec</span><span class="p">)</span>
@@ -1202,7 +1181,7 @@
 <div class="viewcode-block" id="Cell.build">
 <a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.build">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sec_name_apical</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build cell in Neuron and insert dipole if applicable.</span>
+<span class="w">        </span><span class="sd">"""Build cell in Neuron and insert dipole if applicable.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1210,7 +1189,7 @@
 <span class="sd">            If not None, a dipole will be inserted in this cell in alignment</span>
 <span class="sd">            with this section. The section should belong to the apical dendrite</span>
 <span class="sd">            of a pyramidal neuron.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_create_sections</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_tree</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_create_synapses</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">synapses</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_biophysics</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">)</span>
@@ -1218,16 +1197,16 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_insert_dipole</span><span class="p">(</span><span class="n">sec_name_apical</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">sec_name_apical</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;sec_name_apical must be an existing &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;section of the current cell or None. &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">sec_name_apical</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="sa">f</span><span class="s2">"sec_name_apical must be an existing "</span>
+                <span class="sa">f</span><span class="s2">"section of the current cell or None. "</span>
+                <span class="sa">f</span><span class="s2">"Got </span><span class="si">{</span><span class="n">sec_name_apical</span><span class="si">}</span><span class="s2">."</span>
             <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Cell.copy">
 <a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.copy">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return copy of instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return copy of instance."""</span>
         <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 
@@ -1237,21 +1216,21 @@
     <span class="c1">#    section at position 1</span>
     <span class="c1"># In Cell() and not Pyr() for future possibilities</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_insert_dipole</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sec_name_apical</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Insert dipole into each section of this cell.</span>
+<span class="w">        </span><span class="sd">"""Insert dipole into each section of this cell.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        sec_name_apical : str</span>
 <span class="sd">            The name of the section along which dipole moment is calculated.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dpl_vec</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dpl_ref</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dpl_vec</span><span class="o">.</span><span class="n">_ref_x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">cos_thetas</span> <span class="o">=</span> <span class="n">_get_cos_theta</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">,</span> <span class="s2">&quot;apical_trunk&quot;</span><span class="p">)</span>
+        <span class="n">cos_thetas</span> <span class="o">=</span> <span class="n">_get_cos_theta</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">,</span> <span class="s2">"apical_trunk"</span><span class="p">)</span>
 
         <span class="c1"># setting pointers and ztan values</span>
         <span class="k">for</span> <span class="n">sect_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">:</span>
             <span class="n">sect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_sections</span><span class="p">[</span><span class="n">sect_name</span><span class="p">]</span>
-            <span class="n">sect</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s2">&quot;dipole&quot;</span><span class="p">)</span>
+            <span class="n">sect</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s2">"dipole"</span><span class="p">)</span>
 
             <span class="n">dpp</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Dipole</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">sec</span><span class="o">=</span><span class="n">sect</span><span class="p">)</span>  <span class="c1"># defined in dipole_pp.mod</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dipole_pp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dpp</span><span class="p">)</span>
@@ -1275,8 +1254,8 @@
                 <span class="c1"># assign the ri value to the dipole</span>
                 <span class="c1"># ri not defined at 0 and L</span>
                 <span class="n">sect</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span><span class="o">.</span><span class="n">dipole</span><span class="o">.</span><span class="n">ri</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">ri</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">sec</span><span class="o">=</span><span class="n">sect</span><span class="p">)</span>
-                <span class="c1"># range variable &#39;dipole&#39;</span>
-                <span class="c1"># set pointers to previous segment&#39;s voltage, with</span>
+                <span class="c1"># range variable 'dipole'</span>
+                <span class="c1"># set pointers to previous segment's voltage, with</span>
                 <span class="c1"># boundary condition</span>
                 <span class="n">sect</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span><span class="o">.</span><span class="n">dipole</span><span class="o">.</span><span class="n">_ref_pv</span> <span class="o">=</span> <span class="n">sect</span><span class="p">(</span><span class="n">pos_all</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span><span class="o">.</span><span class="n">_ref_v</span>
 
@@ -1285,14 +1264,14 @@
                 <span class="n">sect</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span><span class="o">.</span><span class="n">dipole</span><span class="o">.</span><span class="n">_ref_Qtotal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dpl_ref</span>
                 <span class="c1"># add ztan values</span>
                 <span class="n">sect</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span><span class="o">.</span><span class="n">dipole</span><span class="o">.</span><span class="n">ztan</span> <span class="o">=</span> <span class="n">seg_lens_z</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
-            <span class="c1"># set the pp dipole&#39;s ztan value to the last value from seg_lens_z</span>
+            <span class="c1"># set the pp dipole's ztan value to the last value from seg_lens_z</span>
             <span class="n">dpp</span><span class="o">.</span><span class="n">ztan</span> <span class="o">=</span> <span class="n">seg_lens_z</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dipole</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">()</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dpl_ref</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Cell.create_tonic_bias">
-<a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.create_tonic_bias">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">create_tonic_bias</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="s2">&quot;soma&quot;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create tonic bias at defined section.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_tonic_bias</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="s2">"soma"</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">gid</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Create tonic bias at defined section.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1306,39 +1285,38 @@
 <span class="sd">            Section tonic input is applied to.</span>
 <span class="sd">        loc : float (0 to 1)</span>
 <span class="sd">            The location of the input in the section.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">stim</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">IClamp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_sections</span><span class="p">[</span><span class="n">section</span><span class="p">](</span><span class="n">loc</span><span class="p">))</span>
         <span class="n">stim</span><span class="o">.</span><span class="n">delay</span> <span class="o">=</span> <span class="n">t0</span>
         <span class="n">stim</span><span class="o">.</span><span class="n">dur</span> <span class="o">=</span> <span class="n">tstop</span> <span class="o">-</span> <span class="n">t0</span>
         <span class="n">stim</span><span class="o">.</span><span class="n">amp</span> <span class="o">=</span> <span class="n">amplitude</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tonic_biases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stim</span><span class="p">)</span></div>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">tonic_biases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stim</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Cell.record">
 <a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.record">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_vsec</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">record_isec</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">record_ca</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Record current and voltage from all sections</span>
+<span class="w">        </span><span class="sd">"""Record current and voltage from all sections</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        record_vsec : &#39;all&#39; | &#39;soma&#39; | False</span>
-<span class="sd">            Option to record voltages from all sections (&#39;all&#39;), or just</span>
-<span class="sd">            the soma (&#39;soma&#39;). Default: False.</span>
-<span class="sd">        record_isec : &#39;all&#39; | &#39;soma&#39; | False</span>
-<span class="sd">            Option to record voltages from all sections (&#39;all&#39;), or just</span>
-<span class="sd">            the soma (&#39;soma&#39;). Default: False.</span>
-<span class="sd">        record_ca : &#39;all&#39; | &#39;soma&#39; | False</span>
-<span class="sd">            Option to record calcium concentration from all sections (&#39;all&#39;),</span>
-<span class="sd">            or just the soma (&#39;soma&#39;). Default: False.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        record_vsec : 'all' | 'soma' | False</span>
+<span class="sd">            Option to record voltages from all sections ('all'), or just</span>
+<span class="sd">            the soma ('soma'). Default: False.</span>
+<span class="sd">        record_isec : 'all' | 'soma' | False</span>
+<span class="sd">            Option to record voltages from all sections ('all'), or just</span>
+<span class="sd">            the soma ('soma'). Default: False.</span>
+<span class="sd">        record_ca : 'all' | 'soma' | False</span>
+<span class="sd">            Option to record calcium concentration from all sections ('all'),</span>
+<span class="sd">            or just the soma ('soma'). Default: False.</span>
+<span class="sd">        """</span>
 
         <span class="n">section_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
         <span class="c1"># Logic checks if just recording soma, sections, or both</span>
-        <span class="k">if</span> <span class="n">record_vsec</span> <span class="o">==</span> <span class="s2">&quot;soma&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">vsec</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">([</span><span class="s2">&quot;soma&quot;</span><span class="p">])</span>
-        <span class="k">elif</span> <span class="n">record_vsec</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">record_vsec</span> <span class="o">==</span> <span class="s2">"soma"</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vsec</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">([</span><span class="s2">"soma"</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">record_vsec</span> <span class="o">==</span> <span class="s2">"all"</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">vsec</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">section_names</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">record_vsec</span><span class="p">:</span>
@@ -1346,9 +1324,9 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">vsec</span><span class="p">[</span><span class="n">sec_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">vsec</span><span class="p">[</span><span class="n">sec_name</span><span class="p">]</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_sections</span><span class="p">[</span><span class="n">sec_name</span><span class="p">](</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">_ref_v</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">record_isec</span> <span class="o">==</span> <span class="s2">&quot;soma&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">isec</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">([</span><span class="s2">&quot;soma&quot;</span><span class="p">])</span>
-        <span class="k">elif</span> <span class="n">record_isec</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">record_isec</span> <span class="o">==</span> <span class="s2">"soma"</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">isec</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">([</span><span class="s2">"soma"</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">record_isec</span> <span class="o">==</span> <span class="s2">"all"</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">isec</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">section_names</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">record_isec</span><span class="p">:</span>
@@ -1356,7 +1334,7 @@
                 <span class="n">list_syn</span> <span class="o">=</span> <span class="p">[</span>
                     <span class="n">key</span>
                     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_synapses</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-                    <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sec_name</span><span class="si">}</span><span class="s2">_&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">sec_name</span><span class="si">}</span><span class="s2">_"</span><span class="p">)</span>
                 <span class="p">]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">isec</span><span class="p">[</span><span class="n">sec_name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">list_syn</span><span class="p">)</span>
 
@@ -1367,14 +1345,14 @@
                     <span class="p">)</span>
 
         <span class="c1"># calcium concentration</span>
-        <span class="k">if</span> <span class="n">record_ca</span> <span class="o">==</span> <span class="s2">&quot;soma&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">ca</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">([</span><span class="s2">&quot;soma&quot;</span><span class="p">])</span>
-        <span class="k">elif</span> <span class="n">record_ca</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">record_ca</span> <span class="o">==</span> <span class="s2">"soma"</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ca</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">([</span><span class="s2">"soma"</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">record_ca</span> <span class="o">==</span> <span class="s2">"all"</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ca</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">section_names</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">record_ca</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">sec_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ca</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_sections</span><span class="p">[</span><span class="n">sec_name</span><span class="p">](</span><span class="mf">0.5</span><span class="p">),</span> <span class="s2">&quot;_ref_cai&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_sections</span><span class="p">[</span><span class="n">sec_name</span><span class="p">](</span><span class="mf">0.5</span><span class="p">),</span> <span class="s2">"_ref_cai"</span><span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">ca</span><span class="p">[</span><span class="n">sec_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">()</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">ca</span><span class="p">[</span><span class="n">sec_name</span><span class="p">]</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_sections</span><span class="p">[</span><span class="n">sec_name</span><span class="p">](</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">_ref_cai</span><span class="p">)</span></div>
 
@@ -1382,9 +1360,9 @@
 <div class="viewcode-block" id="Cell.syn_create">
 <a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.syn_create">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">syn_create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secloc</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a NEURON synapse at the given section location.</span>
+<span class="w">        </span><span class="sd">"""Create a NEURON synapse at the given section location.</span>
 
-<span class="sd">        By default (or when ``mechname=&#39;Exp2Syn&#39;``), creates an ``h.Exp2Syn`` two-state</span>
+<span class="sd">        By default (or when ``mechname='Exp2Syn'``), creates an ``h.Exp2Syn`` two-state</span>
 <span class="sd">        kinetic synapse. A custom NEURON synapse mechanism can be used instead by</span>
 <span class="sd">        passing ``mechname=&lt;synapse_class_name&gt;`` along with any parameters that</span>
 <span class="sd">        synapse accepts.</span>
@@ -1398,8 +1376,8 @@
 
 <span class="sd">            mechname : str, optional</span>
 <span class="sd">                Name of the NEURON synapse class to instantiate (must be available in</span>
-<span class="sd">                NEURON&#39;s hoc interpreter). Custom synapse mechanisms must be compiled</span>
-<span class="sd">                from a MOD file. Defaults to ``&#39;Exp2Syn&#39;``.</span>
+<span class="sd">                NEURON's hoc interpreter). Custom synapse mechanisms must be compiled</span>
+<span class="sd">                from a MOD file. Defaults to ``'Exp2Syn'``.</span>
 <span class="sd">            e : float</span>
 <span class="sd">                Reversal potential (mV). Required for ``Exp2Syn``.</span>
 <span class="sd">            tau1 : float</span>
@@ -1415,22 +1393,22 @@
 <span class="sd">        -------</span>
 <span class="sd">        syn : NEURON synapse object</span>
 <span class="sd">            The instantiated synapse object (e.g. ``h.Exp2Syn`` or a custom mechanism).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">secloc</span><span class="p">,</span> <span class="n">nrn</span><span class="o">.</span><span class="n">Segment</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;secloc must be instance of nrn.Segment. Got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">secloc</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"secloc must be instance of nrn.Segment. Got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">secloc</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
-        <span class="c1"># Check for no &quot;mechname&quot; (including backwards compatibility), or case of mechname being</span>
-        <span class="c1"># explicitly &quot;Exp2Syn&quot;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;mechname&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="ow">or</span> <span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;mechname&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Exp2Syn&quot;</span><span class="p">):</span>
+        <span class="c1"># Check for no "mechname" (including backwards compatibility), or case of mechname being</span>
+        <span class="c1"># explicitly "Exp2Syn"</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s2">"mechname"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="ow">or</span> <span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">"mechname"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"Exp2Syn"</span><span class="p">):</span>
             <span class="n">syn</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Exp2Syn</span><span class="p">(</span><span class="n">secloc</span><span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">param_name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;e&quot;</span><span class="p">,</span> <span class="s2">&quot;tau1&quot;</span><span class="p">,</span> <span class="s2">&quot;tau2&quot;</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">param_name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"e"</span><span class="p">,</span> <span class="s2">"tau1"</span><span class="p">,</span> <span class="s2">"tau2"</span><span class="p">]:</span>
                     <span class="nb">setattr</span><span class="p">(</span><span class="n">syn</span><span class="p">,</span> <span class="n">param_name</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">param_name</span><span class="p">])</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;The Exp2Syn synapse in segment </span><span class="si">{</span><span class="n">secloc</span><span class="si">}</span><span class="s2"> is missing a required parameter.&quot;</span>
+                    <span class="sa">f</span><span class="s2">"The Exp2Syn synapse in segment </span><span class="si">{</span><span class="n">secloc</span><span class="si">}</span><span class="s2"> is missing a required parameter."</span>
                 <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Otherwise, there is a custom synapse mechanism to be used. Create a</span>
@@ -1441,14 +1419,14 @@
                 <span class="c1"># This tries to obtain the synapse object as if it is an attribute of</span>
                 <span class="c1"># the HOC interpreter as a whole, which all valid synapse mechanisms</span>
                 <span class="c1"># should be. In other words, if you have compiled a synapse mechanism</span>
-                <span class="c1"># called e.g. &#39;NMDA_gao&#39;, then `h.NMDA_gao` should exist.</span>
-                <span class="n">synapse_class</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;mechname&quot;</span><span class="p">])</span>
+                <span class="c1"># called e.g. 'NMDA_gao2021', then `h.NMDA_gao2021` should exist.</span>
+                <span class="n">synapse_class</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">"mechname"</span><span class="p">])</span>
             <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Synapse mechanism &#39;</span><span class="si">{</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;mechname&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39; not found in NEURON&#39;s &quot;</span>
-                    <span class="s2">&quot;hoc interpreter. You probably either need to recompile your MOD &quot;</span>
-                    <span class="s2">&quot;mechanism files or you are missing a required MOD file for this &quot;</span>
-                    <span class="s2">&quot;synapse mechanism.&quot;</span>
+                    <span class="sa">f</span><span class="s2">"Synapse mechanism '</span><span class="si">{</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">'mechname'</span><span class="p">]</span><span class="si">}</span><span class="s2">' not found in NEURON's "</span>
+                    <span class="s2">"hoc interpreter. You probably either need to recompile your MOD "</span>
+                    <span class="s2">"mechanism files or you are missing a required MOD file for this "</span>
+                    <span class="s2">"synapse mechanism."</span>
                 <span class="p">)</span>
             <span class="c1"># Create the synapse</span>
             <span class="n">syn</span> <span class="o">=</span> <span class="n">synapse_class</span><span class="p">(</span><span class="n">secloc</span><span class="p">)</span>
@@ -1457,32 +1435,31 @@
             <span class="k">for</span> <span class="n">param_name</span><span class="p">,</span> <span class="n">param_value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">syn</span><span class="p">,</span> <span class="n">param_name</span><span class="p">):</span>
                     <span class="nb">setattr</span><span class="p">(</span><span class="n">syn</span><span class="p">,</span> <span class="n">param_name</span><span class="p">,</span> <span class="n">param_value</span><span class="p">)</span>
-                <span class="k">elif</span> <span class="n">param_name</span> <span class="o">==</span> <span class="s2">&quot;mechname&quot;</span><span class="p">:</span>
-                    <span class="c1"># Ignore &quot;mechname&quot; since it&#39;s only used in the control flow of</span>
+                <span class="k">elif</span> <span class="n">param_name</span> <span class="o">==</span> <span class="s2">"mechname"</span><span class="p">:</span>
+                    <span class="c1"># Ignore "mechname" since it's only used in the control flow of</span>
                     <span class="c1"># this function, but is never an actual attribute of the NEURON</span>
                     <span class="c1"># Synapse object.</span>
                     <span class="k">continue</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;Synapse mechanism &#39;</span><span class="si">{</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;mechname&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39; does not have a parameter &quot;</span>
-                        <span class="sa">f</span><span class="s2">&quot;named &#39;</span><span class="si">{</span><span class="n">param_name</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+                        <span class="sa">f</span><span class="s2">"Synapse mechanism '</span><span class="si">{</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">'mechname'</span><span class="p">]</span><span class="si">}</span><span class="s2">' does not have a parameter "</span>
+                        <span class="sa">f</span><span class="s2">"named '</span><span class="si">{</span><span class="n">param_name</span><span class="si">}</span><span class="s2">'."</span>
                     <span class="p">)</span>
-
         <span class="k">return</span> <span class="n">syn</span></div>
 
 
 <div class="viewcode-block" id="Cell.setup_source_netcon">
 <a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.setup_source_netcon">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">setup_source_netcon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Created for _PC.cell and specifies SOURCES of spikes.</span>
+<span class="w">        </span><span class="sd">"""Created for _PC.cell and specifies SOURCES of spikes.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        threshold : float</span>
 <span class="sd">            The voltage threshold for action potential.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">nc</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">NetCon</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_sections</span><span class="p">[</span><span class="s2">&quot;soma&quot;</span><span class="p">](</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">_ref_v</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_sections</span><span class="p">[</span><span class="s2">&quot;soma&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_sections</span><span class="p">[</span><span class="s2">"soma"</span><span class="p">](</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">_ref_v</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_sections</span><span class="p">[</span><span class="s2">"soma"</span><span class="p">]</span>
         <span class="p">)</span>
         <span class="n">nc</span><span class="o">.</span><span class="n">threshold</span> <span class="o">=</span> <span class="n">threshold</span>
         <span class="k">return</span> <span class="n">nc</span></div>
@@ -1491,7 +1468,7 @@
 <div class="viewcode-block" id="Cell.parconnect_from_src">
 <a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.parconnect_from_src">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">parconnect_from_src</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gid_presyn</span><span class="p">,</span> <span class="n">nc_dict</span><span class="p">,</span> <span class="n">postsyn</span><span class="p">,</span> <span class="n">inplane_distance</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parallel receptor-centric connect FROM presyn TO this cell,</span>
+<span class="w">        </span><span class="sd">"""Parallel receptor-centric connect FROM presyn TO this cell,</span>
 <span class="sd">           based on GID.</span>
 
 <span class="sd">        Parameters</span>
@@ -1511,15 +1488,15 @@
 <span class="sd">        -------</span>
 <span class="sd">        nc : instance of h.NetCon</span>
 <span class="sd">            A network connection object.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">.network_builder</span><span class="w"> </span><span class="kn">import</span> <span class="n">_PC</span>
 
         <span class="n">nc</span> <span class="o">=</span> <span class="n">_PC</span><span class="o">.</span><span class="n">gid_connect</span><span class="p">(</span><span class="n">gid_presyn</span><span class="p">,</span> <span class="n">postsyn</span><span class="p">)</span>
 
         <span class="c1"># set props here.</span>
-        <span class="n">nc</span><span class="o">.</span><span class="n">threshold</span> <span class="o">=</span> <span class="n">nc_dict</span><span class="p">[</span><span class="s2">&quot;threshold&quot;</span><span class="p">]</span>
+        <span class="n">nc</span><span class="o">.</span><span class="n">threshold</span> <span class="o">=</span> <span class="n">nc_dict</span><span class="p">[</span><span class="s2">"threshold"</span><span class="p">]</span>
         <span class="n">nc</span><span class="o">.</span><span class="n">weight</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">nc</span><span class="o">.</span><span class="n">delay</span> <span class="o">=</span> <span class="n">_get_gaussian_connection</span><span class="p">(</span>
-            <span class="n">nc_dict</span><span class="p">[</span><span class="s2">&quot;pos_src&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="p">,</span> <span class="n">nc_dict</span><span class="p">,</span> <span class="n">inplane_distance</span><span class="o">=</span><span class="n">inplane_distance</span>
+            <span class="n">nc_dict</span><span class="p">[</span><span class="s2">"pos_src"</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="p">,</span> <span class="n">nc_dict</span><span class="p">,</span> <span class="n">inplane_distance</span><span class="o">=</span><span class="n">inplane_distance</span>
         <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">nc</span></div>
@@ -1537,7 +1514,7 @@
         <span class="n">zlim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">1200</span><span class="p">),</span>
         <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the cell morphology.</span>
+<span class="w">        </span><span class="sd">"""Plot the cell morphology.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1549,7 +1526,7 @@
 <span class="sd">            can be specified. Must have a key for every section in cell as</span>
 <span class="sd">            defined in the `Cell.sections` attribute.</span>
 
-<span class="sd">        | Ex: ``{&#39;apical_trunk&#39;: &#39;r&#39;, &#39;soma&#39;: &#39;b&#39;, ...}``</span>
+<span class="sd">        | Ex: ``{'apical_trunk': 'r', 'soma': 'b', ...}``</span>
 <span class="sd">        pos : tuple of int or float | None</span>
 <span class="sd">            Position of cell soma. Must be a tuple of 3 elements for the</span>
 <span class="sd">            (x, y, z) position of the soma in 3D space. Default: (0, 0, 0)</span>
@@ -1566,7 +1543,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        axes : instance of Axes3D</span>
 <span class="sd">            The matplotlib 3D axis handle.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">plot_cell_morphology</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
@@ -1600,7 +1577,7 @@
 <div class="viewcode-block" id="Cell.define_shape">
 <a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.define_shape">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">define_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Redefines end_pts according to section lengths.</span>
+<span class="w">        </span><span class="sd">"""Redefines end_pts according to section lengths.</span>
 
 <span class="sd">        Detects change in section lengths of the sections in the</span>
 <span class="sd">        subtree of the input node.</span>
@@ -1613,10 +1590,10 @@
 
 <span class="sd">        Note</span>
 <span class="sd">        ----</span>
-<span class="sd">        Using sec_name as &#39;soma&#39; and node end as 0 checks for changes</span>
+<span class="sd">        Using sec_name as 'soma' and node end as 0 checks for changes</span>
 <span class="sd">        in any section length of the cell as (soma, 0) is the root node</span>
 <span class="sd">        of the cell.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># Python version of Neuron define_shape function</span>
         <span class="c1"># https://nrn.readthedocs.io/en/latest/python/modelspec/programmatic/topology/geometry.html?highlight=pt3dadd#pt3dadd  # noqa</span>
         <span class="c1"># cell tree is None therefore cannot define shape</span>
@@ -1656,25 +1633,25 @@
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_update_end_pts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update all end pts according to the length of the sections.</span>
+<span class="w">        </span><span class="sd">"""Update all end pts according to the length of the sections.</span>
 
 <span class="sd">        Can be used whenever length of any section is updated</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        Updated end pts for the cell</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="s2">&quot;soma&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;soma must be defined for cell&quot;</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="s2">"soma"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">"soma must be defined for cell"</span><span class="p">)</span>
         <span class="c1"># cell tree is None therefore no end_pts to update</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_tree</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span>
 
         <span class="c1"># shift cell to self.pos and reorient apical dendrite</span>
         <span class="c1"># along z direction of self.pos</span>
-        <span class="n">dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="s2">&quot;soma&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">end_pts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">dy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="s2">&quot;soma&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">end_pts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">dz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="s2">&quot;soma&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">end_pts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="s2">"soma"</span><span class="p">]</span><span class="o">.</span><span class="n">end_pts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">dy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="s2">"soma"</span><span class="p">]</span><span class="o">.</span><span class="n">end_pts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">dz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="s2">"soma"</span><span class="p">]</span><span class="o">.</span><span class="n">end_pts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">sec_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">:</span>
             <span class="n">end_pts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">sec_name</span><span class="p">]</span><span class="o">.</span><span class="n">end_pts</span>
             <span class="n">updated_end_pts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -1684,12 +1661,12 @@
 
         <span class="c1"># Check and update all end pts starting from root according to length</span>
         <span class="c1"># of sections.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">define_shape</span><span class="p">((</span><span class="s2">&quot;soma&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">define_shape</span><span class="p">((</span><span class="s2">"soma"</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
 
 <div class="viewcode-block" id="Cell.modify_section">
 <a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.modify_section">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">modify_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sec_name</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">diam</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Ra</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">v0</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Change attributes of section specified by `sec_name`</span>
+<span class="w">        </span><span class="sd">"""Change attributes of section specified by `sec_name`</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1709,28 +1686,28 @@
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        Leaving default of None produces no change.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">valid_sec_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-        <span class="n">_check_option</span><span class="p">(</span><span class="s2">&quot;sec_name&quot;</span><span class="p">,</span> <span class="n">sec_name</span><span class="p">,</span> <span class="n">valid_sec_names</span><span class="p">)</span>
+        <span class="n">_check_option</span><span class="p">(</span><span class="s2">"sec_name"</span><span class="p">,</span> <span class="n">sec_name</span><span class="p">,</span> <span class="n">valid_sec_names</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">L</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">_validate_type</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s2">&quot;L&quot;</span><span class="p">)</span>
+            <span class="n">_validate_type</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s2">"L"</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">sec_name</span><span class="p">]</span><span class="o">.</span><span class="n">_L</span> <span class="o">=</span> <span class="n">L</span>
 
         <span class="k">if</span> <span class="n">diam</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">_validate_type</span><span class="p">(</span><span class="n">diam</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s2">&quot;diam&quot;</span><span class="p">)</span>
+            <span class="n">_validate_type</span><span class="p">(</span><span class="n">diam</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s2">"diam"</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">sec_name</span><span class="p">]</span><span class="o">.</span><span class="n">_diam</span> <span class="o">=</span> <span class="n">diam</span>
 
         <span class="k">if</span> <span class="n">cm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">_validate_type</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s2">&quot;cm&quot;</span><span class="p">)</span>
+            <span class="n">_validate_type</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s2">"cm"</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">sec_name</span><span class="p">]</span><span class="o">.</span><span class="n">_cm</span> <span class="o">=</span> <span class="n">cm</span>
 
         <span class="k">if</span> <span class="n">Ra</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">_validate_type</span><span class="p">(</span><span class="n">Ra</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s2">&quot;Ra&quot;</span><span class="p">)</span>
+            <span class="n">_validate_type</span><span class="p">(</span><span class="n">Ra</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s2">"Ra"</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">sec_name</span><span class="p">]</span><span class="o">.</span><span class="n">_Ra</span> <span class="o">=</span> <span class="n">Ra</span>
 
         <span class="k">if</span> <span class="n">v0</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">_validate_type</span><span class="p">(</span><span class="n">v0</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s2">&quot;v0&quot;</span><span class="p">)</span>
+            <span class="n">_validate_type</span><span class="p">(</span><span class="n">v0</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s2">"v0"</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">sec_name</span><span class="p">]</span><span class="o">.</span><span class="n">_v0</span> <span class="o">=</span> <span class="n">v0</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_end_pts</span><span class="p">()</span></div>
@@ -1765,8 +1742,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1787,7 +1764,6 @@
 
   <p class="sphinx-version">
     Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
-    <br/>
   </p>
 </div>
       
@@ -1800,7 +1776,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.22.0.
 </p></div>
       
     </div>

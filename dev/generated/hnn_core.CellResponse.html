@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -27,32 +26,27 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=fd6457a4" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c43d5962" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
 
     <script src="../_static/documentation_options.js?v=debdd0a9"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'generated/hnn_core.CellResponse';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.22.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
@@ -125,7 +119,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -172,13 +166,6 @@
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../auto_examples/index.html">
-    Examples
-  </a>
-</li>
-
-
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="../api.html">
     API
@@ -213,6 +200,13 @@
   </a>
 </li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">
+    HNN Textbook
+  </a>
+</li>
+
             <li class="nav-item dropdown">
                 <button class="btn dropdown-toggle nav-item" type="button"
                 data-bs-toggle="dropdown" aria-expanded="false"
@@ -221,13 +215,6 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-<li class=" ">
-  <a class="nav-link dropdown-item nav-external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">
-    HNN Textbook
-  </a>
-</li>
-
-
 <li class=" ">
   <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
     PyPI package
@@ -255,7 +242,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -286,15 +273,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
     <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
     <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
     <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -305,7 +292,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -314,7 +301,7 @@
   
 
   
-    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
       <span class="fa-solid fa-outdent"></span>
     </button>
   
@@ -347,13 +334,6 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../install.html">
     Install (Textbook)
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../auto_examples/index.html">
-    Examples
   </a>
 </li>
 
@@ -446,15 +426,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
     <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
     <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
     <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -521,13 +501,17 @@
 <h1>hnn_core.CellResponse<a class="headerlink" href="#hnn-core-cellresponse" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="hnn_core.CellResponse">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">hnn_core.</span></span><span class="sig-name descname"><span class="pre">CellResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_type_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_times</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_gids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">times</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell_response.html#CellResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.CellResponse" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">hnn_core.</span></span><span class="sig-name descname"><span class="pre">CellResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_type_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_type_metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_times</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_gids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">times</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell_response.html#CellResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.CellResponse" title="Link to this definition">#</a></dt>
 <dd><p>The CellResponse class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>cell_type_names</strong><span class="classifier">list</span></dt><dd><p>List of unique cell type names that are explicitly modeled in the
 network.</p>
+</dd>
+<dt><strong>cell_type_metadata</strong><span class="classifier">dict, optional</span></dt><dd><p>Corresponding metadata of the cell types in the Network that spawned this
+CellResponse, in the dictionary form of metadata available at the top of
+<em class="xref py py-obj">network_models.py</em>.</p>
 </dd>
 <dt><strong>spike_times</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float | None</span></dt><dd><p>Each element of the outer list is a trial.
 The inner list contains the time stamps of spikes.</p>
@@ -590,7 +574,7 @@ This includes vsoma and isoma.</p>
 <tr class="row-odd"><td><p><strong>plot(ax=None, show=True)</strong></p></td>
 <td><p>Plot and return a matplotlib Figure object showing the aggregate network spiking activity according to cell type.</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>mean_rates(tstart, tstop, gid_ranges, mean_type=’all’)</strong></p></td>
+<tr class="row-even"><td><p><strong>mean_rates(tstart, tstop, gid_ranges=None, mean_type=’all’)</strong></p></td>
 <td><p>Calculate mean firing rate for each cell type. Specify averaging method with mean_type argument.</p></td>
 </tr>
 <tr class="row-odd"><td><p><strong>write(fname)</strong></p></td>
@@ -613,7 +597,7 @@ This includes vsoma and isoma.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.CellResponse.mean_rates">
-<span class="sig-name descname"><span class="pre">mean_rates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tstart</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gid_ranges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell_response.html#CellResponse.mean_rates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.CellResponse.mean_rates" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">mean_rates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tstart</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gid_ranges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell_response.html#CellResponse.mean_rates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.CellResponse.mean_rates" title="Link to this definition">#</a></dt>
 <dd><p>Mean spike rates (Hz) by cell type.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -622,16 +606,19 @@ This includes vsoma and isoma.</p>
 </dd>
 <dt><strong>tstop</strong><span class="classifier">int | float | None</span></dt><dd><p>Value defining the stop time of all trials.</p>
 </dd>
-<dt><strong>gid_ranges</strong><span class="classifier">dict of lists or range objects</span></dt><dd><p>Dictionary with keys ‘evprox1’, ‘evdist1’ etc.
-containing the range of Cell or input IDs of different
-cell or input types.</p>
+<dt><strong>gid_ranges</strong><span class="classifier">dict of lists or range objects | None</span></dt><dd><p>Dictionary with keys, e.g. net.gid_ranges containing the range of Cell or
+input GIDs of different cell or input types. If None (default), the number
+of cells per type is inferred from the recorded spikes.</p>
 </dd>
 <dt><strong>mean_type</strong><span class="classifier">str</span></dt><dd><dl class="simple">
-<dt>‘all’<span class="classifier">Average over trials and cells</span></dt><dd><p>Returns mean rate for cell types</p>
+<dt>‘all’<span class="classifier">Average over trials and cells</span></dt><dd><p>Returns mean firing rate over time, trials, and gids, per cell type.
+Returns: <em class="xref py py-obj">spike_rates[cell_type] =</em></p>
 </dd>
-<dt>‘trial’<span class="classifier">Average over cell types</span></dt><dd><p>Returns trial mean rate for cell types</p>
+<dt>‘trial’<span class="classifier">Average over cell types</span></dt><dd><p>Returns mean firing rate over time and gids, per trials and cell type.
+Returns: <em class="xref py py-obj">spike_rates[cell_type] =</em></p>
 </dd>
-<dt>‘cell’<span class="classifier">Average over individual cells</span></dt><dd><p>Returns trial mean rate for individual cells</p>
+<dt>‘cell’<span class="classifier">Average over individual cells</span></dt><dd><p>Returns mean firing rate averaged over time, per gid, trial and cell type.
+Returns: <em class="xref py py-obj">spike_rates[cell_type] =</em></p>
 </dd>
 </dl>
 </dd>
@@ -640,6 +627,58 @@ cell or input types.</p>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
 <dt><strong>spike_rate</strong><span class="classifier">dict</span></dt><dd><p>Dictionary with keys ‘L5_pyramidal’, ‘L5_basket’, etc.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.CellResponse.plot_firing_rate_time">
+<span class="sig-name descname"><span class="pre">plot_firing_rate_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trial_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sharex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sharey</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xticks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yticks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'time</span> <span class="pre">(ms)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'firing</span> <span class="pre">rate</span> <span class="pre">(Hz)'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell_response.html#CellResponse.plot_firing_rate_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.CellResponse.plot_firing_rate_time" title="Link to this definition">#</a></dt>
+<dd><p>Plot time course of firing rates</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>window_length</strong><span class="classifier">int | float</span></dt><dd><p>Length of the sliding window over which mean rates are calculated, in ms.</p>
+</dd>
+<dt><strong>trial_idx</strong><span class="classifier">int | list of int | None</span></dt><dd><p>Trial index (or list of indices) to be plotted. If None (the default), mean
+rate over all trials is plotted, and standard deviation is indicated by
+shading.</p>
+</dd>
+<dt><strong>ax</strong><span class="classifier">instance of matplotlib axis | None</span></dt><dd><p>An axis object from matplotlib. If None, a new figure is created.</p>
+</dd>
+<dt><strong>show</strong><span class="classifier">bool</span></dt><dd><p>If True, show the figure.</p>
+</dd>
+<dt><strong>cell_types</strong><span class="classifier">list of str | None</span></dt><dd><p>List of cell types to plot. If None, all cell types are plotted.</p>
+</dd>
+<dt><strong>colors</strong><span class="classifier">list of str | None</span></dt><dd><p>Optional custom colors to plot. Default will use the colors defined in cell metadata.</p>
+</dd>
+<dt><strong>show_legend</strong><span class="classifier">bool</span></dt><dd><p>If True, show the legend with colors for cell types</p>
+</dd>
+<dt><strong>sharex</strong><span class="classifier">bool</span></dt><dd><p>If True, subplot x-axes will be shared. Only used when creating a new
+figure (i.e., when <em class="xref py py-obj">ax</em> is None).</p>
+</dd>
+<dt><strong>sharey</strong><span class="classifier">bool</span></dt><dd><p>If True, subplot y-axes will be shared. Only used when creating a new
+figure (i.e., when <em class="xref py py-obj">ax</em> is None).</p>
+</dd>
+<dt><strong>xticks</strong><span class="classifier">array-like | None</span></dt><dd><p>Custom x-axis tick locations. If None, matplotlib’s default is used.</p>
+</dd>
+<dt><strong>yticks</strong><span class="classifier">array-like | None</span></dt><dd><p>Custom y-axis tick locations. If None, matplotlib’s default is used.</p>
+</dd>
+<dt><strong>xlim</strong><span class="classifier">tuple of (float, float) | None</span></dt><dd><p>Custom x-axis limits. If None, defaults to the full time range.</p>
+</dd>
+<dt><strong>ylim</strong><span class="classifier">tuple of (float, float) | None</span></dt><dd><p>Custom y-axis limits. If None, matplotlib’s default is used.</p>
+</dd>
+<dt><strong>xlabel</strong><span class="classifier">str</span></dt><dd><p>Label for the x-axis.</p>
+</dd>
+<dt><strong>ylabel</strong><span class="classifier">str</span></dt><dd><p>Label for the y-axis.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>fig</strong><span class="classifier">instance of matplotlib Figure</span></dt><dd><p>The matplotlib figure object.</p>
 </dd>
 </dl>
 </dd>
@@ -706,7 +745,7 @@ the name of this group must be used to specify the colors.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.CellResponse.plot_spikes_raster">
-<span class="sig-name descname"><span class="pre">plot_spikes_raster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trial_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlay_dipoles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell_response.html#CellResponse.plot_spikes_raster"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.CellResponse.plot_spikes_raster" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">plot_spikes_raster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trial_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlay_dipoles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xticks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yticks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Time</span> <span class="pre">(ms)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Neuron</span> <span class="pre">index'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell_response.html#CellResponse.plot_spikes_raster"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.CellResponse.plot_spikes_raster" title="Link to this definition">#</a></dt>
 <dd><p>Plot the aggregate spiking activity according to cell type.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -719,7 +758,7 @@ the name of this group must be used to specify the colors.</p>
 </dd>
 <dt><strong>cell_types</strong><span class="classifier">list of str</span></dt><dd><p>List of cell types to plot</p>
 </dd>
-<dt><strong>colors</strong><span class="classifier">list of str | None</span></dt><dd><p>Optional custom colors to plot. Default will use the color cycler.</p>
+<dt><strong>colors</strong><span class="classifier">list of str | None</span></dt><dd><p>Optional custom colors to plot. Default will use the colors defined in cell metadata.</p>
 </dd>
 <dt><strong>show_legend</strong><span class="classifier">bool</span></dt><dd><p>If True, show the legend with colors for cell types</p>
 </dd>
@@ -733,11 +772,53 @@ to overlay on the raster plot</p>
 <dt><strong>overlay_dipoles</strong><span class="classifier">bool</span></dt><dd><p>If True, overlay the layer-specific dipole data on the
 raster plot</p>
 </dd>
+<dt><strong>xticks</strong><span class="classifier">list | np.array | None</span></dt><dd><p>Ticks on x-axis. If None, ticks are created by matplotlib.</p>
+</dd>
+<dt><strong>yticks</strong><span class="classifier">list | np.array | None</span></dt><dd><p>Ticks on y-axis,  If None, ticks are created by matplotlib.</p>
+</dd>
+<dt><strong>xlabel</strong><span class="classifier">str, default: “Time (ms)”</span></dt><dd><p>The matplotlib x-axis label</p>
+</dd>
+<dt><strong>ylabel</strong><span class="classifier">str, default: “Neuron index”</span></dt><dd><p>The matplotlib y-axis label</p>
+</dd>
+<dt><strong>title</strong><span class="classifier">str | None</span></dt><dd><p>The matplotlib figure title</p>
+</dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
 <dt><strong>fig</strong><span class="classifier">instance of matplotlib Figure</span></dt><dd><p>The matplotlib figure object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.CellResponse.rate_over_time">
+<span class="sig-name descname"><span class="pre">rate_over_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gid_ranges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trial_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell_response.html#CellResponse.rate_over_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.CellResponse.rate_over_time" title="Link to this definition">#</a></dt>
+<dd><p>Mean spike rates (Hz) by cell type over time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>window_length</strong><span class="classifier">int | float</span></dt><dd><p>Length of the sliding window over which firing rates are calculated, in
+ms. Must be greater than the ‘dt’ of the simulation.</p>
+</dd>
+<dt><strong>gid_ranges</strong><span class="classifier">None | dict of lists or range objects, default=None</span></dt><dd><p>Dictionary with keys, e.g. net.gid_ranges containing the range of Cell or
+input IDs of different cell or input types. If None (default), the number of
+cells per type is inferred from the recorded spikes.</p>
+</dd>
+<dt><strong>cell_types</strong><span class="classifier">None| str | list of str, default=None</span></dt><dd><p>Cell types for which firing rates are calculated. If None (the default),
+firing rates are calculated for all cell types in the network.</p>
+</dd>
+<dt><strong>trial_idx</strong><span class="classifier">None | int | list of int, default=None</span></dt><dd><p>Trial index (or list of indices) for which firing rate is calculated. If
+None (the default), firing rates are calculated for all trials.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>rates</strong><span class="classifier">dict</span></dt><dd><p>Dictionary one key per cell type (e.g. ‘L5_pyramidal)
+containing np.array of size &lt;n_trials, timepoints&gt;</p>
 </dd>
 </dl>
 </dd>
@@ -798,7 +879,7 @@ appended to the file name.</p>
 
 </dd></dl>
 
-<span class="target" id="sphx-glr-backreferences-hnn-core-cellresponse"></span></section>
+</section>
 
 
                 </article>
@@ -851,8 +932,10 @@ appended to the file name.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.CellResponse.__repr__"><code class="docutils literal notranslate"><span class="pre">CellResponse.__repr__()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.CellResponse.cell_types"><code class="docutils literal notranslate"><span class="pre">CellResponse.cell_types</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.CellResponse.mean_rates"><code class="docutils literal notranslate"><span class="pre">CellResponse.mean_rates()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.CellResponse.plot_firing_rate_time"><code class="docutils literal notranslate"><span class="pre">CellResponse.plot_firing_rate_time()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.CellResponse.plot_spikes_hist"><code class="docutils literal notranslate"><span class="pre">CellResponse.plot_spikes_hist()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.CellResponse.plot_spikes_raster"><code class="docutils literal notranslate"><span class="pre">CellResponse.plot_spikes_raster()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.CellResponse.rate_over_time"><code class="docutils literal notranslate"><span class="pre">CellResponse.rate_over_time()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.CellResponse.spike_times_by_type"><code class="docutils literal notranslate"><span class="pre">CellResponse.spike_times_by_type</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.CellResponse.to_dict"><code class="docutils literal notranslate"><span class="pre">CellResponse.to_dict()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.CellResponse.update_types"><code class="docutils literal notranslate"><span class="pre">CellResponse.update_types()</span></code></a></li>
@@ -884,8 +967,8 @@ appended to the file name.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -906,7 +989,6 @@ appended to the file name.</p>
 
   <p class="sphinx-version">
     Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
-    <br/>
   </p>
 </div>
       
@@ -919,7 +1001,7 @@ appended to the file name.</p>
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.22.0.
 </p></div>
       
     </div>

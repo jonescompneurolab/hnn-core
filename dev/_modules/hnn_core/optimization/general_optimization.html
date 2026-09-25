@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -26,32 +25,27 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c43d5962" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
 
     <script src="../../../_static/documentation_options.js?v=debdd0a9"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script src="../../../_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/hnn_core/optimization/general_optimization';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.22.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
@@ -122,7 +116,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -170,13 +164,6 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../auto_examples/index.html">
-    Examples
-  </a>
-</li>
-
-
-<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../api.html">
     API
   </a>
@@ -210,6 +197,13 @@
   </a>
 </li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">
+    HNN Textbook
+  </a>
+</li>
+
             <li class="nav-item dropdown">
                 <button class="btn dropdown-toggle nav-item" type="button"
                 data-bs-toggle="dropdown" aria-expanded="false"
@@ -218,13 +212,6 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-<li class=" ">
-  <a class="nav-link dropdown-item nav-external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">
-    HNN Textbook
-  </a>
-</li>
-
-
 <li class=" ">
   <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
     PyPI package
@@ -252,7 +239,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -283,15 +270,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
     <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
     <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
     <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -302,7 +289,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -342,13 +329,6 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../install.html">
     Install (Textbook)
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../auto_examples/index.html">
-    Examples
   </a>
 </li>
 
@@ -441,15 +421,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
     <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
     <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
     <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -513,7 +493,7 @@
                 <article class="bd-article">
                   
   <h1>Source code for hnn_core.optimization.general_optimization</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Parameter optimization.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""Parameter optimization."""</span>
 
 <span class="c1"># Authors: Carolina Fernandez &lt;cxf418@miami.edu&gt;</span>
 <span class="c1">#          Nick Tolley &lt;nicholas_tolley@brown.edu&gt;</span>
@@ -526,17 +506,79 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">fmin_cobyla</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.objective_functions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">_rmse_evoked</span><span class="p">,</span>
     <span class="n">_anticorr_evoked</span><span class="p">,</span>
-    <span class="n">_maximize_psd</span><span class="p">,</span>
     <span class="n">_custom_objective_function</span><span class="p">,</span>
+    <span class="n">_rmse_corr_evoked</span><span class="p">,</span>
+    <span class="n">_rmse_evoked</span><span class="p">,</span>
+    <span class="n">_maximize_psd</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..externals.mne</span><span class="w"> </span><span class="kn">import</span> <span class="n">_validate_type</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">op</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
 
 
 <div class="viewcode-block" id="Optimizer">
 <a class="viewcode-back" href="../../../generated/hnn_core.optimization.Optimizer.html#hnn_core.optimization.Optimizer">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Optimizer</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Parameter optimization.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    initial_net : instance of Network</span>
+<span class="sd">        The network object.</span>
+<span class="sd">    tstop : float</span>
+<span class="sd">        The simulated dipole's duration.</span>
+<span class="sd">    constraints : dict</span>
+<span class="sd">        The user-defined constraints.</span>
+<span class="sd">    set_params : func</span>
+<span class="sd">        User-defined function that sets parameters in network drives.</span>
+
+<span class="sd">            ``set_params(net, params) -&gt; None``</span>
+
+<span class="sd">        where ``net`` is a Network object and ``params`` is a dictionary of the</span>
+<span class="sd">        parameters that will be set inside the function.</span>
+<span class="sd">    initial_params : dict, optional</span>
+<span class="sd">        Initial parameters for the objective function. Keys are parameter names,</span>
+<span class="sd">        values are initial parameters. The default is None. If None, the parameters</span>
+<span class="sd">        will be set to the midpoints of parameter ranges.</span>
+<span class="sd">    solver : str</span>
+<span class="sd">        The optimizer, 'bayesian', 'cobyla', or 'cma'.</span>
+<span class="sd">    obj_fun : str | func</span>
+<span class="sd">        The objective function to be minimized. Can be 'dipole_rmse',</span>
+<span class="sd">        'maximize_psd', 'dipole_corr', 'custom', or a user-defined function. See the</span>
+<span class="sd">        docstring for ``Optimizer.fit`` to view the required and optional arguments</span>
+<span class="sd">        for each of these cases. If a user-defined function is provided, it must</span>
+<span class="sd">        have the same function signature as the existing objective functions</span>
+<span class="sd">        (i.e. `_rmse_evoked` and `_maximize_psd` in objective_functions.py).The</span>
+<span class="sd">        default is 'dipole_rmse'.</span>
+<span class="sd">    max_iter : int, optional</span>
+<span class="sd">        The max number of calls to the objective function. The default is 200.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    constraints : dict</span>
+<span class="sd">        The user-defined constraints.</span>
+<span class="sd">    initial_params : dict, None</span>
+<span class="sd">        Initial parameters for the objective function. If None, initial_params</span>
+<span class="sd">        is set to the midpoint of upper/lower bounds defined in constraints.</span>
+<span class="sd">    max_iter : int</span>
+<span class="sd">        The max number of calls to the objective function.</span>
+<span class="sd">    solver : func</span>
+<span class="sd">        The optimization function.</span>
+<span class="sd">    obj_fun : func</span>
+<span class="sd">        The objective function to be minimized.</span>
+<span class="sd">    obj_fun_name : str</span>
+<span class="sd">        The name of the template objective function.</span>
+<span class="sd">    tstop : float</span>
+<span class="sd">        The simulated dipole's duration.</span>
+<span class="sd">    net_ : instance of Network</span>
+<span class="sd">        The network object with optimized drives.</span>
+<span class="sd">    obj_ : list</span>
+<span class="sd">        The objective function values.</span>
+<span class="sd">    opt_params_ : list</span>
+<span class="sd">        The list of optimized parameter values.</span>
+<span class="sd">    """</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">initial_net</span><span class="p">,</span>
@@ -544,100 +586,45 @@
         <span class="n">constraints</span><span class="p">,</span>
         <span class="n">set_params</span><span class="p">,</span>
         <span class="n">initial_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;bayesian&quot;</span><span class="p">,</span>
-        <span class="n">obj_fun</span><span class="o">=</span><span class="s2">&quot;dipole_rmse&quot;</span><span class="p">,</span>
+        <span class="n">solver</span><span class="o">=</span><span class="s2">"bayesian"</span><span class="p">,</span>
+        <span class="n">obj_fun</span><span class="o">=</span><span class="s2">"dipole_rmse"</span><span class="p">,</span>
         <span class="n">max_iter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parameter optimization.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        initial_net : instance of Network</span>
-<span class="sd">            The network object.</span>
-<span class="sd">        tstop : float</span>
-<span class="sd">            The simulated dipole&#39;s duration.</span>
-<span class="sd">        constraints : dict</span>
-<span class="sd">            The user-defined constraints.</span>
-<span class="sd">        set_params : func</span>
-<span class="sd">            User-defined function that sets parameters in network drives.</span>
-
-<span class="sd">                ``set_params(net, params) -&gt; None``</span>
-
-<span class="sd">            where ``net`` is a Network object and ``params`` is a dictionary of the</span>
-<span class="sd">            parameters that will be set inside the function.</span>
-<span class="sd">        initial_params : dict, optional</span>
-<span class="sd">            Initial parameters for the objective function. Keys are parameter names,</span>
-<span class="sd">            values are initial parameters. The default is None. If None, the parameters</span>
-<span class="sd">            will be set to the midpoints of parameter ranges.</span>
-<span class="sd">        solver : str</span>
-<span class="sd">            The optimizer, &#39;bayesian&#39;, &#39;cobyla&#39;, or &#39;cma&#39;.</span>
-<span class="sd">        obj_fun : str | func</span>
-<span class="sd">            The objective function to be minimized. Can be &#39;dipole_rmse&#39;,</span>
-<span class="sd">            &#39;maximize_psd&#39;, &#39;dipole_corr&#39;, &#39;custom&#39;, or a user-defined function. See the</span>
-<span class="sd">            docstring for ``Optimizer.fit`` to view the required and optional arguments</span>
-<span class="sd">            for each of these cases. If a user-defined function is provided, it must</span>
-<span class="sd">            have the same function signature as the existing objective functions</span>
-<span class="sd">            (i.e. `_rmse_evoked` and `_maximize_psd` in objective_functions.py).The</span>
-<span class="sd">            default is &#39;dipole_rmse&#39;.</span>
-<span class="sd">        max_iter : int, optional</span>
-<span class="sd">            The max number of calls to the objective function. The default is 200.</span>
-
-<span class="sd">        Attributes</span>
-<span class="sd">        ----------</span>
-<span class="sd">        constraints : dict</span>
-<span class="sd">            The user-defined constraints.</span>
-<span class="sd">        initial_params : dict, None</span>
-<span class="sd">            Initial parameters for the objective function. If None, initial_params</span>
-<span class="sd">            is set to the midpoint of upper/lower bounds defined in constraints.</span>
-<span class="sd">        max_iter : int</span>
-<span class="sd">            The max number of calls to the objective function.</span>
-<span class="sd">        solver : func</span>
-<span class="sd">            The optimization function.</span>
-<span class="sd">        obj_fun : func</span>
-<span class="sd">            The objective function to be minimized.</span>
-<span class="sd">        obj_fun_name : str</span>
-<span class="sd">            The name of the template objective function.</span>
-<span class="sd">        tstop : float</span>
-<span class="sd">            The simulated dipole&#39;s duration.</span>
-<span class="sd">        net_ : instance of Network</span>
-<span class="sd">            The network object with optimized drives.</span>
-<span class="sd">        obj_ : list</span>
-<span class="sd">            The objective function values.</span>
-<span class="sd">        opt_params_ : list</span>
-<span class="sd">            The list of optimized parameter values.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_initial_net</span> <span class="o">=</span> <span class="n">initial_net</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">=</span> <span class="n">constraints</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_params</span> <span class="o">=</span> <span class="n">set_params</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span> <span class="o">=</span> <span class="n">max_iter</span>
         <span class="c1"># Optimizer method</span>
-        <span class="k">if</span> <span class="n">solver</span> <span class="o">==</span> <span class="s2">&quot;bayesian&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">solver</span> <span class="o">=</span> <span class="s2">&quot;bayesian&quot;</span>
+        <span class="k">if</span> <span class="n">solver</span> <span class="o">==</span> <span class="s2">"bayesian"</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">solver</span> <span class="o">=</span> <span class="s2">"bayesian"</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_assemble_constraints</span> <span class="o">=</span> <span class="n">_assemble_constraints_bayesian</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_run_opt</span> <span class="o">=</span> <span class="n">_run_opt_bayesian</span>
-        <span class="k">elif</span> <span class="n">solver</span> <span class="o">==</span> <span class="s2">&quot;cobyla&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">solver</span> <span class="o">=</span> <span class="s2">&quot;cobyla&quot;</span>
+        <span class="k">elif</span> <span class="n">solver</span> <span class="o">==</span> <span class="s2">"cobyla"</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">solver</span> <span class="o">=</span> <span class="s2">"cobyla"</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_assemble_constraints</span> <span class="o">=</span> <span class="n">_assemble_constraints_cobyla</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_run_opt</span> <span class="o">=</span> <span class="n">_run_opt_cobyla</span>
-        <span class="k">elif</span> <span class="n">solver</span> <span class="o">==</span> <span class="s2">&quot;cma&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">solver</span> <span class="o">=</span> <span class="s2">&quot;cma&quot;</span>
+        <span class="k">elif</span> <span class="n">solver</span> <span class="o">==</span> <span class="s2">"cma"</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">solver</span> <span class="o">=</span> <span class="s2">"cma"</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_assemble_constraints</span> <span class="o">=</span> <span class="n">_assemble_constraints_cma</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_run_opt</span> <span class="o">=</span> <span class="n">_run_opt_cma</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;solver must be &#39;bayesian&#39; or &#39;cobyla&#39;&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"solver must be 'bayesian' or 'cobyla'"</span><span class="p">)</span>
         <span class="c1"># Response to be optimized</span>
-        <span class="k">if</span> <span class="n">obj_fun</span> <span class="o">==</span> <span class="s2">&quot;dipole_rmse&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">obj_fun</span> <span class="o">==</span> <span class="s2">"dipole_rmse"</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun</span> <span class="o">=</span> <span class="n">_rmse_evoked</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">=</span> <span class="s2">&quot;dipole_rmse&quot;</span>
-        <span class="k">elif</span> <span class="n">obj_fun</span> <span class="o">==</span> <span class="s2">&quot;maximize_psd&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">=</span> <span class="s2">"dipole_rmse"</span>
+        <span class="k">elif</span> <span class="n">obj_fun</span> <span class="o">==</span> <span class="s2">"maximize_psd"</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun</span> <span class="o">=</span> <span class="n">_maximize_psd</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">=</span> <span class="s2">&quot;maximize_psd&quot;</span>
-        <span class="k">elif</span> <span class="n">obj_fun</span> <span class="o">==</span> <span class="s2">&quot;dipole_corr&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">=</span> <span class="s2">"maximize_psd"</span>
+        <span class="k">elif</span> <span class="n">obj_fun</span> <span class="o">==</span> <span class="s2">"dipole_corr"</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun</span> <span class="o">=</span> <span class="n">_anticorr_evoked</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">=</span> <span class="s2">&quot;dipole_corr&quot;</span>
-        <span class="k">elif</span> <span class="n">obj_fun</span> <span class="o">==</span> <span class="s2">&quot;custom&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">=</span> <span class="s2">"dipole_corr"</span>
+        <span class="k">elif</span> <span class="n">obj_fun</span> <span class="o">==</span> <span class="s2">"dipole_rmse_corr"</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun</span> <span class="o">=</span> <span class="n">_rmse_corr_evoked</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">=</span> <span class="s2">"dipole_rmse_corr"</span>
+        <span class="k">elif</span> <span class="n">obj_fun</span> <span class="o">==</span> <span class="s2">"custom"</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun</span> <span class="o">=</span> <span class="n">_custom_objective_function</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">=</span> <span class="s2">&quot;custom&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">=</span> <span class="s2">"custom"</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun</span> <span class="o">=</span> <span class="n">obj_fun</span>  <span class="c1"># user-defined function</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">=</span> <span class="kc">None</span>
@@ -649,7 +636,7 @@
             <span class="c1"># Check if initial_params keys match constraints keys</span>
             <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">initial_params</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;The keys of initial_params must match the keys of constraints.&quot;</span>
+                    <span class="s2">"The keys of initial_params must match the keys of constraints."</span>
                 <span class="p">)</span>
 
             <span class="c1"># Check if initial_params values contain only int or float</span>
@@ -664,8 +651,11 @@
                     <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
                 <span class="p">):</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;Initial parameter &#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#39; with value </span><span class="si">{</span><span class="n">initial_params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="si">}</span><span class="s2"> is out of bounds </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span>
+                        <span class="sa">f</span><span class="s2">"Initial parameter '</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">' with value </span><span class="si">{</span><span class="n">initial_params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="si">}</span><span class="s2"> is out of bounds </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="si">}</span><span class="s2">."</span>
                     <span class="p">)</span>
+
+            <span class="c1"># ensure keys initial params and constraints are in the same order</span>
+            <span class="n">initial_params</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">initial_params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">constraints</span><span class="p">}</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">initial_params</span> <span class="o">=</span> <span class="n">initial_params</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">initial_params</span> <span class="o">=</span> <span class="n">_get_initial_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">)</span>
@@ -683,42 +673,48 @@
             <span class="n">is_fit</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="s2">solver=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">solver</span><span class="si">}</span><span class="se">\n</span><span class="s2">fit=</span><span class="si">{</span><span class="n">is_fit</span><span class="si">}</span><span class="s2">&gt;&quot;</span></div>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"&lt;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="s2">solver=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">solver</span><span class="si">}</span><span class="se">\n</span><span class="s2">fit=</span><span class="si">{</span><span class="n">is_fit</span><span class="si">}</span><span class="s2">&gt;"</span></div>
 
 
 <div class="viewcode-block" id="Optimizer.fit">
 <a class="viewcode-back" href="../../../generated/hnn_core.optimization.Optimizer.html#hnn_core.optimization.Optimizer.fit">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">obj_fun_kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs optimization routine.</span>
+<span class="w">        </span><span class="sd">"""Runs optimization routine.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        target : instance of Dipole (Required if obj_fun=&#39;dipole_rmse&#39; or &#39;dipole_corr&#39;)</span>
+<span class="sd">        target : instance of Dipole (Required if obj_fun='dipole_corr', 'dipole_rmse', or 'dipole_rmse_corr')</span>
 <span class="sd">            A dipole object with experimental data.</span>
-<span class="sd">        n_trials : int (Optional if obj_fun=&#39;dipole_rmse&#39; or &#39;dipole_corr&#39;)</span>
+<span class="sd">        n_trials : int (Optional if obj_fun='dipole_corr', 'dipole_rmse', or 'dipole_rmse_corr')</span>
 <span class="sd">            Number of trials to simulate and average.</span>
-<span class="sd">        f_bands : list of tuples (Required if obj_fun=&#39;maximize_psd&#39;)</span>
+<span class="sd">        tstart : float (Optional if obj_fun='dipole_corr', 'dipole_rmse', or 'dipole_rmse_corr')</span>
+<span class="sd">            Time at beginning of range over which to calculate the objective function</span>
+<span class="sd">        weights : array (Optional if obj_fun='dipole_corr', 'dipole_rmse', or 'dipole_rmse_corr')</span>
+<span class="sd">            An array of weights to be applied to each point in simulated dpl. Must have</span>
+<span class="sd">            length &gt;= dpl.data . If None, weights will be replaced with 1's for typical</span>
+<span class="sd">            objective function calculation.</span>
+<span class="sd">        f_bands : list of tuples (Required if obj_fun='maximize_psd')</span>
 <span class="sd">            Lower and higher limit for each frequency band in Hz.</span>
-<span class="sd">        relative_bandpower : list of float | float (Required if obj_fun=&#39;maximize_psd&#39;)</span>
+<span class="sd">        relative_bandpower : list of float | float (Required if obj_fun='maximize_psd')</span>
 <span class="sd">            Weight for each frequency band in f_bands. If a single float is provided,</span>
 <span class="sd">            the same weight is applied to all frequency bands.</span>
-<span class="sd">        loss_fun : callable (Required if obj_fun=&#39;custom&#39;)</span>
+<span class="sd">        loss_fun : callable (Required if obj_fun='custom')</span>
 <span class="sd">            Objective loss function to be provided by user. The function must accept a</span>
 <span class="sd">            single ``Dipole`` object as its first argument, and `obj_fun_kwargs` as its</span>
 <span class="sd">            second argument, where `obj_fun_kwargs` is the same as the kwargs passed to</span>
 <span class="sd">            this ``Optimizer.fit` function.</span>
-<span class="sd">        sigma0 : float| array-like (Only used if solver=&#39;cma&#39;)</span>
+<span class="sd">        sigma0 : float| array-like (Only used if solver='cma')</span>
 <span class="sd">            Initial standard deviation of CME-ES algorithm. If float, sigma0 is scaled</span>
 <span class="sd">            by bounds defined in the constraints for each parameter. If array-like, The</span>
 <span class="sd">            length of sigma0 must equal the length of constraints. Default: 0.25</span>
-<span class="sd">        popsize : int (Only used if solver=&#39;cma&#39;)</span>
+<span class="sd">        popsize : int (Only used if solver='cma')</span>
 <span class="sd">            Number of parameter samples simulated per epoch. Default: 16</span>
-<span class="sd">        n_jobs : int (Only used if solver=&#39;cma&#39;)</span>
+<span class="sd">        n_jobs : int (Only used if solver='cma')</span>
 <span class="sd">            The number of jobs to start in parallel. If None, then 1 trial will be</span>
 <span class="sd">            started without parallelism.</span>
-<span class="sd">        seed : int, optional (Only used if solver=&#39;cma&#39;)</span>
+<span class="sd">        seed : int, optional (Only used if solver='cma')</span>
 <span class="sd">            Optional seed for random number generator of optimizer.</span>
-<span class="sd">        tolfun : float (Only used if solver=&#39;cma&#39;)</span>
+<span class="sd">        tolfun : float (Only used if solver='cma')</span>
 <span class="sd">            Termination criteria. Stops if the range of the best objective function</span>
 <span class="sd">            values of the last 10 + ((30 * n_parameters) / popsize) generations and all</span>
 <span class="sd">            function values of the recent generation is below tolfun. Default 0.01.</span>
@@ -728,6 +724,11 @@
 <span class="sd">            The dipole scale factor to use after every optimization iteration before</span>
 <span class="sd">            data comparison. There is no scaling applied by default, so you must pass a</span>
 <span class="sd">            value if you want any scaling.</span>
+<span class="sd">        baseline_correction : bool, default=True</span>
+<span class="sd">            Whether to apply the baseline correction to the simulated dipole after every</span>
+<span class="sd">            optimization iteration (which correction is used depends on</span>
+<span class="sd">            ``Network._model_variant``). Defaults to True, applying the appropriate</span>
+<span class="sd">            correction.</span>
 <span class="sd">        smooth_window_len : float, optional</span>
 <span class="sd">            The smooth window length to use after every optimization iteration before</span>
 <span class="sd">            data comparison. There is no smoothing applied by default, so you must pass</span>
@@ -746,31 +747,31 @@
 <span class="sd">        When defining popsize for CMA-ES, it is recommended to increase popsize relative</span>
 <span class="sd">        to the number of parameters being optimized (N). 4+3*log(N)</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="s2">&quot;n_trials&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span><span class="p">:</span>
-            <span class="n">obj_fun_kwargs</span><span class="p">[</span><span class="s2">&quot;n_trials&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="s2">"n_trials"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span><span class="p">:</span>
+            <span class="n">obj_fun_kwargs</span><span class="p">[</span><span class="s2">"n_trials"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">==</span> <span class="s2">&quot;dipole_rmse&quot;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">==</span> <span class="s2">&quot;dipole_corr&quot;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s2">&quot;target&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;target must be specified&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">==</span> <span class="s2">"dipole_rmse"</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">==</span> <span class="s2">"dipole_corr"</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">"target"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"target must be specified"</span><span class="p">)</span>
 
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">==</span> <span class="s2">&quot;maximize_psd&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">==</span> <span class="s2">"maximize_psd"</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">(</span>
-                <span class="s2">&quot;f_bands&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span>
-                <span class="ow">or</span> <span class="s2">&quot;relative_bandpower&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span>
+                <span class="s2">"f_bands"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span>
+                <span class="ow">or</span> <span class="s2">"relative_bandpower"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span>
             <span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;f_bands and relative_bandpower must be specified&quot;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">obj_fun_kwargs</span><span class="p">[</span><span class="s2">&quot;n_trials&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"f_bands and relative_bandpower must be specified"</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">obj_fun_kwargs</span><span class="p">[</span><span class="s2">"n_trials"</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span>
-                    <span class="s2">&quot;WARNING: For the `_maximize_psd` objective function, currently only 1 trial is supported. Overwriting the number of trials to be 1.&quot;</span>
+                    <span class="s2">"WARNING: For the `_maximize_psd` objective function, currently only 1 trial is supported. Overwriting the number of trials to be 1."</span>
                 <span class="p">)</span>
-                <span class="n">obj_fun_kwargs</span><span class="p">[</span><span class="s2">&quot;n_trials&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">obj_fun_kwargs</span><span class="p">[</span><span class="s2">"n_trials"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">==</span> <span class="s2">&quot;custom&quot;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s2">&quot;loss_fun&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;loss_fun must be specified when obj_fun=&#39;custom&#39;&quot;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">obj_fun_kwargs</span><span class="p">[</span><span class="s2">&quot;loss_fun&quot;</span><span class="p">]):</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;loss_fun must be a callable&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">==</span> <span class="s2">"custom"</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">"loss_fun"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"loss_fun must be specified when obj_fun='custom'"</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">obj_fun_kwargs</span><span class="p">[</span><span class="s2">"loss_fun"</span><span class="p">]):</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"loss_fun must be a callable"</span><span class="p">)</span>
 
         <span class="n">constraints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_assemble_constraints</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">)</span>
 
@@ -793,7 +794,7 @@
 <div class="viewcode-block" id="Optimizer.plot_convergence">
 <a class="viewcode-back" href="../../../generated/hnn_core.optimization.Optimizer.html#hnn_core.optimization.Optimizer.plot_convergence">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">plot_convergence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convergence plot.</span>
+<span class="w">        </span><span class="sd">"""Convergence plot.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -806,7 +807,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        fig : instance of plt.fig</span>
 <span class="sd">            The matplotlib figure handle.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -817,11 +818,11 @@
         <span class="n">y_min</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj_</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.01</span>
         <span class="n">y_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj_</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.01</span>
 
-        <span class="n">axis</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+        <span class="n">axis</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"black"</span><span class="p">)</span>
         <span class="n">axis</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">])</span>
-        <span class="n">axis</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Convergence&quot;</span><span class="p">)</span>
-        <span class="n">axis</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Number of calls&quot;</span><span class="p">)</span>
-        <span class="n">axis</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Objective value&quot;</span><span class="p">)</span>
+        <span class="n">axis</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Convergence"</span><span class="p">)</span>
+        <span class="n">axis</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Number of calls"</span><span class="p">)</span>
+        <span class="n">axis</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Objective value"</span><span class="p">)</span>
         <span class="n">axis</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -834,7 +835,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_get_initial_params</span><span class="p">(</span><span class="n">constraints</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets initial parameters as midpoints of parameter ranges.</span>
+<span class="w">    </span><span class="sd">"""Gets initial parameters as midpoints of parameter ranges.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -845,7 +846,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    initial_params : dict</span>
 <span class="sd">        Keys are parameter names, values are initial parameters.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">initial_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">cons_key</span> <span class="ow">in</span> <span class="n">constraints</span><span class="p">:</span>
@@ -857,7 +858,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_assemble_constraints_bayesian</span><span class="p">(</span><span class="n">constraints</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Assembles constraints in format required by gp_minimize.</span>
+<span class="w">    </span><span class="sd">"""Assembles constraints in format required by gp_minimize.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -868,7 +869,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    cons_bayesian : list of tuples</span>
 <span class="sd">        Lower and higher limit for each parameter.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># assemble constraints in solver-specific format</span>
     <span class="n">cons_bayesian</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">constraints</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
@@ -876,7 +877,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_assemble_constraints_cobyla</span><span class="p">(</span><span class="n">constraints</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Assembles constraints in format required by fmin_cobyla.</span>
+<span class="w">    </span><span class="sd">"""Assembles constraints in format required by fmin_cobyla.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -887,7 +888,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    cons_bayesian : dict</span>
 <span class="sd">        Set of functions.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># assemble constraints in solver-specific format</span>
     <span class="n">cons_cobyla</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -899,7 +900,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_assemble_constraints_cma</span><span class="p">(</span><span class="n">constraints</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Assembles constraints in format required by cma.</span>
+<span class="w">    </span><span class="sd">"""Assembles constraints in format required by cma.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -910,7 +911,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    cons_cma : list of lists</span>
 <span class="sd">        Lower and higher limit for each parameter.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># assemble constraints in solver-specific format</span>
     <span class="n">lower_bounds</span> <span class="o">=</span> <span class="p">[</span><span class="n">bound</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">bound</span> <span class="ow">in</span> <span class="n">constraints</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
@@ -920,7 +921,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_update_params</span><span class="p">(</span><span class="n">initial_params</span><span class="p">,</span> <span class="n">predicted_params</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Update params with predicted parameters.</span>
+<span class="w">    </span><span class="sd">"""Update params with predicted parameters.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -933,7 +934,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    params : dict</span>
 <span class="sd">        Keys are parameter names, values are parameters.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">param_key</span><span class="p">,</span> <span class="n">param_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">initial_params</span><span class="p">):</span>
@@ -952,14 +953,14 @@
     <span class="n">max_iter</span><span class="p">,</span>
     <span class="n">obj_fun_kwargs</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Runs optimization routine with gp_minimize optimizer.</span>
+<span class="w">    </span><span class="sd">"""Runs optimization routine with gp_minimize optimizer.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    initial_net : instance of Network</span>
 <span class="sd">        The network object.</span>
 <span class="sd">    tstop : float</span>
-<span class="sd">        The simulated dipole&#39;s duration.</span>
+<span class="sd">        The simulated dipole's duration.</span>
 <span class="sd">    constraints : list of tuples</span>
 <span class="sd">        Parameter constraints in solver-specific format.</span>
 <span class="sd">    set_params : func</span>
@@ -982,7 +983,7 @@
 <span class="sd">        Objective values.</span>
 <span class="sd">    net_ : instance of Network</span>
 <span class="sd">        Optimized network object.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">..externals.bayesopt</span><span class="w"> </span><span class="kn">import</span> <span class="n">bayes_opt</span><span class="p">,</span> <span class="n">expected_improvement</span>
 
     <span class="c1"># `obj_values` tracks optimizer loss over all epochs</span>
@@ -1033,14 +1034,14 @@
     <span class="n">max_iter</span><span class="p">,</span>
     <span class="n">obj_fun_kwargs</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Runs optimization routine with CMA-ES</span>
+<span class="w">    </span><span class="sd">"""Runs optimization routine with CMA-ES</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    initial_net : instance of Network</span>
 <span class="sd">        The network object.</span>
 <span class="sd">    tstop : float</span>
-<span class="sd">        The simulated dipole&#39;s duration.</span>
+<span class="sd">        The simulated dipole's duration.</span>
 <span class="sd">    constraints : list of tuples</span>
 <span class="sd">        Parameter constraints in solver-specific format.</span>
 <span class="sd">    set_params : func</span>
@@ -1063,7 +1064,7 @@
 <span class="sd">        Objective values.</span>
 <span class="sd">    net_ : instance of Network</span>
 <span class="sd">        Optimized network object.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="kn">import</span><span class="w"> </span><span class="nn">cma</span>
 
@@ -1084,38 +1085,44 @@
         <span class="p">)</span>
 
     <span class="n">default_sigma0</span> <span class="o">=</span> <span class="mf">0.25</span>
-    <span class="n">sigma0</span> <span class="o">=</span> <span class="n">obj_fun_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sigma0&quot;</span><span class="p">,</span> <span class="n">default_sigma0</span><span class="p">)</span>
+    <span class="n">sigma0</span> <span class="o">=</span> <span class="n">obj_fun_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"sigma0"</span><span class="p">,</span> <span class="n">default_sigma0</span><span class="p">)</span>
     <span class="n">_validate_type</span><span class="p">(</span><span class="n">sigma0</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">))</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sigma0</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
         <span class="k">if</span> <span class="n">sigma0</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;sigma0 must be greater than zero&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"sigma0 must be greater than zero"</span><span class="p">)</span>
         <span class="n">sigma0</span> <span class="o">=</span> <span class="n">sigma0</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">constraints</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">constraints</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sigma0</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sigma0</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;When sigma0 is array-like, it must be shape (N,), got shape </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sigma0</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"When sigma0 is array-like, it must be shape (N,), got shape </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sigma0</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sigma0</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">constraints</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;When sigma0 is array-like, the length must be the same as the constraints.&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">constraints</span><span class="p">)</span><span class="si">}</span><span class="s2"> elements, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">sigma0</span><span class="p">)</span><span class="si">}</span><span class="s2"> elements)&quot;</span>
+                <span class="s2">"When sigma0 is array-like, the length must be the same as the constraints."</span>
+                <span class="sa">f</span><span class="s2">"Expected </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">constraints</span><span class="p">)</span><span class="si">}</span><span class="s2"> elements, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">sigma0</span><span class="p">)</span><span class="si">}</span><span class="s2"> elements)"</span>
             <span class="p">)</span>
     <span class="n">es</span> <span class="o">=</span> <span class="n">cma</span><span class="o">.</span><span class="n">CMAEvolutionStrategy</span><span class="p">(</span>
         <span class="nb">list</span><span class="p">(</span><span class="n">initial_params</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
         <span class="mi">1</span><span class="p">,</span>
         <span class="p">{</span>
-            <span class="s2">&quot;bounds&quot;</span><span class="p">:</span> <span class="n">constraints</span><span class="p">,</span>
-            <span class="s2">&quot;tolfun&quot;</span><span class="p">:</span> <span class="n">obj_fun_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;tolfun&quot;</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">),</span>
-            <span class="s2">&quot;maxiter&quot;</span><span class="p">:</span> <span class="n">max_iter</span><span class="p">,</span>
-            <span class="s2">&quot;popsize&quot;</span><span class="p">:</span> <span class="n">obj_fun_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;popsize&quot;</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span>
-            <span class="s2">&quot;CMA_stds&quot;</span><span class="p">:</span> <span class="n">sigma0</span><span class="p">,</span>
-            <span class="s2">&quot;verbose&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="n">obj_fun_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;seed&quot;</span><span class="p">,</span> <span class="mi">123</span><span class="p">),</span>
+            <span class="s2">"bounds"</span><span class="p">:</span> <span class="n">constraints</span><span class="p">,</span>
+            <span class="s2">"tolfun"</span><span class="p">:</span> <span class="n">obj_fun_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"tolfun"</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">),</span>
+            <span class="s2">"maxiter"</span><span class="p">:</span> <span class="n">max_iter</span><span class="p">,</span>
+            <span class="s2">"popsize"</span><span class="p">:</span> <span class="n">obj_fun_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"popsize"</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span>
+            <span class="s2">"CMA_stds"</span><span class="p">:</span> <span class="n">sigma0</span><span class="p">,</span>
+            <span class="s2">"verbose"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">"seed"</span><span class="p">:</span> <span class="n">obj_fun_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"seed"</span><span class="p">,</span> <span class="mi">123</span><span class="p">),</span>
         <span class="p">},</span>
     <span class="p">)</span>
     <span class="k">while</span> <span class="ow">not</span> <span class="n">es</span><span class="o">.</span><span class="n">stop</span><span class="p">():</span>
         <span class="n">solutions</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">ask</span><span class="p">()</span>
         <span class="n">es</span><span class="o">.</span><span class="n">tell</span><span class="p">(</span><span class="n">solutions</span><span class="p">,</span> <span class="n">_obj_func</span><span class="p">(</span><span class="n">solutions</span><span class="p">))</span>
+        <span class="n">es</span><span class="o">.</span><span class="n">disp</span><span class="p">()</span>
+        <span class="n">backup_dir</span> <span class="o">=</span> <span class="n">obj_fun_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"pth_backup"</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">backup_dir</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">es</span><span class="o">.</span><span class="n">countiter</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">backup_dir</span><span class="p">,</span> <span class="s2">"cma_checkpoint.pkl"</span><span class="p">),</span> <span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">({</span><span class="s2">"es"</span><span class="p">:</span> <span class="n">es</span><span class="p">,</span> <span class="s2">"obj_values"</span><span class="p">:</span> <span class="n">obj_values</span><span class="p">},</span> <span class="n">f</span><span class="p">)</span>
     <span class="n">es</span><span class="o">.</span><span class="n">result_pretty</span><span class="p">()</span>
 
     <span class="c1"># get best params</span>
@@ -1142,14 +1149,14 @@
     <span class="n">max_iter</span><span class="p">,</span>
     <span class="n">obj_fun_kwargs</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Runs optimization routine with fmin_cobyla optimizer.</span>
+<span class="w">    </span><span class="sd">"""Runs optimization routine with fmin_cobyla optimizer.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    initial_net : instance of Network</span>
 <span class="sd">        The network object.</span>
 <span class="sd">    tstop : float</span>
-<span class="sd">        The simulated dipole&#39;s duration.</span>
+<span class="sd">        The simulated dipole's duration.</span>
 <span class="sd">    constraints : list of tuples</span>
 <span class="sd">        Parameter constraints in solver-specific format.</span>
 <span class="sd">    set_params : func</span>
@@ -1172,15 +1179,15 @@
 <span class="sd">        Objective values.</span>
 <span class="sd">    net_ : instance of Network</span>
 <span class="sd">        Optimized network object.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># `obj_values` tracks optimizer loss over all epochs</span>
     <span class="c1"># the list is passed to `_obj_func()` and updated in place</span>
     <span class="n">obj_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
     <span class="n">best</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;obj&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
-        <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s2">"obj"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
+        <span class="s2">"params"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_obj_func</span><span class="p">(</span><span class="n">predicted_params</span><span class="p">):</span>
@@ -1207,7 +1214,7 @@
     <span class="p">)</span>
 
     <span class="c1"># get optimized params</span>
-    <span class="n">opt_params</span> <span class="o">=</span> <span class="n">best</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]</span>
+    <span class="n">opt_params</span> <span class="o">=</span> <span class="n">best</span><span class="p">[</span><span class="s2">"params"</span><span class="p">]</span>
 
     <span class="c1"># get objective values</span>
     <span class="n">obj</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">obj_values</span><span class="p">[:</span><span class="n">idx</span><span class="p">])</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iter</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
@@ -1221,31 +1228,31 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">generate_opt_history_table</span><span class="p">(</span><span class="n">opt_results</span><span class="p">,</span> <span class="n">report_timestamp</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a human-readable text table of optimization history.</span>
+<span class="w">    </span><span class="sd">"""Generate a human-readable text table of optimization history.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    opt_results : list of dict</span>
 <span class="sd">        List of optimization results, where each dict contains the following key-value pairs:</span>
-<span class="sd">        &quot;initial_params&quot; : dict</span>
+<span class="sd">        "initial_params" : dict</span>
 <span class="sd">            Initial parameter values</span>
-<span class="sd">        &quot;opt_params&quot; : list</span>
+<span class="sd">        "opt_params" : list</span>
 <span class="sd">            Optimized parameter values</span>
-<span class="sd">        &quot;obj_values&quot; : list</span>
+<span class="sd">        "obj_values" : list</span>
 <span class="sd">            Objective function values at each iteration</span>
-<span class="sd">        &quot;solver&quot; : str</span>
+<span class="sd">        "solver" : str</span>
 <span class="sd">            Solver name used</span>
-<span class="sd">        &quot;obj_fun&quot; : str</span>
+<span class="sd">        "obj_fun" : str</span>
 <span class="sd">            Objective function name</span>
-<span class="sd">        &quot;max_iter&quot; : int</span>
+<span class="sd">        "max_iter" : int</span>
 <span class="sd">            Maximum iterations</span>
-<span class="sd">        &quot;target_data&quot; : str, optional</span>
+<span class="sd">        "target_data" : str, optional</span>
 <span class="sd">            Target dataset name (for dipole_rmse)</span>
-<span class="sd">        &quot;n_trials&quot; : int, optional</span>
+<span class="sd">        "n_trials" : int, optional</span>
 <span class="sd">            Number of trials (for dipole_rmse)</span>
-<span class="sd">        &quot;psd_f_bands&quot; : list of tuple, optional</span>
+<span class="sd">        "psd_f_bands" : list of tuple, optional</span>
 <span class="sd">            Frequency bands (for maximize_psd)</span>
-<span class="sd">        &quot;psd_relative_bandpower&quot; : list of float, optional</span>
+<span class="sd">        "psd_relative_bandpower" : list of float, optional</span>
 <span class="sd">            Relative bandpower weights (for maximize_psd)</span>
 <span class="sd">    report_timestamp : str</span>
 <span class="sd">        A timestamp which will be used to indicate the time when the report</span>
@@ -1258,83 +1265,83 @@
 <span class="sd">        A formatted text table documenting the initial and final values</span>
 <span class="sd">        of optimized parameters and the first/final objective function values</span>
 <span class="sd">        for each full optimization run.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">opt_results</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;No optimization runs have been completed yet.&quot;</span>
+        <span class="k">return</span> <span class="s2">"No optimization runs have been completed yet."</span>
 
     <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
-    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;OPTIMIZATION HISTORY&quot;</span><span class="p">)</span>
-    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generated: </span><span class="si">{</span><span class="n">report_timestamp</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
-    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"OPTIMIZATION HISTORY"</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Generated: </span><span class="si">{</span><span class="n">report_timestamp</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">run_idx</span><span class="p">,</span> <span class="n">opt_result</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">opt_results</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-        <span class="n">solver</span> <span class="o">=</span> <span class="n">opt_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;solver&quot;</span><span class="p">,</span> <span class="s2">&quot;N/A&quot;</span><span class="p">)</span>
-        <span class="n">obj_fun</span> <span class="o">=</span> <span class="n">opt_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;obj_fun&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">)</span>
-        <span class="n">max_iter</span> <span class="o">=</span> <span class="n">opt_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_iter&quot;</span><span class="p">,</span> <span class="s2">&quot;N/A&quot;</span><span class="p">)</span>
+        <span class="n">solver</span> <span class="o">=</span> <span class="n">opt_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"solver"</span><span class="p">,</span> <span class="s2">"N/A"</span><span class="p">)</span>
+        <span class="n">obj_fun</span> <span class="o">=</span> <span class="n">opt_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"obj_fun"</span><span class="p">,</span> <span class="s2">"unknown"</span><span class="p">)</span>
+        <span class="n">max_iter</span> <span class="o">=</span> <span class="n">opt_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"max_iter"</span><span class="p">,</span> <span class="s2">"N/A"</span><span class="p">)</span>
 
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Run #</span><span class="si">{</span><span class="n">run_idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Solver: </span><span class="si">{</span><span class="n">solver</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Objective Function: </span><span class="si">{</span><span class="n">obj_fun</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Max Iterations: </span><span class="si">{</span><span class="n">max_iter</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Run #</span><span class="si">{</span><span class="n">run_idx</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"-"</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Solver: </span><span class="si">{</span><span class="n">solver</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Objective Function: </span><span class="si">{</span><span class="n">obj_fun</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Max Iterations: </span><span class="si">{</span><span class="n">max_iter</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="c1"># Add target dataset info if using dipole_rmse</span>
-        <span class="k">if</span> <span class="n">obj_fun</span> <span class="o">==</span> <span class="s2">&quot;dipole_rmse&quot;</span> <span class="ow">and</span> <span class="s2">&quot;target_data&quot;</span> <span class="ow">in</span> <span class="n">opt_result</span><span class="p">:</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Target Dataset: </span><span class="si">{</span><span class="n">opt_result</span><span class="p">[</span><span class="s1">&#39;target_data&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="s2">&quot;n_trials&quot;</span> <span class="ow">in</span> <span class="n">opt_result</span><span class="p">:</span>
-                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of Trials: </span><span class="si">{</span><span class="n">opt_result</span><span class="p">[</span><span class="s1">&#39;n_trials&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">obj_fun</span> <span class="o">==</span> <span class="s2">"dipole_rmse"</span> <span class="ow">and</span> <span class="s2">"target_data"</span> <span class="ow">in</span> <span class="n">opt_result</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Target Dataset: </span><span class="si">{</span><span class="n">opt_result</span><span class="p">[</span><span class="s1">'target_data'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">"n_trials"</span> <span class="ow">in</span> <span class="n">opt_result</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Number of Trials: </span><span class="si">{</span><span class="n">opt_result</span><span class="p">[</span><span class="s1">'n_trials'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="c1"># Add frequency band info if using maximize_psd</span>
-        <span class="k">if</span> <span class="n">obj_fun</span> <span class="o">==</span> <span class="s2">&quot;maximize_psd&quot;</span> <span class="ow">and</span> <span class="s2">&quot;psd_f_bands&quot;</span> <span class="ow">in</span> <span class="n">opt_result</span><span class="p">:</span>
-            <span class="n">f_bands</span> <span class="o">=</span> <span class="n">opt_result</span><span class="p">[</span><span class="s2">&quot;psd_f_bands&quot;</span><span class="p">]</span>
-            <span class="n">rel_bandpower</span> <span class="o">=</span> <span class="n">opt_result</span><span class="p">[</span><span class="s2">&quot;psd_relative_bandpower&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">obj_fun</span> <span class="o">==</span> <span class="s2">"maximize_psd"</span> <span class="ow">and</span> <span class="s2">"psd_f_bands"</span> <span class="ow">in</span> <span class="n">opt_result</span><span class="p">:</span>
+            <span class="n">f_bands</span> <span class="o">=</span> <span class="n">opt_result</span><span class="p">[</span><span class="s2">"psd_f_bands"</span><span class="p">]</span>
+            <span class="n">rel_bandpower</span> <span class="o">=</span> <span class="n">opt_result</span><span class="p">[</span><span class="s2">"psd_relative_bandpower"</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">band</span><span class="p">,</span> <span class="n">weight</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">f_bands</span><span class="p">,</span> <span class="n">rel_bandpower</span><span class="p">),</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
                 <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;  Frequency Band </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">band</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">band</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> Hz (weight: </span><span class="si">{</span><span class="n">weight</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">)&quot;</span>
+                    <span class="sa">f</span><span class="s2">"  Frequency Band </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">band</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">band</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> Hz (weight: </span><span class="si">{</span><span class="n">weight</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">)"</span>
                 <span class="p">)</span>
 
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
 
         <span class="c1"># Get parameter names from initial_params dict</span>
-        <span class="n">param_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">opt_result</span><span class="p">[</span><span class="s2">&quot;initial_params&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">param_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">opt_result</span><span class="p">[</span><span class="s2">"initial_params"</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
         <span class="c1"># Create header</span>
-        <span class="n">header</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;Parameter&#39;</span><span class="si">:</span><span class="s2">&lt;40</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;Initial Value&#39;</span><span class="si">:</span><span class="s2">&gt;15</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;Final Value&#39;</span><span class="si">:</span><span class="s2">&gt;15</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;Change&#39;</span><span class="si">:</span><span class="s2">&gt;15</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'Parameter'</span><span class="si">:</span><span class="s2">&lt;40</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">'Initial Value'</span><span class="si">:</span><span class="s2">&gt;15</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">'Final Value'</span><span class="si">:</span><span class="s2">&gt;15</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">'Change'</span><span class="si">:</span><span class="s2">&gt;15</span><span class="si">}</span><span class="s2">"</span>
         <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"-"</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
 
         <span class="c1"># Add each parameter</span>
         <span class="k">for</span> <span class="n">param_idx</span><span class="p">,</span> <span class="n">param_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">param_names</span><span class="p">):</span>
-            <span class="n">initial_val</span> <span class="o">=</span> <span class="n">opt_result</span><span class="p">[</span><span class="s2">&quot;initial_params&quot;</span><span class="p">][</span><span class="n">param_name</span><span class="p">]</span>
-            <span class="c1"># opt_params should be a list in the same order as &quot;initial_params&quot;</span>
-            <span class="n">final_val</span> <span class="o">=</span> <span class="n">opt_result</span><span class="p">[</span><span class="s2">&quot;opt_params&quot;</span><span class="p">][</span><span class="n">param_idx</span><span class="p">]</span>
+            <span class="n">initial_val</span> <span class="o">=</span> <span class="n">opt_result</span><span class="p">[</span><span class="s2">"initial_params"</span><span class="p">][</span><span class="n">param_name</span><span class="p">]</span>
+            <span class="c1"># opt_params should be a list in the same order as "initial_params"</span>
+            <span class="n">final_val</span> <span class="o">=</span> <span class="n">opt_result</span><span class="p">[</span><span class="s2">"opt_params"</span><span class="p">][</span><span class="n">param_idx</span><span class="p">]</span>
             <span class="n">change</span> <span class="o">=</span> <span class="n">final_val</span> <span class="o">-</span> <span class="n">initial_val</span>
 
             <span class="c1"># Format the values with appropriate precision</span>
-            <span class="n">param_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">param_name</span><span class="si">:</span><span class="s2">&lt;40</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="n">initial_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">initial_val</span><span class="si">:</span><span class="s2">&gt;15.6f</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="n">final_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">final_val</span><span class="si">:</span><span class="s2">&gt;15.6f</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="n">change_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">change</span><span class="si">:</span><span class="s2">&gt;+15.6f</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">param_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">param_name</span><span class="si">:</span><span class="s2">&lt;40</span><span class="si">}</span><span class="s2">"</span>
+            <span class="n">initial_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">initial_val</span><span class="si">:</span><span class="s2">&gt;15.6f</span><span class="si">}</span><span class="s2">"</span>
+            <span class="n">final_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">final_val</span><span class="si">:</span><span class="s2">&gt;15.6f</span><span class="si">}</span><span class="s2">"</span>
+            <span class="n">change_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">change</span><span class="si">:</span><span class="s2">&gt;+15.6f</span><span class="si">}</span><span class="s2">"</span>
 
-            <span class="n">line</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">param_str</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">initial_str</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">final_str</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">change_str</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">param_str</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">initial_str</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">final_str</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">change_str</span><span class="si">}</span><span class="s2">"</span>
             <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
 
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Objective Function (</span><span class="si">{</span><span class="n">obj_fun</span><span class="si">}</span><span class="s2">) Values:&quot;</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Objective Function (</span><span class="si">{</span><span class="n">obj_fun</span><span class="si">}</span><span class="s2">) Values:"</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">obj_idx</span><span class="p">,</span> <span class="n">obj_out</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">opt_result</span><span class="p">[</span><span class="s2">&quot;obj_values&quot;</span><span class="p">]):</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Iteration </span><span class="si">{</span><span class="n">obj_idx</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">obj_out</span><span class="si">:</span><span class="s2">&gt;15.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">obj_idx</span><span class="p">,</span> <span class="n">obj_out</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">opt_result</span><span class="p">[</span><span class="s2">"obj_values"</span><span class="p">]):</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Iteration </span><span class="si">{</span><span class="n">obj_idx</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">obj_out</span><span class="si">:</span><span class="s2">&gt;15.6f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-        <span class="n">obj_diff</span> <span class="o">=</span> <span class="n">opt_result</span><span class="p">[</span><span class="s2">&quot;obj_values&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">opt_result</span><span class="p">[</span><span class="s2">&quot;obj_values&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total Change:  </span><span class="si">{</span><span class="n">obj_diff</span><span class="si">:</span><span class="s2">&gt;+15.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">obj_diff</span> <span class="o">=</span> <span class="n">opt_result</span><span class="p">[</span><span class="s2">"obj_values"</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">opt_result</span><span class="p">[</span><span class="s2">"obj_values"</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total Change:  </span><span class="si">{</span><span class="n">obj_diff</span><span class="si">:</span><span class="s2">&gt;+15.6f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
 </pre></div>
 
                 </article>
@@ -1364,8 +1371,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1386,7 +1393,6 @@
 
   <p class="sphinx-version">
     Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
-    <br/>
   </p>
 </div>
       
@@ -1399,7 +1405,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.22.0.
 </p></div>
       
     </div>

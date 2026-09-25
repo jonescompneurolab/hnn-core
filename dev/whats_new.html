@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -27,32 +26,27 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=fd6457a4" />
-    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
-    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
-    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=c43d5962" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
 
     <script src="_static/documentation_options.js?v=debdd0a9"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script src="_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'whats_new';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.22.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
@@ -125,7 +119,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -173,13 +167,6 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="auto_examples/index.html">
-    Examples
-  </a>
-</li>
-
-
-<li class="nav-item ">
   <a class="nav-link nav-internal" href="api.html">
     API
   </a>
@@ -187,7 +174,7 @@
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
+  <a class="nav-link nav-internal" href="#" aria-current="page">
     What’s new?
   </a>
 </li>
@@ -213,6 +200,13 @@
   </a>
 </li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">
+    HNN Textbook
+  </a>
+</li>
+
             <li class="nav-item dropdown">
                 <button class="btn dropdown-toggle nav-item" type="button"
                 data-bs-toggle="dropdown" aria-expanded="false"
@@ -221,13 +215,6 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-<li class=" ">
-  <a class="nav-link dropdown-item nav-external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">
-    HNN Textbook
-  </a>
-</li>
-
-
 <li class=" ">
   <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
     PyPI package
@@ -255,7 +242,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -286,15 +273,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
     <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
     <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
     <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -305,7 +292,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -314,7 +301,7 @@
   
 
   
-    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
       <span class="fa-solid fa-outdent"></span>
     </button>
   
@@ -352,13 +339,6 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="auto_examples/index.html">
-    Examples
-  </a>
-</li>
-
-
-<li class="nav-item ">
   <a class="nav-link nav-internal" href="api.html">
     API
   </a>
@@ -366,7 +346,7 @@
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
+  <a class="nav-link nav-internal" href="#" aria-current="page">
     What’s new?
   </a>
 </li>
@@ -446,15 +426,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
     <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
     <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
     <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -531,6 +511,11 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 <h2>0.6.2.dev0 In-progress Notes<a class="headerlink" href="#dev0-in-progress-notes" title="Link to this heading">#</a></h2>
 <section id="deprecations">
 <h3>Deprecations<a class="headerlink" href="#deprecations" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>User-facing deprecation notices now emit <code class="docutils literal notranslate"><span class="pre">FutureWarning</span></code>, making them visible under
+Python’s default warning filters,
+by <a class="reference external" href="https://github.com/WilliamK112">William Kang</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1339">#1339</a>. This was their first PR, thanks William!</p></li>
+</ul>
 </section>
 <section id="new-features">
 <h3>New Features<a class="headerlink" href="#new-features" title="Link to this heading">#</a></h3>
@@ -560,6 +545,9 @@ by <a class="reference external" href="https://github.com/vshnvii">Vaishnavi Bag
 <section id="bug-fixes">
 <h3>Bug Fixes<a class="headerlink" href="#bug-fixes" title="Link to this heading">#</a></h3>
 <ul class="simple">
+<li><p>Loading external drives in the GUI now extends the simulation duration when needed,
+preserving configured drive and tonic-bias stop times,
+by <a class="reference external" href="https://github.com/WilliamK112">William Kang</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1348">#1348</a>.</p></li>
 <li><p><a class="reference external" href="https://github.com/kmilo9999">Camilo Diaz</a> did considerable work in fixing our long-standing MPI Timeout issues
 and putting in place a permanent solution that uses tempfiles instead of standard
 input/output/error streams. Thanks Camilo!</p></li>
@@ -575,6 +563,7 @@ input/output/error streams. Thanks Camilo!</p></li>
 <li><p><a class="reference external" href="https://github.com/ArneshBanerjee">Arnesh Banerjee</a></p></li>
 <li><p><a class="reference external" href="https://github.com/Shivansh1205">Shivansh Bhageria</a></p></li>
 <li><p><a class="reference external" href="https://github.com/kmilo9999">Camilo Diaz</a></p></li>
+<li><p><a class="reference external" href="https://github.com/WilliamK112">William Kang</a></p></li>
 </ul>
 </section>
 <section id="changelog">
@@ -854,7 +843,7 @@ By <a class="reference external" href="https://github.com/Chetank99">Chetan Kand
 in various formats (see its docstring), including spikes generated by previous HNN
 simulations, and then “replay” the spike trains as inputs into the current
 simulation. This offers a large degree of control over both the data of the spike
-trains and how you want to connect them to your simulation. There is a <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/plot_replaying_spike_data_as_input.html#sphx-glr-auto-examples-howto-plot-replaying-spike-data-as-input-py">new example
+trains and how you want to connect them to your simulation. There is a <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/replaying_spike_data_as_input.html">new example
 script
 here</a>
 which illustrates its use.
@@ -899,8 +888,8 @@ over 3 dipoles rather than simulating a single dipole, with the option to contro
 behavior by setting the <code class="docutils literal notranslate"><span class="pre">n_trials</span></code> parameter in
 <a class="reference internal" href="generated/hnn_core.optimization.Optimizer.html#hnn_core.optimization.Optimizer.fit" title="hnn_core.optimization.Optimizer.fit"><code class="xref py py-func docutils literal notranslate"><span class="pre">fit()</span></code></a>. To capture the model’s average behavior,
 it is recommended to set <code class="docutils literal notranslate"><span class="pre">n_trials</span></code> &gt; 1, as using <code class="docutils literal notranslate"><span class="pre">n_trials=1</span></code> may identify parameters
-that work well for one simulation run but perform poorly on average. The optimization
-example (<code class="docutils literal notranslate"><span class="pre">examples/howto/optimize_evoked.py</span></code>) has also been enhanced with improved
+that work well for one simulation run but perform poorly on average. The <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/optimize_simulated_evoked_response_parameters.html">optimization
+example</a> has also been enhanced with improved
 markdown and updated contents to better illustrate best practices.
 By <a class="reference external" href="https://github.com/carolinafernandezp">Carolina Fernandez Pujol</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1057">#1057</a>.</p></li>
 <li><p>Tiny bugfix for the <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1099">#1099</a> to enable backwards-compatibility,
@@ -1110,13 +1099,13 @@ by <a class="reference external" href="https://github.com/wagdy88">Mohamed W. El
 <h3>New Features<a class="headerlink" href="#id23" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> now includes a fully-tested and robust GUI of its own. The <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> GUI was present as a prototype in v0.3, but it is now ready for production. New features and visual improvements will still be coming to it in the future, such as the ability to use optimization. See our new <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/dev/install.html">Install page</a> for ways to install it, and we have already begun incorporating it into a new, fresh series of tutorials for our upcoming revamp of the HNN website. If you have installed it, you can start the GUI using <code class="docutils literal notranslate"><span class="pre">hnn-gui</span></code> in your terminal/command prompt window.</p></li>
-<li><p>The <code class="docutils literal notranslate"><span class="pre">BatchSimulate</span></code> class: Thanks to <a class="reference external" href="https://github.com/samadpls">Abdul Samad Siddiqui</a> and Google Summer of Code 2024, there is now the capability to run “batches” of simulations across multiple parameter sets, enabling easy analysis and simulation of behavior across parameter sweeps. See our <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/plot_batch_simulate.html#sphx-glr-auto-examples-howto-plot-batch-simulate-py">example for more details</a>. Note that currently, only its <code class="docutils literal notranslate"><span class="pre">loky</span></code> backend is supported, and the <code class="docutils literal notranslate"><span class="pre">&quot;hnn-core[parallel]&quot;</span></code> dependencies must be installed for it to be used.</p></li>
-<li><p>Significant improvements to the API, documentation, and pedagogical examples <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/auto_examples/howto/optimize_evoked.html#sphx-glr-auto-examples-howto-optimize-evoked-py">especially for Optimization</a>, among others.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">BatchSimulate</span></code> class: Thanks to <a class="reference external" href="https://github.com/samadpls">Abdul Samad Siddiqui</a> and Google Summer of Code 2024, there is now the capability to run “batches” of simulations across multiple parameter sets, enabling easy analysis and simulation of behavior across parameter sweeps. See our <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/batch_simulation.html">example for more details</a>. Note that currently, only its <code class="docutils literal notranslate"><span class="pre">loky</span></code> backend is supported, and the <code class="docutils literal notranslate"><span class="pre">&quot;hnn-core[parallel]&quot;</span></code> dependencies must be installed for it to be used.</p></li>
+<li><p>Significant improvements to the API, documentation, and pedagogical examples <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/optimize_simulated_evoked_response_parameters.html">especially for Optimization</a>, among others.</p></li>
 <li><p>Calcium concentration can now be recorded: recorded calcium concentration from either the soma,
 or all sections, are enabled by setting <code class="docutils literal notranslate"><span class="pre">record_ca</span></code> to <code class="docutils literal notranslate"><span class="pre">soma</span></code> or <code class="docutils literal notranslate"><span class="pre">all</span></code> in
 <a class="reference internal" href="generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole"><code class="xref py py-func docutils literal notranslate"><span class="pre">simulate_dipole()</span></code></a>. Recordings are accessed through
 <code class="xref py py-class docutils literal notranslate"><span class="pre">ca</span></code>.</p></li>
-<li><p>There is now a new class <a class="reference internal" href="generated/hnn_core.viz.NetworkPlotter.html#hnn_core.viz.NetworkPlotter" title="hnn_core.viz.NetworkPlotter"><code class="xref py py-class docutils literal notranslate"><span class="pre">NetworkPlotter</span></code></a> which can be used to visualize an entire network in 3D, including firing animations; <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/plot_hnn_animation.html#sphx-glr-auto-examples-howto-plot-hnn-animation-py">see our example of how to use it here</a>.</p></li>
+<li><p>There is now a new class <a class="reference internal" href="generated/hnn_core.viz.NetworkPlotter.html#hnn_core.viz.NetworkPlotter" title="hnn_core.viz.NetworkPlotter"><code class="xref py py-class docutils literal notranslate"><span class="pre">NetworkPlotter</span></code></a> which can be used to visualize an entire network in 3D, including firing animations; <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/animating_hnn_simulations.html">see our example of how to use it here</a>.</p></li>
 <li><p>There is now a new function <a class="reference internal" href="generated/hnn_core.viz.plot_drive_strength.html#hnn_core.viz.plot_drive_strength" title="hnn_core.viz.plot_drive_strength"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_drive_strength()</span></code></a> for illustrating the absolute or relative amount of strength that a particular drive provides to different cell types.</p></li>
 <li><p>A very large amount of polishing, bug fixes, general improvements, etc.</p></li>
 </ul>
@@ -1142,7 +1131,7 @@ or all sections, are enabled by setting <code class="docutils literal notranslat
 <li><p>New argument to <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a> initialization: you can now set <code class="docutils literal notranslate"><span class="pre">mesh_shape</span></code> to easily make a grid of different sizes of <code class="docutils literal notranslate"><span class="pre">Network</span></code>s.</p></li>
 <li><p><a class="reference internal" href="generated/hnn_core.Cell.html#hnn_core.Cell" title="hnn_core.Cell"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cell</span></code></a> initialization argument <code class="docutils literal notranslate"><span class="pre">topology</span></code> has had both its name changed to <code class="docutils literal notranslate"><span class="pre">cell_tree</span></code> and its data type significantly changed; see <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/dev/generated/hnn_core.Cell.html#hnn_core.Cell">the API docs of <code class="docutils literal notranslate"><span class="pre">Cell</span></code> for details</a>.</p></li>
 <li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">jones_2009_model()</span></code> and other built-in Network Models including <a class="reference internal" href="generated/hnn_core.law_2021_model.html#hnn_core.law_2021_model" title="hnn_core.law_2021_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">law_2021_model()</span></code></a> and <a class="reference internal" href="generated/hnn_core.calcium_model.html#hnn_core.calcium_model" title="hnn_core.calcium_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">calcium_model()</span></code></a> all accept the aforementioned <code class="docutils literal notranslate"><span class="pre">mesh_shape</span></code> argument like <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a>.</p></li>
-<li><p>The API for optimization has changed significantly. Instead of running the function <code class="docutils literal notranslate"><span class="pre">optimize_evoked</span></code> obtained using <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">hnn_core.optimization</span> <span class="pre">import</span> <span class="pre">optimize_evoked</span></code>, you should use the new <code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code> class and its methods; <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/optimize_evoked.html#sphx-glr-auto-examples-howto-optimize-evoked-py">see our example of evoked-response optimization here</a>.</p></li>
+<li><p>The API for optimization has changed significantly. Instead of running the function <code class="docutils literal notranslate"><span class="pre">optimize_evoked</span></code> obtained using <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">hnn_core.optimization</span> <span class="pre">import</span> <span class="pre">optimize_evoked</span></code>, you should use the new <code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code> class and its methods; <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/optimize_simulated_evoked_response_parameters.html">see our example of evoked-response optimization here</a>.</p></li>
 <li><p><a class="reference internal" href="generated/hnn_core.viz.plot_spikes_hist.html#hnn_core.viz.plot_spikes_hist" title="hnn_core.viz.plot_spikes_hist"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_spikes_hist()</span></code></a> now accepts more arguments, including <code class="docutils literal notranslate"><span class="pre">invert_spike_types</span></code>, <code class="docutils literal notranslate"><span class="pre">color</span></code>, and any <code class="docutils literal notranslate"><span class="pre">**kwargs_hist</span></code> which can be applied to <code class="docutils literal notranslate"><span class="pre">matplotlib.axes.Axes.hist</span></code>. See the docstring for details.</p></li>
 <li><p><a class="reference internal" href="generated/hnn_core.viz.plot_spikes_raster.html#hnn_core.viz.plot_spikes_raster" title="hnn_core.viz.plot_spikes_raster"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_spikes_raster()</span></code></a> now accepts many more arguments, including <code class="docutils literal notranslate"><span class="pre">cell_types</span></code>, <code class="docutils literal notranslate"><span class="pre">colors</span></code>, <code class="docutils literal notranslate"><span class="pre">show_legend</span></code>, <code class="docutils literal notranslate"><span class="pre">marker_size</span></code>, <code class="docutils literal notranslate"><span class="pre">dpl</span></code>, and <code class="docutils literal notranslate"><span class="pre">overlay_dipoles</span></code>. See the docstring for details.</p></li>
 <li><p><a class="reference internal" href="generated/hnn_core.viz.plot_cell_morphology.html#hnn_core.viz.plot_cell_morphology" title="hnn_core.viz.plot_cell_morphology"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_cell_morphology()</span></code></a> now accepts more arguments, including <code class="docutils literal notranslate"><span class="pre">color</span></code> and several arguments related to its position and viewing window, including <code class="docutils literal notranslate"><span class="pre">pos</span></code>, <code class="docutils literal notranslate"><span class="pre">xlim</span></code>, <code class="docutils literal notranslate"><span class="pre">ylim</span></code>, and <code class="docutils literal notranslate"><span class="pre">zlim</span></code>. See the docstring for details.</p></li>
@@ -1167,7 +1156,7 @@ or all sections, are enabled by setting <code class="docutils literal notranslat
 <li><p><a class="reference external" href="https://github.com/Shehrozkashif">Shehroz Kashif</a></p></li>
 <li><p><a class="reference external" href="https://github.com/raj1701">Rajat Partani</a></p></li>
 <li><p><a class="reference external" href="https://github.com/carolinafernandezp">Carolina Fernandez Pujol</a></p></li>
-<li><p><a class="reference external" href="https://github.com/dantoms">Dan Toms</a></p></li>
+<li><p><a class="reference external" href="https://github.com/bydtoms">Dan Toms</a></p></li>
 <li><p><a class="reference external" href="https://github.com/samadpls">Abdul Samad Siddiqui</a></p></li>
 <li><p><a class="reference external" href="https://github.com/asoplata">Austin E. Soplata</a></p></li>
 <li><p><a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a></p></li>
@@ -1215,7 +1204,7 @@ deprecated, by <a class="reference external" href="https://github.com/katduecker
 <li><p>Add function <code class="xref py py-func docutils literal notranslate"><span class="pre">convert_to_json()</span></code> to convert legacy param and json
 files to new json format, by <a class="reference external" href="https://github.com/gtdang">George Dang</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/772">#772</a></p></li>
 <li><p>Add
-<a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/plot_batch_simulate.html#sphx-glr-auto-examples-howto-plot-batch-simulate-py"><code class="docutils literal notranslate"><span class="pre">BatchSimulate</span></code></a>
+<a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/generated/hnn_core.batch_simulate.BatchSimulate.html#hnn_core.batch_simulate.BatchSimulate"><code class="docutils literal notranslate"><span class="pre">BatchSimulate</span></code></a>
 class for batch simulation capability, by <a class="reference external" href="https://github.com/samadpls">Abdul Samad Siddiqui</a>
 in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/782">#782</a></p></li>
 <li><p>Recorded calcium concentration from the soma, as well as all sections, are enabled by
@@ -1226,7 +1215,7 @@ Duecker</a> in <a class="reference external" href="https://github.com/jonescompn
 colormap, and interpolation method to smoothen CSD plot, by <a class="reference external" href="https://github.com/katduecker">Katharina Duecker</a> in
 <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/815">#815</a></p></li>
 <li><p>Refactor and improve documentation for
-<a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/plot_batch_simulate.html#sphx-glr-auto-examples-howto-plot-batch-simulate-py"><code class="docutils literal notranslate"><span class="pre">BatchSimulate</span></code></a>, by <a class="reference external" href="https://github.com/samadpls">Abdul Samad Siddiqui</a>
+<a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/generated/hnn_core.batch_simulate.BatchSimulate.html#hnn_core.batch_simulate.BatchSimulate"><code class="docutils literal notranslate"><span class="pre">BatchSimulate</span></code></a>, including a <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/batch_simulation.html">tutorial</a> by <a class="reference external" href="https://github.com/samadpls">Abdul Samad Siddiqui</a>
 in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/830">#830</a> and <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/857">#857</a></p></li>
 <li><p>Add argument to change colors of <code class="docutils literal notranslate"><span class="pre">plot_spikes_raster</span></code>, shortened line lengths to
 prevent overlap, and added an argument for custom cell types, by <a class="reference external" href="https://github.com/gtdang">George Dang</a> in
@@ -1309,7 +1298,7 @@ passing an int for rate_constant when <code class="docutils literal notranslate"
 <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/929">#929</a></p></li>
 <li><p>Fix statistical Poisson drive tests that were failing stochastically by <a class="reference external" href="https://github.com/asoplata">Austin
 E. Soplata</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/978">#978</a></p></li>
-<li><p>Fix typo of “leading” in docstring, by <a class="reference external" href="https://github.com/dantoms">Dan Toms</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/979">#979</a></p></li>
+<li><p>Fix typo of “leading” in docstring, by <a class="reference external" href="https://github.com/bydtoms">Dan Toms</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/979">#979</a></p></li>
 <li><p>Copy template for monthly metrics workflow, in the hope it will fix the unsuccessful
 runs by <a class="reference external" href="https://github.com/asoplata">Austin E. Soplata</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/983">#983</a></p></li>
 <li><p>Hotfix of MPI install on MacOS CI runners by <a class="reference external" href="https://github.com/asoplata">Austin E. Soplata</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/994">#994</a></p></li>
@@ -1533,12 +1522,10 @@ in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-
 <section id="notable-changes">
 <h2>Notable Changes<a class="headerlink" href="#notable-changes" title="Link to this heading">#</a></h2>
 <ul class="simple">
-<li><p>Local field potentials can now be recorded during simulations <a class="reference internal" href="auto_examples/howto/plot_record_extracellular_potentials.html#sphx-glr-auto-examples-howto-plot-record-extracellular-potentials-py"><span class="std std-ref">[Example]</span></a></p></li>
-<li><p>Ability to optimize parameters to reproduce event related potentials from real data
-<a class="reference internal" href="auto_examples/howto/optimize_evoked.html#sphx-glr-auto-examples-howto-optimize-evoked-py"><span class="std std-ref">[Example]</span></a></p></li>
+<li><p>Local field potentials can now be recorded during simulations <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/record_and_plot_extracellular_potentials.html">Example</a></p></li>
+<li><p>Ability to optimize parameters to reproduce event related potentials from real data <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/optimize_simulated_evoked_response_parameters.html">Example</a></p></li>
 <li><p>Published models using HNN were added and can be loaded via dedicated functions</p></li>
-<li><p>Several improvements enabling easy modification of connectivity and cell properties
-<a class="reference internal" href="auto_examples/howto/plot_connectivity.html#sphx-glr-auto-examples-howto-plot-connectivity-py"><span class="std std-ref">[Example]</span></a></p></li>
+<li><p>Several improvements enabling easy modification of connectivity and cell properties <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/modifying_local_connectivity.html">Example</a></p></li>
 <li><p>Improved visualization including spectral analysis, connectivity, and cell morphology</p></li>
 </ul>
 <section id="id31">
@@ -1621,7 +1608,7 @@ biophysics parameters) as cells are now instantiated from template cells specifi
 Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/321">#321</a></p></li>
 <li><p>New API for network creation. The default network is now created with <code class="docutils literal notranslate"><span class="pre">net</span> <span class="pre">=</span> <span class="pre">jones_2009_model(params)</span></code>, by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/318">#318</a></p></li>
 <li><p>Replace parameter <code class="docutils literal notranslate"><span class="pre">T</span></code> with <code class="docutils literal notranslate"><span class="pre">tstop</span></code> in <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network.add_tonic_bias" title="hnn_core.Network.add_tonic_bias"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_tonic_bias()</span></code></a> and
-<a class="reference internal" href="generated/hnn_core.Cell.html#hnn_core.Cell.create_tonic_bias" title="hnn_core.Cell.create_tonic_bias"><code class="xref py py-func docutils literal notranslate"><span class="pre">create_tonic_bias()</span></code></a> to be more consistent with other functions and improve
+<code class="xref py py-func docutils literal notranslate"><span class="pre">create_tonic_bias()</span></code> to be more consistent with other functions and improve
 readability, by <a class="reference external" href="https://github.com/kenloi">Kenneth Loi</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/354">#354</a></p></li>
 <li><p>Deprecated <code class="docutils literal notranslate"><span class="pre">postproc</span></code> argument in <code class="xref py py-func docutils literal notranslate"><span class="pre">simulate_dipole()</span></code>, whereby user should
 explicitly smooth and scale resulting dipoles, by <a class="reference external" href="https://github.com/cjayb">Christopher Bailey</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/372">#372</a></p></li>
@@ -1693,7 +1680,7 @@ in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-
 <li><p>Add y-label units (nAm) to all visualisation functions involving dipole moments, by <a class="reference external" href="https://github.com/cjayb">Christopher
 Bailey</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/264">#264</a></p></li>
 <li><p>Add Savitzky-Golay filtering method <a class="reference internal" href="generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.savgol_filter" title="hnn_core.dipole.Dipole.savgol_filter"><code class="xref py py-meth docutils literal notranslate"><span class="pre">savgol_filter()</span></code></a> to <code class="docutils literal notranslate"><span class="pre">Dipole</span></code>;
-copied from <code class="docutils literal notranslate"><span class="pre">mne-python</span></code> <a class="reference external" href="https://mne.tools/dev/generated/mne.Evoked.html#mne.Evoked.savgol_filter" title="(in MNE v1.13)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">savgol_filter()</span></code></a>, by <a class="reference external" href="https://github.com/cjayb">Christopher Bailey</a> in
+copied from <code class="docutils literal notranslate"><span class="pre">mne-python</span></code> <a class="reference external" href="https://mne.tools/dev/generated/mne.Evoked.html#mne.Evoked.savgol_filter" title="(in MNE v1.14)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">savgol_filter()</span></code></a>, by <a class="reference external" href="https://github.com/cjayb">Christopher Bailey</a> in
 <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/264">#264</a></p></li>
 </ul>
 </section>
@@ -1904,8 +1891,8 @@ scaling, by <a class="reference external" href="https://github.com/cjayb">Christ
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1926,7 +1913,6 @@ scaling, by <a class="reference external" href="https://github.com/cjayb">Christ
 
   <p class="sphinx-version">
     Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
-    <br/>
   </p>
 </div>
       
@@ -1939,7 +1925,7 @@ scaling, by <a class="reference external" href="https://github.com/cjayb">Christ
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.22.0.
 </p></div>
       
     </div>
