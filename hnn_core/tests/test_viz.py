@@ -690,6 +690,17 @@ class TestCellResponsePlotters:
             (max(gid_ranges["L2_pyramidal"]) + marker_size, 0)
         )
 
+        # case 4: same as case 3, except for a cell type that is silent
+        with pytest.warns(UserWarning, match="No spikes found"):
+            fig = cell_response.plot_spikes_raster(
+                show=False,
+                marker_size=marker_size,
+                gid_ranges=gid_ranges,
+                cell_types=["L5_pyramidal"],
+            )
+        assert fig.axes[0].get_ylim() == pytest.approx(
+            (max(gid_ranges["L5_pyramidal"]) + marker_size, 0)
+        )
     # smoke test for raster plot input arguments
     def test_spikes_raster_input_args(self, base_simulation_spikes):
         net, _ = base_simulation_spikes

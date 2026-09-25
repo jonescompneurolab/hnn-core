@@ -848,6 +848,11 @@ def plot_spikes_raster(
                     [-1], lineoffsets=[-1], color=color, label=cell_type, linelengths=1
                 )
             )
+    if len(cell_type_gids) == 0:
+        warnings.warn(
+            f"No spikes found for the spike types {cell_colors.keys()}. "
+            "Raster plot will be empty."
+        )
 
     # Extent of y-axis based on maximum gid in gid_ranges if provided, otherwise the range of the cells that
     # spiked
