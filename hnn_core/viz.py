@@ -269,6 +269,168 @@ def plot_laminar_lfp(
     return ax.get_figure()
 
 
+def _collect_drive_arrow_markers(net):
+    """Return sorted drive time markers for overlay on dipole plots."""
+    from hnn_core.network_models import default_drive_colors
+
+    markers = list()
+    seen = set()
+    for drive_name in sorted(net.external_drives.keys()):
+        drive = net.external_drives[drive_name]
+        drive_type = drive["type"]
+        dynamics = drive.get("dynamics", dict())
+        location = drive.get("location", "proximal")
+        color = default_drive_colors[location]
+
+        if drive_type != "evoked":
+            continue
+        event_time = dynamics["mu"]
+
+        key = (drive_name, round(float(event_time), 4))
+        if key in seen:
+            continue
+        seen.add(key)
+        markers.append(
+            {
+                "time": float(event_time),
+                "label": drive_name,
+                "color": color,
+                "location": location,
+            }
+        )
+
+    markers.sort(key=lambda marker: marker["time"])
+    return markers
+
+
+def _add_arrows_to_dipole(
+    ax,
+    net,
+    *,
+    tmin=None,
+    tmax=None,
+    show_labels=False,
+    arrow_width=3.0,
+    arrow_height=1.75,
+):
+    """Add drive-timing arrows and guide lines to an existing dipole axis."""
+    from hnn_core.network import Network
+
+    _validate_type(net, Network, "net", "Network")
+
+    if tmin is None or tmax is None:
+        x_left, x_right = ax.get_xlim()
+        if tmin is None:
+            tmin = x_left
+        if tmax is None:
+            tmax = x_right
+
+    markers = _collect_drive_arrow_markers(net)
+    visible_markers = [marker for marker in markers if tmin <= marker["time"] <= tmax]
+    if not visible_markers:
+        return ax
+
+    ymin_data, ymax_data = ax.get_ylim()
+    y_span = ymax_data - ymin_data
+    if y_span == 0:
+        y_span = 1.0
+
+    # Same shaft length for proximal and distal; 0.127 matches pre-refactor
+    # proximal arrow size at default arrow_height (0.12 + 0.015 - 0.008 headroom terms).
+    arrow_length_y = 0.127 * y_span * arrow_height
+    label_gap_y = 0.012 * y_span * arrow_height
+    margin_y = arrow_length_y + (label_gap_y if show_labels else 0.0)
+
+    has_proximal = any(marker["location"] == "proximal" for marker in visible_markers)
+    has_distal = any(marker["location"] == "distal" for marker in visible_markers)
+    ymin_plot = ymin_data - margin_y if has_proximal else ymin_data
+    ymax_plot = ymax_data + margin_y if has_distal else ymax_data
+    ax.set_ylim(ymin_plot, ymax_plot)
+
+    for guide_time in sorted({marker["time"] for marker in visible_markers}):
+        ax.axvline(
+            guide_time,
+            color="0.75",
+            linestyle="--",
+            linewidth=0.8,
+            zorder=0,
+        )
+
+    arrow_head_scale = 6.0 * arrow_width
+    arrowprops_template = dict(
+        arrowstyle="-|>",
+        lw=arrow_width,
+        mutation_scale=arrow_head_scale,
+        shrinkA=0,
+        shrinkB=0,
+    )
+
+    drawn_at_time_and_location = set()
+
+    for marker in visible_markers:
+        drive_time = marker["time"]
+        location = marker["location"]
+        marker_key = (drive_time, location)
+        if marker_key in drawn_at_time_and_location:
+            continue
+        drawn_at_time_and_location.add(marker_key)
+
+        label = marker["label"] if show_labels else ""
+        color = marker["color"]
+        arrowprops = {**arrowprops_template, "color": color}
+
+        if location == "proximal":
+            arrow_tip_y = ymin_data
+            arrow_tail_y = ymin_data - arrow_length_y
+            ax.annotate(
+                "",
+                xy=(drive_time, arrow_tip_y),
+                xytext=(drive_time, arrow_tail_y),
+                ha="center",
+                va="bottom",
+                color=color,
+                annotation_clip=True,
+                arrowprops=arrowprops,
+            )
+            if show_labels:
+                ax.text(
+                    drive_time,
+                    arrow_tail_y - label_gap_y,
+                    label,
+                    ha="center",
+                    va="top",
+                    color=color,
+                    fontsize=7,
+                    clip_on=True,
+                )
+        else:
+            arrow_tip_y = ymax_data
+            arrow_tail_y = ymax_data + arrow_length_y
+            ax.annotate(
+                "",
+                xy=(drive_time, arrow_tip_y),
+                xytext=(drive_time, arrow_tail_y),
+                ha="center",
+                va="top",
+                color=color,
+                annotation_clip=True,
+                arrowprops=arrowprops,
+            )
+            if show_labels:
+                ax.text(
+                    drive_time,
+                    arrow_tail_y + label_gap_y,
+                    label,
+                    ha="center",
+                    va="bottom",
+                    color=color,
+                    fontsize=7,
+                    clip_on=True,
+                )
+
+    return ax
+
+
 def plot_dipole(
     dpl,
     tmin=None,
@@ -279,6 +441,10 @@ def plot_dipole(
     color="k",
     label="average",
     average=False,
+    net=None,
+    show_drive_arrows=False,
+    arrow_width=3.0,
+    arrow_height=1.75,
     show=True,
 ):
     """Simple layer-specific plot function.
@@ -307,6 +473,16 @@ def plot_dipole(
         Dipole label. Enabled when average=True.
     average : bool, default=False
         If True, render the average across all dpls.
+    net : instance of Network | None
+        Network used to overlay drive timing arrows when
+        ``show_drive_arrows=True``.
+    show_drive_arrows : bool, default=False
+        If True, draw arrows on each axis marking evoked drive onsets.
+        Requires ``net``.
+    arrow_width : float, default=3.0
+        Line width of drive timing arrow shafts when ``show_drive_arrows=True``.
+    arrow_height : float, default=1.75
+        Vertical scale for drive timing arrows when ``show_drive_arrows=True``.
     show : bool, default=True
         If True, show the figure.
 
@@ -316,6 +492,7 @@ def plot_dipole(
         The matplotlib figure handle.
     """
     from .dipole import Dipole, average_dipoles
+    from .network import Network
 
     layers = layer if isinstance(layer, list) else [layer]
     if ax is None:
@@ -391,6 +568,19 @@ def plot_dipole(
         else:
             title_str = layer
         ax.set_title(title_str)
+
+        if show_drive_arrows:
+            if net is None:
+                raise ValueError("net must be provided when show_drive_arrows=True")
+            _validate_type(net, Network, "net", "Network")
+            _add_arrows_to_dipole(
+                ax,
+                net,
+                tmin=tmin,
+                tmax=tmax,
+                arrow_width=arrow_width,
+                arrow_height=arrow_height,
+            )
 
     plt_show(show)
     return axes[0].get_figure()
