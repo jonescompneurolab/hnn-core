@@ -319,15 +319,15 @@ class TestDipoleViz:
         assert any(
             isinstance(child, matplotlib.text.Annotation) for child in ax.get_children()
         )
-        custom_lw = 3.5
+        custom_arrow_width = 3.5
         _, ax = plt.subplots()
-        _add_arrows_to_dipole(ax, net, line_width=custom_lw)
+        _add_arrows_to_dipole(ax, net, arrow_width=custom_arrow_width)
         ann = next(
             child
             for child in ax.get_children()
             if isinstance(child, matplotlib.text.Annotation)
         )
-        assert ann.arrow_patch.get_linewidth() == custom_lw
+        assert ann.arrow_patch.get_linewidth() == custom_arrow_width
         plt.close("all")
 
         _, ax = plt.subplots()
