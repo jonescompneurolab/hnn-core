@@ -14,6 +14,7 @@ from hnn_core import (
     read_params,
     calcium_model,
     duecker_ET_model,
+    law_2021_model,
     neymotin_2020_model,
     simulate_dipole,
 )
@@ -89,9 +90,15 @@ def fix_net_duecker_ET():
     def _fix_net_duecker_ET(
         add_drives_from_params=False,
         legacy_mode=False,
+        mesh_shape=None,
         reduced=False,
         electrode_array=None,
     ):
+        if reduced and mesh_shape:
+            raise ValueError(
+                "Cannot specify both `reduced=True` and `mesh_shape` argument."
+            )
+
         if reduced:
             mesh_shape = (3, 3)
             # Shorten when the drives start, since we usually use a shorter simulation
@@ -100,7 +107,10 @@ def fix_net_duecker_ET():
             dist1_mu = 10
             prox2_mu = 20
         else:
-            mesh_shape = (10, 10)
+            if mesh_shape is not None:
+                pass  # Use the provided mesh_shape
+            else:
+                mesh_shape = (10, 10)
             prox1_mu = 18
             dist1_mu = 62
             prox2_mu = 100
@@ -196,7 +206,6 @@ def fix_net_duecker_ET():
                 synaptic_delays=synaptic_delays_prox,
             )
 
-        net.set_cell_positions(inplane_distance=30.0)
         if electrode_array is not None:
             for name, positions in electrode_array.items():
                 net.add_electrode_array(name, positions)
@@ -219,6 +228,7 @@ def fix_net_neymotin_2020():
     def _fix_net_neymotin_2020(
         add_drives_from_params=False,
         legacy_mode=False,
+        mesh_shape=None,
         reduced=False,
         electrode_array=None,
         featureful_reduced_network=False,
@@ -236,6 +246,10 @@ def fix_net_neymotin_2020():
             )
 
         if not featureful_reduced_network:
+            if reduced and mesh_shape:
+                raise ValueError(
+                    "Cannot specify both `reduced=True` and `mesh_shape` argument."
+                )
             if reduced:
                 mesh_shape = (3, 3)
                 # NOTE: `run_hnn_core_fixture` with `reduced=True` originally set:
@@ -246,8 +260,11 @@ def fix_net_neymotin_2020():
                 # mode is a regular argument.
                 # TODO AES: Use the API for this, NOT params!
                 params.update({"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20})
+            elif mesh_shape is not None:
+                pass  # Use the provided mesh_shape
             else:
                 mesh_shape = (10, 10)
+
             # Legacy mode necessary for exact dipole comparison test
             net = neymotin_2020_model(
                 params,
@@ -376,13 +393,22 @@ def fix_net_calcium():
     def _fix_net_calcium(
         add_drives_from_params=False,
         legacy_mode=False,
+        mesh_shape=None,
         reduced=False,
         electrode_array=None,
     ):
+        if reduced and mesh_shape:
+            raise ValueError(
+                "Cannot specify both `reduced=True` and `mesh_shape` argument."
+            )
+
         if reduced:
             mesh_shape = (3, 3)
+        elif mesh_shape is not None:
+            pass  # Use the provided mesh_shape
         else:
             mesh_shape = (10, 10)
+
         # Legacy mode necessary for exact dipole comparison test
         net = calcium_model(
             add_drives_from_params=add_drives_from_params,
@@ -399,6 +425,49 @@ def fix_net_calcium():
         return net, inh_name
 
     return _fix_net_calcium
+
+
+@pytest.fixture(scope="module")
+def fix_net_law_2021():
+    """Test fixture for the "Law" model network.
+
+    TODO Docstring coming soon! UNDER CONSTRUCTION <construction-beaver.gif>
+    """
+
+    def _fix_net_law_2021(
+        add_drives_from_params=False,
+        legacy_mode=False,
+        mesh_shape=None,
+        reduced=False,
+        electrode_array=None,
+    ):
+        if reduced and mesh_shape:
+            raise ValueError(
+                "Cannot specify both `reduced=True` and `mesh_shape` argument."
+            )
+
+        if reduced:
+            mesh_shape = (3, 3)
+        elif mesh_shape is not None:
+            pass  # Use the provided mesh_shape
+        else:
+            mesh_shape = (10, 10)
+        # Legacy mode necessary for exact dipole comparison test
+        net = law_2021_model(
+            add_drives_from_params=add_drives_from_params,
+            legacy_mode=legacy_mode,
+            mesh_shape=mesh_shape,
+        )
+        if electrode_array is not None:
+            for name, positions in electrode_array.items():
+                net.add_electrode_array(name, positions)
+
+        # Account for Duecker name variations
+        inh_name = "basket" if "L2_basket" in net.cell_types else "inhibitory"
+
+        return net, inh_name
+
+    return _fix_net_law_2021
 
 
 @pytest.fixture(scope="module")
