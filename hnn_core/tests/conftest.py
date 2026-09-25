@@ -548,25 +548,3 @@ def fix_default_params():
     """Return the loaded default "flat JSON" parameters for the Neymotin 2020 (aka Jones 2009) model."""
     params_fname = hnn_core_root / "param" / "default.json"
     return read_params(params_fname)
-
-
-@pytest.fixture
-def network_default(fix_default_params):
-    """Default Neymotin 2020 (aka Jones 2009) network with drives."""
-    return neymotin_2020_model(fix_default_params, add_drives_from_params=True)
-
-
-@pytest.fixture
-def network_no_drives(fix_default_params):
-    """Default Neymotin 2020 (aka Jones 2009) network without external drives."""
-    return neymotin_2020_model(fix_default_params, add_drives_from_params=False)
-
-
-@pytest.fixture
-def network_small(fix_default_params):
-    """Small network (1x1 mesh) for faster tests."""
-    return neymotin_2020_model(
-        fix_default_params,
-        add_drives_from_params=True,
-        mesh_shape=(1, 1),
-    )

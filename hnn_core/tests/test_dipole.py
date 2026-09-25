@@ -392,9 +392,7 @@ def test_rmse(fix_default_params):
     assert_allclose(avg_rmse, expected_rmse)
 
 
-def test_dipole_simulation_with_renamed_cells(
-    fix_net_neymotin_2020, fix_run_simulation
-):
+def test_dipole_simulation_with_renamed_cells(fix_net_neymotin_2020):
     """Test dipole simulation works with renamed pyramidal cells."""
     net = fix_net_neymotin_2020()
 
