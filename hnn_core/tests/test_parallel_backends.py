@@ -1,3 +1,4 @@
+from copy import deepcopy
 from pathlib import Path
 from os import environ
 import io
@@ -207,7 +208,7 @@ class TestParallelBackends:
         self, use_hwthreading_if_found, fix_default_params
     ):
         """Test running MPIBackend with oversubscribed number of procs"""
-        params = fix_default_params
+        params = deepcopy(fix_default_params)
         params.update(
             {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}
         )

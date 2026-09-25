@@ -32,7 +32,7 @@ def test_dipole(
     net_model = request.getfixturevalue(fix_net_model)
     dpl_out_fname = tmp_path / "dpl1.txt"
     dpl_out_hdf5_fname = tmp_path / "dpl.hdf5"
-    params = fix_default_params
+    params = deepcopy(fix_default_params)
     times = np.arange(0, 6000 * params["dt"], params["dt"])
     data = np.random.random((6000, 3))
     dipole = Dipole(times, data)
@@ -233,7 +233,7 @@ def test_dipole_simulation(fix_net_neymotin_2020, fix_default_params):
     assert_allclose(dpl.data["agg"], dpl.copy().data["agg"])
 
     with pytest.warns(UserWarning, match="No connections"):
-        params = fix_default_params
+        params = deepcopy(fix_default_params)
         net = Network(params)
         # warning triggered on simulate_dipole()
         simulate_dipole(net, tstop=0.1, n_trials=1)
@@ -376,7 +376,7 @@ def test_rmse(fix_default_params):
         times=extdata[:, 0], data=np.c_[extdata[:, 1], extdata[:, 1], extdata[:, 1]]
     )
 
-    params = fix_default_params
+    params = deepcopy(fix_default_params)
 
     expected_rmse = 0.1
     test_dpl = Dipole(

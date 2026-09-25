@@ -41,7 +41,7 @@ hnn_core_root = Path(hnn_core.__file__).parent
 @pytest.fixture(scope="module")
 def base_network(fix_default_params):
     """Base Network with connections and drives"""
-    params = fix_default_params
+    params = deepcopy(fix_default_params)
     net = Network(params, legacy_mode=False)
     # add some basic local network connectivity
     # layer2 Pyr -> layer2 Pyr
@@ -127,7 +127,7 @@ def test_create_cell_coords():
 
 @pytest.mark.parametrize("mesh_shape", [(1, 1), (2, 2), (2, 3)])
 def test_custom_network_coords(mesh_shape, fix_default_params):
-    params = fix_default_params
+    params = deepcopy(fix_default_params)
 
     # network with custom cell types and positions (an irregular one)
     custom_cell_types = {
@@ -283,7 +283,7 @@ def test_custom_network_coords(mesh_shape, fix_default_params):
 
 def test_custom_network_coords_degenerate_dimension(fix_default_params):
     """Test warning/fallback when pos_dict has no spread in X and/or Y"""
-    params = fix_default_params
+    params = deepcopy(fix_default_params)
 
     custom_cell_types = {
         "L2_pyramidal": {
@@ -358,7 +358,7 @@ def test_custom_network_coords_degenerate_dimension(fix_default_params):
 
 def test_custom_network_coords_validation(fix_default_params):
     """Test input validation of custom pos_dict/cell_types in Network"""
-    params = fix_default_params
+    params = deepcopy(fix_default_params)
 
     custom_cell_types = {
         "L2_pyramidal": {
@@ -535,14 +535,14 @@ def test_model_variant_read_from_params(fix_default_params):
     assert params["model_variant"] == "duecker_ET_model"
 
     # param files of models that predate 'model_variant' don't define it
-    assert "model_variant" not in fix_default_params
+    assert "model_variant" not in deepcopy(fix_default_params)
 
 
 def test_model_variant_matches_network(fix_default_params):
     """Test that a mismatch between param file and network model is caught"""
     duecker_params_fname = hnn_core_root / "param" / "default_duecker_ET.json"
     duecker_params = read_params(duecker_params_fname)
-    neymo_params = fix_default_params
+    neymo_params = deepcopy(fix_default_params)
     mesh_shape = (3, 3)
 
     # default call assigns model_variant correctly
@@ -607,7 +607,7 @@ def test_model_variant_matches_network(fix_default_params):
 )
 def test_network_models_cell_params(network_model, short_inh_name, fix_default_params):
     """Test that the network models check the cell types defined in params"""
-    default_params = fix_default_params
+    default_params = deepcopy(fix_default_params)
     mesh_shape = (3, 3)
 
     if network_model == duecker_ET_model:
@@ -846,7 +846,7 @@ def test_network_reset_to_original_cell_positions(
             "origin": layer_dict["origin"],
         }
         net = Network(
-            fix_default_params,
+            deepcopy(fix_default_params),
             pos_dict=custom_pos_dict,
             cell_types=custom_cell_types,
         )
@@ -959,7 +959,7 @@ def test_network_drives(fix_default_params, fix_net_model, request):
     with pytest.raises(TypeError, match="params must be an instance of dict"):
         Network("hello")
 
-    params = fix_default_params
+    params = deepcopy(fix_default_params)
     net_model = request.getfixturevalue(fix_net_model)
     net, inh_name = net_model()
     short_inh_name = "Inh" if inh_name == "inhibitory" else "Basket"  # codespell:ignore
@@ -1300,7 +1300,7 @@ def test_network_drives(fix_default_params, fix_net_model, request):
 
 def test_network_drives_legacy(fix_default_params):
     """Test manipulation of drives in the network object under legacy mode."""
-    params = fix_default_params
+    params = deepcopy(fix_default_params)
     # add rhythmic inputs (i.e., a type of common input)
     params.update(
         {
@@ -1647,7 +1647,7 @@ def test_add_cell_type(fix_net_model, fix_default_params, request):
     net_model = request.getfixturevalue(fix_net_model)
     net, inh_name = net_model()
     short_inh_name = "Inh" if inh_name == "inhibitory" else "Basket"  # codespell:ignore
-    params = fix_default_params
+    params = deepcopy(fix_default_params)
     # instantiate drive events for NetworkBuilder
     net._instantiate_drives(tstop=params["tstop"], n_trials=params["N_trials"])
 
@@ -1757,7 +1757,7 @@ def test_tonic_biases_non_gid(fix_net_model, request):
 
 def test_tonic_biases_legacy_params_api(fix_default_params):
     """Test that the legacy 'params' API for tonic biases is still functional."""
-    params = fix_default_params
+    params = deepcopy(fix_default_params)
     net = Network(params)
     # add arbitrary local network connectivity to avoid simulation warning
     net.add_connection(
@@ -2302,7 +2302,7 @@ def test_tonic_biases_validation():
 
 def test_network_mesh(fix_default_params):
     """Test mesh for defining cell positions biases."""
-    params = fix_default_params
+    params = deepcopy(fix_default_params)
 
     # Test custom mesh_shape
     mesh_shape = (2, 3)

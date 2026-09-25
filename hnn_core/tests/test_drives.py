@@ -1,6 +1,8 @@
 # Authors: Mainak Jas <mainakjas@gmail.com>
 #          Christopher Bailey <bailey.cj@gmail.com>
 
+from copy import deepcopy
+
 import pytest
 
 import numpy as np
@@ -204,7 +206,7 @@ def test_clear_drives(fix_net_neymotin_2020):
 
 def test_add_drives(fix_default_params):
     """Test methods for adding drives to a Network."""
-    params = fix_default_params
+    params = deepcopy(fix_default_params)
     net = Network(params, legacy_mode=False)
 
     # Ensure weights and delays are updated
