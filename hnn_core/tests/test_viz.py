@@ -12,8 +12,8 @@ from numpy.testing import assert_allclose
 import pytest
 
 import hnn_core
-from hnn_core import read_params, neymotin_2020_model, read_spikes
-from hnn_core.dipole import simulate_dipole
+from hnn_core import CellResponse, read_params, neymotin_2020_model, read_spikes
+from hnn_core.dipole import Dipole, simulate_dipole
 from hnn_core.network_models import default_cell_metadata
 from hnn_core.viz import (
     plot_cells,
@@ -635,6 +635,110 @@ class TestCellResponsePlotters:
 
         assert updated_raster_yrange <= initial_raster_yrange
 
+    def test_spikes_raster_ylim(self):
+        """Raster y-axis spans the network gids, or the gids that spiked."""
+
+        # generate some spike times for some example cells
+        gid_ranges = {
+            "L2_basket": range(0, 5),
+            "L2_pyramidal": range(5, 15),
+            "L5_basket": range(15, 20),
+            "L5_pyramidal": range(20, 29),
+        }
+
+        # Hard-coded spikes, with the cell type associated with largest gids silent
+        spike_times, spike_gids, spike_types = [], [], []
+        for cell_type in ["L2_basket", "L2_pyramidal", "L5_basket"]:
+            for gid in gid_ranges[cell_type]:
+                spike_times.append(10.0 + gid)
+                spike_gids.append(gid)
+                spike_types.append(cell_type)
+
+        # create cell_response object
+        cell_response = CellResponse(
+            cell_type_names=list(gid_ranges.keys()),
+            spike_times=[spike_times],
+            spike_gids=[spike_gids],
+            spike_types=[spike_types],
+            times=np.linspace(0, 100, 101),
+        )
+
+        marker_size = 1.0
+
+        # case 1: no defined gid_ranges, y-axis ends at largest gid + marker_size
+        fig = cell_response.plot_spikes_raster(show=False, marker_size=marker_size)
+        assert fig.axes[0].get_ylim() == pytest.approx(
+            (max(spike_gids) + marker_size, 0)
+        )
+
+        # case 2: gid_ranges added as input, y-axis spans largest gid + marker size
+        fig = cell_response.plot_spikes_raster(
+            show=False, marker_size=marker_size, gid_ranges=gid_ranges
+        )
+        assert fig.axes[0].get_ylim() == pytest.approx(
+            (max(gid_ranges["L5_pyramidal"]) + marker_size, 0)
+        )
+
+        # case 3: plotting a subset of cell types spans the gids of those types only
+        fig = cell_response.plot_spikes_raster(
+            show=False,
+            marker_size=marker_size,
+            gid_ranges=gid_ranges,
+            cell_types=["L2_basket", "L2_pyramidal"],
+        )
+        assert fig.axes[0].get_ylim() == pytest.approx(
+            (max(gid_ranges["L2_pyramidal"]) + marker_size, 0)
+        )
+
+        # case 4: same as case 3, except for a cell type that is silent
+        with pytest.warns(UserWarning, match="No spikes found"):
+            fig = cell_response.plot_spikes_raster(
+                show=False,
+                marker_size=marker_size,
+                gid_ranges=gid_ranges,
+                cell_types=["L5_pyramidal"],
+            )
+        assert fig.axes[0].get_ylim() == pytest.approx(
+            (max(gid_ranges["L5_pyramidal"]) + marker_size, 0)
+        )
+
+        # case 5: test that overlay dipoles works correctly with gid_ranges
+        # This test was written by Claude Opus 5.5, but Austin read it and it seems good.
+        times = np.linspace(0, 100, 101)
+        l2_data = np.sin(2 * np.pi * times / 50)
+        l5_data = 2 * np.cos(2 * np.pi * times / 50)
+        dpl = Dipole(times, np.column_stack([l2_data + l5_data, l2_data, l5_data]))
+
+        def plot_dipole_lines(**kwargs):
+            fig = cell_response.plot_spikes_raster(
+                show=False, overlay_dipoles=True, dpl=dpl, **kwargs
+            )
+            lines = {line.get_label(): line for line in fig.axes[0].get_lines()}
+            return fig.axes[0], lines["L2 Dipole"], lines["L5 Dipole"]
+
+        ax, l2_line, l5_line = plot_dipole_lines(gid_ranges=gid_ranges)
+
+        # Each dipole is overlaid on the rows of its own layer's cells, which for
+        # L5 includes the silent L5 pyramidal cells
+        l2_gids = [*gid_ranges["L2_basket"], *gid_ranges["L2_pyramidal"]]
+        l5_gids = [*gid_ranges["L5_basket"], *gid_ranges["L5_pyramidal"]]
+        for line, gids in [(l2_line, l2_gids), (l5_line, l5_gids)]:
+            y_data = line.get_ydata()
+            assert min(gids) <= np.mean(y_data) <= max(gids)
+            assert min(gid_ranges["L2_basket"]) <= y_data.min()
+            assert y_data.max() <= max(gid_ranges["L5_pyramidal"])
+
+        # Both dipoles are drawn within the visible y-axis
+        ylim_low, ylim_high = sorted(ax.get_ylim())
+        for line in (l2_line, l5_line):
+            assert ylim_low <= line.get_ydata().min()
+            assert line.get_ydata().max() <= ylim_high
+
+        # Without gid_ranges, the raster ends at the largest gid that spiked, so the
+        # L5 dipole is placed higher up (at smaller gids) than with gid_ranges
+        _, _, l5_line_no_ranges = plot_dipole_lines()
+        assert np.mean(l5_line_no_ranges.get_ydata()) < np.mean(l5_line.get_ydata())
+
     # smoke test for raster plot input arguments
     def test_spikes_raster_input_args(self, base_simulation_spikes):
         net, _ = base_simulation_spikes
@@ -701,7 +805,8 @@ class TestCellResponsePlotters:
         """Test that the raster plot contains no data."""
         net = setup_net
         _ = simulate_dipole(net, tstop=100.0, n_trials=2)
-        fig = net.cell_response.plot_spikes_raster(trial_idx=[0, 1], show=False)
+        with pytest.warns(UserWarning, match="No spikes found"):
+            fig = net.cell_response.plot_spikes_raster(trial_idx=[0, 1], show=False)
 
         # Exactly 4 elements present in an empty plot
         assert len(fig.axes[0].collections) == 4
