@@ -280,16 +280,11 @@ def _collect_drive_arrow_markers(net):
         drive_type = drive["type"]
         dynamics = drive.get("dynamics", dict())
         location = drive.get("location", "proximal")
-        if location in default_drive_colors:
-            color = default_drive_colors[location]
-        else:
-            color = default_drive_colors["default"]
+        color = default_drive_colors[location]
 
-        event_time = None
-        if drive_type in ("evoked", "gaussian"):
-            event_time = dynamics["mu"]
-        elif drive_type == "bursty":
-            event_time = dynamics["tstart"]
+        if drive_type != "evoked":
+            continue
+        event_time = dynamics["mu"]
 
         if event_time is None:
             continue
@@ -485,7 +480,7 @@ def plot_dipole(
         Network used to overlay drive timing arrows when
         ``show_drive_arrows=True``.
     show_drive_arrows : bool, default=False
-        If True, draw arrows on each axis marking evoked / bursty drive times.
+        If True, draw arrows on each axis marking evoked drive onsets.
         Requires ``net``.
     arrow_width : float, default=3.0
         Line width of drive timing arrow shafts when ``show_drive_arrows=True``.
