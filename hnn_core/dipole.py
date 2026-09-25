@@ -710,7 +710,7 @@ class Dipole(object):
     def _convert_fAm_to_nAm(self):
         """The NEURON simulator output is in fAm, convert to nAm
 
-        NB! Must be run `after` :meth:`Dipole.correct_baseline`
+        NB! Must be run `after` :meth:`Dipole._correct_baseline`
         """
         for key in self.data.keys():
             self.data[key] *= 1e-6
