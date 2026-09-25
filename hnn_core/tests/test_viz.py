@@ -1,16 +1,15 @@
-# import os.path as op
-# import tempfile
+import os.path as op
+import tempfile
 
 import matplotlib
 from matplotlib import backend_bases
 import matplotlib.pyplot as plt
 from matplotlib.colorbar import Colorbar
-
 import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
-# from hnn_core import read_spikes
+from hnn_core import read_spikes
 from hnn_core.dipole import simulate_dipole
 from hnn_core.viz import (
     plot_cells,
@@ -143,98 +142,101 @@ class TestCellResponsePlotters:
                 # when there are no spikes there should be exactly 4 elements in the plot
                 assert len(fig.axes[0].collections) == 4
 
-    # # AES TODO commenting this out until this bug is fixed
-    # https://github.com/jonescompneurolab/hnn-core/pull/1356#issuecomment-5767003365
-    # def test_spikes_raster_colors(self, fix_use_cached_sims):
-    #     """Plotting with different color arguments"""
-    #     net, _, inh_name, spiking = fix_use_cached_sims
+    def test_spikes_raster_colors(self, fix_use_cached_sims):
+        """Plotting with different color arguments"""
+        net, _, inh_name, spiking = fix_use_cached_sims
 
-    #     def _get_line_hex_colors(fig):
-    #         colors = [
-    #             matplotlib.colors.to_hex(line.get_color())
-    #             for line in fig.axes[0].legend_.get_lines()
-    #         ]
-    #         labels = [text.get_text() for text in fig.axes[0].legend_.get_texts()]
-    #         return colors, labels
+        def _get_line_hex_colors(fig):
+            colors = [
+                matplotlib.colors.to_hex(line.get_color())
+                for line in fig.axes[0].legend_.get_lines()
+            ]
+            labels = [text.get_text() for text in fig.axes[0].legend_.get_texts()]
+            return colors, labels
 
-    #     metadata_colors = []
-    #     if net.cell_response._cell_type_metadata:
-    #         for cell_type in net.cell_response._cell_type_metadata:
-    #             metadata_colors.append(
-    #                 matplotlib.colors.to_hex(
-    #                     net.cell_response._cell_type_metadata[cell_type]["color"]
-    #                 )
-    #             )
-    #         # Default colors should be from the CellResponse metadata
-    #         fig = net.cell_response.plot_spikes_raster(trial_idx=0, show=False)
-    #         colors, _ = _get_line_hex_colors(fig)
-    #         assert colors == metadata_colors
+        metadata_colors = []
+        if net.cell_response._cell_type_metadata:
+            for cell_type in net.cell_response._cell_type_metadata:
+                metadata_colors.append(
+                    matplotlib.colors.to_hex(
+                        net.cell_response._cell_type_metadata[cell_type]["color"]
+                    )
+                )
+            # Default colors should be from the CellResponse metadata
+            fig = net.cell_response.plot_spikes_raster(trial_idx=0, show=False)
+            colors, _ = _get_line_hex_colors(fig)
+            assert colors == metadata_colors
 
-    #     # Custom hex colors as list
-    #     custom_colors = ["#daf7a6", "#ffc300", "#ff5733", "#c70039"]
-    #     fig = net.cell_response.plot_spikes_raster(
-    #         trial_idx=0, show=False, colors=custom_colors
-    #     )
-    #     colors, _ = _get_line_hex_colors(fig)
-    #     assert colors == custom_colors
+        # Custom hex colors as list
+        custom_colors = ["#daf7a6", "#ffc300", "#ff5733", "#c70039"]
+        fig = net.cell_response.plot_spikes_raster(
+            trial_idx=0, show=False, colors=custom_colors
+        )
+        colors, _ = _get_line_hex_colors(fig)
+        assert colors == custom_colors
 
-    #     # Custom named colors as list
-    #     custom_colors = ["skyblue", "maroon", "gold", "hotpink"]
-    #     color_map = matplotlib.colors.get_named_colors_mapping()
-    #     fig = net.cell_response.plot_spikes_raster(
-    #         trial_idx=0, show=False, colors=custom_colors
-    #     )
-    #     colors, _ = _get_line_hex_colors(fig)
-    #     assert colors == [color_map[color].lower() for color in custom_colors]
+        # Custom named colors as list
+        custom_colors = ["skyblue", "maroon", "gold", "hotpink"]
+        color_map = matplotlib.colors.get_named_colors_mapping()
+        fig = net.cell_response.plot_spikes_raster(
+            trial_idx=0, show=False, colors=custom_colors
+        )
+        colors, _ = _get_line_hex_colors(fig)
+        assert colors == [color_map[color].lower() for color in custom_colors]
 
-    #     # Incorrect number of colors as list
-    #     too_few = ["r", "g", "b"]
-    #     too_many = ["r", "g", "b", "y", "k"]
-    #     for colors in [too_few, too_many]:
-    #         with pytest.raises(ValueError, match="Number of colors must be equal to"):
-    #             net.cell_response.plot_spikes_raster(
-    #                 trial_idx=0, show=False, colors=colors
-    #             )
+        # Incorrect number of colors as list
+        too_few = ["r", "g", "b"]
+        too_many = ["r", "g", "b", "y", "k"]
+        for colors in [too_few, too_many]:
+            with pytest.raises(ValueError, match="Number of colors must be equal to"):
+                net.cell_response.plot_spikes_raster(
+                    trial_idx=0, show=False, colors=colors
+                )
 
-    #     # Colors as dict mapping
-    #     if spiking == "yes_spikes":
-    #         dict_mapping = {
-    #             f"L2_{inh_name}": "#daf7a6",
-    #             "L2_pyramidal": "#ffc300",
-    #             f"L5_{inh_name}": "#ff5733",
-    #             "L5_pyramidal": "#c70039",
-    #         }
-    #     elif spiking == "no_spikes":
-    #         dict_mapping = {
-    #             "beta_dist": "#ffc300",
-    #             "beta_prox": "#c70039",
-    #         }
-    #     fig = net.cell_response.plot_spikes_raster(
-    #         trial_idx=0, show=False, colors=dict_mapping
-    #     )
-    #     colors, _ = _get_line_hex_colors(fig)
-    #     assert colors == list(dict_mapping.values())
+        # Colors as dict mapping
+        if spiking == "yes_spikes":
+            dict_mapping = {
+                f"L2_{inh_name}": "#daf7a6",
+                "L2_pyramidal": "#ffc300",
+                f"L5_{inh_name}": "#ff5733",
+                "L5_pyramidal": "#c70039",
+            }
+        elif spiking == "no_spikes":
+            dict_mapping = {
+                "beta_dist": "#ffc300",
+                "beta_prox": "#c70039",
+            }
+        fig = net.cell_response.plot_spikes_raster(
+            trial_idx=0, show=False, colors=dict_mapping
+        )
+        colors, _ = _get_line_hex_colors(fig)
+        if spiking == "yes_spikes":
+            assert colors == list(dict_mapping.values())
+        elif spiking == "no_spikes":
+            # Default colors are always present for celltypes, but not necessarily for
+            # drives
+            assert set(dict_mapping.values()).issubset(set(colors))
 
-    #     # Change color of only one cell type
-    #     if spiking == "yes_spikes":
-    #         dict_mapping = {"L2_pyramidal": "#daf7a6"}
-    #     elif spiking == "no_spikes":
-    #         dict_mapping = {"beta_dist": "#ffc300"}
-    #     fig = net.cell_response.plot_spikes_raster(
-    #         trial_idx=0, show=False, colors=dict_mapping
-    #     )
-    #     colors, cell_types = _get_line_hex_colors(fig)
-    #     if spiking == "yes_spikes":
-    #         assert colors[cell_types.index("L2_pyramidal Spikes")] == "#daf7a6"
-    #     elif spiking == "no_spikes":
-    #         assert colors[cell_types.index("beta_dist Spikes")] == "#daf7a6"
+        # Change color of only one cell type
+        if spiking == "yes_spikes":
+            dict_mapping = {"L2_pyramidal": "#daf7a6"}
+        elif spiking == "no_spikes":
+            dict_mapping = {"beta_dist": "#ffc300"}
+        fig = net.cell_response.plot_spikes_raster(
+            trial_idx=0, show=False, colors=dict_mapping
+        )
+        colors, cell_types = _get_line_hex_colors(fig)
+        if spiking == "yes_spikes":
+            assert colors[cell_types.index("L2_pyramidal Spikes")] == "#daf7a6"
+        elif spiking == "no_spikes":
+            assert colors[cell_types.index("beta_dist Spikes")] == "#ffc300"
 
-    #     # Invalid key in dict mapping
-    #     dict_mapping = {"bad_cell_type": "#daf7a6"}
-    #     with pytest.raises(ValueError, match="Invalid cell types provided."):
-    #         net.cell_response.plot_spikes_raster(
-    #             trial_idx=0, show=False, colors=dict_mapping
-    #         )
+        # Invalid key in dict mapping
+        dict_mapping = {"bad_cell_type": "#daf7a6"}
+        with pytest.raises(ValueError, match="Invalid cell types provided."):
+            net.cell_response.plot_spikes_raster(
+                trial_idx=0, show=False, colors=dict_mapping
+            )
 
     def test_firing_rate_time_colors(self, fix_use_cached_sims):
         """Plotting firing rates over time with different color arguments"""
@@ -366,47 +368,58 @@ class TestCellResponsePlotters:
         ):
             cell_response.plot_firing_rate_time(window_length=10, ax=axes, show=False)
 
-    # # TODO AES: also currently broken due to a bug with lack of detection of when https://github.com/satviksaluja/hnn-core/blob/ce7fcb9c87c8fca606068ac38691d2712deb841d/hnn_core/viz.py#L804 plot_spikes_raster cell_type_gids is empty
-    # def test_spikes_raster_dipole_overlay(self, fix_use_cached_sims):
-    #     net, dpls, _, spiking = fix_use_cached_sims
+    # For the below, we only use the "yes_spikes" variant, since if there are no spikes
+    # but someone is trying to overlay dipoles, then our logic for scaling the dipoles
+    # to fit breaks down.
+    @pytest.mark.parametrize(
+        "fix_use_cached_sims",
+        [
+            (net_model_name, "yes_spikes")
+            for net_model_name in ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+        ],
+        ids=lambda param: f"{param[0]}-{param[1]}",
+        indirect=True,
+    )
+    def test_spikes_raster_dipole_overlay(self, fix_use_cached_sims):
+        net, dpls, _, _ = fix_use_cached_sims
 
-    #     # Missing dipole argument raises error
-    #     # --------------------------------------------------
-    #     with pytest.raises(ValueError, match="Dipole object must be provided"):
-    #         net.cell_response.plot_spikes_raster(
-    #             overlay_dipoles=True,
-    #             dpl=None,
-    #         )
+        # Missing dipole argument raises error
+        # --------------------------------------------------
+        with pytest.raises(ValueError, match="Dipole object must be provided"):
+            net.cell_response.plot_spikes_raster(
+                overlay_dipoles=True,
+                dpl=None,
+            )
 
-    #     # Confirm dipoles are scaled correctly
-    #     # --------------------------------------------------
-    #     # Get initial y-axis ticks for raster plot without dipole
-    #     fig = net.cell_response.plot_spikes_raster()
-    #     initial_raster_yrange = fig.axes[0].get_yticks()
+        # Confirm dipoles are scaled correctly
+        # --------------------------------------------------
+        # Get initial y-axis ticks for raster plot without dipole
+        fig = net.cell_response.plot_spikes_raster()
+        initial_raster_yrange = fig.axes[0].get_yticks()
 
-    #     # Get initial y-axis range, including a small allowance for a single
-    #     # increment expansion on either end of the axis
-    #     increment = abs(initial_raster_yrange[1] - initial_raster_yrange[0])
-    #     initial_raster_yrange = (
-    #         abs(max(initial_raster_yrange) - min(initial_raster_yrange)) + increment * 2
-    #     )
+        # Get initial y-axis range, including a small allowance for a single
+        # increment expansion on either end of the axis
+        increment = abs(initial_raster_yrange[1] - initial_raster_yrange[0])
+        initial_raster_yrange = (
+            abs(max(initial_raster_yrange) - min(initial_raster_yrange)) + increment * 2
+        )
 
-    #     # Ensure dipoles are initially out of the bounds of the raster plot
-    #     for dipole in dpls:
-    #         for layer in ["L2", "L5"]:
-    #             dipole.data[layer] = dipole.data[layer] * initial_raster_yrange
+        # Ensure dipoles are initially out of the bounds of the raster plot
+        for dipole in dpls:
+            for layer in ["L2", "L5"]:
+                dipole.data[layer] = dipole.data[layer] * initial_raster_yrange
 
-    #     # Get y-axis range of raster plot with overlaid dipoles
-    #     fig = net.cell_response.plot_spikes_raster(
-    #         overlay_dipoles=True,
-    #         dpl=dpls,
-    #     )
-    #     updated_raster_yrange = fig.axes[0].get_yticks()
-    #     updated_raster_yrange = abs(
-    #         max(updated_raster_yrange) - min(updated_raster_yrange)
-    #     )
+        # Get y-axis range of raster plot with overlaid dipoles
+        fig = net.cell_response.plot_spikes_raster(
+            overlay_dipoles=True,
+            dpl=dpls,
+        )
+        updated_raster_yrange = fig.axes[0].get_yticks()
+        updated_raster_yrange = abs(
+            max(updated_raster_yrange) - min(updated_raster_yrange)
+        )
 
-    #     assert updated_raster_yrange <= initial_raster_yrange
+        assert updated_raster_yrange <= initial_raster_yrange
 
     # smoke test for raster plot input arguments
     def test_spikes_raster_input_args(self, fix_use_cached_sims):
@@ -477,6 +490,7 @@ class TestCellResponsePlotters:
     #         f"Expected {n_cell_spikes} spikes plotted in raster, got "
     #         f"{n_plotted_raster_overlay}"
     #     )
+
     def test_spikes_hist_default(self, fix_use_cached_sims):
         """Test basic spike histogram plotting."""
         net, _, _, _ = fix_use_cached_sims
