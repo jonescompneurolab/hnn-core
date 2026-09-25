@@ -315,12 +315,14 @@ class TestDipoleViz:
             plot_dipole(dpls[0], show=False, show_drive_arrows=True)
 
         _, ax = plt.subplots()
+        ax.set_xlim(0, 100)
         _add_arrows_to_dipole(ax, net)
         assert any(
             isinstance(child, matplotlib.text.Annotation) for child in ax.get_children()
         )
         custom_arrow_width = 3.5
         _, ax = plt.subplots()
+        ax.set_xlim(0, 100)
         _add_arrows_to_dipole(ax, net, arrow_width=custom_arrow_width)
         ann = next(
             child
@@ -332,6 +334,7 @@ class TestDipoleViz:
 
         _, ax = plt.subplots()
         plot_dipole(dpls[0], ax=ax, show=False)
+        ax.set_xlim(0, 100)
         _add_arrows_to_dipole(ax, net, show_labels=True)
         assert "ev_test" in [text.get_text() for text in ax.texts]
         plt.close("all")
