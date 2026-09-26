@@ -4,6 +4,7 @@
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
 import pickle
+from functools import partial
 
 from hnn_core import simulate_dipole
 from hnn_core.dipole import _rmse
@@ -15,6 +16,36 @@ from hnn_core.optimization.general_optimization import (
 
 import numpy as np
 import pytest
+
+def _evoked_drive_weights(inh_name_suffix="basket"):
+    """Weights and delays for proximal evoked drives in optimization tests."""
+    weights_ampa = {
+        f"L2_{inh_name_suffix}": 0.5,
+        "L2_pyramidal": 0.5,
+        f"L5_{inh_name_suffix}": 0.5,
+        "L5_pyramidal": 0.5,
+    }
+    synaptic_delays = {
+        f"L2_{inh_name_suffix}": 0.1,
+        "L2_pyramidal": 0.1,
+        f"L5_{inh_name_suffix}": 1.0,
+        "L5_pyramidal": 1.0,
+    }
+    return weights_ampa, synaptic_delays
+
+
+def _evoked_set_params(net, params, inh_name_suffix="basket"):
+    """Apply proximal evoked drive parameters for optimization tests."""
+    weights_ampa, synaptic_delays = _evoked_drive_weights(inh_name_suffix)
+    net.add_evoked_drive(
+        "evprox",
+        mu=params["mu"],
+        sigma=params["sigma"],
+        numspikes=params.get("numspikes", 1),
+        location="proximal",
+        weights_ampa=weights_ampa,
+        synaptic_delays=synaptic_delays,
+    )
 
 
 @pytest.mark.parametrize("solver", ["bayesian", "cobyla", "cma"])
@@ -37,54 +68,12 @@ def test_optimize_evoked(solver, obj_fun, fix_net_model, request):
     inh_name_suffix = net_customizations["inh_name_suffix"]
 
     mu_orig = 2.0
-    weights_ampa = {
-        f"L2_{inh_name_suffix}": 0.5,
-        "L2_pyramidal": 0.5,
-        f"L5_{inh_name_suffix}": 0.5,
-        "L5_pyramidal": 0.5,
-    }
-    synaptic_delays = {
-        f"L2_{inh_name_suffix}": 0.1,
-        "L2_pyramidal": 0.1,
-        f"L5_{inh_name_suffix}": 1.0,
-        "L5_pyramidal": 1.0,
-    }
-    net_orig.add_evoked_drive(
-        "evprox",
-        mu=mu_orig,
-        sigma=1,
-        numspikes=1,
-        location="proximal",
-        weights_ampa=weights_ampa,
-        synaptic_delays=synaptic_delays,
+    _evoked_set_params(
+        net_orig, {"mu": mu_orig, "sigma": 1}, inh_name_suffix=inh_name_suffix
     )
     dpl_orig = simulate_dipole(net_orig, tstop=tstop, n_trials=n_trials)[0]
 
-    # define set_params function and constraints
     net_offset, _ = net_model(reduced=True)
-
-    def set_params(net_offset, params):
-        weights_ampa = {
-            f"L2_{inh_name_suffix}": 0.5,
-            "L2_pyramidal": 0.5,
-            f"L5_{inh_name_suffix}": 0.5,
-            "L5_pyramidal": 0.5,
-        }
-        synaptic_delays = {
-            f"L2_{inh_name_suffix}": 0.1,
-            "L2_pyramidal": 0.1,
-            f"L5_{inh_name_suffix}": 1.0,
-            "L5_pyramidal": 1.0,
-        }
-        net_offset.add_evoked_drive(
-            "evprox",
-            mu=params["mu"],
-            sigma=params["sigma"],
-            numspikes=1,
-            location="proximal",
-            weights_ampa=weights_ampa,
-            synaptic_delays=synaptic_delays,
-        )
 
     # define constraints
     constraints = dict()
@@ -94,7 +83,7 @@ def test_optimize_evoked(solver, obj_fun, fix_net_model, request):
         net_offset,
         tstop=tstop,
         constraints=constraints,
-        set_params=set_params,
+        set_params=partial(_evoked_set_params, inh_name_suffix=inh_name_suffix),
         solver=solver,
         obj_fun=obj_fun,
         max_iter=max_iter,
@@ -243,54 +232,10 @@ def test_initial_params(solver, fix_net_neymotin_2020):
 
     mu_orig = 2.0
     sigma_orig = 1.0
-    weights_ampa = {
-        "L2_basket": 0.5,
-        "L2_pyramidal": 0.5,
-        "L5_basket": 0.5,
-        "L5_pyramidal": 0.5,
-    }
-    synaptic_delays = {
-        "L2_basket": 0.1,
-        "L2_pyramidal": 0.1,
-        "L5_basket": 1.0,
-        "L5_pyramidal": 1.0,
-    }
-    net_orig.add_evoked_drive(
-        "evprox",
-        mu=mu_orig,
-        sigma=sigma_orig,
-        numspikes=1,
-        location="proximal",
-        weights_ampa=weights_ampa,
-        synaptic_delays=synaptic_delays,
-    )
+    _evoked_set_params(net_orig, {"mu": mu_orig, "sigma": sigma_orig})
     dpl_orig = simulate_dipole(net_orig, tstop=tstop, n_trials=n_trials)[0]
 
-    # define set_params function and constraints
     net_offset, _ = fix_net_neymotin_2020(reduced=True)
-
-    def set_params(net_offset, params):
-        weights_ampa = {
-            "L2_basket": 0.5,
-            "L2_pyramidal": 0.5,
-            "L5_basket": 0.5,
-            "L5_pyramidal": 0.5,
-        }
-        synaptic_delays = {
-            "L2_basket": 0.1,
-            "L2_pyramidal": 0.1,
-            "L5_basket": 1.0,
-            "L5_pyramidal": 1.0,
-        }
-        net_offset.add_evoked_drive(
-            "evprox",
-            mu=params["mu"],
-            sigma=params["sigma"],
-            numspikes=1,
-            location="proximal",
-            weights_ampa=weights_ampa,
-            synaptic_delays=synaptic_delays,
-        )
 
     # define constraints
     constraints = dict()
@@ -301,7 +246,7 @@ def test_initial_params(solver, fix_net_neymotin_2020):
         net_offset,
         tstop=tstop,
         constraints=constraints,
-        set_params=set_params,
+        set_params=_evoked_set_params,
         solver=solver,
         obj_fun="dipole_rmse",
         max_iter=max_iter,
@@ -325,27 +270,6 @@ def test_initial_params_ordering(solver, fix_net_neymotin_2020):
     tstop = 10.0
     net_offset, _ = fix_net_neymotin_2020(reduced=True)
 
-    def set_params(net_offset, params):
-        net_offset.add_evoked_drive(
-            "evprox",
-            mu=params["mu"],
-            sigma=params["sigma"],
-            numspikes=params["numspikes"],
-            location="proximal",
-            weights_ampa={
-                "L2_basket": 0.5,
-                "L2_pyramidal": 0.5,
-                "L5_basket": 0.5,
-                "L5_pyramidal": 0.5,
-            },
-            synaptic_delays={
-                "L2_basket": 0.1,
-                "L2_pyramidal": 0.1,
-                "L5_basket": 1.0,
-                "L5_pyramidal": 1.0,
-            },
-        )
-
     constraints = {"mu": (1, 10), "sigma": (20, 30), "numspikes": (40, 50)}
     # initial_params in a different order than constraints
     initial_params = {"numspikes": 45, "mu": 5, "sigma": 25}
@@ -354,7 +278,7 @@ def test_initial_params_ordering(solver, fix_net_neymotin_2020):
         net_offset,
         tstop=tstop,
         constraints=constraints,
-        set_params=set_params,
+        set_params=_evoked_set_params,
         solver=solver,
         obj_fun="dipole_rmse",
         max_iter=2,
@@ -392,29 +316,6 @@ def test_initial_params_validation(
     tstop = 10.0
     net_offset, _ = fix_net_neymotin_2020(reduced=True)
 
-    def set_params(net_offset, params):
-        weights_ampa = {
-            "L2_basket": 0.5,
-            "L2_pyramidal": 0.5,
-            "L5_basket": 0.5,
-            "L5_pyramidal": 0.5,
-        }
-        synaptic_delays = {
-            "L2_basket": 0.1,
-            "L2_pyramidal": 0.1,
-            "L5_basket": 1.0,
-            "L5_pyramidal": 1.0,
-        }
-        net_offset.add_evoked_drive(
-            "evprox",
-            mu=params["mu"],
-            sigma=params["sigma"],
-            numspikes=1,
-            location="proximal",
-            weights_ampa=weights_ampa,
-            synaptic_delays=synaptic_delays,
-        )
-
     # define constraints
     constraints = dict()
     constraints.update({"mu": (1, 10), "sigma": (1, 10)})
@@ -424,7 +325,7 @@ def test_initial_params_validation(
             net_offset,
             tstop=tstop,
             constraints=constraints,
-            set_params=set_params,
+            set_params=_evoked_set_params,
             solver=solver,
             obj_fun="dipole_rmse",
             max_iter=2,
@@ -479,34 +380,11 @@ def test_cma_seed(fix_net_neymotin_2020):
     solver = "cma"
     obj_fun = "dipole_corr"
 
-    def set_params(net, params):
-        weights_ampa = {
-            "L2_basket": 0.5,
-            "L2_pyramidal": 0.5,
-            "L5_basket": 0.5,
-            "L5_pyramidal": 0.5,
-        }
-        synaptic_delays = {
-            "L2_basket": 0.1,
-            "L2_pyramidal": 0.1,
-            "L5_basket": 1.0,
-            "L5_pyramidal": 1.0,
-        }
-        net.add_evoked_drive(
-            "evprox",
-            mu=params["mu"],
-            sigma=params["sigma"],
-            numspikes=1,
-            location="proximal",
-            weights_ampa=weights_ampa,
-            synaptic_delays=synaptic_delays,
-        )
-
     # Simulate a dipole to establish the target
     net_target, _ = fix_net_neymotin_2020(reduced=True)
     params_target = {"mu": 2.0, "sigma": 1.0}
 
-    set_params(net_target, params_target)
+    _evoked_set_params(net_target, params_target)
     dpl_target = simulate_dipole(net_target, tstop=tstop, dt=dt, n_trials=n_trials)[0]
 
     # define set_params function and constraints
@@ -520,7 +398,7 @@ def test_cma_seed(fix_net_neymotin_2020):
         "initial_net": net_opt,
         "tstop": tstop,
         "constraints": constraints,
-        "set_params": set_params,
+        "set_params": _evoked_set_params,
         "solver": solver,
         "obj_fun": obj_fun,
         "max_iter": max_iter,
@@ -610,54 +488,10 @@ def test_custom_loss_fun(solver, fix_net_neymotin_2020):
     net_orig, _ = fix_net_neymotin_2020(reduced=True)
 
     mu_orig = 2.0
-    weights_ampa = {
-        "L2_basket": 0.5,
-        "L2_pyramidal": 0.5,
-        "L5_basket": 0.5,
-        "L5_pyramidal": 0.5,
-    }
-    synaptic_delays = {
-        "L2_basket": 0.1,
-        "L2_pyramidal": 0.1,
-        "L5_basket": 1.0,
-        "L5_pyramidal": 1.0,
-    }
-    net_orig.add_evoked_drive(
-        "evprox",
-        mu=mu_orig,
-        sigma=1,
-        numspikes=1,
-        location="proximal",
-        weights_ampa=weights_ampa,
-        synaptic_delays=synaptic_delays,
-    )
+    _evoked_set_params(net_orig, {"mu": mu_orig, "sigma": 1})
     dpl_orig = simulate_dipole(net_orig, tstop=tstop, n_trials=n_trials)[0]
 
-    # define set_params function and constraints
     net_offset, _ = fix_net_neymotin_2020(reduced=True)
-
-    def set_params(net_offset, params):
-        weights_ampa = {
-            "L2_basket": 0.5,
-            "L2_pyramidal": 0.5,
-            "L5_basket": 0.5,
-            "L5_pyramidal": 0.5,
-        }
-        synaptic_delays = {
-            "L2_basket": 0.1,
-            "L2_pyramidal": 0.1,
-            "L5_basket": 1.0,
-            "L5_pyramidal": 1.0,
-        }
-        net_offset.add_evoked_drive(
-            "evprox",
-            mu=params["mu"],
-            sigma=params["sigma"],
-            numspikes=1,
-            location="proximal",
-            weights_ampa=weights_ampa,
-            synaptic_delays=synaptic_delays,
-        )
 
     # define constraints
     constraints = dict()
@@ -670,7 +504,7 @@ def test_custom_loss_fun(solver, fix_net_neymotin_2020):
         net_offset,
         tstop=tstop,
         constraints=constraints,
-        set_params=set_params,
+        set_params=_evoked_set_params,
         solver=solver,
         obj_fun="custom",
         max_iter=max_iter,
@@ -785,55 +619,12 @@ def test_optimize_options_baseline_correction(
     inh_name_suffix = net_customizations["inh_name_suffix"]
 
     mu_orig = 2.0
-    weights_ampa = {
-        f"L2_{inh_name_suffix}": 0.5,
-        "L2_pyramidal": 0.5,
-        f"L5_{inh_name_suffix}": 0.5,
-        "L5_pyramidal": 0.5,
-    }
-    synaptic_delays = {
-        f"L2_{inh_name_suffix}": 0.1,
-        "L2_pyramidal": 0.1,
-        f"L5_{inh_name_suffix}": 1.0,
-        "L5_pyramidal": 1.0,
-    }
-    net_orig.add_evoked_drive(
-        "evprox",
-        mu=mu_orig,
-        sigma=1,
-        numspikes=1,
-        location="proximal",
-        weights_ampa=weights_ampa,
-        synaptic_delays=synaptic_delays,
+    _evoked_set_params(
+        net_orig, {"mu": mu_orig, "sigma": 1}, inh_name_suffix=inh_name_suffix
     )
     dpl_orig = simulate_dipole(net_orig, tstop=tstop, dt=0.5, n_trials=n_trials)[0]
 
-    # define set_params function and constraints
-    net_offset, net_customizations = net_model(reduced=True)
-    inh_name_suffix = net_customizations["inh_name_suffix"]
-
-    def set_params(net_offset, params):
-        weights_ampa = {
-            f"L2_{inh_name_suffix}": 0.5,
-            "L2_pyramidal": 0.5,
-            f"L5_{inh_name_suffix}": 0.5,
-            "L5_pyramidal": 0.5,
-        }
-        synaptic_delays = {
-            f"L2_{inh_name_suffix}": 0.1,
-            "L2_pyramidal": 0.1,
-            f"L5_{inh_name_suffix}": 1.0,
-            "L5_pyramidal": 1.0,
-        }
-        net_offset.add_evoked_drive(
-            "evprox",
-            mu=params["mu"],
-            sigma=params["sigma"],
-            numspikes=1,
-            location="proximal",
-            weights_ampa=weights_ampa,
-            synaptic_delays=synaptic_delays,
-        )
+    net_offset, _ = net_model(reduced=True)
 
     # define constraints
     constraints = dict()
@@ -843,7 +634,7 @@ def test_optimize_options_baseline_correction(
         net_offset,
         tstop=tstop,
         constraints=constraints,
-        set_params=set_params,
+        set_params=partial(_evoked_set_params, inh_name_suffix=inh_name_suffix),
         solver="cma",
         obj_fun="dipole_corr",
         max_iter=max_iter,
