@@ -309,7 +309,6 @@ def _add_arrows_to_dipole(
     *,
     tmin=None,
     tmax=None,
-    show_labels=False,
     arrow_width=3.0,
     arrow_height=1.75,
 ):
@@ -339,9 +338,6 @@ def _add_arrows_to_dipole(
     # proximal arrow size at default arrow_height (0.12 + 0.015 - 0.008 headroom terms).
     arrow_length_y = 0.127 * y_span * arrow_height
     margin_y = arrow_length_y
-    if show_labels:
-        label_gap_y = 0.012 * y_span * arrow_height
-        margin_y += label_gap_y
 
     has_proximal = any(marker["location"] == "proximal" for marker in visible_markers)
     has_distal = any(marker["location"] == "distal" for marker in visible_markers)
@@ -393,17 +389,6 @@ def _add_arrows_to_dipole(
                 annotation_clip=True,
                 arrowprops=arrowprops,
             )
-            if show_labels:
-                ax.text(
-                    drive_time,
-                    arrow_tail_y - label_gap_y,
-                    marker["label"],
-                    ha="center",
-                    va="top",
-                    color=color,
-                    fontsize=7,
-                    clip_on=True,
-                )
         else:
             arrow_tip_y = ymax_data
             arrow_tail_y = ymax_data + arrow_length_y
@@ -417,17 +402,6 @@ def _add_arrows_to_dipole(
                 annotation_clip=True,
                 arrowprops=arrowprops,
             )
-            if show_labels:
-                ax.text(
-                    drive_time,
-                    arrow_tail_y + label_gap_y,
-                    marker["label"],
-                    ha="center",
-                    va="bottom",
-                    color=color,
-                    fontsize=7,
-                    clip_on=True,
-                )
 
     return ax
 

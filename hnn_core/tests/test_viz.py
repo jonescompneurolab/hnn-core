@@ -332,13 +332,6 @@ class TestDipoleViz:
         assert ann.arrow_patch.get_linewidth() == custom_arrow_width
         plt.close("all")
 
-        _, ax = plt.subplots()
-        plot_dipole(dpls[0], ax=ax, show=False)
-        ax.set_xlim(0, 100)
-        _add_arrows_to_dipole(ax, net, show_labels=True)
-        assert "ev_test" in [text.get_text() for text in ax.texts]
-        plt.close("all")
-
 
 def test_drive_strength(setup_net):
     """Adds empty external drives to check there strength across each cell types"""
