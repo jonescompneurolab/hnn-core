@@ -377,7 +377,6 @@ def _add_arrows_to_dipole(
             continue
         drawn_at_time_and_location.add(marker_key)
 
-        label = marker["label"] if show_labels else ""
         color = marker["color"]
         arrowprops = {**arrowprops_template, "color": color}
 
@@ -398,7 +397,7 @@ def _add_arrows_to_dipole(
                 ax.text(
                     drive_time,
                     arrow_tail_y - label_gap_y,
-                    label,
+                    marker["label"],
                     ha="center",
                     va="top",
                     color=color,
@@ -422,7 +421,7 @@ def _add_arrows_to_dipole(
                 ax.text(
                     drive_time,
                     arrow_tail_y + label_gap_y,
-                    label,
+                    marker["label"],
                     ha="center",
                     va="bottom",
                     color=color,
