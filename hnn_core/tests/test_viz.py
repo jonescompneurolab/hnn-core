@@ -717,6 +717,7 @@ class TestCellResponsePlotters:
             return fig.axes[0], lines["L2 Dipole"], lines["L5 Dipole"]
 
         ax, l2_line, l5_line = plot_dipole_lines(gid_ranges=gid_ranges)
+        float_tol = 1e-8  # Managing y-data floating point precision
 
         # Each dipole is overlaid on the rows of its own layer's cells, which for
         # L5 includes the silent L5 pyramidal cells
@@ -724,20 +725,22 @@ class TestCellResponsePlotters:
         l5_gids = [*gid_ranges["L5_basket"], *gid_ranges["L5_pyramidal"]]
         for line, gids in [(l2_line, l2_gids), (l5_line, l5_gids)]:
             y_data = line.get_ydata()
-            assert min(gids) <= np.mean(y_data) <= max(gids)
-            assert min(gid_ranges["L2_basket"]) <= y_data.min()
-            assert y_data.max() <= max(gid_ranges["L5_pyramidal"])
+            assert (min(gids) - float_tol) <= np.mean(y_data) <= (max(gids) + float_tol)
+            assert (min(gid_ranges["L2_basket"]) - float_tol) <= y_data.min()
+            assert y_data.max() <= (max(gid_ranges["L5_pyramidal"]) + float_tol)
 
         # Both dipoles are drawn within the visible y-axis
         ylim_low, ylim_high = sorted(ax.get_ylim())
         for line in (l2_line, l5_line):
-            assert ylim_low <= line.get_ydata().min()
-            assert line.get_ydata().max() <= ylim_high
+            assert (ylim_low - float_tol) <= line.get_ydata().min()
+            assert line.get_ydata().max() <= (ylim_high + float_tol)
 
         # Without gid_ranges, the raster ends at the largest gid that spiked, so the
         # L5 dipole is placed higher up (at smaller gids) than with gid_ranges
         _, _, l5_line_no_ranges = plot_dipole_lines()
-        assert np.mean(l5_line_no_ranges.get_ydata()) < np.mean(l5_line.get_ydata())
+        assert (np.mean(l5_line_no_ranges.get_ydata()) - float_tol) < np.mean(
+            l5_line.get_ydata()
+        )
 
     # smoke test for raster plot input arguments
     def test_spikes_raster_input_args(self, base_simulation_spikes):
