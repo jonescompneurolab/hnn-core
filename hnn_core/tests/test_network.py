@@ -1482,7 +1482,7 @@ def test_network_drives_legacy(fix_default_params):
 
 
 def test_network_connectivity(base_network):
-    net, params = base_network
+    net, params = deepcopy(base_network)
 
     # instantiate drive events and artificial cells for NetworkBuilder
     net._instantiate_drives(tstop=10.0, n_trials=1)
@@ -2452,7 +2452,7 @@ class TestPickConnection:
     @pytest.mark.parametrize("arg_name", ["src_gids", "target_gids", "loc", "receptor"])
     def test_1argument_none(self, base_network, arg_name):
         """Tests passing None as an argument value."""
-        net, _ = base_network
+        net, _ = deepcopy(base_network)
         kwargs = {"net": net, f"{arg_name}": None}
         indices = pick_connection(**kwargs)
         assert len(indices) == 0
@@ -2460,7 +2460,7 @@ class TestPickConnection:
     @pytest.mark.parametrize("arg_name", ["src_gids", "target_gids"])
     def test_1argument_gids_range(self, base_network, arg_name):
         """Tests passing range as an argument value."""
-        net, _ = base_network
+        net, _ = deepcopy(base_network)
         test_range = range(2)
         kwargs = {"net": net, f"{arg_name}": test_range}
         indices = pick_connection(**kwargs)
@@ -2479,7 +2479,7 @@ class TestPickConnection:
     )
     def test_1argument_str(self, base_network, arg_name, value):
         """Tests passing string as an argument value."""
-        net, _ = base_network
+        net, _ = deepcopy(base_network)
         kwargs = {"net": net, f"{arg_name}": value}
         indices = pick_connection(**kwargs)
 
@@ -2502,7 +2502,7 @@ class TestPickConnection:
     )
     def test_1argument_gids_int(self, base_network, arg_name, value):
         """Tests that connections are not missing when passing one gid."""
-        net, _ = base_network
+        net, _ = deepcopy(base_network)
         kwargs = {"net": net, f"{arg_name}": value}
         indices = pick_connection(**kwargs)
 
@@ -2521,7 +2521,7 @@ class TestPickConnection:
     )
     def test_1argument_list_of_cell_types_str(self, base_network, arg_name, value):
         """Tests passing a list of valid strings"""
-        net, _ = base_network
+        net, _ = deepcopy(base_network)
         kwargs = {"net": net, f"{arg_name}": value}
         indices = pick_connection(**kwargs)
 
@@ -2542,7 +2542,7 @@ class TestPickConnection:
     )
     def test_1argument_list_of_gids_int(self, base_network, arg_name, value):
         """Tests passing a list of valid ints."""
-        net, _ = base_network
+        net, _ = deepcopy(base_network)
         kwargs = {"net": net, f"{arg_name}": value}
         indices = pick_connection(**kwargs)
 
@@ -2566,7 +2566,7 @@ class TestPickConnection:
     )
     def test_no_match(self, base_network, src_gids, target_gids, loc, receptor):
         """Tests no matches returned for non-configured connections."""
-        net, _ = base_network
+        net, _ = deepcopy(base_network)
         indices = pick_connection(
             net, src_gids=src_gids, target_gids=target_gids, loc=loc, receptor=receptor
         )
@@ -2586,7 +2586,7 @@ class TestPickConnection:
     )
     def test_type_error(self, base_network, src_gids, target_gids, loc, receptor):
         """Tests TypeError when passing floats."""
-        net, _ = base_network
+        net, _ = deepcopy(base_network)
         match = "must be an instance of"
         with pytest.raises(TypeError, match=match):
             pick_connection(
@@ -2610,7 +2610,7 @@ class TestPickConnection:
     )
     def test_invalid_gids_int(self, base_network, src_gids, target_gids):
         """Tests AssertionError when passing negative ints."""
-        net, _ = base_network
+        net, _ = deepcopy(base_network)
         match = "not in net.gid_ranges"
         with pytest.raises(AssertionError, match=match):
             pick_connection(net, src_gids=src_gids, target_gids=target_gids)
@@ -2618,7 +2618,7 @@ class TestPickConnection:
     @pytest.mark.parametrize("arg_name", ["src_gids", "target_gids", "loc", "receptor"])
     def test_invalid_str(self, base_network, arg_name):
         """Tests ValueError raises when passing unrecognized string."""
-        net, _ = base_network
+        net, _ = deepcopy(base_network)
         match = f"Invalid value for the '{arg_name}' parameter"
         with pytest.raises(ValueError, match=match):
             kwargs = {"net": net, f"{arg_name}": "invalid_string"}
@@ -2637,7 +2637,7 @@ class TestPickConnection:
 
         Only searches for drive connectivity should have results.
         """
-        _, param = base_network
+        _, param = deepcopy(base_network)
         net = Network(param, add_drives_from_params=True)
         indices = pick_connection(net, src_gids=src_gids, target_gids=target_gids)
         assert len(indices) == expected
@@ -2645,7 +2645,7 @@ class TestPickConnection:
 
 def test_rename_cell_types(base_network, fix_load_featureful_tmp_path):
     """Tests renaming cell function"""
-    net1, params = base_network
+    net1, params = deepcopy(base_network)
 
     # Add MORE arbitrary drives to force spiking
     net1.add_evoked_drive(
