@@ -405,10 +405,10 @@ def get_L5PyrET_params():
         "L5Pyr_soma_L": 39.0,
         "L5Pyr_soma_diam": 28.9,
         "L5Pyr_soma_cm": 1,
-        "L5Pyr_soma_Ra": 100,  
+        "L5Pyr_soma_Ra": 100,
         # Dendrite
         "L5Pyr_dend_cm": 1,
-        "L5Pyr_dend_Ra": 100, 
+        "L5Pyr_dend_Ra": 100,
         "L5Pyr_apicaltrunk_L": 102.0,
         "L5Pyr_apicaltrunk_diam": 10.2,
         "L5Pyr_apical1_L": 680.0,
@@ -455,7 +455,7 @@ def get_L5PyrET_params():
         "L5Pyr_soma_g_pas": 8.45e-06,
         "L5Pyr_soma_e_pas": -90,
         "L5Pyr_soma_decay_CaDynamics_E2_hay2011": 460,
-        "L5Pyr_soma_gamma_CaDynamics_E2_hay2011": 0.000501,  
+        "L5Pyr_soma_gamma_CaDynamics_E2_hay2011": 0.000501,
         # Biophysics basal
         "L5Pyr_basal_gbar_NaTs2_t_hay2011": 0.0102,
         "L5Pyr_basal_gbar_SKv3_1_hay2011": 0.0001305,
