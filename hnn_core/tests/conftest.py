@@ -482,7 +482,7 @@ def fix_run_simulation():
         record_ca=False,
         postproc=False,
         verbose=True,
-        baseline_correction=False,
+        baseline_correction=True,
         backend=None,
         n_procs=None,
         n_jobs=1,

@@ -387,9 +387,7 @@ class TestParallelBackends:
 
         # TODO AES: CURRENTLY NEEDS LEGACY MODE
         net, _ = fix_net_neymotin_2020(legacy_mode=True, add_drives_from_params=True)
-        dpls, net = fix_run_simulation(
-            net, tstop=170, backend=backend, baseline_correction=True
-        )
+        dpls, net = fix_run_simulation(net, tstop=170, backend=backend)
         dpl = dpls[0].smooth(30).scale(3000)
 
         # write the dipole to a file and compare
