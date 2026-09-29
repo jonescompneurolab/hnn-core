@@ -79,7 +79,7 @@ def pytest_runtest_setup(item):
                 pytest.xfail("previous test failed ({})".format(test_name))
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def fix_net_duecker_ET():
     """Test fixture for the Duecker ET model network.
 
@@ -218,7 +218,7 @@ def fix_net_duecker_ET():
     return _fix_net_duecker_ET
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def fix_net_neymotin_2020():
     """Test fixture for the Neymotin 2020 model network.
 
@@ -383,7 +383,7 @@ def fix_load_featureful_tmp_path(tmp_path_factory, fix_net_neymotin_2020):
     return net_path
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def fix_net_calcium():
     """Test fixture for the "Calcium" model network.
 
@@ -427,7 +427,7 @@ def fix_net_calcium():
     return _fix_net_calcium
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def fix_net_law_2021():
     """Test fixture for the "Law" model network.
 
@@ -545,7 +545,7 @@ def fix_run_simulation():
     return _fix_run_simulation
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def _base_simulation_cached():
     """Adds bursty drives and simulates once per network model and variation"""
     cache = {}
