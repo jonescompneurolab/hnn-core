@@ -83,8 +83,58 @@ def pytest_runtest_setup(item):
 def fix_net_duecker_ET():
     """Test fixture for the Duecker ET model network.
 
-    Note that the argument `legacy_mode` is unused, since it is only present for API
-    equality with `fix_net_neymotin_2020`.
+    Returns a factory function rather than a network, so that each call builds a
+    new, independent ``Network``. To use this fixture, you must do three things:
+
+    1. Add both the built-in ``request`` fixture along with this fixture to your test
+      function's arguments, e.g. ``def test_my_test(fix_net_duecker_ET, request):``.
+      Note that you can use ``@pytest.mark.parametrize`` to iterate between this fixture
+      and other network model fixtures.
+
+    2. Create the callable network function by requesting the factory fixture's value,
+      e.g. ``net_model = request.getfixturevalue(fix_net_duecker_ET)`` (this does NOT
+      create the actual network, it only creates the function to create the network).
+
+    3. Finally, use your new callable to create the network, using the Parameters
+      described below, e.g. ``net, inh_name = net_model(add_drives_from_params=True,
+      reduced=True)``.
+
+    There are many examples of this pattern in the tests, so if you are unsure,
+
+    Parameters
+    ----------
+    add_drives_from_params : bool
+        If True, add three evoked drives (``evprox1``, ``evdist1``, and
+        ``evprox2``) that mirror the default ERP drives. Default is False.
+    legacy_mode : bool
+        Unused. Only present for API equality with ``fix_net_neymotin_2020``, so
+        that both fixtures can be called interchangeably in parametrized tests.
+    mesh_shape : tuple of int | None
+        Shape of the cell grid. If None and ``reduced`` is False, ``(10, 10)`` is
+        used. Cannot be combined with ``reduced=True``.
+    reduced : bool
+        If True, use a small ``(3, 3)`` mesh and shift the evoked drive times
+        earlier (``evprox1``: 5 ms, ``evdist1``: 10 ms, ``evprox2``: 20 ms) so
+        they fit within the shorter simulations typically used with a reduced
+        network. Otherwise the drive times are 18, 62, and 100 ms. Default is
+        False.
+    electrode_array : dict | None
+        Mapping of electrode array name to its list of positions, each passed
+        to ``net.add_electrode_array``. Default is None.
+
+    Returns
+    -------
+    net : Network
+        The Duecker ET model network.
+    inh_name : str
+        Name suffix of the inhibitory cell types, either ``"basket"`` or
+        ``"inhibitory"``, to account for naming differences between model
+        versions.
+
+    Raises
+    ------
+    ValueError
+        If both ``reduced=True`` and ``mesh_shape`` are given.
     """
 
     def _fix_net_duecker_ET(
@@ -606,7 +656,7 @@ def _base_simulation_cached():
     ids=lambda param: f"{param[0]}-{param[1]}",
 )
 def fix_use_cached_sims(_base_simulation_cached, request):
-    """Copy of the cached simulation, for both the spiking and non-spiking variations
+    """Copy of the cached simulation, for both the spiking and non-spiking viz tests
 
     Returns ``(net, dpls, inh_name, variation)``, where ``variation`` is either
     ``"yes_spikes"`` or ``"no_spikes"``.

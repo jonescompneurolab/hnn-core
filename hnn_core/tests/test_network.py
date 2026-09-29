@@ -40,7 +40,7 @@ hnn_core_root = Path(hnn_core.__file__).parent
 
 @pytest.fixture(scope="module")
 def base_network(fix_default_params):
-    """Base Network with connections and drives"""
+    """Base Network object with connections and drives (no network models)"""
     params = deepcopy(fix_default_params)
     net = Network(params, legacy_mode=False)
     # add some basic local network connectivity
