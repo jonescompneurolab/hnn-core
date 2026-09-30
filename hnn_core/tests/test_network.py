@@ -619,11 +619,13 @@ def test_model_variant_matches_network(fix_default_params):
 )
 def test_network_models_cell_params(network_model, short_inh_name, fix_default_params):
     """Test that the network models check the cell types defined in params"""
-    default_params = fix_default_params
     mesh_shape = (3, 3)
 
     if network_model == duecker_ET_model:
-        default_params.update({"model_variant": "duecker_ET_model"})
+        duecker_params_fname = hnn_core_root / "param" / "default_duecker_ET.json"
+        default_params = read_params(duecker_params_fname)
+    else:
+        default_params = fix_default_params
 
     # law_2021_model and calcium_model inherit the check from the
     # neymotin_2020_model network they are built on
@@ -1134,6 +1136,7 @@ def test_network_drives(fix_default_params, fix_net_model, request):
     if net._model_variant != "duecker_ET_model":
         for p in params:
             assert len(params) == len(net._params)
+            assert params[p] == net._params[p]
     print(network_builder)
     print(network_builder._cells[:2])
 

@@ -672,7 +672,7 @@ def test_network_visualization(fix_net_model, request):
 
     # test interactive clicking updates the position of src_cell in plot
     del net.connectivity[-1]
-    conn_idx = 15
+    conn_idx = len(net.connectivity) - 1
     net.add_connection(
         net.gid_ranges["L2_pyramidal"][::2],
         f"L5_{inh_name}",
