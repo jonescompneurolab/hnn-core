@@ -56,7 +56,6 @@ def _get_dends(
     cell_type,
     section_names,
     v_init={"all": -65},
-    is_basal_specific=False,
 ):
     """Create dendritic Section objects from flat parameter dictionary.
 
@@ -89,11 +88,6 @@ def _get_dends(
         Initial membrane potential in mV. If dict contains single key "all", that value
         is applied to all sections. Otherwise, keys must match 'section_names' for
         section-specific initialization.
-    is_basal_specific : bool, default=False
-        Flag indicating whether or not to use the (Duecker 2025) model's custom basal
-        dendrite parameters. If True, this will read the 'Ra' and 'cm' parameters from
-        'params' using '{cell_type}_basal_{property}' instead of the default
-        '{cell_type}_dend_{property}' naming scheme.
 
     Returns
     -------
@@ -103,14 +97,11 @@ def _get_dends(
 
     Notes
     -----
-    - KD: This function is where the initial voltages for the dendritic sections are
-      set; these voltages are not overridden by `h.finitialize` unless called with a
+    - This function sets the initial voltages for all sections;
+      these voltages are not overridden by `h.finitialize` unless called with a
       value, e.g. `h.finitialize(-65)`.
     - The 'v0' (initial voltage) parameter is handled separately from other properties
       as it is a newer addition not found in legacy parameter files.
-    - In the (Neymotin et al., 2020) model, this is used to construct both apical and
-      basal dendrite sections. In the newer Duecker model, this is only used for the
-      apical dendrite sections (excluding apical_oblique).
     """
     prop_names = ["L", "diam", "Ra", "cm"]
     sections = dict()
@@ -118,10 +109,7 @@ def _get_dends(
         dend_prop = dict()
         for key in prop_names:
             if key in ["Ra", "cm"]:
-                if is_basal_specific:
-                    middle = "basal"
-                else:
-                    middle = "dend"
+                middle = "dend"
             else:
                 # map apicaltrunk -> apical_trunk etc.
                 middle = section_name.replace("_", "")
@@ -188,81 +176,6 @@ def _get_pyr_soma(params, cell_type, v_init=-65):
         Ra=params[f"{cell_type}_soma_Ra"],
         v0=v_init,
     )
-
-
-def _get_basal(params, cell_type, section_names, v_init={"all": -65}):
-    """Create Duecker-only basal and apical_oblique dendritic Section objects.
-
-    Extracts geometric and electrical properties (length, diameter, axial resistance,
-    membrane capacitance) from a flat parameter dictionary, takes initial membrane
-    voltage from an argument, and constructs Section objects for each basal dendritic
-    compartment. Handles parameter key name transformations (e.g., 'apical_oblique' ->
-    'apicaloblique') required for lookup in the parameter dictionary.
-
-    *Importantly*, "Section objects" in this context are objects of the class
-    `hnn_core/cell.py::Section`, NOT the "true" NEURON sections. The "true" NEURON
-    sections are only created later, immediately before a simulation is run, using
-    `NetworkBuilder._build`.
-
-    Parameters
-    ----------
-    params : dict
-        Flat dictionary containing cell parameters with keys formatted as
-        '{cell_type}_{section}_{property}' (e.g., 'L5Pyr_apicaltrunk_L'). 'Ra' and 'cm'
-        use "dend" as the middle component rather than specific section names. This
-        'params' dictionary is expected to be constructed using
-        functions like `params_default.py::get_L2Pyr_params_default`.
-    cell_type : {'L2Pyr', 'L5Pyr'}
-        Cell type identifier used as prefix in parameter key lookups.
-    section_names : list of str
-        Names of dendritic sections to create (e.g., ["basal_1", "basal_2", "basal_3",
-        "apical_oblique"]). Underscores are removed for parameter lookups except for
-        'Ra' and 'cm'.
-    v_init : dict, default={"all": -65}
-        Initial membrane potential in mV. If dict contains single key "all", that value
-        is applied to all sections. Otherwise, keys must match 'section_names' for
-        section-specific initialization.
-
-    Returns
-    -------
-    sections : dict
-        Dictionary mapping section names (str) to Section objects with attributes 'L',
-        'diam', 'Ra', and 'cm' set from 'params', and 'v0' set from argument.
-
-    Notes
-    -----
-    - KD: This function is where the initial voltages for the dendritic sections are
-      set; these voltages are not overridden by `h.finitialize` unless called with a
-      value, e.g. `h.finitialize(-65)`.
-    - The 'v0' (initial voltage) parameter is handled separately from other properties
-      as it is a newer addition not found in legacy parameter files.
-    - This is not used in the (Neymotin et al., 2020) model. In the newer Duecker model,
-      this is only used for the basal dendrite and "apical_oblique" dendrite sections.
-    """
-    prop_names = ["L", "diam", "Ra", "cm"]
-    sections = dict()
-    for section_name in section_names:
-        dend_prop = dict()
-        middle = section_name.replace("_", "")
-        for key in prop_names:
-            if key in ["Ra", "cm"]:
-                middle = "basal"
-            else:
-                # map apicaltrunk -> apical_trunk etc.
-                middle = section_name.replace("_", "")
-            dend_prop[key] = params[f"{cell_type}_{middle}_{key}"]
-            if len(v_init) == 1:
-                dend_prop["v0"] = v_init["all"]
-            else:
-                dend_prop["v0"] = v_init[section_name]
-        sections[section_name] = Section(
-            L=dend_prop["L"],
-            diam=dend_prop["diam"],
-            Ra=dend_prop["Ra"],
-            cm=dend_prop["cm"],
-            v0=dend_prop["v0"],
-        )
-    return sections
 
 
 def _get_pyr_soma(p_all, cell_type, v_init=-65):
@@ -1051,20 +964,12 @@ def pyramidal_humanL5ET(cell_name, pos=(0, 0, 0), gid=None):
         "soma": -71.54401603093514,
     }
 
-    sections_apcl = _get_dends(
+    sections = _get_dends(
         p_all,
         "L5Pyr",
-        section_names=["apical_trunk", "apical_1", "apical_2", "apical_tuft"],
+        section_names=section_names,
         v_init=v_init,
     )
-    sections_basal = _get_basal(
-        p_all,
-        "L5Pyr",
-        section_names=["basal_1", "basal_2", "basal_3", "apical_oblique"],
-        v_init=v_init,
-    )
-
-    sections = {**sections_apcl, **sections_basal}
 
     sections["soma"] = _get_pyr_soma(p_all, "L5Pyr", v_init=v_init["soma"])
 
