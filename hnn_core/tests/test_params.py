@@ -1,7 +1,6 @@
 # Authors: Mainak Jas <mainakjas@gmail.com>
 #          Blake Caldwell <blake_caldwell@brown.edu>
 
-from copy import deepcopy
 import json
 from pathlib import Path
 from urllib.request import urlretrieve
@@ -19,7 +18,7 @@ hnn_core_root = Path(hnn_core.__file__).parent
 
 def test_read_params(fix_default_params):
     """Test reading of params object."""
-    params = deepcopy(fix_default_params)
+    params = fix_default_params
     # Smoke test that network loads params
     _ = neymotin_2020_model(params, add_drives_from_params=True, legacy_mode=False)
     _ = neymotin_2020_model(params, add_drives_from_params=True, legacy_mode=True)

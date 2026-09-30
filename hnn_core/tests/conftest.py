@@ -669,8 +669,17 @@ def fix_use_cached_sims(_base_simulation_cached, request):
     return net, dpls, inh_name, variation
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def fix_default_params():
-    """Return the loaded default "flat JSON" parameters for the Neymotin 2020 (aka Jones 2009) model."""
+    """Default "flat JSON" parameters for the Neymotin 2020 (aka Jones 2009) model.
+
+    Loads ``hnn_core/param/default.json`` with ``read_params``, freshly for every test,
+    so tests are free to modify the returned object.
+
+    Returns
+    -------
+    params : Params object
+        The default parameters, as read from ``default.json``.
+    """
     params_fname = hnn_core_root / "param" / "default.json"
     return read_params(params_fname)
