@@ -81,55 +81,103 @@ def pytest_runtest_setup(item):
 
 @pytest.fixture(scope="session")
 def fix_net_duecker_ET():
-    """Test fixture for the Duecker ET model network.
+    """Network fixture for tests of the Duecker ET model network (``duecker_ET_model``).
 
-    Returns a factory function rather than a network, so that each call builds a
-    new, independent ``Network``. To use this fixture, you must do three things:
+    You can use this and other network fixtures in one of two ways. All network fixtures
+    can be used in the following ways:
 
-    1. Add both the built-in ``request`` fixture along with this fixture to your test
-      function's arguments, e.g. ``def test_my_test(fix_net_duecker_ET, request):``.
-      Note that you can use ``@pytest.mark.parametrize`` to iterate between this fixture
-      and other network model fixtures.
+    1. If you only want to use this network, and do not want to parametrize the test
+    across multiple network models, then you can use this like a fixture that accepts
+    arguments. For example, in ``test_dipole.py::test_dipole_simulation``, you include
+    the fixture in the test's arguments:
 
-    2. Create the callable network function by requesting the factory fixture's value,
-      e.g. ``net_model = request.getfixturevalue(fix_net_duecker_ET)`` (this does NOT
-      create the actual network, it only creates the function to create the network).
+    ```
+    def test_dipole_simulation(fix_net_neymotin_2020, fix_default_params):
+    ```
 
-    3. Finally, use your new callable to create the network, using the Parameters
-      described below, e.g. ``net, inh_name = net_model(add_drives_from_params=True,
-      reduced=True)``.
+    and then use the fixture similarly to a regular network models function:
 
-    There are many examples of this pattern in the tests, so if you are unsure,
+    ```
+    net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+    ```
+
+    2. If you want to use this network fixture while parametrizing a test to use other
+    network fixtures as well, such as in
+    ``test_extracellular.py::test_transmembrane_currents``, then you have to do four
+    separate things:
+
+    2.1. Add this fixture as an entry to the ``@pytest.mark.parametrize`` decorator such
+    that this network fixture is a value in the list of values given to the "parameter"
+    variable. For example:
+
+    ```
+    @pytest.mark.parametrize(
+        "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+    )
+    ```
+
+    In the above, ``fix_net_model`` will be a variable that you pass to the argument list
+    of the test, and the entries in the list are the values that that parameter will
+    take, as the test is re-run once per parameter set.
+
+    2.2. Add both the built-in ``request`` fixture along with the above "parameter"
+    variable to your test function's arguments, e.g.
+
+    ```
+    def test_transmembrane_currents(fix_net_model, request):
+    ```
+
+    2.2. Create the callable network function by requesting the factory fixture's value,
+    e.g.
+    ```
+    net_model = request.getfixturevalue(fix_net_model)
+    ```
+
+    (Note that this does NOT create the actual network, it only creates the
+    *function/callable* to create the network).
+
+    2.3. Finally, use your new callable to create the network, using the Parameters
+    described below, e.g.
+
+    ```
+    net, inh_name = net_model(add_drives_from_params=True, reduced=True)
+    ```
+
+    This is what actually deploys the appropriate fixture and builds your model, using
+    the arguments provided below.
+
+    There are many examples of this pattern in the tests, so if you are unsure how to
+    use this, see existing tests.
 
     Parameters
     ----------
-    add_drives_from_params : bool
-        If True, add three evoked drives (``evprox1``, ``evdist1``, and
-        ``evprox2``) that mirror the default ERP drives. Default is False.
-    legacy_mode : bool
-        Unused. Only present for API equality with ``fix_net_neymotin_2020``, so
-        that both fixtures can be called interchangeably in parametrized tests.
-    mesh_shape : tuple of int | None
-        Shape of the cell grid. If None and ``reduced`` is False, ``(10, 10)`` is
-        used. Cannot be combined with ``reduced=True``.
-    reduced : bool
-        If True, use a small ``(3, 3)`` mesh and shift the evoked drive times
-        earlier (``evprox1``: 5 ms, ``evdist1``: 10 ms, ``evprox2``: 20 ms) so
-        they fit within the shorter simulations typically used with a reduced
-        network. Otherwise the drive times are 18, 62, and 100 ms. Default is
-        False.
-    electrode_array : dict | None
-        Mapping of electrode array name to its list of positions, each passed
-        to ``net.add_electrode_array``. Default is None.
+    add_drives_from_params : bool, default=False
+        If True, add three evoked drives (``evprox1``, ``evdist1``, and ``evprox2``)
+        that mirror the default ERP drives of ``neymotin_2020_model``, except that the
+        cell type names have been updated to match the Duecker model.
+    legacy_mode : bool, default=False
+        Unused. Only present for API equality with other network fixtures, so that all
+        fixtures can be called interchangeably in parametrized tests.
+    mesh_shape : tuple of int | None, default=None
+        Shape of the cell grid. If None (default), a ``mesh_shape`` of ``(10, 10)`` is
+        used. Incompatible with ``reduced=True``.
+    reduced : bool, default=False
+        If True, use a small ``(3, 3)`` mesh and shift the evoked drive times earlier
+        (``evprox1``: 5 ms, ``evdist1``: 10 ms, ``evprox2``: 20 ms) so they fit within
+        the shorter simulations typically used with a reduced network. (Otherwise the
+        drive times are 18, 62, and 100 ms). Incompatible with ``mesh_shape`` of value
+        other than None.
+    electrode_array : dict | None, default=None
+        Mapping of electrode array names to their lists of positions, each passed
+        to ``net.add_electrode_array``.
 
     Returns
     -------
-    net : Network
+    net : Network object
         The Duecker ET model network.
-    inh_name : str
-        Name suffix of the inhibitory cell types, either ``"basket"`` or
-        ``"inhibitory"``, to account for naming differences between model
-        versions.
+    inh_name : "inhibitory"
+        Name suffix of the inhibitory cell types, which is ``"inhibitory"`` for the
+        Duecker model. Used to account for naming differences between model versions.
 
     Raises
     ------
@@ -148,6 +196,9 @@ def fix_net_duecker_ET():
             raise ValueError(
                 "Cannot specify both `reduced=True` and `mesh_shape` argument."
             )
+
+        # Account for Duecker name variations
+        inh_name = "inhibitory"
 
         if reduced:
             mesh_shape = (3, 3)
@@ -260,9 +311,6 @@ def fix_net_duecker_ET():
             for name, positions in electrode_array.items():
                 net.add_electrode_array(name, positions)
 
-        # Account for Duecker name variations
-        inh_name = "basket" if "L2_basket" in net.cell_types else "inhibitory"
-
         return net, inh_name
 
     return _fix_net_duecker_ET
@@ -270,9 +318,121 @@ def fix_net_duecker_ET():
 
 @pytest.fixture(scope="session")
 def fix_net_neymotin_2020():
-    """Test fixture for the Neymotin 2020 model network.
+    """Network fixture for tests of the Neymotin 2020 model network (``neymotin_2020_model``).
 
-    TODO Docstring coming soon! UNDER CONSTRUCTION <construction-beaver.gif>
+    You can use this and other network fixtures in one of two ways. All network fixtures
+    can be used in the following ways:
+
+    1. If you only want to use this network, and do not want to parametrize the test
+    across multiple network models, then you can use this like a fixture that accepts
+    arguments. For example, in ``test_dipole.py::test_dipole_simulation``, you include
+    the fixture in the test's arguments:
+
+    ```
+    def test_dipole_simulation(fix_net_neymotin_2020, fix_default_params):
+    ```
+
+    and then use the fixture similarly to a regular network models function:
+
+    ```
+    net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+    ```
+
+    2. If you want to use this network fixture while parametrizing a test to use other
+    network fixtures as well, such as in
+    ``test_extracellular.py::test_transmembrane_currents``, then you have to do four
+    separate things:
+
+    2.1. Add this fixture as an entry to the ``@pytest.mark.parametrize`` decorator such
+    that this network fixture is a value in the list of values given to the "parameter"
+    variable. For example:
+
+    ```
+    @pytest.mark.parametrize(
+        "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+    )
+    ```
+
+    In the above, ``fix_net_model`` will be a variable that you pass to the argument list
+    of the test, and the entries in the list are the values that that parameter will
+    take, as the test is re-run once per parameter set.
+
+    2.2. Add both the built-in ``request`` fixture along with the above "parameter"
+    variable to your test function's arguments, e.g.
+
+    ```
+    def test_transmembrane_currents(fix_net_model, request):
+    ```
+
+    2.2. Create the callable network function by requesting the factory fixture's value,
+    e.g.
+    ```
+    net_model = request.getfixturevalue(fix_net_model)
+    ```
+
+    (Note that this does NOT create the actual network, it only creates the
+    *function/callable* to create the network).
+
+    2.3. Finally, use your new callable to create the network, using the Parameters
+    described below, e.g.
+
+    ```
+    net, inh_name = net_model(add_drives_from_params=True, reduced=True)
+    ```
+
+    This is what actually deploys the appropriate fixture and builds your model, using
+    the arguments provided below.
+
+    There are many examples of this pattern in the tests, so if you are unsure how to
+    use this, see existing tests.
+
+    Parameters
+    ----------
+    add_drives_from_params : bool, default=False
+        If True, pass ``add_drives_from_params=True`` to the ``neymotin_2020_model``
+        call in order to add the three canonical evoked drives (``evprox1``,
+        ``evdist1``, and ``evprox2``). Incompatible with
+        ``featureful_reduced_network=True``.
+    legacy_mode : bool, default=False
+        If True, pass ``add_drives_from_params=True`` to the ``neymotin_2020_model``
+        call for testing deprecated legacy behavior. Incompatible with
+        ``featureful_reduced_network=True``.
+    mesh_shape : tuple of int | None, default=None
+        Shape of the cell grid. If None (default), a ``mesh_shape`` of ``(10, 10)`` is
+        used. Incompatible with ``reduced=True`` or ``featureful_reduced_network=True``.
+    reduced : bool, default=False
+        If True, use a small ``(3, 3)`` mesh and shift the evoked drive times earlier
+        (``evprox1``: 5 ms, ``evdist1``: 10 ms, ``evprox2``: 20 ms) so they fit within
+        the shorter simulations typically used with a reduced network. (Otherwise the
+        drive times are 18, 62, and 100 ms). Incompatible with ``mesh_shape`` of value
+        other than None or ``featureful_reduced_network=True``.
+    electrode_array : dict | None, default=None
+        Mapping of electrode array names to their lists of positions, each passed
+        to ``net.add_electrode_array``. Incompatible with
+        ``featureful_reduced_network=True``.
+    featureful_reduced_network : bool, default=False
+        Incompatible with all other arguments. If True, use a ``reduced`` network with a
+        small ``(3, 3)`` mesh, ``add_drives_from_params=True``, a bias, multiple
+        electrode arrays, and a bursty and Poisson drive. This is called "featureful"
+        because it includes all types of Network features, in order to test that all
+        features are correctly serialized, written, deserialized, and loaded, including
+        via both the API and the GUI. This is identical to the network that was formerly
+        stored at ``hnn_core/tests/assets/neymotin2020_3x3_drives.json``.
+
+    Returns
+    -------
+    net : Network object
+        The Neymotin 2020 model network.
+    inh_name : "basket"
+        Name suffix of the inhibitory cell types, which is ``"basket"`` for the
+        non-Duecker models.
+
+    Raises
+    ------
+    ValueError
+        If both ``reduced=True`` and ``mesh_shape`` are given.
+    ValueError
+        If ``featureful_reduced_network=True`` is given along with any other argument.
     """
 
     def _fix_net_neymotin_2020(
@@ -283,17 +443,23 @@ def fix_net_neymotin_2020():
         electrode_array=None,
         featureful_reduced_network=False,
     ):
-        # default params
-        params_fname = hnn_core_root / "param" / "default.json"
-        params = read_params(params_fname)
-
         if featureful_reduced_network and (
-            legacy_mode or reduced or electrode_array is not None
+            add_drives_from_params
+            or legacy_mode
+            or (mesh_shape is not None)
+            or reduced
+            or (electrode_array is not None)
         ):
             raise ValueError(
                 "featureful_reduced_network cannot be used with legacy_mode, reduced, "
                 "or electrode_array arguments."
             )
+
+        # default params
+        params_fname = hnn_core_root / "param" / "default.json"
+        params = read_params(params_fname)
+        # Account for Duecker name variations
+        inh_name = "basket"
 
         if not featureful_reduced_network:
             if reduced and mesh_shape:
@@ -414,9 +580,6 @@ def fix_net_neymotin_2020():
             electrode_pos = [(1, 2, 3), (-1, -2, -3)]
             net.add_electrode_array("arr1", electrode_pos)
 
-        # Account for Duecker name variations
-        inh_name = "basket" if "L2_basket" in net.cell_types else "inhibitory"
-
         return net, inh_name
 
     return _fix_net_neymotin_2020
@@ -424,7 +587,31 @@ def fix_net_neymotin_2020():
 
 @pytest.fixture(scope="module")
 def fix_load_featureful_tmp_path(tmp_path_factory, fix_net_neymotin_2020):
-    """Load the featureful reduced Neymotin 2020 network from the fixture."""
+    """Save a "featureful" Neymotin 2020 network fixture to file, and return the path.
+
+    This is used to test that the network can be serialized and deserialized correctly by saving a copy of
+
+    ```
+    fix_net_neymotin_2020(featureful_reduced_network=True)
+    ```
+
+    to a temporary file and returning the path to that file. The temporary file is
+    deleted after the test session ends. This allows both the GUI and API to test
+    loading the network from file, but without having to carry around a permanent copy
+    of the network. This functionality replaces the previously stored network at
+    ``hnn_core/tests/assets/neymotin2020_3x3_drives.json``.
+
+    Parameters
+    ----------
+    This takes no user-provided arguments, and instead requires only other fixtures that
+    are automatically provided via the argument list.
+
+    Returns
+    -------
+    net_path : Path
+        Path to the temporary file containing the serialized "featureful" Neymotin 2020
+        network.
+    """
     net, _ = fix_net_neymotin_2020(featureful_reduced_network=True)
     net_path = (
         tmp_path_factory.mktemp("network") / "neymotin_2020_featureful_reduced.json"
@@ -435,9 +622,106 @@ def fix_load_featureful_tmp_path(tmp_path_factory, fix_net_neymotin_2020):
 
 @pytest.fixture(scope="session")
 def fix_net_calcium():
-    """Test fixture for the "Calcium" model network.
+    """Network fixture for tests of the "Calcium" model network (``calcium_model``).
 
-    TODO Docstring coming soon! UNDER CONSTRUCTION <construction-beaver.gif>
+    You can use this and other network fixtures in one of two ways. All network fixtures
+    can be used in the following ways:
+
+    1. If you only want to use this network, and do not want to parametrize the test
+    across multiple network models, then you can use this like a fixture that accepts
+    arguments. For example, in ``test_dipole.py::test_dipole_simulation``, you include
+    the fixture in the test's arguments:
+
+    ```
+    def test_dipole_simulation(fix_net_neymotin_2020, fix_default_params):
+    ```
+
+    and then use the fixture similarly to a regular network models function:
+
+    ```
+    net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+    ```
+
+    2. If you want to use this network fixture while parametrizing a test to use other
+    network fixtures as well, such as in
+    ``test_extracellular.py::test_transmembrane_currents``, then you have to do four
+    separate things:
+
+    2.1. Add this fixture as an entry to the ``@pytest.mark.parametrize`` decorator such
+    that this network fixture is a value in the list of values given to the "parameter"
+    variable. For example:
+
+    ```
+    @pytest.mark.parametrize(
+        "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+    )
+    ```
+
+    In the above, ``fix_net_model`` will be a variable that you pass to the argument list
+    of the test, and the entries in the list are the values that that parameter will
+    take, as the test is re-run once per parameter set.
+
+    2.2. Add both the built-in ``request`` fixture along with the above "parameter"
+    variable to your test function's arguments, e.g.
+
+    ```
+    def test_transmembrane_currents(fix_net_model, request):
+    ```
+
+    2.2. Create the callable network function by requesting the factory fixture's value,
+    e.g.
+    ```
+    net_model = request.getfixturevalue(fix_net_model)
+    ```
+
+    (Note that this does NOT create the actual network, it only creates the
+    *function/callable* to create the network).
+
+    2.3. Finally, use your new callable to create the network, using the Parameters
+    described below, e.g.
+
+    ```
+    net, inh_name = net_model(add_drives_from_params=True, reduced=True)
+    ```
+
+    This is what actually deploys the appropriate fixture and builds your model, using
+    the arguments provided below.
+
+    There are many examples of this pattern in the tests, so if you are unsure how to
+    use this, see existing tests.
+
+    Parameters
+    ----------
+    add_drives_from_params : bool, default=False
+        If True, pass ``add_drives_from_params=True`` to the ``calcium_model`` call in
+        order to add the three canonical evoked drives (``evprox1``, ``evdist1``, and
+        ``evprox2``).
+    legacy_mode : bool, default=False
+        If True, pass ``add_drives_from_params=True`` to the ``calcium_model`` call for
+        testing deprecated legacy behavior.
+    mesh_shape : tuple of int | None, default=None
+        Shape of the cell grid. If None (default), a ``mesh_shape`` of ``(10, 10)`` is
+        used. Incompatible with ``reduced=True``.
+    reduced : bool, default=False
+        If True, use a small ``(3, 3)`` mesh. Incompatible with ``mesh_shape`` of value
+        other than None. Does not change the times of drives, unlike the Neymotin 2020
+        model fixture.
+    electrode_array : dict | None, default=None
+        Mapping of electrode array names to their lists of positions, each passed
+        to ``net.add_electrode_array``.
+
+    Returns
+    -------
+    net : Network object
+        The Calcium model network.
+    inh_name : "basket"
+        Name suffix of the inhibitory cell types, which is ``"basket"`` for the
+        non-Duecker models.
+
+    Raises
+    ------
+    ValueError
+        If both ``reduced=True`` and ``mesh_shape`` are given.
     """
 
     def _fix_net_calcium(
@@ -451,6 +735,8 @@ def fix_net_calcium():
             raise ValueError(
                 "Cannot specify both `reduced=True` and `mesh_shape` argument."
             )
+        # Account for Duecker name variations
+        inh_name = "basket"
 
         if reduced:
             mesh_shape = (3, 3)
@@ -469,9 +755,6 @@ def fix_net_calcium():
             for name, positions in electrode_array.items():
                 net.add_electrode_array(name, positions)
 
-        # Account for Duecker name variations
-        inh_name = "basket" if "L2_basket" in net.cell_types else "inhibitory"
-
         return net, inh_name
 
     return _fix_net_calcium
@@ -479,9 +762,106 @@ def fix_net_calcium():
 
 @pytest.fixture(scope="session")
 def fix_net_law_2021():
-    """Test fixture for the "Law" model network.
+    """Network fixture for tests of the "Law" model network (``law_2021_model``).
 
-    TODO Docstring coming soon! UNDER CONSTRUCTION <construction-beaver.gif>
+    You can use this and other network fixtures in one of two ways. All network fixtures
+    can be used in the following ways:
+
+    1. If you only want to use this network, and do not want to parametrize the test
+    across multiple network models, then you can use this like a fixture that accepts
+    arguments. For example, in ``test_dipole.py::test_dipole_simulation``, you include
+    the fixture in the test's arguments:
+
+    ```
+    def test_dipole_simulation(fix_net_neymotin_2020, fix_default_params):
+    ```
+
+    and then use the fixture similarly to a regular network models function:
+
+    ```
+    net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+    ```
+
+    2. If you want to use this network fixture while parametrizing a test to use other
+    network fixtures as well, such as in
+    ``test_extracellular.py::test_transmembrane_currents``, then you have to do four
+    separate things:
+
+    2.1. Add this fixture as an entry to the ``@pytest.mark.parametrize`` decorator such
+    that this network fixture is a value in the list of values given to the "parameter"
+    variable. For example:
+
+    ```
+    @pytest.mark.parametrize(
+        "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+    )
+    ```
+
+    In the above, ``fix_net_model`` will be a variable that you pass to the argument list
+    of the test, and the entries in the list are the values that that parameter will
+    take, as the test is re-run once per parameter set.
+
+    2.2. Add both the built-in ``request`` fixture along with the above "parameter"
+    variable to your test function's arguments, e.g.
+
+    ```
+    def test_transmembrane_currents(fix_net_model, request):
+    ```
+
+    2.2. Create the callable network function by requesting the factory fixture's value,
+    e.g.
+    ```
+    net_model = request.getfixturevalue(fix_net_model)
+    ```
+
+    (Note that this does NOT create the actual network, it only creates the
+    *function/callable* to create the network).
+
+    2.3. Finally, use your new callable to create the network, using the Parameters
+    described below, e.g.
+
+    ```
+    net, inh_name = net_model(add_drives_from_params=True, reduced=True)
+    ```
+
+    This is what actually deploys the appropriate fixture and builds your model, using
+    the arguments provided below.
+
+    There are many examples of this pattern in the tests, so if you are unsure how to
+    use this, see existing tests.
+
+    Parameters
+    ----------
+    add_drives_from_params : bool, default=False
+        If True, pass ``add_drives_from_params=True`` to the ``law_2021_model`` call in
+        order to add the three canonical evoked drives (``evprox1``, ``evdist1``, and
+        ``evprox2``).
+    legacy_mode : bool, default=False
+        If True, pass ``add_drives_from_params=True`` to the ``law_2021_model`` call for
+        testing deprecated legacy behavior.
+    mesh_shape : tuple of int | None, default=None
+        Shape of the cell grid. If None (default), a ``mesh_shape`` of ``(10, 10)`` is
+        used. Incompatible with ``reduced=True``.
+    reduced : bool, default=False
+        If True, use a small ``(3, 3)`` mesh. Incompatible with ``mesh_shape`` of value
+        other than None. Does not change the times of drives, unlike the Neymotin 2020
+        model fixture.
+    electrode_array : dict | None, default=None
+        Mapping of electrode array names to their lists of positions, each passed
+        to ``net.add_electrode_array``.
+
+    Returns
+    -------
+    net : Network object
+        The Law model network.
+    inh_name : "basket"
+        Name suffix of the inhibitory cell types, which is ``"basket"`` for the
+        non-Duecker models.
+
+    Raises
+    ------
+    ValueError
+        If both ``reduced=True`` and ``mesh_shape`` are given.
     """
 
     def _fix_net_law_2021(
@@ -496,6 +876,8 @@ def fix_net_law_2021():
                 "Cannot specify both `reduced=True` and `mesh_shape` argument."
             )
 
+        # Account for Duecker name variations
+        inh_name = "basket"
         if reduced:
             mesh_shape = (3, 3)
         elif mesh_shape is not None:
@@ -512,9 +894,6 @@ def fix_net_law_2021():
             for name, positions in electrode_array.items():
                 net.add_electrode_array(name, positions)
 
-        # Account for Duecker name variations
-        inh_name = "basket" if "L2_basket" in net.cell_types else "inhibitory"
-
         return net, inh_name
 
     return _fix_net_law_2021
@@ -522,6 +901,65 @@ def fix_net_law_2021():
 
 @pytest.fixture(scope="module")
 def fix_run_simulation():
+    """Factory fixture that simulates a network and runs basic sanity checks.
+
+    Include ``fix_run_simulation`` in your test's arguments, then call it on a network
+    (e.g. one created by a network fixture such as ``fix_net_neymotin_2020``):
+
+    ```
+    net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+    dpls, net = fix_run_simulation(net, tstop=40, backend="joblib", n_jobs=2)
+    ```
+
+    After simulating, this checks that the network is still picklable and that every
+    external drive has one set of events per simulated trial.
+
+    Future refactor: This isn't used very commonly, and may be better just using the raw
+    simulate code and backends in-place in the relevant tests, just to make this more
+    explicit.
+
+    Parameters
+    ----------
+    net : Network object
+        The network to simulate. It is modified in place by the simulation, and also
+        returned by this fixture.
+    tstop : float
+        The simulation stop time (ms).
+    dt : float, default=0.025
+        The integration time step (ms).
+    n_trials : int, default=2
+        The number of trials to simulate. Note that this differs from the default of
+        ``simulate_dipole`` in that it defaults to multiple trials!
+    record_vsec : 'all' | 'soma' | False, default=False
+        Passed to ``simulate_dipole``; which section voltages to record.
+    record_isec : 'all' | 'soma' | False, default=False
+        Passed to ``simulate_dipole``; which section synaptic currents to record.
+    record_ca : 'all' | 'soma' | False, default=False
+        Passed to ``simulate_dipole``; which section calcium concentrations to record.
+    postproc : bool, default=False
+        Passed to ``simulate_dipole`` (deprecated there); whether to apply smoothing
+        and scaling to the dipoles.
+    verbose : bool, default=True
+        Passed to ``simulate_dipole``.
+    baseline_correction : bool, default=True
+        Passed to ``simulate_dipole``.
+    backend : 'mpi' | 'joblib' | None, default=None
+        The parallel backend to simulate within. If ``'mpi'``, uses ``MPIBackend``
+        with ``n_procs`` and ``mpi_cmd="mpiexec"``. If ``'joblib'``, uses
+        ``JoblibBackend`` with ``n_jobs``. If None, no backend context is entered.
+    n_procs : int | None, default=None
+        The number of MPI processes. Only used when ``backend='mpi'``.
+    n_jobs : int, default=1
+        The number of Joblib jobs. Only used when ``backend='joblib'``.
+
+    Returns
+    -------
+    dpls : list of Dipole
+        The simulated dipoles, one per trial.
+    net : Network object
+        The simulated network (the same object passed in).
+    """
+
     def _fix_run_simulation(
         net,
         tstop,
@@ -597,7 +1035,51 @@ def fix_run_simulation():
 
 @pytest.fixture(scope="session")
 def _base_simulation_cached():
-    """Adds bursty drives and simulates once per network model and variation"""
+    """Private helper session-cached factory that simulates each network model and variation once.
+
+    This is a private helper fixture; tests should normally use ``fix_use_cached_sims``
+    instead of requesting this directly. This is currently only used in `test_viz.py`
+    where we're not interested in actually testing that simulation or data output
+    themselves are correct, but may be useful for other simulation variants elsewhere in
+    the tests for the future.
+
+    The returned callable builds a reduced (``reduced=True``) network from the given
+    network fixture, adds two bursty "beta" drives (``beta_prox`` at the proximal
+    location and ``beta_dist`` at the distal location), and simulates it with
+    ``tstop=100.0``, ``n_trials=2``, and ``record_vsec="all"``. The drives' AMPA
+    weights depend on the variation:
+
+    - ``"yes_spikes"``: weights strong enough that the pyramidal cells spike.
+    - ``"no_spikes"``: weights so weak that the pyramidal cells do not spike, for
+      testing code paths that must handle empty spike data.
+
+    Because simulations are expensive, each ``(net_model_name, variation)`` pair is only
+    simulated once per test session, and the result is stored in a cache. Every call
+    returns a deep copy of the cached result, so callers may freely modify the returned
+    network and dipoles without affecting other tests.
+
+    Parameters
+    ----------
+    net_model_name : str
+        Name of the network fixture, e.g. ``"fix_net_neymotin_2020"``. Used as part
+        of the cache key.
+    net_model : callable
+        The network fixture's callable (e.g. obtained via
+        ``request.getfixturevalue(net_model_name)``), which must accept
+        ``reduced=True`` and return ``(net, inh_name)``.
+    variation : "yes_spikes" | "no_spikes"
+        Which set of drive weights to use.
+
+    Returns
+    -------
+    net : Network object
+        A deep copy of the simulated network, including its ``cell_response``.
+    dpls : list of Dipole
+        A deep copy of the simulated dipoles, one per trial.
+    inh_name : str
+        Name suffix of the inhibitory cell types for this network model (e.g.
+        ``"basket"``).
+    """
     cache = {}
     # AMPA weights of the bursty drives for each variation
     variation_weights_ampa = {
@@ -656,10 +1138,56 @@ def _base_simulation_cached():
     ids=lambda param: f"{param[0]}-{param[1]}",
 )
 def fix_use_cached_sims(_base_simulation_cached, request):
-    """Copy of the cached simulation, for both the spiking and non-spiking viz tests
+    """Parametrized fixture providing a fresh copy of a cached, already-run simulation.
 
-    Returns ``(net, dpls, inh_name, variation)``, where ``variation`` is either
-    ``"yes_spikes"`` or ``"no_spikes"``.
+    This is intended for tests (such as those in ``test_viz.py``) that need a simulated
+    network with spiking results but do not care about testing how the simulation was
+    set up or executed. See ``_base_simulation_cached`` for the details of the
+    simulation.
+
+    By default, this fixture is parametrized over every combination of:
+
+    - network model: ``"fix_net_neymotin_2020"`` and ``"fix_net_duecker_ET"``
+    - variation: ``"yes_spikes"`` and ``"no_spikes"``
+
+    so any test that requests it is run once per combination (4 times in total). Each
+    combination is only simulated once per test session, and each test receives its
+    own deep copy, so tests may modify the returned objects.
+
+    To restrict a test to a subset of combinations, override the parameters using
+    "indirect parametrization" (aka ask AI for help), e.g.
+
+    ```
+    @pytest.mark.parametrize(
+        "fix_use_cached_sims",
+        [
+            (net_model_name, "yes_spikes")
+            for net_model_name in ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+        ],
+        ids=lambda param: f"{param[0]}-{param[1]}",
+        indirect=True,
+    )
+    def test_spikes_raster_dipole_overlay(self, fix_use_cached_sims):
+        net, dpls, _, _ = fix_use_cached_sims
+    ```
+
+    Parameters
+    ----------
+    This takes no user-provided arguments, and instead requires only other fixtures that
+    are automatically provided via the argument list.
+
+    Returns
+    -------
+    net : Network object
+        A copy of the simulated network, including its ``cell_response``.
+    dpls : list of Dipole
+        A copy of the simulated dipoles, one per trial.
+    inh_name : str
+        Name suffix of the inhibitory cell types for this network model (e.g.
+        ``"basket"``). Useful for building cell type names that work across models.
+    variation : "yes_spikes" | "no_spikes"
+        Which variation was simulated, so that tests can branch on whether spikes are
+        expected.
     """
     net_model_name, variation = request.param
     net_model = request.getfixturevalue(net_model_name)

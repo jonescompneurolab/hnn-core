@@ -40,7 +40,7 @@ hnn_core_root = Path(hnn_core.__file__).parent
 
 @pytest.fixture(scope="module")
 def base_network():
-    """Base Network object with connections and drives (no network models)"""
+    """Base Network object with connections and drives (NOT a "network model")"""
     # We can't use fix_default_params here because that is a function-scoped fixture,
     # but this one is module-scoped.
     params = read_params(hnn_core_root / "param" / "default.json")
