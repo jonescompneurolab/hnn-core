@@ -56,7 +56,6 @@ def _get_dends(
     cell_type,
     section_names,
     v_init={"all": -65},
-    is_basal_specific=False,
 ):
     """Create dendritic Section objects from flat parameter dictionary.
 
@@ -103,9 +102,6 @@ def _get_dends(
       value, e.g. `h.finitialize(-65)`.
     - The 'v0' (initial voltage) parameter is handled separately from other properties
       as it is a newer addition not found in legacy parameter files.
-    - In the (Neymotin et al., 2020) model, this is used to construct both apical and
-      basal dendrite sections. In the newer Duecker model, this is only used for the
-      apical dendrite sections (excluding apical_oblique).
     """
     prop_names = ["L", "diam", "Ra", "cm"]
     sections = dict()
