@@ -40,12 +40,11 @@ hnn_core_root = Path(hnn_core.__file__).parent
 params_fname = hnn_core_root / "param" / "default.json"
 
 
-@pytest.fixture(scope="class")
-def base_network():
-    """Base Network with connections and drives"""
+def _build_base_network(use_dataframe=False):
+    """Build the base network used by base_network / base_network parametrized"""
     params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
-    net = Network(params, legacy_mode=False)
+    net = Network(params, legacy_mode=False, use_dataframe=use_dataframe)
     # add some basic local network connectivity
     # layer2 Pyr -> layer2 Pyr
     # layer5 Pyr -> layer5 Pyr
@@ -113,6 +112,12 @@ def base_network():
     return net, params
 
 
+@pytest.fixture(scope="class")
+def base_network():
+    """Base Network with connections and drives"""
+    return _build_base_network(use_dataframe=False)
+
+
 def test_create_cell_coords():
     layer_dict = _create_cell_coords(
         n_pyr_x=3, n_pyr_y=3, z_coord=1307.4, inplane_distance=1.0
@@ -128,8 +133,9 @@ def test_create_cell_coords():
     assert len(layer_dict["L5_bottom"]) == 9
 
 
+@pytest.mark.parametrize("use_dataframe", [False, True])
 @pytest.mark.parametrize("mesh_shape", [(1, 1), (2, 2), (2, 3)])
-def test_custom_network_coords(mesh_shape):
+def test_custom_network_coords(mesh_shape, use_dataframe):
     params = read_params(params_fname)
 
     # network with custom cell types and positions (an irregular one)
@@ -178,11 +184,13 @@ def test_custom_network_coords(mesh_shape):
                 match="Zero distance between cells of type 'L2_pyramidal' in the Y",
             ):
                 custom_net = Network(
-                    params, pos_dict=custom_pos_dict, cell_types=custom_cell_types
+                    params, pos_dict=custom_pos_dict, cell_types=custom_cell_types,
+                    use_dataframe=use_dataframe,
                 )
     else:
         custom_net = Network(
-            params, pos_dict=custom_pos_dict, cell_types=custom_cell_types
+            params, pos_dict=custom_pos_dict, cell_types=custom_cell_types,
+            use_dataframe=use_dataframe,
         )
     assert "L2_pyramidal" in custom_net.cell_types
     assert "L5_pyramidal" in custom_net.cell_types
@@ -269,9 +277,12 @@ def test_custom_network_coords(mesh_shape):
         assert drive_name in custom_net.external_drives
 
     # Pick_connection check in custom_net
-    conn_indices = pick_connection(net=custom_net, src_gids="test_drive")
-    #dataframe
-    conn_indices_df = pick_connection_from_dataframe(net=custom_net, src_gids="test_drive")
+    if use_dataframe == False:
+        conn_indices = pick_connection(net=custom_net, src_gids="test_drive")
+    else:
+        conn_indices = pick_connection_from_dataframe(
+            net=custom_net, src_gids="test_drive"
+        )
     assert len(conn_indices) > 0
 
     # checking drives and check events
@@ -429,7 +440,8 @@ def test_custom_network_coords_validation():
     Network(params, pos_dict=custom_pos_dict, cell_types=custom_cell_types)
 
 
-def test_network_models():
+@pytest.mark.parametrize("use_dataframe", [False, True])
+def test_network_models(use_dataframe):
     """ "Test instantiations of the network object"""
     # Make sure critical biophysics for Law model are updated
     net_law = law_2021_model()
@@ -449,15 +461,15 @@ def test_network_models():
         )
 
     # Check add_default_erp()
-    net_default = neymotin_2020_model()
+    net_default = neymotin_2020_model(use_dataframe=use_dataframe)
     with pytest.raises(TypeError, match="net must be"):
         add_erp_drives_to_jones_model(net="invalid_input")
     with pytest.raises(TypeError, match="tstart must be"):
         add_erp_drives_to_jones_model(net=net_default, tstart="invalid_input")
-    n_conn = len(net_default.connectivity)
-    #df testing
-    n_conn_df = net_default.connectivity_df["conn_idx"].nunique()
-    
+    if use_dataframe == False:  
+        n_conn = len(net_default.connectivity)
+    else:
+        n_conn_df = net_default.connectivity_df["conn_idx"].nunique()
 
     for cell_name in ["L5_pyramidal", "L2_pyramidal"]:
         assert len(net_default.pos_dict[cell_name]) == 100
@@ -466,9 +478,10 @@ def test_network_models():
         assert drive_name in net_default.external_drives.keys()
     # 14 drive connections are added as follows: evdist1: 3 ampa + 3 nmda,
     # evprox1: 4 ampa, evprox2: 4 ampa
-    assert len(net_default.connectivity) == n_conn + 14
-    #df testing
-    assert net_default.connectivity_df["conn_idx"].nunique() == n_conn_df +14
+    if use_dataframe == False: 
+        assert len(net_default.connectivity) == n_conn + 14
+    else:
+        assert net_default.connectivity_df["conn_idx"].nunique() == n_conn_df + 14
 
     # Ensure distant dependent calcium gbar
     net_calcium = calcium_model()
@@ -935,12 +948,13 @@ def test_network_reset_to_original_cell_positions(model_name, mesh_shape):
         assert_allclose(np.array(drive_cell_pos), np.array(original_origin))
 
 
-def test_network_drives():
+@pytest.mark.parametrize("use_dataframe", [False, True])
+def test_network_drives(use_dataframe):
     """Test manipulation of drives in the network object."""
     with pytest.raises(TypeError, match="params must be an instance of dict"):
         Network("hello")
     params = read_params(params_fname)
-    net = neymotin_2020_model(params, legacy_mode=False)
+    net = neymotin_2020_model(params, legacy_mode=False, use_dataframe=use_dataframe)
 
     # add all drives explicitly and ensure that the expected number of drive
     # cells get instantiated for each case
@@ -1120,38 +1134,42 @@ def test_network_drives():
     # source gids by target type
     drive_src_list = list()
     for target_type in net.cell_types:
-        conn_idxs = pick_connection(net, src_gids="evprox1", target_gids=target_type)
-        src_set = set()
-        for conn_idx in conn_idxs:
-            src_set.update(net.connectivity[conn_idx]["src_gids"])
+        if use_dataframe == False: 
+            conn_idxs = pick_connection(net, src_gids="evprox1", target_gids=target_type)
+            src_set = set()
+            for conn_idx in conn_idxs:
+                src_set.update(net.connectivity[conn_idx]["src_gids"])
+        else:
+            conn_idxs = pick_connection_from_dataframe(
+                net, src_gids="evprox1", target_gids=target_type
+            )
+            src_set = set(
+                net.connectivity_df.loc[
+                    net.connectivity_df["conn_idx"].isin(conn_idxs), "src_gid"
+                ]
+            )
         drive_src_list.extend(sorted(src_set))
     assert np.array_equal(drive_src_list, sorted(drive_src_list))
-
-    drive_src_list_df = list()
-    for target_type in net.cell_types:
-        conn_idxs = pick_connection_from_dataframe(net, src_gids="evprox1", target_gids=target_type)
-        src_set = set(
-            net.connectivity_df.loc[
-                net.connectivity_df["conn_idx"].isin(conn_idxs), "src_gid"
-            ]
-        )
-        drive_src_list_df.extend(sorted(src_set))
-    assert np.array_equal(drive_src_list_df, sorted(drive_src_list_df))
-
-    # cross-check: list-based and dataframe-based pick_connection agree
-    assert drive_src_list == drive_src_list_df
 
     # Check drive dict structure for each external drive
     for drive_idx, drive in enumerate(net.external_drives.values()):
         # Check that connectivity sources correspond to gid_ranges
-        conn_idxs = pick_connection(net, src_gids=drive["name"])
-        this_src_gids = set(
-            [
-                gid
-                for conn_idx in conn_idxs
-                for gid in net.connectivity[conn_idx]["src_gids"]
-            ]
-        )  # NB set: globals
+        if use_dataframe == False:  
+            conn_idxs = pick_connection(net, src_gids=drive["name"])
+            this_src_gids = set(
+                [
+                    gid
+                    for conn_idx in conn_idxs
+                    for gid in net.connectivity[conn_idx]["src_gids"]
+                ]
+            )  # NB set: globals
+        else:
+            conn_idxs = pick_connection_from_dataframe(net, src_gids=drive["name"])
+            this_src_gids = set(
+                net.connectivity_df.loc[
+                    net.connectivity_df["conn_idx"].isin(conn_idxs), "src_gid"
+                ]
+            )
         assert sorted(this_src_gids) == list(net.gid_ranges[drive["name"]])
         # Check type-specific dynamics and events
         n_drive_cells = drive["n_drive_cells"]
@@ -1189,16 +1207,6 @@ def test_network_drives():
             )
             assert len(drive["events"][0][0]) == n_events  # 4
 
-    # dataframe: check that connectivity sources correspond to gid_ranges
-    for drive_idx, drive in enumerate(net.external_drives.values()):
-        conn_idxs = pick_connection_from_dataframe(net, src_gids=drive["name"])
-        this_src_gids = set(
-            net.connectivity_df.loc[
-                net.connectivity_df["conn_idx"].isin(conn_idxs), "src_gid"
-            ]
-        )
-        assert sorted(this_src_gids) == list(net.gid_ranges[drive["name"]])
-
     # make sure the PRNGs are consistent.
     target_times = {
         "evdist1": [66.30498327062551, 66.33129889343446],
@@ -1216,45 +1224,44 @@ def test_network_drives():
     # check select excitatory (AMPA+NMDA) synaptic weights and delays
     for drive_name in drive_weights:
         for target_type in drive_weights[drive_name]:
-            conn_idxs = pick_connection(
-                net, src_gids=drive_name, target_gids=target_type
-            )
-            for conn_idx in conn_idxs:
-                drive_conn = net.connectivity[conn_idx]
-                # weights
-                assert_allclose(
-                    drive_conn["nc_dict"]["A_weight"],
-                    drive_weights[drive_name][target_type],
-                    rtol=1e-12,
+            if use_dataframe == False:
+                conn_idxs = pick_connection(
+                    net, src_gids=drive_name, target_gids=target_type
                 )
-                # delays
-                assert_allclose(
-                    drive_conn["nc_dict"]["A_delay"],
-                    drive_delays[drive_name][target_type],
-                    rtol=1e-12,
+                for conn_idx in conn_idxs:
+                    drive_conn = net.connectivity[conn_idx]
+                    # weights
+                    assert_allclose(
+                        drive_conn["nc_dict"]["A_weight"],
+                        drive_weights[drive_name][target_type],
+                        rtol=1e-12,
+                    )
+                    # delays
+                    assert_allclose(
+                        drive_conn["nc_dict"]["A_delay"],
+                        drive_delays[drive_name][target_type],
+                        rtol=1e-12,
+                    )
+            else:
+                conn_idxs = pick_connection_from_dataframe(
+                    net, src_gids=drive_name, target_gids=target_type
                 )
-
-    for drive_name in drive_weights:
-        for target_type in drive_weights[drive_name]:
-            conn_idxs = pick_connection_from_dataframe(
-                net, src_gids=drive_name, target_gids=target_type
-            )
-            for conn_idx in conn_idxs:
-                drive_conn = net.connectivity_df[
-                    net.connectivity_df["conn_idx"] == conn_idx
-                ]
-                # weights
-                assert_allclose(
-                    drive_conn["weight"],
-                    drive_weights[drive_name][target_type],
-                    rtol=1e-12,
-                )
-                # delays
-                assert_allclose(
-                    drive_conn["delay"],
-                    drive_delays[drive_name][target_type],
-                    rtol=1e-12,
-                )
+                for conn_idx in conn_idxs:
+                    drive_conn = net.connectivity_df[
+                        net.connectivity_df["conn_idx"] == conn_idx
+                    ]
+                    # weights
+                    assert_allclose(
+                        drive_conn["weight"],
+                        drive_weights[drive_name][target_type],
+                        rtol=1e-12,
+                    )
+                    # delays
+                    assert_allclose(
+                        drive_conn["delay"],
+                        drive_delays[drive_name][target_type],
+                        rtol=1e-12,
+                    )
 
     # array of simulation times is created in Network.__init__, but passed
     # to CellResponse-constructor for storage (Network is agnostic of time)
@@ -1315,7 +1322,8 @@ def test_network_drives():
     nc = network_builder.ncs["evdist1_L2Basket_nmda"][0]
     assert nc.threshold == params["threshold"]
 
-def test_network_drives_legacy():
+@pytest.mark.parametrize("use_dataframe", [False, True])
+def test_network_drives_legacy(use_dataframe):
     """Test manipulation of drives in the network object under legacy mode."""
     params = read_params(params_fname)
     # add rhythmic inputs (i.e., a type of common input)
@@ -1337,7 +1345,12 @@ def test_network_drives_legacy():
         _ = calcium_model(legacy_mode=True)
         _ = Network(params, legacy_mode=True)
 
-    net = neymotin_2020_model(params, legacy_mode=True, add_drives_from_params=True)
+    net = neymotin_2020_model(
+        params,
+        legacy_mode=True,
+        add_drives_from_params=True,
+        use_dataframe=use_dataframe,
+    )
 
     # instantiate drive events for NetworkBuilder
     net._instantiate_drives(tstop=params["tstop"], n_trials=params["N_trials"])
@@ -1362,61 +1375,22 @@ def test_network_drives_legacy():
     # Check drive dict structure for each external drive
     for drive in net.external_drives.values():
         # Check that connectivity sources correspond to gid_ranges
-        conn_idxs = pick_connection(net, src_gids=drive["name"])
-        this_src_gids = set(
-            [
-                gid
-                for conn_idx in conn_idxs
-                for gid in net.connectivity[conn_idx]["src_gids"]
-            ]
-        )  # NB set: globals
-        assert sorted(this_src_gids) == list(net.gid_ranges[drive["name"]])
-        # Check type-specific dynamics and events
-        n_drive_cells = drive["n_drive_cells"]
-        assert len(drive["events"]) == 1  # single trial simulated
-        if drive["type"] == "evoked":
-            for kw in ["mu", "sigma", "numspikes"]:
-                assert kw in drive["dynamics"].keys()
-            assert len(drive["events"][0]) == n_drive_cells
-            # this also implicitly tests that events are always a list
-            assert len(drive["events"][0][0]) == drive["dynamics"]["numspikes"]
-        elif drive["type"] == "gaussian":
-            for kw in ["mu", "sigma", "numspikes"]:
-                assert kw in drive["dynamics"].keys()
-            assert len(drive["events"][0]) == n_drive_cells
-        elif drive["type"] == "poisson":
-            for kw in ["tstart", "tstop", "rate_constant"]:
-                assert kw in drive["dynamics"].keys()
-            assert len(drive["events"][0]) == n_drive_cells
-        elif drive["type"] == "bursty":
-            for kw in [
-                "tstart",
-                "tstart_std",
-                "tstop",
-                "burst_rate",
-                "burst_std",
-                "numspikes",
-            ]:
-                assert kw in drive["dynamics"].keys()
-            assert len(drive["events"][0]) == n_drive_cells
-            n_events = (
-                drive["dynamics"]["numspikes"]  # 2
-                * (
-                    1
-                    + (drive["dynamics"]["tstop"] - drive["dynamics"]["tstart"] - 1)
-                    // (1000.0 / drive["dynamics"]["burst_rate"])
-                )
-            )
-            assert len(drive["events"][0][0]) == n_events  # 4
-
-    # dataframe: check that connectivity sources correspond to gid_ranges
-    for drive in net.external_drives.values():
-        conn_idxs = pick_connection_from_dataframe(net, src_gids=drive["name"])
-        this_src_gids = set(
-            net.connectivity_df.loc[
-                net.connectivity_df["conn_idx"].isin(conn_idxs), "src_gid"
-            ]
-        )  # NB set: globals
+        if use_dataframe == False: 
+            conn_idxs = pick_connection(net, src_gids=drive["name"])
+            this_src_gids = set(
+                [
+                    gid
+                    for conn_idx in conn_idxs
+                    for gid in net.connectivity[conn_idx]["src_gids"]
+                ]
+            )  # NB set: globals
+        else:
+            conn_idxs = pick_connection_from_dataframe(net, src_gids=drive["name"])
+            this_src_gids = set(
+                net.connectivity_df.loc[
+                    net.connectivity_df["conn_idx"].isin(conn_idxs), "src_gid"
+                ]
+            )  # NB set: globals
         assert sorted(this_src_gids) == list(net.gid_ranges[drive["name"]])
         # Check type-specific dynamics and events
         n_drive_cells = drive["n_drive_cells"]
@@ -1480,30 +1454,30 @@ def test_network_drives_legacy():
     }
     for drive_name in target_weights:
         for target_type in target_weights[drive_name]:
-            conn_idxs = pick_connection(
-                net, src_gids=drive_name, target_gids=target_type, receptor="ampa"
-            )
-            for conn_idx in conn_idxs:
-                drive_conn = net.connectivity[conn_idx]
-                assert_allclose(
-                    drive_conn["nc_dict"]["A_weight"],
-                    target_weights[drive_name][target_type],
-                    rtol=1e-12,
+            if use_dataframe == False:  
+                conn_idxs = pick_connection(
+                    net, src_gids=drive_name, target_gids=target_type, receptor="ampa"
                 )
-    for drive_name in target_weights:
-        for target_type in target_weights[drive_name]:
-            conn_idxs = pick_connection_from_dataframe(
-                net, src_gids=drive_name, target_gids=target_type, receptor="ampa"
-            )
-            for conn_idx in conn_idxs:
-                drive_conn = net.connectivity_df[
-                    net.connectivity_df["conn_idx"] == conn_idx
-                ]
-                assert_allclose(
-                    drive_conn["weight"],
-                    target_weights[drive_name][target_type],
-                    rtol=1e-12,
+                for conn_idx in conn_idxs:
+                    drive_conn = net.connectivity[conn_idx]
+                    assert_allclose(
+                        drive_conn["nc_dict"]["A_weight"],
+                        target_weights[drive_name][target_type],
+                        rtol=1e-12,
+                    )
+            else:
+                conn_idxs = pick_connection_from_dataframe(
+                    net, src_gids=drive_name, target_gids=target_type, receptor="ampa"
                 )
+                for conn_idx in conn_idxs:
+                    drive_conn = net.connectivity_df[
+                        net.connectivity_df["conn_idx"] == conn_idx
+                    ]
+                    assert_allclose(
+                        drive_conn["weight"],
+                        target_weights[drive_name][target_type],
+                        rtol=1e-12,
+                    )
 
     # check select synaptic delays
     target_delays = {
@@ -1513,30 +1487,30 @@ def test_network_drives_legacy():
     }
     for drive_name in target_delays:
         for target_type in target_delays[drive_name]:
-            conn_idxs = pick_connection(
-                net, src_gids=drive_name, target_gids=target_type, receptor="ampa"
-            )
-            for conn_idx in conn_idxs:
-                drive_conn = net.connectivity[conn_idx]
-                assert_allclose(
-                    drive_conn["nc_dict"]["A_delay"],
-                    target_delays[drive_name][target_type],
-                    rtol=1e-12,
+            if use_dataframe == False:  
+                conn_idxs = pick_connection(
+                    net, src_gids=drive_name, target_gids=target_type, receptor="ampa"
                 )
-    for drive_name in target_delays:
-        for target_type in target_delays[drive_name]:
-            conn_idxs = pick_connection_from_dataframe(
-                net, src_gids=drive_name, target_gids=target_type, receptor="ampa"
-            )
-            for conn_idx in conn_idxs:
-                drive_conn = net.connectivity_df[
-                    net.connectivity_df["conn_idx"] == conn_idx
-                ]
-                assert_allclose(
-                    drive_conn["delay"],
-                    target_delays[drive_name][target_type],
-                    rtol=1e-12,
+                for conn_idx in conn_idxs:
+                    drive_conn = net.connectivity[conn_idx]
+                    assert_allclose(
+                        drive_conn["nc_dict"]["A_delay"],
+                        target_delays[drive_name][target_type],
+                        rtol=1e-12,
+                    )
+            else:
+                conn_idxs = pick_connection_from_dataframe(
+                    net, src_gids=drive_name, target_gids=target_type, receptor="ampa"
                 )
+                for conn_idx in conn_idxs:
+                    drive_conn = net.connectivity_df[
+                        net.connectivity_df["conn_idx"] == conn_idx
+                    ]
+                    assert_allclose(
+                        drive_conn["delay"],
+                        target_delays[drive_name][target_type],
+                        rtol=1e-12,
+                    )
     # array of simulation times is created in Network.__init__, but passed
     # to CellResponse-constructor for storage (Network is agnostic of time)
     with pytest.raises(TypeError, match="'times' is an np.ndarray of simulation times"):
@@ -1562,8 +1536,9 @@ def test_network_drives_legacy():
     )
 
 
-def test_network_connectivity(base_network):
-    net, params = base_network
+@pytest.mark.parametrize("use_dataframe", [False, True])
+def test_network_connectivity(use_dataframe):
+    net, params = _build_base_network(use_dataframe=use_dataframe)
 
     # instantiate drive events and artificial cells for NetworkBuilder
     net._instantiate_drives(tstop=10.0, n_trials=1)
@@ -1604,7 +1579,7 @@ def test_network_connectivity(base_network):
     )
     net.add_connection(**kwargs_default)  # smoke test
     kwargs_trunk = kwargs_default.copy()
-    kwargs_trunk["loc"] = "apical_trunk"
+    kwargs_trunk["loc"] = "apical_tuft"
     kwargs_trunk["receptor"] = "nmda"
     net.add_connection(**kwargs_trunk)
     network_builder = NetworkBuilder(net)
@@ -1615,16 +1590,16 @@ def test_network_connectivity(base_network):
     nc = network_builder.ncs["L2Pyr_L2Pyr_ampa"][-1]
     assert_allclose(nc.weight[0], kwargs_default["weight"])
 
-    # Check apical_trunk targeted connection count increased by right number
-    # (2*2 connections between cells, 1 section i.e. apical_turnk)
+    # Check apical_tuft targeted connection count increased by right number
+    # (2*2 connections between cells, 1 section i.e. apical_tuft)
     assert len(network_builder.ncs["L2Pyr_L2Pyr_nmda"]) == n_conn_trunk + 4
     nc = network_builder.ncs["L2Pyr_L2Pyr_nmda"][-1]
     assert_allclose(nc.weight[0], kwargs_trunk["weight"])
-    # Check that exactly 4 apical_trunk connections appended
+    # Check that exactly 4 apical_tuft connections appended
     for idx in range(1, 5):
         assert (
             network_builder.ncs["L2Pyr_L2Pyr_nmda"][-idx].postseg().__str__()
-            == "L2Pyr_apical_trunk(0.5)"
+            == "L2Pyr_apical_tuft(0.5)"
         )
     assert (
         network_builder.ncs["L2Pyr_L2Pyr_nmda"][-5].postseg().__str__()
@@ -1697,30 +1672,32 @@ def test_network_connectivity(base_network):
     kwargs = kwargs_default.copy()
     kwargs["probability"] = 0.5
     net.add_connection(**kwargs)
-    n_connections = np.sum(
-        [len(t_gids) for t_gids in net.connectivity[-2]["gid_pairs"].values()]
-    )
-    n_connections_new = np.sum(
-        [len(t_gids) for t_gids in net.connectivity[-1]["gid_pairs"].values()]
-    )
-    assert n_connections_new == np.round(n_connections * 0.5).astype(int)
-    assert net.connectivity[-1]["probability"] == 0.5
 
-    # dataframe same as above 
-    last_counter = net.connectivity_df["conn_idx"].max()
-    n_connections_df = len(
-        net.connectivity_df[net.connectivity_df["conn_idx"] == last_counter - 1]
-    )
-    n_connections_new_df = len(
-        net.connectivity_df[net.connectivity_df["conn_idx"] == last_counter]
-    )
-    assert n_connections_new_df == np.round(n_connections_df * 0.5).astype(int)
-    assert (
-        net.connectivity_df.loc[
-            net.connectivity_df["conn_idx"] == last_counter, "probability"
-        ]
-        == 0.
-    ).all()
+    if use_dataframe == False:  
+        n_connections = np.sum(
+            [len(t_gids) for t_gids in net.connectivity[-2]["gid_pairs"].values()]
+        )
+        n_connections_new = np.sum(
+            [len(t_gids) for t_gids in net.connectivity[-1]["gid_pairs"].values()]
+        )
+        assert n_connections_new == np.round(n_connections * 0.5).astype(int)
+        assert net.connectivity[-1]["probability"] == 0.5
+    else:
+        last_counter = net.connectivity_df["conn_idx"].max()
+        n_connections_df = len(
+            net.connectivity_df[net.connectivity_df["conn_idx"] == last_counter - 1]
+        )
+        n_connections_new_df = len(
+            net.connectivity_df[net.connectivity_df["conn_idx"] == last_counter]
+        )
+        assert n_connections_new_df == np.round(n_connections_df * 0.5).astype(int)
+        assert (
+            net.connectivity_df.loc[
+                net.connectivity_df["conn_idx"] == last_counter, "probability"
+            ]
+            == 0.5
+        ).all()
+
     with pytest.raises(ValueError, match="probability must be"):
         kwargs = kwargs_default.copy()
         kwargs["probability"] = -1.0
@@ -1735,14 +1712,18 @@ def test_network_connectivity(base_network):
         kwargs["receptor"] = "ampa"
         net.add_connection(**kwargs)
 
-    # Test removing connections from net.connectivity
+    # Test removing connections from net.connectivity / net.connectivity_df
     # Needs to be updated if number of drives change in preceding tests
     net.clear_connectivity()
-    assert len(net.connectivity) == 4  # 2 drives x 2 target cell types
-    assert net.connectivity_df["conn_idx"].nunique() == 4
+    if use_dataframe == False:  
+        assert len(net.connectivity) == 4  # 2 drives x 2 target cell types
+    else:
+        assert net.connectivity_df["conn_idx"].nunique() == 4
     net.clear_drives()
-    assert len(net.connectivity) == 0
-    assert len(net.connectivity_df) == 0
+    if use_dataframe == False: 
+        assert len(net.connectivity) == 0
+    else:
+        assert len(net.connectivity_df) == 0
 
     with pytest.warns(UserWarning, match="No connections"):
         simulate_dipole(net, tstop=10)
@@ -1849,7 +1830,8 @@ def test_tonic_biases_non_gid():
     assert np.isclose(net.external_biases["tonic_soma"]["L5_pyramidal"]["tstop"], 10.0)
 
 
-def test_tonic_biases_legacy_params_api():
+@pytest.mark.parametrize("use_dataframe", [False, True])
+def test_tonic_biases_legacy_params_api(use_dataframe):
     """Test that the legacy 'params' API for tonic biases is still functional."""
     hnn_core_root = Path(hnn_core.__file__).parent
 
@@ -1857,7 +1839,7 @@ def test_tonic_biases_legacy_params_api():
     params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
 
-    net = Network(params)
+    net = Network(params, use_dataframe=use_dataframe)
     # add arbitrary local network connectivity to avoid simulation warning
     net.add_connection(
         src_gids="L2_pyramidal",
@@ -1870,7 +1852,7 @@ def test_tonic_biases_legacy_params_api():
     )
     with pytest.raises(ValueError, match="parameter may be missing"):
         params["Itonic_T_L2Pyr_soma"] = 5.0
-        net = Network(params, add_drives_from_params=True)
+        net = Network(params, add_drives_from_params=True, use_dataframe=use_dataframe)
 
     params.update(
         {
@@ -1888,12 +1870,12 @@ def test_tonic_biases_legacy_params_api():
         }
     )
     # old API
-    net = Network(params, add_drives_from_params=True)
+    net = Network(params, add_drives_from_params=True, use_dataframe=use_dataframe)
     assert "tonic" in net.external_biases
     assert "L2_pyramidal" in net.external_biases["tonic"]
 
     # new API
-    net = Network(params)
+    net = Network(params, use_dataframe=use_dataframe)
     good_amplitude = {"L2_pyramidal": 1.0, "L5_basket": 0.5}
     net.add_tonic_bias(amplitude=good_amplitude)
 
@@ -1907,7 +1889,8 @@ def test_tonic_biases_legacy_params_api():
         net.add_tonic_bias(amplitude=good_amplitude)
 
 
-def test_tonic_biases_gid_routing():
+@pytest.mark.parametrize("use_dataframe", [False, True])
+def test_tonic_biases_gid_routing(use_dataframe):
     """Test routing and simulation of gids to cell types when biasing multiple cell types."""
 
     def _test_and_simulate_gid_case(
@@ -1918,7 +1901,7 @@ def test_tonic_biases_gid_routing():
     ):
         """Helper function to test that gid and amplitude variants route and simulate correctly."""
         for gid_input, amplitude_input in zip(gid_inputs, amplitude_inputs):
-            net = neymotin_2020_model()
+            net = neymotin_2020_model(use_dataframe=use_dataframe)
             net.clear_connectivity()
 
             net.add_tonic_bias(
@@ -1949,7 +1932,7 @@ def test_tonic_biases_gid_routing():
     # bias correctly and, when simulated, only that GID spikes.
     # ----------------------------------------------------------------------------------
     # We will test for all styles of `gid` input that produce this same routing
-    net = neymotin_2020_model()
+    net = neymotin_2020_model(use_dataframe=use_dataframe)
     target_gid = 35
     cell_type = "L2_pyramidal"
     # Pre-check that GID is Correct type
@@ -1975,7 +1958,7 @@ def test_tonic_biases_gid_routing():
     # Test that in an empty network, adding a bias for a list of GIDs both creates the
     # bias correctly and, when simulated, only those GIDs spikes.
     # ----------------------------------------------------------------------------------
-    net = neymotin_2020_model()
+    net = neymotin_2020_model(use_dataframe=use_dataframe)
     net.clear_connectivity()
     target_gids = [56, 67]
     cell_type = "L2_pyramidal"
@@ -2001,7 +1984,7 @@ def test_tonic_biases_gid_routing():
     # Test that in an empty network, adding a bias for a list of GIDs of multiple cell
     # types creates the bias correctly and, when simulated, only those GIDs spikes.
     # ----------------------------------------------------------------------------------
-    net = neymotin_2020_model()
+    net = neymotin_2020_model(use_dataframe=use_dataframe)
     net.clear_connectivity()
     target_gids = [56, 67, 173]
     cell_types = ["L2_pyramidal", "L5_pyramidal"]
@@ -2038,7 +2021,7 @@ def test_tonic_biases_gid_routing():
     # type and ALL GIDs of another cell type creates the bias correctly and, when
     # simulated, only those GIDs spikes.
     # ----------------------------------------------------------------------------------
-    net = neymotin_2020_model()
+    net = neymotin_2020_model(use_dataframe=use_dataframe)
     net.clear_connectivity()
     target_gids = [56, 67]
     target_gids.extend(list(net.gid_ranges["L5_pyramidal"]))
@@ -2077,9 +2060,9 @@ def test_tonic_biases_gid_routing():
     # type spike. Do this for both the deprecated arg cell_type (backwards
     # compatibility), amplitude by itself, and our new gid argument.
     # ----------------------------------------------------------------------------------
-    net = neymotin_2020_model()
+    net = neymotin_2020_model(use_dataframe=use_dataframe)
     for cell_type in net.cell_types.keys():
-        net = neymotin_2020_model()
+        net = neymotin_2020_model(use_dataframe=use_dataframe)
         kwargs_inputs = [
             {
                 "amplitude": 3,
@@ -2125,7 +2108,7 @@ def test_tonic_biases_gid_routing():
         ]
 
         for kwargs in kwargs_inputs:
-            net = neymotin_2020_model()
+            net = neymotin_2020_model(use_dataframe=use_dataframe)
             net.clear_connectivity()
             net.add_tonic_bias(**kwargs)
             # Check that the bias is applied to all gids of that cell type
@@ -2448,9 +2431,10 @@ def test_network_models_mesh(network_model):
     del net, dp
 
 
-def test_set_global_synaptic_gains():
+@pytest.mark.parametrize("use_dataframe", [False, True])
+def test_set_global_synaptic_gains(use_dataframe):
     """Test synaptic gains setter"""
-    net = neymotin_2020_model()
+    net = neymotin_2020_model(use_dataframe=use_dataframe)
     nb_base = NetworkBuilder(net)
     e_cell_names = ["L2_pyramidal", "L5_pyramidal"]
     i_cell_names = ["L2_basket", "L5_basket"]
@@ -2469,32 +2453,80 @@ def test_set_global_synaptic_gains():
 
     # Single argument check with copy
     net_updated = net.set_global_synaptic_gains(e_e=2.0, copy=True)
-    for conn in net_updated.connectivity:
-        if conn["src_type"] in e_cell_names and conn["target_type"] in e_cell_names:
-            assert conn["nc_dict"]["gain"] == 2.0
-        else:
-            assert conn["nc_dict"]["gain"] == 1.0
+    if use_dataframe == False:
+        for conn in net_updated.connectivity:
+            if conn["src_type"] in e_cell_names and conn["target_type"] in e_cell_names:
+                assert conn["nc_dict"]["gain"] == 2.0
+            else:
+                assert conn["nc_dict"]["gain"] == 1.0
+    else:
+        conn_idxs = pick_connection_from_dataframe(net_updated, src_gids=list(net_updated.cell_types))
+        for conn_idx in conn_idxs:
+            conn = net_updated.connectivity_df[net_updated.connectivity_df["conn_idx"] == conn_idx]
+            if (
+                conn["src_type"].iloc[0] in e_cell_names
+                and conn["target_type"].iloc[0] in e_cell_names
+            ):
+                assert (conn["gain"] == 2.0).all()
+            else:
+                assert (conn["gain"] == 1.0).all()
+
     # Ensure that the original network gains did not change
-    for conn in net.connectivity:
-        assert conn["nc_dict"]["gain"] == 1.0
+    if use_dataframe == False:
+        for conn in net.connectivity:
+            assert conn["nc_dict"]["gain"] == 1.0
+    else:
+        conn_idxs = pick_connection_from_dataframe(net, src_gids=list(net.cell_types))
+        for conn_idx in conn_idxs:
+            conn = net.connectivity_df[net.connectivity_df["conn_idx"] == conn_idx]
+            assert (conn["gain"] == 1.0).all()
 
     # Single argument with inplace change
     net.set_global_synaptic_gains(i_e=0.5, copy=False)
-    for conn in net.connectivity:
-        if conn["src_type"] in i_cell_names and conn["target_type"] in e_cell_names:
-            assert conn["nc_dict"]["gain"] == 0.5
-        else:
-            assert conn["nc_dict"]["gain"] == 1.0
+    if use_dataframe == False:
+        for conn in net.connectivity:
+            if conn["src_type"] in i_cell_names and conn["target_type"] in e_cell_names:
+                assert conn["nc_dict"]["gain"] == 0.5
+            else:
+                assert conn["nc_dict"]["gain"] == 1.0
+    else:
+        conn_idxs = pick_connection_from_dataframe(net, src_gids=list(net.cell_types))
+        for conn_idx in conn_idxs:
+            conn = net.connectivity_df[net.connectivity_df["conn_idx"] == conn_idx]
+            if (
+                conn["src_type"].iloc[0] in i_cell_names
+                and conn["target_type"].iloc[0] in e_cell_names
+            ):
+                assert (conn["gain"] == 0.5).all()
+            else:
+                assert (conn["gain"] == 1.0).all()
 
     # Two argument check
     net.set_global_synaptic_gains(i_e=0.5, i_i=0.25, copy=False)
-    for conn in net.connectivity:
-        if conn["src_type"] in i_cell_names and conn["target_type"] in e_cell_names:
-            assert conn["nc_dict"]["gain"] == 0.5
-        elif conn["src_type"] in i_cell_names and conn["target_type"] in i_cell_names:
-            assert conn["nc_dict"]["gain"] == 0.25
-        else:
-            assert conn["nc_dict"]["gain"] == 1.0
+    if use_dataframe == False:
+        for conn in net.connectivity:
+            if conn["src_type"] in i_cell_names and conn["target_type"] in e_cell_names:
+                assert conn["nc_dict"]["gain"] == 0.5
+            elif conn["src_type"] in i_cell_names and conn["target_type"] in i_cell_names:
+                assert conn["nc_dict"]["gain"] == 0.25
+            else:
+                assert conn["nc_dict"]["gain"] == 1.0
+    else:
+        conn_idxs = pick_connection_from_dataframe(net, src_gids=list(net.cell_types))
+        for conn_idx in conn_idxs:
+            conn = net.connectivity_df[net.connectivity_df["conn_idx"] == conn_idx]
+            if (
+                conn["src_type"].iloc[0] in i_cell_names
+                and conn["target_type"].iloc[0] in e_cell_names
+            ):
+                assert (conn["gain"] == 0.5).all()
+            elif (
+                conn["src_type"].iloc[0] in i_cell_names
+                and conn["target_type"].iloc[0] in i_cell_names
+            ):
+                assert (conn["gain"] == 0.25).all()
+            else:
+                assert (conn["gain"] == 1.0).all()
 
     # Check weights are altered
     def _get_weight(nb, conn_name, idx=0):
@@ -2518,7 +2550,10 @@ def test_set_global_synaptic_gains():
     ) == 1
 
     # Verify network can be simulated with very heterogeneous gains
-    net.connectivity[1]["nc_dict"]["gain"] = 0.37
+    if use_dataframe == False:
+        net.connectivity[1]["nc_dict"]["gain"] = 0.37
+    else:
+        net.connectivity_df.loc[net.connectivity_df["conn_idx"] == 1, "gain"] = 0.37
     dpls = simulate_dipole(net, tstop=10.0, n_trials=1)
     assert len(dpls[0].times) > 0
 
@@ -2534,25 +2569,26 @@ class TestPickConnection:
         indices = pick_connection(**kwargs)
         assert len(indices) == 0
 
+    @pytest.mark.parametrize("use_dataframe", [False, True])
     @pytest.mark.parametrize("arg_name", ["src_gids", "target_gids"])
-    def test_1argument_gids_range(self, base_network, arg_name):
+    def test_1argument_gids_range(self, arg_name, use_dataframe):
         """Tests passing range as an argument value."""
-        net, _ = base_network
+        net, _ = _build_base_network(use_dataframe=use_dataframe)
         test_range = range(2)
         kwargs = {"net": net, f"{arg_name}": test_range}
-        indices = pick_connection(**kwargs)
 
-        for conn_idx in indices:
-            assert set(test_range).issubset(net.connectivity[conn_idx][arg_name])
+        if use_dataframe == False:  
+            indices = pick_connection(**kwargs)
+            for conn_idx in indices:
+                assert set(test_range).issubset(net.connectivity[conn_idx][arg_name])
+        else:
+            df_col = {"src_gids": "src_gid", "target_gids": "target_gid"}[arg_name]
+            indices_df = pick_connection_from_dataframe(**kwargs)
+            gids_by_conn = net.connectivity_df.groupby("conn_idx")[df_col].apply(set)
+            for conn_idx in indices_df:
+                assert set(test_range).issubset(gids_by_conn[conn_idx])
 
-        
-        df_col = {"src_gids": "src_gid", "target_gids": "target_gid"}[arg_name]
-        indices_df = pick_connection_from_dataframe(**kwargs)
-        assert indices == indices_df
-        gids_by_conn = net.connectivity_df.groupby("conn_idx")[df_col].apply(set)
-        for conn_idx in indices_df:
-            assert set(test_range).issubset(gids_by_conn[conn_idx])
-
+    @pytest.mark.parametrize("use_dataframe", [False, True])
     @pytest.mark.parametrize(
         "arg_name,value",
         [
@@ -2562,40 +2598,40 @@ class TestPickConnection:
             ("receptor", "gabaa"),
         ],
     )
-    def test_1argument_str(self, base_network, arg_name, value):
+    def test_1argument_str(self, arg_name, value, use_dataframe):
         """Tests passing string as an argument value."""
-        net, _ = base_network
+        net, _ = _build_base_network(use_dataframe=use_dataframe)
         kwargs = {"net": net, f"{arg_name}": value}
-        indices = pick_connection(**kwargs)
 
-        for conn_idx in indices:
-            if arg_name in ("src_gids", "target_gids"):
-                # arg specifies a subset of item gids (within gid_ranges)
-                assert net.connectivity[conn_idx][arg_name].issubset(
-                    net.gid_ranges[value]
-                )
-            else:
-                # arg and item specify equivalent string descriptors
-                assert net.connectivity[conn_idx][arg_name] == value
+        if use_dataframe == False:  
+            indices = pick_connection(**kwargs)
+            for conn_idx in indices:
+                if arg_name in ("src_gids", "target_gids"):
+                    # arg specifies a subset of item gids (within gid_ranges)
+                    assert net.connectivity[conn_idx][arg_name].issubset(
+                        net.gid_ranges[value]
+                    )
+                else:
+                    # arg and item specify equivalent string descriptors
+                    assert net.connectivity[conn_idx][arg_name] == value
+        else:
+            df_col = {
+                "src_gids": "src_gid",
+                "target_gids": "target_gid",
+                "loc": "template_loc",
+                "receptor": "receptor",
+            }[arg_name]
+            indices_df = pick_connection_from_dataframe(**kwargs)
+            # group once instead of re-filtering the whole dataframe per conn_idx
+            grouped = net.connectivity_df.groupby("conn_idx")
+            for conn_idx in indices_df:
+                conn_rows = grouped.get_group(conn_idx)
+                if arg_name in ("src_gids", "target_gids"):
+                    assert set(conn_rows[df_col]).issubset(net.gid_ranges[value])
+                else:
+                    assert (conn_rows[df_col] == value).all()
 
-
-        df_col = {
-            "src_gids": "src_gid",
-            "target_gids": "target_gid",
-            "loc": "template_loc",
-            "receptor": "receptor",
-        }[arg_name]
-        indices_df = pick_connection_from_dataframe(**kwargs)
-        assert indices == indices_df
-        # group once instead of re-filtering the whole dataframe per conn_idx
-        grouped = net.connectivity_df.groupby("conn_idx")
-        for conn_idx in indices_df:
-            conn_rows = grouped.get_group(conn_idx)
-            if arg_name in ("src_gids", "target_gids"):
-                assert set(conn_rows[df_col]).issubset(net.gid_ranges[value])
-            else:
-                assert (conn_rows[df_col] == value).all()
-
+    @pytest.mark.parametrize("use_dataframe", [False, True])
     @pytest.mark.parametrize(
         "arg_name,value",
         [
@@ -2603,29 +2639,29 @@ class TestPickConnection:
             ("target_gids", 35),
         ],
     )
-    def test_1argument_gids_int(self, base_network, arg_name, value):
+    def test_1argument_gids_int(self, arg_name, value, use_dataframe):
         """Tests that connections are not missing when passing one gid."""
-        net, _ = base_network
+        net, _ = _build_base_network(use_dataframe=use_dataframe)
         kwargs = {"net": net, f"{arg_name}": value}
-        indices = pick_connection(**kwargs)
 
-        for conn_idx in range(len(net.connectivity)):
-            if conn_idx in indices:
-                assert value in net.connectivity[conn_idx][arg_name]
-            else:
-                assert value not in net.connectivity[conn_idx][arg_name]
+        if use_dataframe == False:  
+            indices = pick_connection(**kwargs)
+            for conn_idx in range(len(net.connectivity)):
+                if conn_idx in indices:
+                    assert value in net.connectivity[conn_idx][arg_name]
+                else:
+                    assert value not in net.connectivity[conn_idx][arg_name]
+        else:
+            df_col = {"src_gids": "src_gid", "target_gids": "target_gid"}[arg_name]
+            indices_df = pick_connection_from_dataframe(**kwargs)
+            gids_by_conn = net.connectivity_df.groupby("conn_idx")[df_col].apply(set)
+            for conn_idx, gids in gids_by_conn.items():
+                if conn_idx in indices_df:
+                    assert value in gids
+                else:
+                    assert value not in gids
 
-
-        df_col = {"src_gids": "src_gid", "target_gids": "target_gid"}[arg_name]
-        indices_df = pick_connection_from_dataframe(**kwargs)
-        assert indices == indices_df
-        gids_by_conn = net.connectivity_df.groupby("conn_idx")[df_col].apply(set)
-        for conn_idx, gids in gids_by_conn.items():
-            if conn_idx in indices_df:
-                assert value in gids
-            else:
-                assert value not in gids
-
+    @pytest.mark.parametrize("use_dataframe", [False, True])
     @pytest.mark.parametrize(
         "arg_name,value",
         [
@@ -2633,31 +2669,31 @@ class TestPickConnection:
             ("target_gids", ["L2_pyramidal", "L5_pyramidal"]),
         ],
     )
-    def test_1argument_list_of_cell_types_str(self, base_network, arg_name, value):
+    def test_1argument_list_of_cell_types_str(self, arg_name, value, use_dataframe):
         """Tests passing a list of valid strings"""
-        net, _ = base_network
+        net, _ = _build_base_network(use_dataframe=use_dataframe)
         kwargs = {"net": net, f"{arg_name}": value}
-        indices = pick_connection(**kwargs)
-
         true_gid_set = set(
             list(net.gid_ranges[value[0]]) + list(net.gid_ranges[value[1]])
         )
-        pick_gid_list = []
-        for idx in indices:
-            pick_gid_list.extend(net.connectivity[idx][arg_name])
-        assert true_gid_set == set(pick_gid_list)
 
-        # dataframe: same check via pick_connection_from_dataframe. A single
-        # isin() mask covers all matched conn_idx at once -- no need to loop
-        # and re-filter per conn_idx.
-        df_col = {"src_gids": "src_gid", "target_gids": "target_gid"}[arg_name]
-        indices_df = pick_connection_from_dataframe(**kwargs)
-        assert indices == indices_df
-        pick_gid_list_df = net.connectivity_df.loc[
-            net.connectivity_df["conn_idx"].isin(indices_df), df_col
-        ].tolist()
-        assert true_gid_set == set(pick_gid_list_df)
+        if use_dataframe == False:  
+            indices = pick_connection(**kwargs)
+            pick_gid_list = []
+            for idx in indices:
+                pick_gid_list.extend(net.connectivity[idx][arg_name])
+            assert true_gid_set == set(pick_gid_list)
+        else:
+            # a single isin() mask covers all matched conn_idx at once -- no
+            # need to loop and re-filter per conn_idx.
+            df_col = {"src_gids": "src_gid", "target_gids": "target_gid"}[arg_name]
+            indices_df = pick_connection_from_dataframe(**kwargs)
+            pick_gid_list_df = net.connectivity_df.loc[
+                net.connectivity_df["conn_idx"].isin(indices_df), df_col
+            ].tolist()
+            assert true_gid_set == set(pick_gid_list_df)
 
+    @pytest.mark.parametrize("use_dataframe", [False, True])
     @pytest.mark.parametrize(
         "arg_name,value",
         [
@@ -2665,28 +2701,28 @@ class TestPickConnection:
             ("target_gids", [35, 34]),
         ],
     )
-    def test_1argument_list_of_gids_int(self, base_network, arg_name, value):
+    def test_1argument_list_of_gids_int(self, arg_name, value, use_dataframe):
         """Tests passing a list of valid ints."""
-        net, _ = base_network
+        net, _ = _build_base_network(use_dataframe=use_dataframe)
         kwargs = {"net": net, f"{arg_name}": value}
-        indices = pick_connection(**kwargs)
 
-        true_idx_list = []
-        for idx, conn in enumerate(net.connectivity):
-            if any([val in conn[arg_name] for val in value]):
-                true_idx_list.append(idx)
-
-        assert indices == true_idx_list
-
-        df_col = {"src_gids": "src_gid", "target_gids": "target_gid"}[arg_name]
-        indices_df = pick_connection_from_dataframe(**kwargs)
-        gids_by_conn = net.connectivity_df.groupby("conn_idx")[df_col].apply(set)
-        true_idx_list_df = [
-            idx
-            for idx, gids in gids_by_conn.items()
-            if any(val in gids for val in value)
-        ]
-        assert indices_df == true_idx_list_df
+        if use_dataframe == False:  
+            indices = pick_connection(**kwargs)
+            true_idx_list = []
+            for idx, conn in enumerate(net.connectivity):
+                if any([val in conn[arg_name] for val in value]):
+                    true_idx_list.append(idx)
+            assert indices == true_idx_list
+        else:
+            df_col = {"src_gids": "src_gid", "target_gids": "target_gid"}[arg_name]
+            indices_df = pick_connection_from_dataframe(**kwargs)
+            gids_by_conn = net.connectivity_df.groupby("conn_idx")[df_col].apply(set)
+            true_idx_list_df = [
+                idx
+                for idx, gids in gids_by_conn.items()
+                if any(val in gids for val in value)
+            ]
+            assert indices_df == true_idx_list_df
 
     @pytest.mark.parametrize(
         "src_gids,target_gids,loc,receptor",
@@ -2767,20 +2803,29 @@ class TestPickConnection:
             ("L2_basket", "L2_basket", 0),
         ],
     )
-    def test_only_drives_specified(self, base_network, src_gids, target_gids, expected):
+    @pytest.mark.parametrize("use_dataframe", [False, True])
+    def test_only_drives_specified(self, src_gids, target_gids, expected, use_dataframe):
         """Tests searching a Network with only drive connections added.
 
         Only searches for drive connectivity should have results.
         """
-        _, param = base_network
-        net = Network(param, add_drives_from_params=True)
-        indices = pick_connection(net, src_gids=src_gids, target_gids=target_gids)
+        params = read_params(params_fname)
+        net = Network(
+            params, add_drives_from_params=True, use_dataframe=use_dataframe
+        )
+        if use_dataframe == False:
+            indices = pick_connection(net, src_gids=src_gids, target_gids=target_gids)
+        else:
+            indices = pick_connection_from_dataframe(
+                net, src_gids=src_gids, target_gids=target_gids
+            )
         assert len(indices) == expected
 
 
-def test_rename_cell_types(base_network):
+@pytest.mark.parametrize("use_dataframe", [False, True])
+def test_rename_cell_types(use_dataframe):
     """Tests renaming cell function"""
-    net1, params = base_network
+    net1, params = _build_base_network(use_dataframe=use_dataframe)
 
     # Add MORE arbitrary drives to force spiking
     net1.add_evoked_drive(
@@ -2804,8 +2849,10 @@ def test_rename_cell_types(base_network):
     # Make a new network, rename all the cell type names, then test it
     #
     net2 = net1.copy()
-    assert net2.connectivity
-    assert not net2.connectivity_df.empty  
+    if use_dataframe == False:  
+        assert net2.connectivity
+    else:
+        assert not net2.connectivity_df.empty
     # adding a list of new_names
     cell_type_rename_mapping = {
         cell_name: f"{cell_name}_test" for cell_name in net1.cell_types
@@ -3133,37 +3180,40 @@ def test_filter_cell_types():
     assert filtered_types == []
 
 
-def test_update_weights_metadata():
+@pytest.mark.parametrize("use_dataframe", [False, True])
+def test_update_weights_metadata(use_dataframe):
     """Test update_weights with new cell_metadata logic."""
-    net = neymotin_2020_model()
+    net = neymotin_2020_model(use_dataframe=use_dataframe)
     e_cell_names = net.filter_cell_types(electro_type="excitatory")
     i_cell_names = net.filter_cell_types(electro_type="inhibitory")
 
     # Test updating excitatory to inhibitory connections
     net.set_global_synaptic_gains(e_i=2.0)
 
-    for conn in net.connectivity:
-        is_e_to_i = (
-            conn["src_type"] in e_cell_names and conn["target_type"] in i_cell_names
-        )
-        if is_e_to_i:
-            # Assert that the gain was updated only for E->I connections
-            assert conn["nc_dict"]["gain"] == 2.0
-        else:
-            # Assert that all other gains remain unchanged
-            assert conn["nc_dict"]["gain"] == 1.0
-
-    grouped = net.connectivity_df.groupby("conn_idx")
-    src_types = grouped["src_type"].first()
-    target_types = grouped["target_type"].first()
-    gains = grouped["gain"].apply(set)
-    for conn_idx in src_types.index:
-        is_e_to_i = (
-            src_types[conn_idx] in e_cell_names
-            and target_types[conn_idx] in i_cell_names
-        )
-        expected_gain = 2.0 if is_e_to_i else 1.0
-        assert gains[conn_idx] == {expected_gain}
+    if use_dataframe == False: 
+        for conn in net.connectivity:
+            is_e_to_i = (
+                conn["src_type"] in e_cell_names
+                and conn["target_type"] in i_cell_names
+            )
+            if is_e_to_i:
+                # Assert that the gain was updated only for E->I connections
+                assert conn["nc_dict"]["gain"] == 2.0
+            else:
+                # Assert that all other gains remain unchanged
+                assert conn["nc_dict"]["gain"] == 1.0
+    else:
+        grouped = net.connectivity_df.groupby("conn_idx")
+        src_types = grouped["src_type"].first()
+        target_types = grouped["target_type"].first()
+        gains = grouped["gain"].apply(set)
+        for conn_idx in src_types.index:
+            is_e_to_i = (
+                src_types[conn_idx] in e_cell_names
+                and target_types[conn_idx] in i_cell_names
+            )
+            expected_gain = 2.0 if is_e_to_i else 1.0
+            assert gains[conn_idx] == {expected_gain}
 
 
 def test_get_global_synaptic_gains():
@@ -3180,9 +3230,10 @@ def test_get_global_synaptic_gains():
     assert net.get_global_synaptic_gains() == new_gains
 
 
-def test_add_connection_threshold_and_gain():
+@pytest.mark.parametrize("use_dataframe", [False, True])
+def test_add_connection_threshold_and_gain(use_dataframe):
     """Test adding connections with custom threshold and gain parameters."""
-    net = neymotin_2020_model()
+    net = neymotin_2020_model(use_dataframe=use_dataframe)
 
     # Add connection with custom threshold
     custom_threshold = 15.0
@@ -3198,16 +3249,17 @@ def test_add_connection_threshold_and_gain():
     )
 
     # Check that the threshold was set correctly
-    conn_idx = pick_connection(
-        net, src_gids="L2_pyramidal", target_gids="L2_basket", receptor="ampa"
-    )[-1]
-    assert net.connectivity[conn_idx]["nc_dict"]["threshold"] == custom_threshold
-
-    conn_idx = pick_connection_from_dataframe(
-        net, src_gids="L2_pyramidal", target_gids="L2_basket", receptor="ampa"
-    )[-1]
-    drive_conn = net.connectivity_df[net.connectivity_df["conn_idx"] == conn_idx]
-    assert (drive_conn["threshold"] == custom_threshold).all()
+    if use_dataframe == False:  
+        conn_idx = pick_connection(
+            net, src_gids="L2_pyramidal", target_gids="L2_basket", receptor="ampa"
+        )[-1]
+        assert net.connectivity[conn_idx]["nc_dict"]["threshold"] == custom_threshold
+    else:
+        conn_idx = pick_connection_from_dataframe(
+            net, src_gids="L2_pyramidal", target_gids="L2_basket", receptor="ampa"
+        )[-1]
+        drive_conn = net.connectivity_df[net.connectivity_df["conn_idx"] == conn_idx]
+        assert (drive_conn["threshold"] == custom_threshold).all()
 
     # Add connection with custom gain
     custom_gain = 2.5
@@ -3222,16 +3274,17 @@ def test_add_connection_threshold_and_gain():
         gain=custom_gain,
     )
     # Check that the gain was set correctly
-    conn_idx = pick_connection(
-        net, src_gids="L5_pyramidal", target_gids="L5_basket", receptor="ampa"
-    )[-1]
-    assert net.connectivity[conn_idx]["nc_dict"]["gain"] == custom_gain
-
-    conn_idx = pick_connection_from_dataframe(
-        net, src_gids="L5_pyramidal", target_gids="L5_basket", receptor="ampa"
-    )[-1]
-    drive_conn = net.connectivity_df[net.connectivity_df["conn_idx"] == conn_idx]
-    assert (drive_conn["gain"] == custom_gain).all()
+    if use_dataframe == False:  
+        conn_idx = pick_connection(
+            net, src_gids="L5_pyramidal", target_gids="L5_basket", receptor="ampa"
+        )[-1]
+        assert net.connectivity[conn_idx]["nc_dict"]["gain"] == custom_gain
+    else:
+        conn_idx = pick_connection_from_dataframe(
+            net, src_gids="L5_pyramidal", target_gids="L5_basket", receptor="ampa"
+        )[-1]
+        drive_conn = net.connectivity_df[net.connectivity_df["conn_idx"] == conn_idx]
+        assert (drive_conn["gain"] == custom_gain).all()
 
     # Add connection with both custom threshold and gain
     net.add_connection(
@@ -3247,18 +3300,19 @@ def test_add_connection_threshold_and_gain():
     )
 
     # Check that both were set correctly
-    conn_idx = pick_connection(
-        net, src_gids="L2_basket", target_gids="L2_pyramidal", receptor="gabaa"
-    )[-1]
-    assert net.connectivity[conn_idx]["nc_dict"]["threshold"] == custom_threshold
-    assert net.connectivity[conn_idx]["nc_dict"]["gain"] == custom_gain
-
-    conn_idx = pick_connection_from_dataframe(
-        net, src_gids="L2_basket", target_gids="L2_pyramidal", receptor="gabaa"
-    )[-1]
-    drive_conn = net.connectivity_df[net.connectivity_df["conn_idx"] == conn_idx]
-    assert (drive_conn["threshold"] == custom_threshold).all()
-    assert (drive_conn["gain"] == custom_gain).all()
+    if use_dataframe == False:  
+        conn_idx = pick_connection(
+            net, src_gids="L2_basket", target_gids="L2_pyramidal", receptor="gabaa"
+        )[-1]
+        assert net.connectivity[conn_idx]["nc_dict"]["threshold"] == custom_threshold
+        assert net.connectivity[conn_idx]["nc_dict"]["gain"] == custom_gain
+    else:
+        conn_idx = pick_connection_from_dataframe(
+            net, src_gids="L2_basket", target_gids="L2_pyramidal", receptor="gabaa"
+        )[-1]
+        drive_conn = net.connectivity_df[net.connectivity_df["conn_idx"] == conn_idx]
+        assert (drive_conn["threshold"] == custom_threshold).all()
+        assert (drive_conn["gain"] == custom_gain).all()
 
     # Test that default threshold is inherited from network when threshold=None
     net.add_connection(
@@ -3273,18 +3327,19 @@ def test_add_connection_threshold_and_gain():
         gain=1.5,
     )
 
-    conn_idx = pick_connection(
-        net, src_gids="L5_basket", target_gids="L5_pyramidal", receptor="gabaa"
-    )[-1]
-    assert net.connectivity[conn_idx]["nc_dict"]["threshold"] == net.threshold
-    assert net.connectivity[conn_idx]["nc_dict"]["gain"] == 1.5
-
-    conn_idx = pick_connection_from_dataframe(
-        net, src_gids="L5_basket", target_gids="L5_pyramidal", receptor="gabaa"
-    )[-1]
-    drive_conn = net.connectivity_df[net.connectivity_df["conn_idx"] == conn_idx]
-    assert (drive_conn["threshold"] == net.threshold).all()
-    assert (drive_conn["gain"] == 1.5).all()
+    if use_dataframe == False:  
+        conn_idx = pick_connection(
+            net, src_gids="L5_basket", target_gids="L5_pyramidal", receptor="gabaa"
+        )[-1]
+        assert net.connectivity[conn_idx]["nc_dict"]["threshold"] == net.threshold
+        assert net.connectivity[conn_idx]["nc_dict"]["gain"] == 1.5
+    else:
+        conn_idx = pick_connection_from_dataframe(
+            net, src_gids="L5_basket", target_gids="L5_pyramidal", receptor="gabaa"
+        )[-1]
+        drive_conn = net.connectivity_df[net.connectivity_df["conn_idx"] == conn_idx]
+        assert (drive_conn["threshold"] == net.threshold).all()
+        assert (drive_conn["gain"] == 1.5).all()
      
     
 
@@ -3311,9 +3366,10 @@ def test_get_cell_index_by_synapse_type():
     assert len(set(e_gids).intersection(set(i_gids))) == 0
 
 
-def test_check_global_synaptic_gains_uniformity():
+@pytest.mark.parametrize("use_dataframe", [False, True])
+def test_check_global_synaptic_gains_uniformity(use_dataframe):
     """Test _check_global_synaptic_gains_uniformity function."""
-    net = neymotin_2020_model()
+    net = neymotin_2020_model(use_dataframe=use_dataframe)
 
     # Set some global gains
     net.set_global_synaptic_gains(e_e=0.5)
@@ -3324,13 +3380,22 @@ def test_check_global_synaptic_gains_uniformity():
 
     # Make gains non-uniform by setting different gains for different connections
     # Get two e_e connections
-    l2p_l2p_conns = pick_connection(
-        net, src_gids="L2_pyramidal", target_gids="L2_pyramidal"
-    )
-
-    # Set different gains for these connections
-    net.connectivity[l2p_l2p_conns[0]]["nc_dict"]["gain"] = 1.0
-    net.connectivity[l2p_l2p_conns[1]]["nc_dict"]["gain"] = 2.0
+    if use_dataframe == False:
+        l2p_l2p_conns = pick_connection(
+            net, src_gids="L2_pyramidal", target_gids="L2_pyramidal"
+        )
+        net.connectivity[l2p_l2p_conns[0]]["nc_dict"]["gain"] = 1.0
+        net.connectivity[l2p_l2p_conns[1]]["nc_dict"]["gain"] = 2.0
+    else:
+        l2p_l2p_conns = pick_connection_from_dataframe(
+            net, src_gids="L2_pyramidal", target_gids="L2_pyramidal"
+        )
+        net.connectivity_df.loc[
+            net.connectivity_df["conn_idx"] == l2p_l2p_conns[0], "gain"
+        ] = 1.0
+        net.connectivity_df.loc[
+            net.connectivity_df["conn_idx"] == l2p_l2p_conns[1], "gain"
+        ] = 2.0
 
     # Capture stdout to check for warning message
     with io.StringIO() as buf, redirect_stdout(buf):

@@ -83,7 +83,8 @@ def test_base_params():
     assert params == params_base
 
 
-def test_remove_nulled_drives(tmp_path):
+@pytest.mark.parametrize("use_dataframe", [False, True])
+def test_remove_nulled_drives(tmp_path, use_dataframe):
     param_url = (
         "https://raw.githubusercontent.com/jonescompneurolab/hnn/"
         "master/param/ERPYes100Trials.param"
@@ -96,6 +97,7 @@ def test_remove_nulled_drives(tmp_path):
         params=read_params(params_fname),
         add_drives_from_params=True,
         legacy_mode=True,
+        use_dataframe=use_dataframe,
     )
     net_removed = remove_nulled_drives(net)
 
@@ -108,11 +110,12 @@ def test_remove_nulled_drives(tmp_path):
     )
 
     # Connections were removed
-    conn_src_types = set([conn["src_type"] for conn in net_removed.connectivity])
-    assert all([drive not in conn_src_types for drive in drives_removed])
-
-    conn_src_types_df = set(net_removed.connectivity_df["src_type"])
-    assert all([drive not in conn_src_types_df for drive in drives_removed])
+    if use_dataframe == False:  # noqa: E712
+        conn_src_types = set([conn["src_type"] for conn in net_removed.connectivity])
+        assert all([drive not in conn_src_types for drive in drives_removed])
+    else:
+        conn_src_types_df = set(net_removed.connectivity_df["src_type"])
+        assert all([drive not in conn_src_types_df for drive in drives_removed])
 
     # gid ranges were updated
     assert all([drive not in net_removed.gid_ranges.keys() for drive in drives_removed])

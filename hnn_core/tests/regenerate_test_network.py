@@ -9,7 +9,7 @@ hnn_core_root = Path(__file__).parents[1]
 assets_path = Path(hnn_core_root, "tests", "assets")
 
 
-def jones_2009_additional_features():
+def jones_2009_additional_features(use_dataframe=False):
     """Instantiate default network with more features for testing purposes.
 
     Note: Depending on differences between CPU architectures, OS, and other
@@ -20,13 +20,22 @@ def jones_2009_additional_features():
     differences in OTHER cell values, such as conductances, and you need to
     regenerate the network, then please discuss with the HNN Development Team
     before pushing your newly-regenerated test network.
+
+    use_dataframe : bool
+        Passed through to neymotin_2020_model, for tests that need to build
+        this network with use_dataframe=True instead of the default. Does
+        not change the stored asset file, which is always regenerated with
+        the default (use_dataframe=False).
     """
 
     params_path = Path(hnn_core_root, "param", "default.json")
     params = read_params(params_path)
 
     net = neymotin_2020_model(
-        params=params, add_drives_from_params=True, mesh_shape=(3, 3)
+        params=params,
+        add_drives_from_params=True,
+        mesh_shape=(3, 3),
+        use_dataframe=use_dataframe,
     )
 
     # Adding bias

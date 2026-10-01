@@ -133,7 +133,9 @@ def check_equal_networks(net1, net2):
             )
 
     # Check all other attributes
-    attrs_to_ignore = ["connectivity", "external_drives", "external_biases","connectivty_df"]
+    attrs_to_ignore = [
+        "connectivity", "connectivity_df", "external_drives", "external_biases"
+    ]
     for attr in vars(net1).keys():
         if attr.startswith("_") or attr in attrs_to_ignore:
             continue

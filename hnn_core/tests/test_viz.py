@@ -14,6 +14,7 @@ import pytest
 import hnn_core
 from hnn_core import read_params, neymotin_2020_model, read_spikes
 from hnn_core.dipole import simulate_dipole
+from hnn_core.network import pick_connection_from_dataframe
 from hnn_core.network_models import default_cell_metadata
 from hnn_core.viz import (
     plot_cells,
@@ -55,9 +56,10 @@ def _fake_click(fig, ax, point, button=1):
     fig.canvas.callbacks.process("button_press_event", button_press_event)
 
 
-def test_network_visualization(setup_net):
+@pytest.mark.parametrize("use_dataframe", [False, True])
+def test_network_visualization(use_dataframe):
     """Test network visualisations."""
-    net = setup_net
+    net = neymotin_2020_model(mesh_shape=(3, 3), use_dataframe=use_dataframe)
     plot_cells(net)
     ax = net.cell_types["L2_pyramidal"]["cell_object"].plot_morphology()
     assert len(ax.lines) == 8
@@ -134,7 +136,13 @@ def test_network_visualization(setup_net):
     plt.close("all")
 
     # test interactive clicking updates the position of src_cell in plot
-    del net.connectivity[-1]
+    if use_dataframe == False:
+        del net.connectivity[-1]
+    else:
+        conn_idx = net.connectivity_df["conn_idx"].max()
+        net.connectivity_df = net.connectivity_df[
+            net.connectivity_df["conn_idx"] != conn_idx
+        ].copy()
     conn_idx = 15
     net.add_connection(
         net.gid_ranges["L2_pyramidal"][::2],
@@ -146,6 +154,10 @@ def test_network_visualization(setup_net):
         lamtha=3.0,
         probability=0.8,
     )
+    if use_dataframe:
+        conn_idx = pick_connection_from_dataframe(
+            net, src_gids="L2_pyramidal", target_gids="L5_basket"
+        )[-1]
     fig = plot_cell_connectivity(net, conn_idx, show=False)
     ax_src, ax_target, _ = fig.axes
 

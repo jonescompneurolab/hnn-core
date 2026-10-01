@@ -97,62 +97,76 @@ def test_eq(jones_2009_network, calcium_network):
     (net1_hard_change_drive.external_drives["evdist1"]["weights_ampa"]["L2_basket"]) = 0
     assert net1_hard_change_drive != net1
 
-def test_eq_conn_(jones_2009_network):
-    net1 = jones_2009_network
+@pytest.mark.parametrize("use_dataframe", [False, True])
+def test_eq_conn(use_dataframe):
+    net1 = jones_2009_additional_features(use_dataframe=use_dataframe)
 
     # Check a change in connectivity
     net1_clear_conn = net1.copy()
     net1_clear_conn.clear_connectivity()
     assert net1_clear_conn != net1
 
-    # Hardwired change in connectivity attribute
-    net1_hard_change_conn = net1.copy()
-    net1_hard_change_conn.connectivity[0]["gid_pairs"] = {}
-    assert net1_hard_change_conn != net1
+    if use_dataframe == False:  # noqa: E712
+        # Hardwired change in connectivity attribute
+        net1_hard_change_conn = net1.copy()
+        net1_hard_change_conn.connectivity[0]["gid_pairs"] = {}
+        assert net1_hard_change_conn != net1
 
-    # Hardwired change in connectivity nc_dict
-    net1_hard_change_conn = net1.copy()
-    net1_hard_change_conn.connectivity[0]["nc_dict"]["A_weight"] = 0
-    assert net1_hard_change_conn != net1
+        # Hardwired change in connectivity nc_dict
+        net1_hard_change_conn = net1.copy()
+        net1_hard_change_conn.connectivity[0]["nc_dict"]["A_weight"] = 0
+        assert net1_hard_change_conn != net1
 
-    #copied same from above
-    net1_hard_change_conn_df = net1.copy()
-    first_conn_idx = net1_hard_change_conn_df.connectivity_df["conn_idx"].min()
-    net1_hard_change_conn_df.connectivity_df.loc[
-        net1_hard_change_conn_df.connectivity_df["conn_idx"] == first_conn_idx,
-        "weight",
-    ] = 0
-    assert net1_hard_change_conn_df != net1
+        # Check edge case, same number of connections, different replicate in conn
+        net1_alt_conn1 = net1.copy()
+        net1_alt_conn2 = net1.copy()
+        l_conn = net1_alt_conn1.connectivity
+        l_conn_rep_start = [l_conn[0]] + l_conn
+        l_conn_rep_end = l_conn + [l_conn[-1]]
+        net1_alt_conn1.connectivity = l_conn_rep_start
+        net1_alt_conn2.connectivity = l_conn_rep_end
+        assert net1 != net1_alt_conn1
+        assert net1_alt_conn1 == net1_alt_conn1
+        assert net1_alt_conn1 != net1_alt_conn2
+    else:
+        # Remove all gid pairs belonging to the first connection.
+        net1_hard_change_conn_df = net1.copy()
+        first_conn_idx = net1_hard_change_conn_df.connectivity_df["conn_idx"].min()
+        net1_hard_change_conn_df.connectivity_df = (
+            net1_hard_change_conn_df.connectivity_df.loc[
+                net1_hard_change_conn_df.connectivity_df["conn_idx"] != first_conn_idx
+            ].copy()
+        )
+        assert net1_hard_change_conn_df != net1
 
-    # Check edge case, same number of connections, different replicate in conn
-    net1_alt_conn1 = net1.copy()
-    net1_alt_conn2 = net1.copy()
-    l_conn = net1_alt_conn1.connectivity
-    l_conn_rep_start = [l_conn[0]] + l_conn
-    l_conn_rep_end = l_conn + [l_conn[-1]]
-    net1_alt_conn1.connectivity = l_conn_rep_start
-    net1_alt_conn2.connectivity = l_conn_rep_end
-    assert net1 != net1_alt_conn1
-    assert net1_alt_conn1 == net1_alt_conn1
-    assert net1_alt_conn1 != net1_alt_conn2
+        # Hardwired change in connectivity_df, mutating directly (nc_dict
+        # mutations on the old list are not mirrored into connectivity_df)
+        net1_hard_change_conn_df = net1.copy()
+        first_conn_idx = net1_hard_change_conn_df.connectivity_df["conn_idx"].min()
+        net1_hard_change_conn_df.connectivity_df.loc[
+            net1_hard_change_conn_df.connectivity_df["conn_idx"] == first_conn_idx,
+            "weight",
+        ] = 0
+        assert net1_hard_change_conn_df != net1
 
-    #same copied from above
-    net1_alt_conn1_df = net1.copy()
-    net1_alt_conn2_df = net1.copy()
-
-    df = net1_alt_conn1_df.connectivity_df
-
-    net1_alt_conn1_df.connectivity_df = pd.concat(
-        [df.iloc[[0]], df], ignore_index=True
-    )
-
-    net1_alt_conn2_df.connectivity_df = pd.concat(
-        [df, df.iloc[[-1]]], ignore_index=True
-    )
-
-    assert net1 != net1_alt_conn1_df
-    assert net1_alt_conn1_df == net1_alt_conn1_df
-    assert net1_alt_conn1_df != net1_alt_conn2_df
+        # Check edge case, same number of connections, different replicate,
+        # via connectivity_df instead of connectivity
+        net1_alt_conn1_df = net1.copy()
+        net1_alt_conn2_df = net1.copy()
+        df = net1_alt_conn1_df.connectivity_df
+        first_conn = df[df["conn_idx"] == df["conn_idx"].min()].copy()
+        last_conn = df[df["conn_idx"] == df["conn_idx"].max()].copy()
+        first_conn["conn_idx"] = df["conn_idx"].max() + 1
+        last_conn["conn_idx"] = df["conn_idx"].max() + 1
+        net1_alt_conn1_df.connectivity_df = pd.concat(
+            [first_conn, df], ignore_index=True
+        )
+        net1_alt_conn2_df.connectivity_df = pd.concat(
+            [df, last_conn], ignore_index=True
+        )
+        assert net1 != net1_alt_conn1_df
+        assert net1_alt_conn1_df == net1_alt_conn1_df
+        assert net1_alt_conn1_df != net1_alt_conn2_df
 
 
 def test_write_configuration(tmp_path, jones_2009_network):
@@ -237,7 +251,6 @@ def test_rec_array_to_dict(jones_2009_network):
     result2 = _rec_array_to_dict(net.rec_arrays["el1"], write_output=False)
     assert result2["times"].size == 0
     assert result2["voltages"].size == 0
-
 
 def test_conn_to_dict(jones_2009_network):
     """Tests _connectivity_to_list_of_dicts function"""
