@@ -1717,8 +1717,14 @@ class Network:
                         probability=probability,
                         conn_seed=drive["conn_seed"] + seed_increment,
                     )
-                    # Ensure that AMPA/NMDA connections target the same gids
-                    if receptor_idx > 0:
+                    # local fix: self.connectivity is never appended to when
+                    # use_dataframe=True , so indexing into
+                    # it here would always raise IndexError in that mode
+                    if (
+                        receptor_idx > 0
+                        and isinstance(self.use_dataframe, bool)
+                        and not self.use_dataframe
+                    ):
                         self.connectivity[-1]["src_gids"] = self.connectivity[-2][
                             "src_gids"
                         ]
@@ -1739,9 +1745,14 @@ class Network:
                         probability=probability,
                         conn_seed=drive["conn_seed"] + seed_increment,
                     )
-                    # Ensure that AMPA/NMDA connections target the same gids
-                    # when probability < 1
-                    if receptor_idx > 0:
+
+                    # local fix: same as above , self.connectivity stays empty
+                    # when use_dataframe=True, so guard the list indexing
+                    if (
+                        receptor_idx > 0
+                        and isinstance(self.use_dataframe, bool)
+                        and not self.use_dataframe
+                    ):
                         self.connectivity[-1]["src_gids"] = self.connectivity[-2][
                             "src_gids"
                         ]
@@ -1784,13 +1795,15 @@ class Network:
                     trial_seed_offset = self._n_gids
                     if drive["cell_specific"]:
                         if self.use_dataframe:
-                            conn_idxs = pick_connection_from_dataframe(self, src_gids=drive_cell_gid)
-                            target_types = set(
-                                self.connectivity_df.loc[
-                                    self.connectivity_df["conn_idx"].isin(conn_idxs),
-                                    "target_type",
-                                ]
-                            )
+
+                            number = 0
+                            target_types = set()
+                            for target_cell_type in drive["target_types"]:
+                                n_targets = len(self.gid_ranges[target_cell_type])
+                                if number <= drive_cell_gid_offset < number + n_targets:
+                                    target_types = {target_cell_type}
+                                    break
+                                number += n_targets
                         else:
                             conn_idxs = pick_connection(self, src_gids=drive_cell_gid)
                             target_types = set(
@@ -2407,6 +2420,20 @@ class Network:
                     if connection["target_type"] == original_name:
                         connection["target_type"] = new_name
 
+                # local fix: connectivity_df carries its own src_type/
+                # target_type columns that the loop above never touched, so
+                # a renamed network's dataframe representation kept stale
+                # names (and NetworkBuilder's dataframe path would then
+                # KeyError on gid_ranges[stale_name] once it no longer
+                # existed under that name).
+                self.connectivity_df.loc[
+                    self.connectivity_df["src_type"] == original_name, "src_type"
+                ] = new_name
+                self.connectivity_df.loc[
+                    self.connectivity_df["target_type"] == original_name,
+                    "target_type",
+                ] = new_name
+
                 # Restore original cell object name to preserve cell template identity
                 if (
                     new_name in self.cell_types
@@ -2635,10 +2662,10 @@ class Network:
                     valid_sections = target_cell.sect_loc[loc]
                 else:
                     valid_sections = [loc]
-                for section in valid_sections:
+                for section in valid_sections or [None]:
                     nc_dict = conn["nc_dict"]
                     rows.append(
-                        {   
+                        {
                             "conn_idx":self._counter,
                             "src_gid": src_gid,
                             "target_gid": target_gid,
@@ -2647,12 +2674,13 @@ class Network:
                             "receptor": receptor,
                             "template_loc": loc,
                             "actual_section": section,
-                            "segX": 0.5,  # synapse is placed in the middle of the section by default
+                            "segX": 0.5 if section is not None else None,
                             "weight": nc_dict["A_weight"],
                             "delay": nc_dict["A_delay"],
                             "lamtha": nc_dict["lamtha"],
                             "threshold": nc_dict["threshold"],
                             "gain": nc_dict["gain"],
+                            "probability": conn["probability"],
                         }
                     )
         self.connectivity_df = pd.concat(
@@ -2797,12 +2825,20 @@ class Network:
                 raise ValueError(
                     f"Synaptic gains must be non-negative. Got {gain} for '{conn_type}'."
                 )
-
-            conn_indices = pick_connection(
-                net, src_gids=src_gids, target_gids=target_gids
-            )
-            for conn_idx in conn_indices:
-                net.connectivity[conn_idx]["nc_dict"]["gain"] = gain
+            
+            if isinstance(net.use_dataframe, bool) and not net.use_dataframe:
+                conn_indices = pick_connection(
+                    net, src_gids=src_gids, target_gids=target_gids
+                )
+                for conn_idx in conn_indices:
+                    net.connectivity[conn_idx]["nc_dict"]["gain"] = gain
+            else:
+                conn_indices = pick_connection_from_dataframe(
+                    net, src_gids=src_gids, target_gids=target_gids
+                )
+                net.connectivity_df.loc[
+                    net.connectivity_df["conn_idx"].isin(conn_indices), "gain"
+                ] = gain
 
         if copy:
             return net

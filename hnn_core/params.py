@@ -770,17 +770,27 @@ def remove_nulled_drives(net):
     net : Network object
 
     """
-    from .network import pick_connection
+    from .network import pick_connection, pick_connection_from_dataframe
 
     net = deepcopy(net)
     drives_copy = net.external_drives.copy()
 
     extras = dict()
     for drive_name, drive in net.external_drives.items():
-        conn_indices = pick_connection(net, src_gids=drive_name)
-
-        space_constant = net.connectivity[conn_indices[0]]["nc_dict"]["lamtha"]
-        probability = net.connectivity[conn_indices[0]]["probability"]
+        # local fix net.connectivity is never populated when
+        # use_dataframe=True, so read the equivalent values from
+        # connectivity_df in that case instead of indexing the empty list
+        if isinstance(net.use_dataframe, bool) and not net.use_dataframe:
+            conn_indices = pick_connection(net, src_gids=drive_name)
+            space_constant = net.connectivity[conn_indices[0]]["nc_dict"]["lamtha"]
+            probability = net.connectivity[conn_indices[0]]["probability"]
+        else:
+            conn_indices_df = pick_connection_from_dataframe(net, src_gids=drive_name)
+            conn_row = net.connectivity_df[
+                net.connectivity_df["conn_idx"] == conn_indices_df[0]
+            ].iloc[0]
+            space_constant = conn_row["lamtha"]
+            probability = conn_row["probability"]
 
         extras[drive_name] = {
             "space_constant": space_constant,

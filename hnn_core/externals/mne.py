@@ -419,7 +419,9 @@ def _check_option(parameter, value, allowed_values, extra=""):
         "{options}, but got {value!r} instead."
     )
     allowed_values = list(allowed_values)  # e.g., if a dict was given
-    if len(allowed_values) == 1:
+    if len(allowed_values) == 0:
+        options = "No values are allowed"
+    elif len(allowed_values) == 1:
         options = f"The only allowed value is {repr(allowed_values[0])}"
     else:
         options = "Allowed values are "

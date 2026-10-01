@@ -620,6 +620,10 @@ class NetworkBuilder(object):
             sec_name = row.actual_section
             segX = row.segX
 
+            # local fix . Will remove when validate dataframe
+            if sec_name is None or (isinstance(sec_name, float) and np.isnan(sec_name)):
+                continue
+
             target_cell = self._cells[gid_to_idx[target_gid]]
 
             connection_name = (
