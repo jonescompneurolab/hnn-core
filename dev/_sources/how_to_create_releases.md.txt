@@ -220,7 +220,7 @@ Make sure that you check that it's the latest version that you just uploaded. If
 ```
 python -c "from hnn_core import neymotin_2020_model, simulate_dipole ; simulate_dipole(neymotin_2020_model(), tstop=20)"
 ```
-6. You can also test the TestPyPI version in yet another environment if you want, but you should note that the command shown at the top of the [TestPyPI page](https://test.pypi.org/project/hnn-core/#history) will NOT work, due to the `-i` argument. (The reason for this is that TestPyPI does not actually provide the `setuptools` package that we need, [see here](https://stackoverflow.com/a/77948986)). If you want to install the TestPyPI version in a way that actually works, you should do the following:
+6. You can also test the TestPyPI version in yet another environment if you want, but you should note that the command shown at the top of the [TestPyPI page](https://test.pypi.org/project/hnn-core/#history) will NOT work, due to the `-i` argument. (The reason for this is that TestPyPI does not actually provide the `setuptools` package that we need). If you want to install the TestPyPI version in a way that actually works, you should do the following:
 ```
 pip install --extra-index-url https://test.pypi.org/simple/ "hnn-core"
 ```
