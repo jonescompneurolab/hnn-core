@@ -13,6 +13,7 @@ Adopted from http://atpassos.me/post/44900091837/bayesian-optimization
 
 import warnings
 from sklearn import gaussian_process
+from sklearn.utils import check_random_state
 import numpy as np
 
 import scipy.stats as st
@@ -63,7 +64,7 @@ def bayes_opt(func, x0, cons, acquisition, maxfun=200, debug=False, random_state
     debug : bool, optional
         The default is False.
     random_state : int, optional
-        Random state of the GaussianProcessRegressor. The default is None.
+        Random state of the optimizer. The default is None.
 
     Returns
     -------
@@ -83,13 +84,14 @@ def bayes_opt(func, x0, cons, acquisition, maxfun=200, debug=False, random_state
     best_x = X[np.argmin(y)]
     best_f = y[np.argmin(y)]
     gp = gaussian_process.GaussianProcessRegressor(random_state=random_state)
+    rng = check_random_state(random_state)
 
     if debug:
         print("iter", -1, "best_x", best_x, best_f)
 
     for i in range(maxfun):
         # draw samples from distribution
-        all_x = np.random.uniform(
+        all_x = rng.uniform(
             low=[idx[0] for idx in cons],
             high=[idx[1] for idx in cons],
             size=(10000, len(cons)),
