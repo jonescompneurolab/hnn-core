@@ -198,7 +198,7 @@ def test_cell_response(tmp_path, input_metadata):
     }
 
     # repeat test for case in which one cell (L5 basket) does not spike -> L5_basket rate should be 0
-    spike_times = [[2.3456, 7.89], [4.2812, 93.2]]
+    spike_times = [[2.3456, 7.89], [4.2812]]
     spike_gids = [[1, 3], [5]]
     spike_types = [["L2_pyramidal", "L2_basket"], ["L5_pyramidal"]]
     tstart, tstop, fs = 0.1, 98.4, 1000.0
@@ -347,6 +347,66 @@ def test_cell_response(tmp_path, input_metadata):
     }
 
     plt.close("all")
+
+
+def test_mean_rates_time_window():
+    """Test that mean_rates only counts spikes within the time window.
+
+    Spikes before tstart or at/after tstop must not contribute to any rate, and
+    when gid_ranges is not provided, cells that only spiked outside the window
+    must not be counted as cells of their type.
+    """
+    tstart, tstop = 10.0, 20.0
+    rate_per_spike = 1000 / (tstop - tstart)
+    # Trial 0: gid 0 spikes twice in the window, gid 1 before it, gid 2 exactly
+    # at tstop, and gid 4 (L5_pyramidal) before it.
+    # Trial 1: gid 1 spikes exactly at tstart, gid 3 after the window.
+    spike_times = [[5.0, 12.0, 15.0, 20.0, 2.0], [10.0, 25.0]]
+    spike_gids = [[1, 0, 0, 2, 4], [1, 3]]
+    spike_types = [
+        ["L2_pyramidal"] * 4 + ["L5_pyramidal"],
+        ["L2_pyramidal"] * 2,
+    ]
+    gid_ranges = {"L2_pyramidal": range(0, 4), "L5_pyramidal": range(4, 6)}
+    cell_response = CellResponse(
+        cell_type_names=["L2_pyramidal", "L5_pyramidal"],
+        spike_times=spike_times,
+        spike_gids=spike_gids,
+        spike_types=spike_types,
+    )
+
+    # With gid_ranges, every cell in the range gets a rate and is included in
+    # the averages, including those that only spiked outside the window
+    assert cell_response.mean_rates(tstart, tstop, gid_ranges) == {
+        "L2_pyramidal": 3 * rate_per_spike / 8,
+        "L5_pyramidal": 0.0,
+    }
+    assert cell_response.mean_rates(tstart, tstop, gid_ranges, mean_type="trial") == {
+        "L2_pyramidal": [2 * rate_per_spike / 4, rate_per_spike / 4],
+        "L5_pyramidal": [0.0, 0.0],
+    }
+    assert cell_response.mean_rates(tstart, tstop, gid_ranges, mean_type="cell") == {
+        "L2_pyramidal": [
+            [2 * rate_per_spike, 0.0, 0.0, 0.0],
+            [0.0, rate_per_spike, 0.0, 0.0],
+        ],
+        "L5_pyramidal": [[0.0, 0.0], [0.0, 0.0]],
+    }
+
+    # Without gid_ranges, only gids 0 and 1 spiked in the window, so only they
+    # are counted; L5_pyramidal had no spikes in the window at all
+    assert cell_response.mean_rates(tstart, tstop) == {
+        "L2_pyramidal": 3 * rate_per_spike / 4,
+        "L5_pyramidal": 0.0,
+    }
+    assert cell_response.mean_rates(tstart, tstop, mean_type="trial") == {
+        "L2_pyramidal": [2 * rate_per_spike / 2, rate_per_spike / 2],
+        "L5_pyramidal": [0.0, 0.0],
+    }
+    assert cell_response.mean_rates(tstart, tstop, mean_type="cell") == {
+        "L2_pyramidal": [[2 * rate_per_spike, 0.0], [0.0, rate_per_spike]],
+        "L5_pyramidal": [[0.0], [0.0]],
+    }
 
 
 def test_rate_over_time_trial_idx():
