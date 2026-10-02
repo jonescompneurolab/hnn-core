@@ -269,8 +269,8 @@ class TestDipoleViz:
             dpl_sfreq.sfreq /= 10
             plot_psd([dpls[0], dpl_sfreq])
 
-    def test_plot_drive_arrows(self, run_simulation):
-        net, dpls = run_simulation
+    def test_plot_drive_arrows(self, setup_net):
+        net = setup_net
         weights_ampa = {"L2_pyramidal": 5.4e-5, "L5_pyramidal": 5.4e-5}
         net.add_evoked_drive(
             "ev_test",
@@ -282,6 +282,7 @@ class TestDipoleViz:
             n_drive_cells=1,
             cell_specific=False,
         )
+        dpls = simulate_dipole(net, tstop=100.0, n_trials=2)
         markers = _collect_drive_arrow_markers(net)
         assert any(marker["label"] == "ev_test" for marker in markers)
 
