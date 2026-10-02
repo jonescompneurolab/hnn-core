@@ -5,6 +5,7 @@ from glob import glob
 import matplotlib.pyplot as plt
 import pytest
 import numpy as np
+from numpy.testing import assert_allclose, assert_array_equal
 
 from hnn_core import CellResponse, read_spikes
 from hnn_core.network_models import default_cell_metadata
@@ -495,15 +496,15 @@ def test_rate_over_time_n_cells():
     )
 
     # without gid_ranges, only the cells that spiked in a trial are counted
-    np.assert_allclose(_spikes_per_cell(rates_spiked["L5_basket"]), [1.0, 1.0])
-    np.assert_allclose(_spikes_per_cell(rates_spiked["L5_pyramidal"]), [0.0, 1.0])
+    assert_allclose(_spikes_per_cell(rates_spiked["L5_basket"]), [1.0, 1.0])
+    assert_allclose(_spikes_per_cell(rates_spiked["L5_pyramidal"]), [0.0, 1.0])
 
     # with gid_ranges, every cell of the type in the network is counted
-    np.assert_allclose(_spikes_per_cell(rates_network["L5_basket"]), [2 / 4, 1 / 4])
-    np.assert_allclose(_spikes_per_cell(rates_network["L5_pyramidal"]), [0.0, 1 / 2])
+    assert_allclose(_spikes_per_cell(rates_network["L5_basket"]), [2 / 4, 1 / 4])
+    assert_allclose(_spikes_per_cell(rates_network["L5_pyramidal"]), [0.0, 1 / 2])
 
     # a silent trial has zero spiking cells, which must not be divided by
-    np.assert_array_equal(rates_spiked["L5_pyramidal"][0], np.zeros(len(sim_times)))
+    assert_array_equal(rates_spiked["L5_pyramidal"][0], np.zeros(len(sim_times)))
 
 
 def test_gids_from_spikes_trial_list():
@@ -520,23 +521,23 @@ def test_gids_from_spikes_trial_list():
     )
 
     # gids are pooled over the listed trials only, sorted and without duplicates
-    np.assert_array_equal(
+    assert_array_equal(
         cell_response._gids_from_spikes("L5_basket", trial_idx=[1, 0]), [7, 8]
     )
-    np.assert_array_equal(
+    assert_array_equal(
         cell_response._gids_from_spikes("L5_basket", trial_idx=[2, 1]), [7, 9]
     )
-    np.assert_array_equal(
+    assert_array_equal(
         cell_response._gids_from_spikes("L5_pyramidal", trial_idx=[0]), []
     )
 
     # a single-trial list matches the int form, and a list of all trials matches None
     for trial in range(3):
-        np.assert_array_equal(
+        assert_array_equal(
             cell_response._gids_from_spikes("L5_basket", trial_idx=[trial]),
             cell_response._gids_from_spikes("L5_basket", trial_idx=trial),
         )
-    np.assert_array_equal(
+    assert_array_equal(
         cell_response._gids_from_spikes("L5_basket", trial_idx=[0, 1, 2]),
         cell_response._gids_from_spikes("L5_basket"),
     )
