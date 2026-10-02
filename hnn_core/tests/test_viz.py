@@ -1,6 +1,7 @@
 import os.path as op
 import tempfile
 from pathlib import Path
+from unittest.mock import patch
 
 import matplotlib
 from matplotlib import backend_bases
@@ -331,6 +332,78 @@ class TestDipoleViz:
             if isinstance(child, matplotlib.text.Annotation)
         )
         assert ann.arrow_patch.get_linewidth() == custom_arrow_width
+        plt.close("all")
+
+    def test_add_arrows_to_dipole_default_time_window(self, setup_net):
+        """Omitted tmin/tmax are taken from the axis x limits."""
+        net = setup_net
+        weights_ampa = {"L2_pyramidal": 5.4e-5, "L5_pyramidal": 5.4e-5}
+        net.add_evoked_drive(
+            "ev_test",
+            mu=30.0,
+            sigma=0.1,
+            numspikes=1,
+            location="proximal",
+            weights_ampa=weights_ampa,
+            n_drive_cells=1,
+            cell_specific=False,
+        )
+
+        def _n_annotations(ax):
+            return sum(
+                1
+                for child in ax.get_children()
+                if isinstance(child, matplotlib.text.Annotation)
+            )
+
+        _, ax = plt.subplots()
+        ax.set_xlim(20.0, 50.0)
+        ax.set_ylim(-1.0, 1.0)
+        _add_arrows_to_dipole(ax, net, tmin=None, tmax=None)
+        assert _n_annotations(ax) == 1
+
+        _, ax = plt.subplots()
+        ax.set_xlim(0.0, 100.0)
+        ax.set_ylim(-1.0, 1.0)
+        _add_arrows_to_dipole(ax, net, tmin=40.0, tmax=None)
+        assert _n_annotations(ax) == 0
+
+        _, ax = plt.subplots()
+        ax.set_xlim(0.0, 100.0)
+        ax.set_ylim(-1.0, 1.0)
+        _add_arrows_to_dipole(ax, net, tmin=None, tmax=25.0)
+        assert _n_annotations(ax) == 0
+
+        plt.close("all")
+
+    def test_add_arrows_to_dipole_flat_ylim(self, setup_net):
+        """A zero-height y axis still gets drive arrows."""
+        net = setup_net
+        weights_ampa = {"L2_pyramidal": 5.4e-5, "L5_pyramidal": 5.4e-5}
+        net.add_evoked_drive(
+            "ev_test",
+            mu=30.0,
+            sigma=0.1,
+            numspikes=1,
+            location="proximal",
+            weights_ampa=weights_ampa,
+            n_drive_cells=1,
+            cell_specific=False,
+        )
+
+        _, ax = plt.subplots()
+        ax.set_xlim(0.0, 100.0)
+        with patch.object(ax, "get_ylim", return_value=(10.0, 10.0)):
+            _add_arrows_to_dipole(ax, net)
+        annotations = [
+            child
+            for child in ax.get_children()
+            if isinstance(child, matplotlib.text.Annotation)
+        ]
+        assert annotations
+        ymin, ymax = ax.get_ylim()
+        assert ymin < 10.0
+        assert ymax == 10.0
         plt.close("all")
 
 
