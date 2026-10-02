@@ -1,11 +1,28 @@
 """Re-run the same simulation as script_dpl_old.py, save to dpl_new.txt,
 then plot and print both dipoles along with their difference.
+
+Then re-run the simulations of the HNN textbook notebooks (see
+textbook_sims.py), save their dipoles to textbook_dpls/new/, and compare them
+with those saved by script_dpl_old.py in textbook_dpls/old/.
+
+Any command-line arguments restrict the textbook notebooks run and compared to
+those whose names contain one of them, e.g.
+``python script_dpl_new.py gamma alpha``.
 """
 
-import matplotlib.pyplot as plt
+import os
+import sys
+from pathlib import Path
 
-from hnn_core import simulate_dipole, jones_2009_model, read_dipole
+import matplotlib.pyplot as plt
+import textbook_sims
+
+from hnn_core import jones_2009_model, read_dipole, simulate_dipole
 from hnn_core.parallel_backends import MPIBackend
+
+# MPIBackend's child processes import hnn_core from the current directory
+# first, so run from here rather than from an hnn-core checkout
+os.chdir(Path(__file__).resolve().parent)
 
 net = jones_2009_model()
 net.add_evoked_drive(
@@ -42,4 +59,9 @@ ax[2].plot(dpl_old.times, diff)
 ax[2].set_title("difference (new - old)")
 ax[2].set_xlabel("Time (ms)")
 plt.tight_layout()
+
+patterns = sys.argv[1:]
+textbook_sims.run_all("new", patterns)
+textbook_sims.compare("old", "new", patterns)
+
 plt.show()
