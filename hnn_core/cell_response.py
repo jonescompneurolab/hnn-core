@@ -244,7 +244,7 @@ class CellResponse(object):
             spike_types += [list(spike_types_trial)]
         self._spike_types = spike_types
 
-    def _gids_from_spikes(self, cell_type, trial_idx=None):
+    def _gids_from_spikes(self, cell_type, trial_idx=None, tstart=None, tstop=None):
         """Count how many gids per cell type spiked over all trials.
         This function allows mean_rates to be used with gid_ranges=None.
 
@@ -256,35 +256,52 @@ class CellResponse(object):
             Trial index, if None (default) return gids over all trials,
             if int, return gids that spiked in individual trial,
             if list, return gids that spiked over trials in list.
+        tstart : int | float | None, default=None
+            If provided, ignore spikes occurring before tstart.
+        tstop : int | float | None, default=None
+            If provided, ignore spikes occurring at or after tstop.
 
         Returns
         -------
         gids : np.ndarray
             Sorted unique gids of ``cell_type`` observed in the spike record.
         """
-        gids, types = [], []
+        gids, types, times = [], [], []
 
         if trial_idx is None:
-            for trial_gids, trial_types in zip(self._spike_gids, self._spike_types):
+            for trial_gids, trial_types, trial_times in zip(
+                self._spike_gids, self._spike_types, self._spike_times
+            ):
                 gids.extend(trial_gids)
                 types.extend(trial_types)
+                times.extend(trial_times)
         elif isinstance(trial_idx, list):
             for tidx in trial_idx:
                 trial_gids = self._spike_gids[tidx]
                 trial_types = self._spike_types[tidx]
+                trial_times = self._spike_times[tidx]
                 gids.extend(trial_gids)
                 types.extend(trial_types)
+                times.extend(trial_times)
         elif isinstance(trial_idx, int):
             trial_gids = self._spike_gids[trial_idx]
             trial_types = self._spike_types[trial_idx]
+            trial_times = self._spike_times[trial_idx]
             gids.extend(trial_gids)
             types.extend(trial_types)
+            times.extend(trial_times)
 
         gids = np.array(gids)
         types = np.array(types)
+        times = np.array(times)
         if len(gids) == 0:
             return np.array([], dtype=int)
-        return np.unique(gids[types == cell_type])
+        mask = types == cell_type
+        if tstart is not None:
+            mask &= times >= tstart
+        if tstop is not None:
+            mask &= times < tstop
+        return np.unique(gids[mask])
 
     def mean_rates(self, tstart, tstop, gid_ranges=None, mean_type="all"):
         """Mean spike rates (Hz) by cell type.
@@ -292,13 +309,16 @@ class CellResponse(object):
         Parameters
         ----------
         tstart : int | float | None
-            Value defining the start time of all trials.
+            Value defining the start time of all trials. Only spikes occurring at or
+            after tstart are counted.
         tstop : int | float | None
-            Value defining the stop time of all trials.
+            Value defining the stop time of all trials. Only spikes occurring before
+            tstop are counted.
         gid_ranges : dict of lists or range objects | None
             Dictionary with keys, e.g. net.gid_ranges containing the range of Cell or
             input GIDs of different cell or input types. If None (default), the number
-            of cells per type is inferred from the recorded spikes.
+            of cells per type is inferred from the spikes recorded between tstart and
+            tstop.
         mean_type : str
             'all' : Average over trials and cells
                 Returns mean firing rate over time, trials, and gids, per cell type.
@@ -334,9 +354,12 @@ class CellResponse(object):
             if gid_ranges is not None:
                 cell_type_gids = np.array(gid_ranges[cell_type])
             # if gid_ranges not defined by user, calculate number of gids
-            # per type as number of gids that fired at least once.
+            # per type as number of gids that fired at least once within the
+            # time window.
             else:
-                cell_type_gids = self._gids_from_spikes(cell_type)
+                cell_type_gids = self._gids_from_spikes(
+                    cell_type, tstart=tstart, tstop=tstop
+                )
             n_trials, n_cells = len(self._spike_times), len(cell_type_gids)
 
             # if this cell type had no spikes
@@ -352,9 +375,16 @@ class CellResponse(object):
             else:
                 gid_spike_rate = np.zeros((n_trials, n_cells))
 
-                trial_data = zip(self._spike_types, self._spike_gids)
-                for trial_idx, (spike_types, spike_gids) in enumerate(trial_data):
-                    trial_type_mask = np.isin(spike_types, cell_type)
+                trial_data = zip(self._spike_times, self._spike_types, self._spike_gids)
+                for trial_idx, (spike_times, spike_types, spike_gids) in enumerate(
+                    trial_data
+                ):
+                    spike_times = np.array(spike_times)
+                    trial_type_mask = (
+                        np.isin(spike_types, cell_type)
+                        & (spike_times >= tstart)
+                        & (spike_times < tstop)
+                    )
                     gids, gid_counts = np.unique(
                         np.array(spike_gids)[trial_type_mask], return_counts=True
                     )
@@ -538,6 +568,7 @@ class CellResponse(object):
         ax=None,
         show=True,
         cell_types=None,
+        gid_ranges=None,
         colors=None,
         show_legend=True,
         marker_size=5.0,
@@ -561,6 +592,13 @@ class CellResponse(object):
             If True, show the figure.
         cell_types : list of str
             List of cell types to plot
+        gid_ranges : dict of lists or range objects | None
+            Dictionary with keys, e.g. net.gid_ranges containing the range of Cell or
+            input GIDs of different cell or input types. If provided, the raster spans
+            the full range of the plotted cell types, so that cells which never spiked
+            still occupy a row, and any overlaid dipoles are scaled to that range. If
+            None (default), the extent of the raster is inferred from the cells that
+            spiked.
         colors : list of str | None
             Optional custom colors to plot. Default will use the colors defined in cell metadata.
         show_legend : bool
@@ -597,6 +635,7 @@ class CellResponse(object):
             ax=ax,
             show=show,
             cell_types=cell_types,
+            gid_ranges=gid_ranges,
             colors=colors,
             show_legend=show_legend,
             marker_size=marker_size,
