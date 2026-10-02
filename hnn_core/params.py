@@ -332,6 +332,22 @@ class Params(dict):
             if "duecker_ET_model" in (params_input.get("model_variant"),):
                 for key in params_input.keys():
                     self[key] = params_input[key]
+                # The below is needed for an obscure problem: In the Neymotin model,
+                # `params_default.py` is used to add blank `record_XXX` keys to
+                # `net._params` before network build time. These keys are needed at the
+                # time of `NetworkBuilder._build()`. In the case of `simulate_dipole`,
+                # these keys are filled in using the passed parameters. However, there
+                # is a case where we try to execute a simulation WITHOUT using
+                # `simulate_dipole`, which is when we are testing
+                # `mpi_child.py::MPISimulation.run()` by itself. In this case,
+                # `NetworkBuilder._build()` still needs these keys to be present, but
+                # the Duecker model fails here because 1. it does not inherit params
+                # from `params_default.py` and 2. `simulate_dipole` has not been
+                # called. Therefore, these three keys need to be artificially added so
+                # that we can test `mpi_child.py::MPISimulation.run()` by itself.
+                for key in ["record_vsec", "record_isec", "record_ca"]:
+                    if key not in params_input:
+                        self[key] = params_default[key]
             else:
                 for key in params_default.keys():
                     if key in params_input:

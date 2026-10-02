@@ -3,7 +3,7 @@
 
 # make rules
 
-.PHONY: all clean check-manifest lint modl regenerate-test-network test
+.PHONY: all clean check-manifest lint modl test
 
 all: modl
 
@@ -44,9 +44,8 @@ lint:
 modl:
 	cd hnn_core/mod/ && nrnivmodl
 
-regenerate-networks:
+regenerate-network:
 	python ./dev_scripts/regenerate_base_network.py
-	python ./hnn_core/tests/regenerate_test_network.py
 
 regenerate-duecker-test-data:
 	python ./hnn_core/tests/script_duecker_simulate_save.py

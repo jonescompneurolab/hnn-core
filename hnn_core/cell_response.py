@@ -892,7 +892,14 @@ def read_spikes(fname, gid_ranges=None):
             spike_gids += [list()]
             spike_types += [list()]
 
-    network_cell_names = ["L2_basket", "L2_pyramidal", "L5_basket", "L5_pyramidal"]
+    network_cell_names = [
+        "L2_basket",
+        "L2_pyramidal",
+        "L5_basket",
+        "L5_pyramidal",
+        "L2_inhibitory",  # Duecker model
+        "L5_inhibitory",  # Duecker model
+    ]
     # Need to cast "np.str_" to str type, since types are loaded above as np.str_, not
     # regular strings
     cell_type_names = list(

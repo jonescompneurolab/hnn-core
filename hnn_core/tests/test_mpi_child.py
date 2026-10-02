@@ -1,12 +1,10 @@
-from pathlib import Path
 import io
 from contextlib import redirect_stdout, redirect_stderr
 from queue import Queue
 
 import pytest
 
-import hnn_core
-from hnn_core import read_params, Network, neymotin_2020_model
+from hnn_core import Network
 from hnn_core.mpi_child import MPISimulation, _str_to_net
 from hnn_core.parallel_backends import (
     _gather_trial_data,
@@ -82,15 +80,9 @@ def test_extract_data_length():
     assert output == 8
 
 
-def test_str_to_net():
+def test_str_to_net(fix_net_neymotin_2020):
     """Test reading the network via a string"""
-
-    hnn_core_root = Path(hnn_core.__file__).parent
-
-    # prepare network
-    params_fname = hnn_core_root / "param" / "default.json"
-    params = read_params(params_fname)
-    net = neymotin_2020_model(params, add_drives_from_params=True)
+    net, _ = fix_net_neymotin_2020()
 
     pickled_net = base64.b64encode(pickle.dumps(net))
 
@@ -119,20 +111,14 @@ def test_str_to_net():
         _str_to_net(input_str)
 
 
-def test_child_run():
+@pytest.mark.parametrize(
+    "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+)
+def test_child_run(fix_net_model, request):
     """Test running the child process without MPI"""
-
-    hnn_core_root = Path(hnn_core.__file__).parent
-
-    # prepare params
-    params_fname = hnn_core_root / "param" / "default.json"
-    params = read_params(params_fname)
-    params_reduced = params.copy()
-    params_reduced.update({"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20})
+    net_model = request.getfixturevalue(fix_net_model)
+    net_reduced, _ = net_model(add_drives_from_params=True, reduced=True)
     tstop, n_trials = 25, 2
-    net_reduced = neymotin_2020_model(
-        params_reduced, add_drives_from_params=True, mesh_shape=(3, 3)
-    )
     net_reduced._instantiate_drives(tstop=tstop, n_trials=n_trials)
 
     with MPISimulation(skip_mpi_import=True) as mpi_sim:

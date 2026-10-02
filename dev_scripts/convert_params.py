@@ -10,9 +10,10 @@ import tempfile
 from pathlib import Path
 from requests.exceptions import HTTPError
 
+import hnn_core
 from hnn_core import convert_to_json
 
-root_path = Path(__file__).parents[1]
+hnn_core_root = Path(hnn_core.__file__).parent
 
 
 def download_folder_contents(owner, repo, path):
@@ -93,13 +94,13 @@ if __name__ == '__main__':
     convert_param_files_from_repo(owner='jonescompneurolab',
                                   repo='hnn',
                                   repo_path='param',
-                                  local_path=(root_path /
+                                  local_path=(hnn_core_root /
                                               'network_configuration'),
                                   )
     # hnn-core json files
     convert_param_files_from_repo(owner='jonescompneurolab',
                                   repo='hnn-core',
                                   repo_path='hnn_core/param',
-                                  local_path=(root_path /
+                                  local_path=(hnn_core_root /
                                               'network_configuration'),
                                   )
