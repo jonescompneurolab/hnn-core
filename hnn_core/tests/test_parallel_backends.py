@@ -5,8 +5,7 @@ import itertools
 from contextlib import redirect_stdout
 from threading import Thread, Event
 from time import sleep
-# AES
-# from urllib.request import urlretrieve
+from urllib.request import urlretrieve
 
 import numpy as np
 from numpy import loadtxt
@@ -389,14 +388,14 @@ class TestParallelBackends:
         # small snippet of data on data branch for now. To be deleted
         # later. Data branch should have only commit so it does not
         # pollute the history.
-        # # AES
-        # data_url = (
-        #     "https://raw.githubusercontent.com/jonescompneurolab/"
-        #     "hnn-core/test_data/dpl.txt"
-        # )
-        # if not Path("dpl.txt").exists():
-        #     urlretrieve(data_url, "dpl.txt")
-        dpl_master = loadtxt("dpl.txt")
+        ground_truth_fname = "dpl_nonlegacy_units.txt"
+        data_url = (
+            "https://raw.githubusercontent.com/jonescompneurolab/"
+            f"hnn-core/test_data/{ground_truth_fname}"
+        )
+        if not Path(ground_truth_fname).exists():
+            urlretrieve(data_url, ground_truth_fname)
+        dpl_master = loadtxt(ground_truth_fname)
 
         dpls, net = run_hnn_core_fixture(backend=backend)
         dpl = dpls[0].smooth(30).scale(3000)
@@ -419,22 +418,12 @@ class TestParallelBackends:
         assert "common" not in spike_type_counts
         assert "exgauss" not in spike_type_counts
         assert "extpois" not in spike_type_counts
-        # AES
-        # assert spike_type_counts == {
-        #     "evprox1": 270,
-        #     "L2_basket": 55,
-        #     "L2_pyramidal": 114,
-        #     "L5_pyramidal": 396,
-        #     "L5_basket": 86,
-        #     "evdist1": 270,
-        #     "evprox2": 270,
-        # }
         assert spike_type_counts == {
             "evprox1": 270,
             "L2_basket": 55,
             "L2_pyramidal": 114,
             "L5_pyramidal": 396,
-            "L5_basket": 85,  # only diff
+            "L5_basket": 85,
             "evdist1": 270,
             "evprox2": 270,
         }
