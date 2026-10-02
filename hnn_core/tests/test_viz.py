@@ -373,8 +373,7 @@ class TestDipoleViz:
         ax.set_ylim(-1.0, 1.0)
         _add_arrows_to_dipole(ax, net)
         assert not any(
-            isinstance(child, matplotlib.text.Annotation)
-            for child in ax.get_children()
+            isinstance(child, matplotlib.text.Annotation) for child in ax.get_children()
         )
 
         net.add_evoked_drive(
