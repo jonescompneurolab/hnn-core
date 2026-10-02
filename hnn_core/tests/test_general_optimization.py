@@ -3,9 +3,15 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
+import pickle
+
 from hnn_core import simulate_dipole
 from hnn_core.dipole import _rmse
 from hnn_core.optimization import Optimizer
+from hnn_core.optimization.general_optimization import (
+    _assemble_constraints_cma,
+    _run_opt_cma,
+)
 
 import numpy as np
 import pytest
@@ -536,6 +542,48 @@ def test_cma_seed(fix_net_neymotin_2020):
     # The optimization results with different seeds should be different
     assert not np.allclose(optim_seed1.obj_, optim_seed2.obj_)
     assert not np.allclose(optim_seed1.opt_params_, optim_seed2.opt_params_)
+
+
+def test_cma_checkpoint(tmp_path, fix_net_neymotin_2020):
+    """Test that CMA saves a checkpoint to 'pth_backup' every 10 iterations"""
+    net, _ = fix_net_neymotin_2020(reduced=True)
+    initial_params = {"mu": 3.0, "sigma": 2.0}
+    constraints = _assemble_constraints_cma({"mu": (1, 6), "sigma": (1, 3)})
+
+    # Stands in for a simulation-based objective function, to keep the test fast
+    def _obj_fun(predicted_params, obj_values, **kwargs):
+        obj = [
+            float(np.sum((np.array(params) - 2.0) ** 2)) for params in predicted_params
+        ]
+        obj_values.append(obj)
+        return obj
+
+    def _run_cma(max_iter, backup_dir):
+        _run_opt_cma(
+            initial_net=net,
+            tstop=10.0,
+            constraints=constraints,
+            set_params=lambda net, params: None,
+            initial_params=initial_params,
+            obj_fun=_obj_fun,
+            max_iter=max_iter,
+            obj_fun_kwargs={"pth_backup": backup_dir, "popsize": 4, "tolfun": 0},
+        )
+
+    # No checkpoint is saved before the 10th iteration
+    backup_dir = tmp_path / "9_iter"
+    backup_dir.mkdir()
+    _run_cma(max_iter=9, backup_dir=backup_dir)
+    assert not (backup_dir / "cma_checkpoint.pkl").exists()
+
+    # The checkpoint saved at the 10th iteration can be loaded to resume from
+    backup_dir = tmp_path / "10_iter"
+    backup_dir.mkdir()
+    _run_cma(max_iter=10, backup_dir=backup_dir)
+    with open(backup_dir / "cma_checkpoint.pkl", "rb") as f:
+        checkpoint = pickle.load(f)
+    assert checkpoint["es"].countiter == 10
+    assert len(checkpoint["obj_values"]) == 10
 
 
 @pytest.mark.parametrize("solver", ["bayesian", "cma", "cobyla"])

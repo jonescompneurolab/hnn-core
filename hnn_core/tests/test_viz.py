@@ -10,6 +10,7 @@ from numpy.testing import assert_allclose
 import pytest
 
 # from hnn_core import read_spikes
+from hnn_core import CellResponse
 from hnn_core.dipole import simulate_dipole
 from hnn_core.viz import (
     plot_cells,
@@ -368,6 +369,81 @@ class TestCellResponsePlotters:
         ):
             cell_response.plot_firing_rate_time(window_length=10, ax=axes, show=False)
 
+    def test_firing_rate_time_cell_types_axes_ticks(self, fix_use_cached_sims):
+        """Plotting selected cell types, onto existing axes, with custom ticks"""
+        net, _, _, _ = fix_use_cached_sims
+        cell_response = net.cell_response
+
+        def _get_labels(axes):
+            return [
+                line.get_label() for ax in axes for line in ax.get_legend().get_lines()
+            ]
+
+        # A single cell type, given as a str, can be plotted onto a single axis
+        _, ax = plt.subplots(1, 1)
+        axes = cell_response.plot_firing_rate_time(
+            window_length=10, cell_types="L2_pyramidal", ax=ax, show=False
+        )
+        assert axes[0] is ax
+        assert _get_labels(axes) == ["L2_pyramidal"]
+
+        # A list of cell types gets one new subplot per cell type, in the given order
+        cell_types = ["L5_pyramidal", "L2_pyramidal"]
+        axes = cell_response.plot_firing_rate_time(
+            window_length=10, cell_types=cell_types, show=False
+        )
+        assert _get_labels(axes) == cell_types
+
+        # A 2D grid of axes must be flattened before it can be plotted onto
+        _, axes_grid = plt.subplots(2, 2)
+        with pytest.raises(ValueError, match=r"Use ax\.flatten\(\)"):
+            cell_response.plot_firing_rate_time(
+                window_length=10, ax=axes_grid, show=False
+            )
+        axes = cell_response.plot_firing_rate_time(
+            window_length=10, ax=axes_grid.flatten(), show=False
+        )
+        assert _get_labels(axes) == cell_response._cell_type_names
+
+        # Custom ticks are applied to every subplot
+        xticks, yticks = [0.0, 50.0, 100.0], [0.0, 10.0, 20.0]
+        axes = cell_response.plot_firing_rate_time(
+            window_length=10, xticks=xticks, yticks=yticks, show=False
+        )
+        for ax in axes:
+            assert_allclose(ax.get_xticks(), xticks)
+            assert_allclose(ax.get_yticks(), yticks)
+
+    def test_default_colors_without_metadata(self):
+        """Without cell type metadata, colors come from the matplotlib color cycle"""
+        cell_types = ["L2_pyramidal", "L5_pyramidal"]
+        cell_response = CellResponse(
+            cell_type_names=cell_types,
+            spike_times=[[2.0, 8.0]],
+            spike_gids=[[1, 5]],
+            spike_types=[cell_types],
+            times=np.arange(0.0, 20.0, 0.1),
+        )
+        color_cycle = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+        expected_colors = [
+            matplotlib.colors.to_hex(color) for color in color_cycle[: len(cell_types)]
+        ]
+
+        fig = cell_response.plot_spikes_raster(show=False)
+        colors = [
+            matplotlib.colors.to_hex(line.get_color())
+            for line in fig.axes[0].legend_.get_lines()
+        ]
+        assert colors == expected_colors
+
+        axes = cell_response.plot_firing_rate_time(window_length=2.0, show=False)
+        colors = [
+            matplotlib.colors.to_hex(line.get_color())
+            for ax in axes
+            for line in ax.get_legend().get_lines()
+        ]
+        assert colors == expected_colors
+
     # For the below, we only use the "yes_spikes" variant, since if there are no spikes
     # but someone is trying to overlay dipoles, then our logic for scaling the dipoles
     # to fit breaks down.
@@ -429,6 +505,10 @@ class TestCellResponsePlotters:
         net.cell_response.plot_spikes_raster(
             xlabel="time", ylabel="cells ID", title="spikes raster"
         )
+        with pytest.raises(ValueError, match="Invalid cell types provided"):
+            net.cell_response.plot_spikes_raster(
+                cell_types=["bad_cell_type"], show=False
+            )
 
     # # TODO AES: also currently broken due to a bug with lack of detection of when https://github.com/satviksaluja/hnn-core/blob/ce7fcb9c87c8fca606068ac38691d2712deb841d/hnn_core/viz.py#L804 plot_spikes_raster cell_type_gids is empty
     # def test_spikes_from_read_spikes(self, fix_use_cached_sims):
@@ -690,6 +770,36 @@ def test_network_visualization(fix_net_model, request):
     _fake_click(fig, ax_src, [pos[0], pos[1]])
     pos_in_plot = ax_target.collections[2].get_offsets().data[0]
     assert_allclose(pos[:2], pos_in_plot)
+
+
+def test_plot_cells_default_markers(fix_net_neymotin_2020):
+    """Test that plot_cells chooses each cell type's marker from its morpho_type."""
+    net, _ = fix_net_neymotin_2020(reduced=True)
+
+    def _marker_vertices(fig, cell_type):
+        (collection,) = [
+            coll for coll in fig.axes[0].collections if coll.get_label() == cell_type
+        ]
+        return collection.get_paths()[0].vertices
+
+    triangles = _marker_vertices(
+        plot_cells(net, show=False, markers={"L2_pyramidal": "^"}), "L2_pyramidal"
+    )
+    circles = _marker_vertices(
+        plot_cells(net, show=False, markers={"L2_pyramidal": "o"}), "L2_pyramidal"
+    )
+
+    # pyramidal cells are plotted as triangles by default
+    default = _marker_vertices(plot_cells(net, show=False), "L2_pyramidal")
+    assert np.array_equal(default, triangles)
+
+    # a cell type without a morpho_type is plotted as circles
+    metadata = net.cell_types["L2_pyramidal"]["cell_metadata"]
+    net.cell_types["L2_pyramidal"]["cell_metadata"] = {
+        key: val for key, val in metadata.items() if key != "morpho_type"
+    }
+    fallback = _marker_vertices(plot_cells(net, show=False), "L2_pyramidal")
+    assert np.array_equal(fallback, circles)
 
 
 @pytest.mark.parametrize(

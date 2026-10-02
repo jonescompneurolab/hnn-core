@@ -461,6 +461,87 @@ def test_rate_over_time_trial_idx():
     assert np.array_equal(rate_both["L5_pyramidal"], np.zeros((3, len(sim_times))))
 
 
+def test_rate_over_time_n_cells():
+    """Test the per-cell normalization of rate_over_time.
+
+    With gid_ranges, rates are normalized by the number of cells of each type in the
+    network, otherwise by the number of cells of each type that spiked in that trial.
+    A cell type that is silent in one trial must give a zero rate for that trial.
+    """
+    # L5_basket: 2 of its 4 cells spike in trial 0, 1 of them spikes in trial 1
+    # L5_pyramidal: silent in trial 0, 1 of its 2 cells spikes in trial 1
+    spike_times = [[2.0, 2.0], [8.0, 14.0]]
+    spike_gids = [[7, 8], [7, 1]]
+    spike_types = [["L5_basket", "L5_basket"], ["L5_basket", "L5_pyramidal"]]
+    gid_ranges = {"L5_pyramidal": range(0, 2), "L5_basket": range(7, 11)}
+    sim_times = np.arange(0.0, 20.0, 0.1)
+    dt = np.diff(sim_times)[0]
+
+    cell_response = CellResponse(
+        cell_type_names=["L5_pyramidal", "L5_basket"],
+        spike_times=spike_times,
+        spike_gids=spike_gids,
+        spike_types=spike_types,
+        times=sim_times,
+    )
+
+    def _spikes_per_cell(rates):
+        """Integrate each trial's rate (Hz) over time (ms) to get spikes per cell"""
+        return rates.sum(axis=1) * dt / 1e3
+
+    rates_spiked = cell_response.rate_over_time(window_length=2.0)
+    rates_network = cell_response.rate_over_time(
+        window_length=2.0, gid_ranges=gid_ranges
+    )
+
+    # without gid_ranges, only the cells that spiked in a trial are counted
+    np.assert_allclose(_spikes_per_cell(rates_spiked["L5_basket"]), [1.0, 1.0])
+    np.assert_allclose(_spikes_per_cell(rates_spiked["L5_pyramidal"]), [0.0, 1.0])
+
+    # with gid_ranges, every cell of the type in the network is counted
+    np.assert_allclose(_spikes_per_cell(rates_network["L5_basket"]), [2 / 4, 1 / 4])
+    np.assert_allclose(_spikes_per_cell(rates_network["L5_pyramidal"]), [0.0, 1 / 2])
+
+    # a silent trial has zero spiking cells, which must not be divided by
+    np.assert_array_equal(rates_spiked["L5_pyramidal"][0], np.zeros(len(sim_times)))
+
+
+def test_gids_from_spikes_trial_list():
+    """Test that _gids_from_spikes pools the gids of the trials in a list."""
+    cell_response = CellResponse(
+        cell_type_names=["L5_pyramidal", "L5_basket"],
+        spike_times=[[2.0, 2.0], [8.0, 14.0], [5.0]],
+        spike_gids=[[7, 8], [7, 1], [9]],
+        spike_types=[
+            ["L5_basket", "L5_basket"],
+            ["L5_basket", "L5_pyramidal"],
+            ["L5_basket"],
+        ],
+    )
+
+    # gids are pooled over the listed trials only, sorted and without duplicates
+    np.assert_array_equal(
+        cell_response._gids_from_spikes("L5_basket", trial_idx=[1, 0]), [7, 8]
+    )
+    np.assert_array_equal(
+        cell_response._gids_from_spikes("L5_basket", trial_idx=[2, 1]), [7, 9]
+    )
+    np.assert_array_equal(
+        cell_response._gids_from_spikes("L5_pyramidal", trial_idx=[0]), []
+    )
+
+    # a single-trial list matches the int form, and a list of all trials matches None
+    for trial in range(3):
+        np.assert_array_equal(
+            cell_response._gids_from_spikes("L5_basket", trial_idx=[trial]),
+            cell_response._gids_from_spikes("L5_basket", trial_idx=trial),
+        )
+    np.assert_array_equal(
+        cell_response._gids_from_spikes("L5_basket", trial_idx=[0, 1, 2]),
+        cell_response._gids_from_spikes("L5_basket"),
+    )
+
+
 def test_rate_over_time_validation():
     """Test input validation of rate_over_time, independent of its outputs."""
     spike_times = [[2.0], [8.0]]

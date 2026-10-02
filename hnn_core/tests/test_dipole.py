@@ -12,7 +12,7 @@ import pytest
 from hnn_core import read_dipole, average_dipoles
 from hnn_core import Network
 from hnn_core.viz import plot_dipole
-from hnn_core.dipole import Dipole, simulate_dipole, _rmse
+from hnn_core.dipole import Dipole, simulate_dipole, _rmse, _rmse_corr
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 
 matplotlib.use("agg")
@@ -383,6 +383,52 @@ def test_rmse(fix_default_params):
     avg_rmse = _rmse(test_dpl, exp_dpl, tstop=params["tstop"])
 
     assert_allclose(avg_rmse, expected_rmse)
+
+
+def test_rmse_corr():
+    """Test the correlation-weighted RMSE between a simulated and experimental dipole.
+
+    The dipoles are sine waves spanning a whole number of periods, so that resampling
+    them to a different sampling rate is exact.
+    """
+    tstop, period, offset = 100.0, 50.0, 0.1
+    max_penalty = 1 - np.log(1e-10)
+
+    def _sine_dipole(dt, t0=0.0, scale=1.0, shift=0.0):
+        times = np.linspace(t0, t0 + tstop, int(round(tstop / dt)) + 1)
+        data = scale * np.sin(2 * np.pi * times / period) + shift
+        return Dipole(times=times, data=data)
+
+    exp_dpl = _sine_dipole(dt=1.0)
+
+    # a perfectly correlated dipole is only penalized by its RMSE, whether the
+    # simulation is sampled at the same rate as, more finely, or more coarsely than
+    # the experimental data
+    for sim_dt in (1.0, 0.5, 2.0):
+        sim_dpl = _sine_dipole(dt=sim_dt, shift=offset)
+        assert_allclose(_rmse_corr(sim_dpl, exp_dpl, tstop=tstop), offset, rtol=1e-6)
+
+    # a time window extending beyond the data is clamped to the data
+    late_exp_dpl = _sine_dipole(dt=1.0, t0=10.0)
+    late_sim_dpl = _sine_dipole(dt=1.0, t0=10.0, shift=offset)
+    assert_allclose(
+        _rmse_corr(late_sim_dpl, late_exp_dpl, tstart=0.0, tstop=2 * tstop),
+        offset,
+        rtol=1e-6,
+    )
+
+    # negative correlations are clipped to 1e-10, giving the maximum penalty
+    sim_dpl = _sine_dipole(dt=1.0, scale=-1.0)
+    assert_allclose(
+        _rmse_corr(sim_dpl, exp_dpl, tstop=tstop),
+        _rmse(sim_dpl, exp_dpl, tstop=tstop) * max_penalty,
+    )
+
+    # an undefined correlation (e.g. of a flat dipole) also gets the maximum penalty
+    sim_dpl = Dipole(times=exp_dpl.times, data=np.full(len(exp_dpl.times), offset))
+    with pytest.warns(RuntimeWarning, match="constant"):
+        err = _rmse_corr(sim_dpl, exp_dpl, tstop=tstop)
+    assert_allclose(err, _rmse(sim_dpl, exp_dpl, tstop=tstop) * max_penalty)
 
 
 def test_dipole_simulation_with_renamed_cells(fix_net_neymotin_2020):

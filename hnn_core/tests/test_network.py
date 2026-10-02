@@ -16,6 +16,7 @@ import hnn_core
 from hnn_core import (
     CellResponse,
     Network,
+    Params,
     calcium_model,
     duecker_ET_model,
     neymotin_2020_model,
@@ -541,13 +542,25 @@ def test_network_models(
 
 
 def test_model_variant_read_from_params(fix_default_params):
-    """Test that 'model_variant' survives read_params"""
+    """Test that Duecker 'model_variant' survives read_params"""
     duecker_params_fname = hnn_core_root / "param" / "default_duecker_ET.json"
     params = read_params(duecker_params_fname)
     assert params["model_variant"] == "duecker_ET_model"
 
     # param files of models that predate 'model_variant' don't define it
     assert "model_variant" not in fix_default_params
+
+
+def test_model_variant_survives_non_duecker_params(fix_default_params):
+    """Test that 'model_variant' is kept for models that use the legacy defaults"""
+    params_input = dict(fix_default_params)
+    params_input["model_variant"] = "law_2021_model"
+    params = Params(params_input)
+    assert params["model_variant"] == "law_2021_model"
+
+    # so the params are rejected by models other than the one they declare
+    with pytest.raises(ValueError, match="used for neymotin_2020_model"):
+        neymotin_2020_model(params=params, mesh_shape=(3, 3))
 
 
 def test_model_variant_matches_network(fix_default_params):
