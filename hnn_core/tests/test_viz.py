@@ -334,6 +334,65 @@ class TestDipoleViz:
         assert ann.arrow_patch.get_linewidth() == custom_arrow_width
         plt.close("all")
 
+    def test_collect_drive_arrow_markers_evoked_only(self, setup_net):
+        """Bursty and Poisson drives are not shown on dipole arrow overlays."""
+        net = setup_net
+        weights_ampa = {"L2_pyramidal": 5.4e-5, "L5_pyramidal": 5.4e-5}
+        syn_delays = {"L2_pyramidal": 0.1, "L5_pyramidal": 1.0}
+        rate_constant = {
+            "L2_pyramidal": 140.0,
+            "L5_pyramidal": 40.0,
+            "L2_basket": 100.0,
+        }
+
+        net.add_bursty_drive(
+            "beta_prox",
+            tstart=0.0,
+            burst_rate=25,
+            burst_std=5,
+            numspikes=1,
+            spike_isi=0,
+            n_drive_cells=11,
+            location="proximal",
+            weights_ampa=weights_ampa,
+            synaptic_delays=syn_delays,
+            event_seed=14,
+        )
+        net.add_poisson_drive(
+            "poisson",
+            rate_constant=rate_constant,
+            weights_ampa=weights_ampa,
+            location="distal",
+            synaptic_delays=syn_delays,
+            event_seed=1349,
+        )
+        assert _collect_drive_arrow_markers(net) == []
+
+        _, ax = plt.subplots()
+        ax.set_xlim(0.0, 100.0)
+        ax.set_ylim(-1.0, 1.0)
+        _add_arrows_to_dipole(ax, net)
+        assert not any(
+            isinstance(child, matplotlib.text.Annotation)
+            for child in ax.get_children()
+        )
+
+        net.add_evoked_drive(
+            "ev_test",
+            mu=30.0,
+            sigma=0.1,
+            numspikes=1,
+            location="proximal",
+            weights_ampa=weights_ampa,
+            n_drive_cells=1,
+            cell_specific=False,
+        )
+        markers = _collect_drive_arrow_markers(net)
+        assert len(markers) == 1
+        assert markers[0]["label"] == "ev_test"
+        assert markers[0]["time"] == 30.0
+        plt.close("all")
+
     def test_add_arrows_to_dipole_default_time_window(self, setup_net):
         """Omitted tmin/tmax are taken from the axis x limits."""
         net = setup_net
