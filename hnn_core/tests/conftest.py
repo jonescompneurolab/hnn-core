@@ -98,15 +98,24 @@ def run_hnn_core_fixture():
             )
             tstop = 40.0
             legacy_mode = False
+            # AES: Using this to show that the new `load_erp_drives` option works
+            # EXACTLY the same as the old `add_drives_from_params` option (when
+            # legacy_mode is off).
+            net = neymotin_2020_model(
+                params,
+                load_erp_drives=True,
+                legacy_mode=legacy_mode,
+                mesh_shape=mesh_shape,
+            )
         else:
             mesh_shape = (10, 10)
-        # Legacy mode necessary for exact dipole comparison test
-        net = neymotin_2020_model(
-            params,
-            add_drives_from_params=True,
-            legacy_mode=legacy_mode,
-            mesh_shape=mesh_shape,
-        )
+            # Legacy mode necessary for exact dipole comparison test
+            net = neymotin_2020_model(
+                params,
+                add_drives_from_params=True,
+                legacy_mode=legacy_mode,
+                mesh_shape=mesh_shape,
+            )
         if electrode_array is not None:
             for name, positions in electrode_array.items():
                 net.add_electrode_array(name, positions)
