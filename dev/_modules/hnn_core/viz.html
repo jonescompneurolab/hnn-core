@@ -767,6 +767,143 @@
 
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_collect_drive_arrow_markers</span><span class="p">(</span><span class="n">net</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Return sorted drive time markers for overlay on dipole plots."""</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core.network_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">default_drive_colors</span>
+
+    <span class="n">markers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">drive_name</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">external_drives</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+        <span class="n">drive</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">external_drives</span><span class="p">[</span><span class="n">drive_name</span><span class="p">]</span>
+        <span class="n">drive_type</span> <span class="o">=</span> <span class="n">drive</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span>
+        <span class="n">dynamics</span> <span class="o">=</span> <span class="n">drive</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"dynamics"</span><span class="p">,</span> <span class="nb">dict</span><span class="p">())</span>
+        <span class="n">location</span> <span class="o">=</span> <span class="n">drive</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"location"</span><span class="p">,</span> <span class="s2">"proximal"</span><span class="p">)</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="n">default_drive_colors</span><span class="p">[</span><span class="n">location</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">drive_type</span> <span class="o">!=</span> <span class="s2">"evoked"</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">event_time</span> <span class="o">=</span> <span class="n">dynamics</span><span class="p">[</span><span class="s2">"mu"</span><span class="p">]</span>
+
+        <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">drive_name</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">event_time</span><span class="p">),</span> <span class="mi">4</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">markers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">"time"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">event_time</span><span class="p">),</span>
+                <span class="s2">"label"</span><span class="p">:</span> <span class="n">drive_name</span><span class="p">,</span>
+                <span class="s2">"color"</span><span class="p">:</span> <span class="n">color</span><span class="p">,</span>
+                <span class="s2">"location"</span><span class="p">:</span> <span class="n">location</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+    <span class="n">markers</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">marker</span><span class="p">:</span> <span class="n">marker</span><span class="p">[</span><span class="s2">"time"</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">markers</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_add_arrows_to_dipole</span><span class="p">(</span>
+    <span class="n">ax</span><span class="p">,</span>
+    <span class="n">net</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">arrow_width</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span>
+    <span class="n">arrow_height</span><span class="o">=</span><span class="mf">1.75</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Add drive-timing arrows and guide lines to an existing dipole axis."""</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core.network</span><span class="w"> </span><span class="kn">import</span> <span class="n">Network</span>
+
+    <span class="n">_validate_type</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">Network</span><span class="p">,</span> <span class="s2">"net"</span><span class="p">,</span> <span class="s2">"Network"</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">tmin</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">tmax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">x_left</span><span class="p">,</span> <span class="n">x_right</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_xlim</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">tmin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">tmin</span> <span class="o">=</span> <span class="n">x_left</span>
+        <span class="k">if</span> <span class="n">tmax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">tmax</span> <span class="o">=</span> <span class="n">x_right</span>
+
+    <span class="n">markers</span> <span class="o">=</span> <span class="n">_collect_drive_arrow_markers</span><span class="p">(</span><span class="n">net</span><span class="p">)</span>
+    <span class="n">visible_markers</span> <span class="o">=</span> <span class="p">[</span><span class="n">marker</span> <span class="k">for</span> <span class="n">marker</span> <span class="ow">in</span> <span class="n">markers</span> <span class="k">if</span> <span class="n">tmin</span> <span class="o">&lt;=</span> <span class="n">marker</span><span class="p">[</span><span class="s2">"time"</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">tmax</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">visible_markers</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ax</span>
+
+    <span class="n">ymin_data</span><span class="p">,</span> <span class="n">ymax_data</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()</span>
+    <span class="n">y_span</span> <span class="o">=</span> <span class="n">ymax_data</span> <span class="o">-</span> <span class="n">ymin_data</span>
+    <span class="k">if</span> <span class="n">y_span</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">y_span</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+    <span class="c1"># Same shaft length for proximal and distal; 0.127 matches pre-refactor</span>
+    <span class="c1"># proximal arrow size at default arrow_height (0.12 + 0.015 - 0.008 headroom terms).</span>
+    <span class="n">arrow_length_y</span> <span class="o">=</span> <span class="mf">0.127</span> <span class="o">*</span> <span class="n">y_span</span> <span class="o">*</span> <span class="n">arrow_height</span>
+    <span class="n">margin_y</span> <span class="o">=</span> <span class="n">arrow_length_y</span>
+
+    <span class="n">has_proximal</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">marker</span><span class="p">[</span><span class="s2">"location"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"proximal"</span> <span class="k">for</span> <span class="n">marker</span> <span class="ow">in</span> <span class="n">visible_markers</span><span class="p">)</span>
+    <span class="n">has_distal</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">marker</span><span class="p">[</span><span class="s2">"location"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"distal"</span> <span class="k">for</span> <span class="n">marker</span> <span class="ow">in</span> <span class="n">visible_markers</span><span class="p">)</span>
+    <span class="n">ymin_plot</span> <span class="o">=</span> <span class="n">ymin_data</span> <span class="o">-</span> <span class="n">margin_y</span> <span class="k">if</span> <span class="n">has_proximal</span> <span class="k">else</span> <span class="n">ymin_data</span>
+    <span class="n">ymax_plot</span> <span class="o">=</span> <span class="n">ymax_data</span> <span class="o">+</span> <span class="n">margin_y</span> <span class="k">if</span> <span class="n">has_distal</span> <span class="k">else</span> <span class="n">ymax_data</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">ymin_plot</span><span class="p">,</span> <span class="n">ymax_plot</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">guide_time</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">({</span><span class="n">marker</span><span class="p">[</span><span class="s2">"time"</span><span class="p">]</span> <span class="k">for</span> <span class="n">marker</span> <span class="ow">in</span> <span class="n">visible_markers</span><span class="p">}):</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span>
+            <span class="n">guide_time</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="s2">"0.75"</span><span class="p">,</span>
+            <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span>
+            <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+            <span class="n">zorder</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">arrow_head_scale</span> <span class="o">=</span> <span class="mf">6.0</span> <span class="o">*</span> <span class="n">arrow_width</span>
+    <span class="n">arrowprops_template</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">arrowstyle</span><span class="o">=</span><span class="s2">"-|&gt;"</span><span class="p">,</span>
+        <span class="n">lw</span><span class="o">=</span><span class="n">arrow_width</span><span class="p">,</span>
+        <span class="n">mutation_scale</span><span class="o">=</span><span class="n">arrow_head_scale</span><span class="p">,</span>
+        <span class="n">shrinkA</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">shrinkB</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">drawn_at_time_and_location</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">marker</span> <span class="ow">in</span> <span class="n">visible_markers</span><span class="p">:</span>
+        <span class="n">drive_time</span> <span class="o">=</span> <span class="n">marker</span><span class="p">[</span><span class="s2">"time"</span><span class="p">]</span>
+        <span class="n">location</span> <span class="o">=</span> <span class="n">marker</span><span class="p">[</span><span class="s2">"location"</span><span class="p">]</span>
+        <span class="n">marker_key</span> <span class="o">=</span> <span class="p">(</span><span class="n">drive_time</span><span class="p">,</span> <span class="n">location</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">marker_key</span> <span class="ow">in</span> <span class="n">drawn_at_time_and_location</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">drawn_at_time_and_location</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">marker_key</span><span class="p">)</span>
+
+        <span class="n">color</span> <span class="o">=</span> <span class="n">marker</span><span class="p">[</span><span class="s2">"color"</span><span class="p">]</span>
+        <span class="n">arrowprops</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">arrowprops_template</span><span class="p">,</span> <span class="s2">"color"</span><span class="p">:</span> <span class="n">color</span><span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">location</span> <span class="o">==</span> <span class="s2">"proximal"</span><span class="p">:</span>
+            <span class="n">arrow_tip_y</span> <span class="o">=</span> <span class="n">ymin_data</span>
+            <span class="n">arrow_tail_y</span> <span class="o">=</span> <span class="n">ymin_data</span> <span class="o">-</span> <span class="n">arrow_length_y</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
+                <span class="s2">""</span><span class="p">,</span>
+                <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">drive_time</span><span class="p">,</span> <span class="n">arrow_tip_y</span><span class="p">),</span>
+                <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="n">drive_time</span><span class="p">,</span> <span class="n">arrow_tail_y</span><span class="p">),</span>
+                <span class="n">ha</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span>
+                <span class="n">va</span><span class="o">=</span><span class="s2">"bottom"</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+                <span class="n">annotation_clip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">arrowprops</span><span class="o">=</span><span class="n">arrowprops</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">arrow_tip_y</span> <span class="o">=</span> <span class="n">ymax_data</span>
+            <span class="n">arrow_tail_y</span> <span class="o">=</span> <span class="n">ymax_data</span> <span class="o">+</span> <span class="n">arrow_length_y</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
+                <span class="s2">""</span><span class="p">,</span>
+                <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">drive_time</span><span class="p">,</span> <span class="n">arrow_tip_y</span><span class="p">),</span>
+                <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="n">drive_time</span><span class="p">,</span> <span class="n">arrow_tail_y</span><span class="p">),</span>
+                <span class="n">ha</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span>
+                <span class="n">va</span><span class="o">=</span><span class="s2">"top"</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+                <span class="n">annotation_clip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">arrowprops</span><span class="o">=</span><span class="n">arrowprops</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ax</span>
+
+
 <div class="viewcode-block" id="plot_dipole">
 <a class="viewcode-back" href="../../generated/hnn_core.viz.plot_dipole.html#hnn_core.viz.plot_dipole">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_dipole</span><span class="p">(</span>
@@ -779,6 +916,10 @@
     <span class="n">color</span><span class="o">=</span><span class="s2">"k"</span><span class="p">,</span>
     <span class="n">label</span><span class="o">=</span><span class="s2">"average"</span><span class="p">,</span>
     <span class="n">average</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">net</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">show_drive_arrows</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">arrow_width</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span>
+    <span class="n">arrow_height</span><span class="o">=</span><span class="mf">1.75</span><span class="p">,</span>
     <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Simple layer-specific plot function.</span>
@@ -807,6 +948,16 @@
 <span class="sd">        Dipole label. Enabled when average=True.</span>
 <span class="sd">    average : bool, default=False</span>
 <span class="sd">        If True, render the average across all dpls.</span>
+<span class="sd">    net : instance of Network | None</span>
+<span class="sd">        Network used to overlay drive timing arrows when</span>
+<span class="sd">        ``show_drive_arrows=True``.</span>
+<span class="sd">    show_drive_arrows : bool, default=False</span>
+<span class="sd">        If True, draw arrows on each axis marking evoked drive onsets.</span>
+<span class="sd">        Requires ``net``.</span>
+<span class="sd">    arrow_width : float, default=3.0</span>
+<span class="sd">        Line width of drive timing arrow shafts when ``show_drive_arrows=True``.</span>
+<span class="sd">    arrow_height : float, default=1.75</span>
+<span class="sd">        Vertical scale for drive timing arrows when ``show_drive_arrows=True``.</span>
 <span class="sd">    show : bool, default=True</span>
 <span class="sd">        If True, show the figure.</span>
 
@@ -816,6 +967,7 @@
 <span class="sd">        The matplotlib figure handle.</span>
 <span class="sd">    """</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">.dipole</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dipole</span><span class="p">,</span> <span class="n">average_dipoles</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.network</span><span class="w"> </span><span class="kn">import</span> <span class="n">Network</span>
 
     <span class="n">layers</span> <span class="o">=</span> <span class="n">layer</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">layer</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -891,6 +1043,19 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">title_str</span> <span class="o">=</span> <span class="n">layer</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title_str</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">show_drive_arrows</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">net</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"net must be provided when show_drive_arrows=True"</span><span class="p">)</span>
+            <span class="n">_validate_type</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">Network</span><span class="p">,</span> <span class="s2">"net"</span><span class="p">,</span> <span class="s2">"Network"</span><span class="p">)</span>
+            <span class="n">_add_arrows_to_dipole</span><span class="p">(</span>
+                <span class="n">ax</span><span class="p">,</span>
+                <span class="n">net</span><span class="p">,</span>
+                <span class="n">tmin</span><span class="o">=</span><span class="n">tmin</span><span class="p">,</span>
+                <span class="n">tmax</span><span class="o">=</span><span class="n">tmax</span><span class="p">,</span>
+                <span class="n">arrow_width</span><span class="o">=</span><span class="n">arrow_width</span><span class="p">,</span>
+                <span class="n">arrow_height</span><span class="o">=</span><span class="n">arrow_height</span><span class="p">,</span>
+            <span class="p">)</span>
 
     <span class="n">plt_show</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span></div>
