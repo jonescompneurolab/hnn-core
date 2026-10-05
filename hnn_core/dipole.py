@@ -87,11 +87,10 @@ def simulate_dipole(
     if n_trials < 1:
         raise ValueError("Invalid number of simulations: %d" % n_trials)
 
-    #this check is local. WIll be removed when we start valdiating the dataframe 
-    using_dataframe = isinstance(net.use_dataframe, bool) and net.use_dataframe
-    no_connections = (
-        net.connectivity_df.empty if using_dataframe else not net.connectivity
-    )
+    if net.use_dataframe is False:
+        no_connections = not net.connectivity
+    else:
+        no_connections = net.connectivity_df.empty
     if no_connections:
         warnings.warn(
             "No connections instantiated in network. Consider using "

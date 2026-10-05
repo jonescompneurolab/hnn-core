@@ -419,6 +419,8 @@ def _check_option(parameter, value, allowed_values, extra=""):
         "{options}, but got {value!r} instead."
     )
     allowed_values = list(allowed_values)  # e.g., if a dict was given
+    #this is added as in test_network_connectivity in test_network.py internally calls
+    #add_connections . In case of dataframe = True , net.connectivity is empty , hence the test fails
     if len(allowed_values) == 0:
         options = "No values are allowed"
     elif len(allowed_values) == 1:

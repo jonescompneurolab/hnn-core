@@ -8,7 +8,7 @@ import warnings
 
 import hnn_core
 from hnn_core import read_params
-from .network import Network, _create_cell_coords
+from .network import Network, _create_cell_coords, validate_Connectivity_df
 from .params import _short_name
 from .cells_default import (
     basket,
@@ -180,7 +180,7 @@ def neymotin_2020_model(
     use_dataframe : True | False | Dataframe | Path of a string containing path
         If False(default) ,used connectivity list to place synapses
         If True , uses dataframe object to place the synapses.
-        Also , users can also input a custom dataframe or path storing dataframe./
+        For advanced users , a custom dataframe can be als given
     add_drives_from_params : bool
         If True, add drives as defined in the params-dict. NB this is mainly
         for backward-compatibility with HNN GUI, and will be deprecated in a
@@ -226,9 +226,10 @@ def neymotin_2020_model(
         params_fname = hnn_core_root / "param" / "default.json"
         params = read_params(params_fname)
 
-    if isinstance(use_dataframe, str):
-        use_dataframe = pd.read_pickle(use_dataframe)  # we need to validate this
-        # validate_data_frame()
+    #if isinstance(use_dataframe, str):
+    #    use_dataframe = pd.read_pickle(use_dataframe)  
+    #    check = validate_Connectivity_df(use_dataframe) # thsi is moved down
+
 
     # Define cell types for Jones 2009 model
     # data is here in metaData format
@@ -278,12 +279,15 @@ def neymotin_2020_model(
         cell_types=cell_types,
         use_dataframe=use_dataframe,
     )
+    if isinstance(use_dataframe, str):
+        use_dataframe = pd.read_pickle(use_dataframe)  
+        check = validate_Connectivity_df(use_dataframe)
     delay = net.delay
 
     # Ensure model_variant and params' cell types match current model
     net._model_variant = _validate_params_for_model(net, params, "neymotin_2020_model")
 
-    if isinstance(use_dataframe, bool):
+    if isinstance(use_dataframe, bool):# in the case of dataframe or path to dataframe inputted , we dont need to make connections
         # source of synapse is always at soma
 
         # layer2 Pyr -> layer2 Pyr

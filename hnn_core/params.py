@@ -777,9 +777,8 @@ def remove_nulled_drives(net):
 
     extras = dict()
     for drive_name, drive in net.external_drives.items():
-        # local fix net.connectivity is never populated when
-        # use_dataframe=True, so read the equivalent values from
-        # connectivity_df in that case instead of indexing the empty list
+        # local fix as net.connectivity is never populated when use_dataframe=True , so  so read the conn_indices values from
+        # connectivity_df i
         if isinstance(net.use_dataframe, bool) and not net.use_dataframe:
             conn_indices = pick_connection(net, src_gids=drive_name)
             space_constant = net.connectivity[conn_indices[0]]["nc_dict"]["lamtha"]
