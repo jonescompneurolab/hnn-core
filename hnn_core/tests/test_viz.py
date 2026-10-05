@@ -332,7 +332,6 @@ class TestDipoleViz:
             if isinstance(child, matplotlib.text.Annotation)
         )
         assert ann.arrow_patch.get_linewidth() == custom_arrow_width
-        plt.close("all")
 
     def test_collect_drive_arrow_markers_evoked_only(self, setup_net):
         """Bursty and Poisson drives are not shown on dipole arrow overlays."""
@@ -393,7 +392,6 @@ class TestDipoleViz:
         for marker in markers:
             assert "beta_prox" not in marker["label"]
             assert "poisson" not in marker["label"]
-        plt.close("all")
 
     def test_add_arrows_to_dipole_default_time_window(self, setup_net):
         """Omitted tmin/tmax are taken from the axis x limits."""
@@ -435,7 +433,6 @@ class TestDipoleViz:
         _add_arrows_to_dipole(ax, net, tmin=None, tmax=25.0)
         assert _n_annotations(ax) == 0
 
-        plt.close("all")
 
     def test_add_arrows_to_dipole_flat_ylim(self, setup_net):
         """A zero-height y axis still gets drive arrows."""
@@ -465,7 +462,6 @@ class TestDipoleViz:
         ymin, ymax = ax.get_ylim()
         assert ymin < 10.0
         assert ymax == 10.0
-        plt.close("all")
 
 
 def test_drive_strength(setup_net):
