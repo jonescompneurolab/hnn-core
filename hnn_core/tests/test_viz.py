@@ -433,7 +433,6 @@ class TestDipoleViz:
         _add_arrows_to_dipole(ax, net, tmin=None, tmax=25.0)
         assert _n_annotations(ax) == 0
 
-
     def test_add_arrows_to_dipole_flat_ylim(self, setup_net):
         """A zero-height y axis still gets drive arrows."""
         net = setup_net
