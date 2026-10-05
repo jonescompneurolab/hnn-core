@@ -390,6 +390,9 @@ class TestDipoleViz:
         assert len(markers) == 1
         assert markers[0]["label"] == "ev_test"
         assert markers[0]["time"] == 30.0
+        for marker in markers:
+            assert "beta_prox" not in marker["label"]
+            assert "poisson" not in marker["label"]
         plt.close("all")
 
     def test_add_arrows_to_dipole_default_time_window(self, setup_net):
