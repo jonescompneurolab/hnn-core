@@ -739,10 +739,10 @@ def test_add_poisson_drive(setup_net, rate_constant, cell_specific, n_drive_cell
     simulate_dipole(net, tstop=5)
 
 
-def test_load_erp_drives_equivalency():
+def test_add_erp_drives_equivalency():
     """Test the (new) default drives argument produces equivalent drives where relevant."""
     # Create network with drives using the new argument
-    net_api = neymotin_2020_model(load_erp_drives=True)
+    net_api = neymotin_2020_model(add_erp_drives=True)
 
     def _test_drive_equivalency(net1, net2):
         """Helper function for comparing two networks with drives."""
@@ -764,7 +764,7 @@ def test_load_erp_drives_equivalency():
 
     # Test that the API drives argument produces equivalent drives when using a
     # different mesh size
-    net_3x3 = neymotin_2020_model(mesh_shape=(3, 3), load_erp_drives=True)
+    net_3x3 = neymotin_2020_model(mesh_shape=(3, 3), add_erp_drives=True)
     _test_drive_equivalency(net_api, net_3x3)
 
     # Deprecated add_drives_from_params arg should warn and still add ERP drives
@@ -787,11 +787,11 @@ def test_load_erp_drives_equivalency():
         assert net_api_drive["weights_ampa"] == net_func_drive["weights_ampa"]
 
 
-def test_load_erp_drives_incompatible_with_add_drives_from_params():
+def test_add_erp_drives_incompatible_with_add_drives_from_params():
     """Test mutually exclusive drive-loading options raise."""
     with pytest.raises(ValueError, match="Cannot set both"):
         neymotin_2020_model(
-            load_erp_drives=True,
+            add_erp_drives=True,
             add_drives_from_params=True,
             mesh_shape=(3, 3),
         )

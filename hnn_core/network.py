@@ -708,7 +708,7 @@ class Network:
             warnings.warn(
                 "add_drives_from_params=True is deprecated and will be removed "
                 "in a future release. Use neymotin_2020_model(..., "
-                "load_erp_drives=True) to add canonical ERP drives instead.",
+                "add_erp_drives=True) to add canonical ERP drives instead.",
                 FutureWarning,
             )
             _add_drives_from_params(self)

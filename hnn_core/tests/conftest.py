@@ -103,12 +103,12 @@ def run_hnn_core_fixture():
             mesh_shape = (10, 10)
 
         if new_default_drives:
-            # AES: Using this to show that the new `load_erp_drives` option works
+            # AES: Using this to show that the new `add_erp_drives` option works
             # EXACTLY the same as the old `add_drives_from_params` option (when
             # legacy_mode is off).
             net = neymotin_2020_model(
                 params,
-                load_erp_drives=True,
+                add_erp_drives=True,
                 legacy_mode=False,
                 mesh_shape=mesh_shape,
             )

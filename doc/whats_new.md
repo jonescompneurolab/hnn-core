@@ -34,18 +34,19 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
   Python's default warning filters,
   by [William Kang][] in {gh}`1339`. This was their first PR, thanks William!
 - `add_erp_drives_to_jones_model()` is deprecated in favor of
-  `neymotin_2020_model(..., load_erp_drives=True)`.
+  `neymotin_2020_model(..., add_erp_drives=True)`.
 - `add_drives_from_params=True` is deprecated in favor of
-  `neymotin_2020_model(..., load_erp_drives=True)` for adding canonical ERP
+  `neymotin_2020_model(..., add_erp_drives=True)` for adding canonical ERP
   drives.
 
 ### New Features
 
-- `neymotin_2020_model(..., load_erp_drives=True)` loads canonical ERP drives
-  from the packaged ``neymotin2020_erp_drives.json`` configuration file. This
-  provides a single, reproducible way to add default ERP drives. Canonical ERP
-  tutorials and tests now use this flag instead of
-  ``add_drives_from_params=True``.
+- `neymotin_2020_model(..., add_erp_drives=True)` is now the recommended way to add the
+  canonical ERP drives to your network, instead of using `neymotin_2020_model(...,
+  add_drives_from_params=True)` or `add_erp_drives_to_jones_model()`. Canonical ERP
+  tutorials and tests now use this flag.
+  By [Sourav Rajvi][] in {gh}`1340`.
+
 - Users can now specify their own custom objective function in two different ways:
     1. Passing a `obj_fun='custom'` to `Optimizer`. If passing `custom`, then users can
       provide a function that simply accepts a single `Dipole` object and accepts
@@ -82,6 +83,7 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 - [Shivansh Bhageria][]
 - [Camilo Diaz][]
 - [William Kang][]
+- [Sourav Rajvi][]
 
 ### Changelog
 
@@ -1514,3 +1516,4 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [Shivansh Bhageria]: https://github.com/Shivansh1205
 [Arnesh Banerjee]: https://github.com/ArneshBanerjee
 [William Kang]: https://github.com/WilliamK112
+[Sourav Rajvi]: https://github.com/Souravrajvi0

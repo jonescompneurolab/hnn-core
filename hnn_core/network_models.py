@@ -166,7 +166,7 @@ def neymotin_2020_model(
     add_drives_from_params=False,
     legacy_mode=False,
     mesh_shape=(10, 10),
-    load_erp_drives=False,
+    add_erp_drives=False,
 ):
     """Instantiate the network model described in Neymotin et al. 2020
 
@@ -192,18 +192,17 @@ def neymotin_2020_model(
         are added suitably. Will be deprecated in a future release.
     mesh_shape : tuple of int (default: (10, 10))
         Defines the (n_x, n_y) shape of the grid of pyramidal cells.
-    load_erp_drives : bool, default=False
-        If True, add the canonical ERP drives used to reproduce the default
-        event-related potential (ERP) behavior. Drives are loaded from the
-        packaged ``neymotin2020_erp_drives.json`` configuration file. This is
-        the recommended way to add default ERP drives.
+    add_erp_drives : bool, default=False
+        If True, add the canonical event-related potential (ERP) drives used to
+        reproduce the default ERP simulation behavior. This is the recommended way to
+        add default ERP drives.
 
     Returns
     -------
     net : Instance of Network object
         Network object used to store
 
-    Notes
+    Notesae
     -----
     The network is composed of a square grid of pyramidal cells, arranged in
     two layers (L5 and L2). The default in-plane separation of the grid points
@@ -228,9 +227,9 @@ def neymotin_2020_model(
            MEG/EEG Data." eLife 9 (January):e51214. https://doi.org/10.7554/eLife.51214
 
     """
-    if load_erp_drives and add_drives_from_params:
+    if add_erp_drives and add_drives_from_params:
         raise ValueError(
-            "Cannot set both load_erp_drives=True and add_drives_from_params=True."
+            "Cannot set both add_erp_drives=True and add_drives_from_params=True."
         )
 
     hnn_core_root = Path(hnn_core.__file__).parent
@@ -412,7 +411,11 @@ def neymotin_2020_model(
     receptor = "ampa"
     net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
-    if load_erp_drives:
+    if add_erp_drives:
+        # As of HNN-Core v0.6.1 with NEURON 8.2.7, this adds drives that are equivalent
+        # to those added by calling `neymotin_2020_model(add_drives_from_params=True,
+        # legacy_mode=False)`.
+
         # Add distal drive
         weights_ampa_d1 = {
             "L2_basket": 0.006562,
@@ -1161,11 +1164,11 @@ def add_erp_drives_to_jones_model(net, tstart=0.0):
     random sampling of times from a gaussian.
 
     .. deprecated:: 0.6.2
-        Use ``neymotin_2020_model(..., load_erp_drives=True)`` instead.
+        Use ``neymotin_2020_model(..., add_erp_drives=True)`` instead.
     """
     warnings.warn(
         "add_erp_drives_to_jones_model is deprecated and will be removed in a "
-        "future release. Use neymotin_2020_model(..., load_erp_drives=True) "
+        "future release. Use neymotin_2020_model(..., add_erp_drives=True) "
         "instead.",
         FutureWarning,
     )
