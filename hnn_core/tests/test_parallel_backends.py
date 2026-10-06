@@ -382,9 +382,10 @@ class TestParallelBackends:
             assert "--use-hwthread-cpus" not in " ".join(backend.mpi_cmd)
             simulate_dipole(net, tstop=40)
 
-    @pytest.mark.parametrize("backend", ["mpi", "joblib"])
-    def test_compare_hnn_core(self, run_hnn_core_fixture, backend, n_jobs=1):
-        """Test hnn-core does not break."""
+    # Only uses MPI, since we `test_compare_hnn_core` already tests joblib backend with
+    # a very similar simulation.
+    def test_compare_hnn_core_legacy(self, run_hnn_core_fixture, n_jobs=1):
+        """Test hnn-core default simulation with legacy drives/params does not break."""
         # small snippet of data on data branch for now. To be deleted
         # later. Data branch should have only commit so it does not
         # pollute the history.
@@ -396,6 +397,7 @@ class TestParallelBackends:
             urlretrieve(data_url, "dpl.txt")
         dpl_master = loadtxt("dpl.txt")
 
+        backend = "mpi"
         dpls, net = run_hnn_core_fixture(backend=backend)
         dpl = dpls[0].smooth(30).scale(3000)
 
@@ -424,6 +426,54 @@ class TestParallelBackends:
             "L5_pyramidal": 396,
             "L5_basket": 86,
             "evdist1": 270,
+            "evprox2": 270,
+        }
+
+    @pytest.mark.parametrize("backend", ["mpi", "joblib"])
+    def test_compare_hnn_core(self, run_hnn_core_fixture, backend, n_jobs=1):
+        """Test hnn-core default simulation does not break."""
+        # small snippet of data on data branch for now. To be deleted
+        # later. Data branch should have only commit so it does not
+        # pollute the history.
+        ground_truth_fname = "dpl_nonlegacy_seeds.txt"
+        data_url = (
+            "https://raw.githubusercontent.com/jonescompneurolab/"
+            f"hnn-core/test_data/{ground_truth_fname}"
+        )
+        if not Path(ground_truth_fname).exists():
+            urlretrieve(data_url, ground_truth_fname)
+        dpl_master = loadtxt(ground_truth_fname)
+
+        # Once #1180, #1230, and #1340 are all congruent and merged, we will use a
+        # better name/hack than `new_default_drives=True`.
+        dpls, net = run_hnn_core_fixture(backend=backend, new_default_drives=True)
+        dpl = dpls[0].smooth(30).scale(3000)
+
+        # write the dipole to a file and compare
+        fname = "./dpl2.txt"
+        dpl.write(fname)
+
+        dpl_pr = loadtxt(fname)
+        assert_array_equal(dpl_pr[:, 2], dpl_master[:, 2])  # L2
+        assert_array_equal(dpl_pr[:, 3], dpl_master[:, 3])  # L5
+
+        # Test spike type counts
+        spike_type_counts = {}
+        for spike_gid in net.cell_response.spike_gids[0]:
+            if net.gid_to_type(spike_gid) not in spike_type_counts:
+                spike_type_counts[net.gid_to_type(spike_gid)] = 1
+            else:
+                spike_type_counts[net.gid_to_type(spike_gid)] += 1
+        assert "common" not in spike_type_counts
+        assert "exgauss" not in spike_type_counts
+        assert "extpois" not in spike_type_counts
+        assert spike_type_counts == {
+            "evprox1": 270,
+            "L2_basket": 58,
+            "L2_pyramidal": 98,
+            "L5_pyramidal": 384,
+            "L5_basket": 89,
+            "evdist1": 235,
             "evprox2": 270,
         }
 

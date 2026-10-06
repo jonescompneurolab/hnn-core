@@ -451,6 +451,13 @@ def neymotin_2020_model(
             "L5_basket": 0.19934,
             "L5_pyramidal": 0.00865,
         }
+        # AES only to pass test "test_load_erp_drives_matches_json_configuration"
+        weights_nmda_p1 = {
+            "L2_basket": 0.0,
+            "L2_pyramidal": 0.0,
+            "L5_basket": 0.0,
+            "L5_pyramidal": 0.0,
+        }
         synaptic_delays_prox = {
             "L2_basket": 0.1,
             "L2_pyramidal": 0.1,
@@ -463,7 +470,7 @@ def neymotin_2020_model(
             sigma=2.47,
             numspikes=1,
             weights_ampa=weights_ampa_p1,
-            weights_nmda=None,
+            weights_nmda=weights_nmda_p1,  # AES only to pass tests
             location="proximal",
             synaptic_delays=synaptic_delays_prox,
             event_seed=507,
@@ -475,12 +482,19 @@ def neymotin_2020_model(
             "L5_basket": 0.008958,
             "L5_pyramidal": 0.684013,
         }
+        weights_nmda_p2 = {
+            "L2_basket": 0.0,
+            "L2_pyramidal": 0.0,
+            "L5_basket": 0.0,
+            "L5_pyramidal": 0.0,
+        }
         net.add_evoked_drive(
             "evprox2",
             mu=137.12,
             sigma=8.33,
             numspikes=1,
             weights_ampa=weights_ampa_p2,
+            weights_nmda=weights_nmda_p2,  # AES only to pass tests
             location="proximal",
             synaptic_delays=synaptic_delays_prox,
             event_seed=777,
