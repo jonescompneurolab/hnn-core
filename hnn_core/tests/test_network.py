@@ -3132,3 +3132,61 @@ def test_deprecated_jones_2009_model():
         net = jones_2009_model(add_drives_from_params=True, mesh_shape=(3, 3))
 
     simulate_dipole(net, dt=0.5, tstop=20.0, verbose=True)
+
+
+def test_add_erp_drives_equivalency():
+    """Test the (new) default drives argument produces equivalent drives where relevant."""
+    # Create network with drives using the new argument
+    net_api = neymotin_2020_model(add_erp_drives=True)
+
+    def _test_drive_equivalency(net1, net2):
+        """Helper function for comparing two networks with drives."""
+        for drive_name in net1.external_drives.keys():
+            net1_drive = net1.external_drives[drive_name]
+            net2_drive = net2.external_drives[drive_name]
+            assert net1_drive["event_seed"] == net2_drive["event_seed"]
+            assert net1_drive["dynamics"] == net2_drive["dynamics"]
+            assert net1_drive["weights_ampa"] == net2_drive["weights_ampa"]
+            assert net1_drive["weights_nmda"] == net2_drive["weights_nmda"]
+
+    # Test that the API drives argument produces equivalent drives to the loading the
+    # same from file:
+    net_json = read_network_configuration(
+        (hnn_core_root / "param" / "neymotin2020_base.json"),
+        read_drives=True,
+    )
+    _test_drive_equivalency(net_api, net_json)
+
+    # Test that the API drives argument produces equivalent drives when using a
+    # different mesh size
+    net_3x3 = neymotin_2020_model(mesh_shape=(3, 3), add_erp_drives=True)
+    _test_drive_equivalency(net_api, net_3x3)
+
+    # Deprecated add_drives_from_params arg should warn and still add ERP drives
+    with pytest.warns(FutureWarning, match="add_drives_from_params=True is deprecated"):
+        net_old_arg = neymotin_2020_model(add_drives_from_params=True)
+    _test_drive_equivalency(net_api, net_old_arg)
+
+    # Deprecated drive-addition function should warn and still add ERP drives
+    net_func = neymotin_2020_model(mesh_shape=(3, 3))
+    with pytest.warns(
+        FutureWarning, match="add_erp_drives_to_jones_model is deprecated"
+    ):
+        add_erp_drives_to_jones_model(net_func)
+
+    # Both seeds and weights_nmda are different with this old add drives function
+    for drive_name in net_api.external_drives.keys():
+        net_api_drive = net_api.external_drives[drive_name]
+        net_func_drive = net_func.external_drives[drive_name]
+        assert net_api_drive["dynamics"] == net_func_drive["dynamics"]
+        assert net_api_drive["weights_ampa"] == net_func_drive["weights_ampa"]
+
+
+def test_add_erp_drives_incompatible_with_add_drives_from_params():
+    """Test mutually exclusive drive-loading options raise."""
+    with pytest.raises(ValueError, match="Cannot set both"):
+        neymotin_2020_model(
+            add_erp_drives=True,
+            add_drives_from_params=True,
+            mesh_shape=(3, 3),
+        )
