@@ -3,6 +3,7 @@
 # Authors: Mainak Jas <mjas@mgh.harvard.edu>
 #          Sam Neymotin <samnemo@gmail.com>
 #          Christopher Bailey <bailey.cj@gmail.com>
+
 import numpy as np
 
 from .params import (

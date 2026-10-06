@@ -172,37 +172,36 @@ def neymotin_2020_model(
 
     Parameters
     ----------
+    add_erp_drives : bool, default=False
+        If True, add the canonical event-related potential (ERP) drives used to
+        reproduce the default ERP simulation behavior. This is the recommended way to
+        add default ERP drives. Incompatible with arguments ``add_drives_from_params``,
+        ``params``, and ``legacy_mode``.
+    mesh_shape : tuple of int (default: (10, 10))
+        Defines the (n_x, n_y) shape of the grid of pyramidal cells.
     params : str | Path | dict | None, default=None
-        Custom Network parameters to use, if any. If string or Path, it is assumed to be
-        a path to a legacy "flat" JSON file containing the parameters in the style of
-        `hnn_core/param/default.json` (NOT a modern "hierarchical" JSON file like
-        `hnn_core/param/neymotin2020_base.json`). If dict, it is assumed to be a
-        dictionary of parameters in the "flat" JSON style. If None (the default), the
+        Deprecated. Custom Network parameters to use, if any. If string or Path, it is
+        assumed to be a path to a legacy "flat" JSON file containing the parameters in
+        the style of `hnn_core/param/default.json` (NOT a modern "hierarchical" JSON
+        file like `hnn_core/param/neymotin2020_base.json`). If dict, it is assumed to be
+        a dictionary of parameters in the "flat" JSON style. If None (the default), the
         default parameters are used from `hnn_core/param/default.json`. Note that if you
         want to use any drives defined in the params (either your provided custom params
         or the default), then you must also set `add_drives_from_params` to True. If you
         pass any custom params, then no default params will be used, including for
         drives.
     add_drives_from_params : bool, default=False
-        If True, add drives as defined in the params-dict. NB this is mainly
-        for backward-compatibility with HNN GUI, and will be deprecated in a
-        future release. Default: False
+        Deprecated. If True, add drives as defined in the ``params`` dictionary.
     legacy_mode : bool, default=False
-        Set to False by default. Enables matching HNN GUI output when drives
-        are added suitably. Will be deprecated in a future release.
-    mesh_shape : tuple of int (default: (10, 10))
-        Defines the (n_x, n_y) shape of the grid of pyramidal cells.
-    add_erp_drives : bool, default=False
-        If True, add the canonical event-related potential (ERP) drives used to
-        reproduce the default ERP simulation behavior. This is the recommended way to
-        add default ERP drives.
+        Deprecated. Enables matching HNN Original GUI output when drives are added
+        suitably.
 
     Returns
     -------
     net : Instance of Network object
         Network object used to store
 
-    Notesae
+    Notes
     -----
     The network is composed of a square grid of pyramidal cells, arranged in
     two layers (L5 and L2). The default in-plane separation of the grid points
@@ -227,9 +226,10 @@ def neymotin_2020_model(
            MEG/EEG Data." eLife 9 (January):e51214. https://doi.org/10.7554/eLife.51214
 
     """
-    if add_erp_drives and add_drives_from_params:
+    if add_erp_drives and (add_drives_from_params or params is not None or legacy_mode):
         raise ValueError(
-            "Cannot set both add_erp_drives=True and add_drives_from_params=True."
+            "add_erp_drives=True cannot be used with the arguments "
+            "add_drives_from_params, params, or legacy_mode."
         )
 
     hnn_core_root = Path(hnn_core.__file__).parent
@@ -579,7 +579,12 @@ def jones_2009_model(
         FutureWarning,
     )
 
-    net = neymotin_2020_model(params, add_drives_from_params, legacy_mode, mesh_shape)
+    net = neymotin_2020_model(
+        params=params,
+        add_drives_from_params=add_drives_from_params,
+        legacy_mode=legacy_mode,
+        mesh_shape=mesh_shape,
+    )
     return net
 
 

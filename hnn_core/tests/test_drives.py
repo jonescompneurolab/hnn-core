@@ -7,7 +7,11 @@ from pathlib import Path
 import numpy as np
 
 import hnn_core
-from hnn_core import Network, read_params, read_network_configuration
+from hnn_core import (
+    Network,
+    neymotin_2020_model,
+    read_params,
+)
 from hnn_core.drives import (
     _drive_cell_event_times,
     _get_prng,
@@ -15,7 +19,6 @@ from hnn_core.drives import (
     _create_bursty_input,
 )
 from hnn_core.network import pick_connection
-from hnn_core.network_models import add_erp_drives_to_jones_model, neymotin_2020_model
 from hnn_core import simulate_dipole
 
 hnn_core_root = Path(hnn_core.__file__).parent

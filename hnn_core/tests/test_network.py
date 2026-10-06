@@ -22,6 +22,7 @@ from hnn_core import (
     jones_2009_model,
     law_2021_model,
     read_params,
+    read_network_configuration,
     simulate_dipole,
 )
 from hnn_core.cells_default import pyramidal
@@ -3184,9 +3185,18 @@ def test_add_erp_drives_equivalency():
 
 def test_add_erp_drives_incompatible_with_add_drives_from_params():
     """Test mutually exclusive drive-loading options raise."""
-    with pytest.raises(ValueError, match="Cannot set both"):
+    with pytest.raises(ValueError, match="add_erp_drives=True cannot be used with"):
         neymotin_2020_model(
             add_erp_drives=True,
             add_drives_from_params=True,
-            mesh_shape=(3, 3),
+        )
+    with pytest.raises(ValueError, match="add_erp_drives=True cannot be used with"):
+        neymotin_2020_model(
+            add_erp_drives=True,
+            params={},
+        )
+    with pytest.raises(ValueError, match="add_erp_drives=True cannot be used with"):
+        neymotin_2020_model(
+            add_erp_drives=True,
+            legacy_mode=True,
         )
