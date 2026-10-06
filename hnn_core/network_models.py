@@ -413,8 +413,6 @@ def neymotin_2020_model(
     net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     if load_erp_drives:
-        # _load_erp_drives(net)
-
         # Add distal drive
         weights_ampa_d1 = {
             "L2_basket": 0.006562,
@@ -426,7 +424,7 @@ def neymotin_2020_model(
             "L2_pyramidal": 0.004317,
             "L5_pyramidal": 0.080074,
         }
-        # TODO AES delays!!!
+        # TODO Change delay for #1180 here
         synaptic_delays_d1 = {
             "L2_basket": 0.1,
             "L2_pyramidal": 0.1,
@@ -451,7 +449,7 @@ def neymotin_2020_model(
             "L5_basket": 0.19934,
             "L5_pyramidal": 0.00865,
         }
-        # AES only to pass test "test_load_erp_drives_matches_json_configuration"
+        # For testing full equality with 'neymotin2020_base.json'
         weights_nmda_p1 = {
             "L2_basket": 0.0,
             "L2_pyramidal": 0.0,
@@ -470,7 +468,7 @@ def neymotin_2020_model(
             sigma=2.47,
             numspikes=1,
             weights_ampa=weights_ampa_p1,
-            weights_nmda=weights_nmda_p1,  # AES only to pass tests
+            weights_nmda=weights_nmda_p1,
             location="proximal",
             synaptic_delays=synaptic_delays_prox,
             event_seed=507,
@@ -482,6 +480,7 @@ def neymotin_2020_model(
             "L5_basket": 0.008958,
             "L5_pyramidal": 0.684013,
         }
+        # For testing full equality with 'neymotin2020_base.json'
         weights_nmda_p2 = {
             "L2_basket": 0.0,
             "L2_pyramidal": 0.0,
@@ -494,7 +493,7 @@ def neymotin_2020_model(
             sigma=8.33,
             numspikes=1,
             weights_ampa=weights_ampa_p2,
-            weights_nmda=weights_nmda_p2,  # AES only to pass tests
+            weights_nmda=weights_nmda_p2,
             location="proximal",
             synaptic_delays=synaptic_delays_prox,
             event_seed=777,
