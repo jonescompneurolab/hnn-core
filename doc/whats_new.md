@@ -26,7 +26,256 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 <!-- ### Changelog -->
 
-## 0.5.1.dev0 In-progress Development Changes
+## 0.6.2.dev0 In-progress Notes
+
+### Deprecations
+
+- User-facing deprecation notices now emit `FutureWarning`, making them visible under
+  Python's default warning filters,
+  by [William Kang][] in {gh}`1339`. This was their first PR, thanks William!
+
+### New Features
+
+- Users can now specify their own custom objective function in two different ways:
+    1. Passing a `obj_fun='custom'` to `Optimizer`. If passing `custom`, then users can
+      provide a function that simply accepts a single `Dipole` object and accepts
+      `obj_fun_kwargs`. They must then pass this function as `loss_fun` in
+      `Optimizer.fit`. More details are available in the description for
+      `Optimizer.fit`.
+    2. Passing their own callable via `obj_fun=<callable>`. If users want to use an
+      objective function that does not use only a single `Dipole`, then they can write
+      their own function similar to the existing code in
+      `optimization/objective_functions.py` and pass that function to
+      `Optimizer(... obj_fun=<function>)`. Note that this function must accept all the
+      same arguments as the other objective functions in
+      `optimization/objective_functions.py` and run a simulation.
+      by [Vaishnavi Baghel][] in {gh}`1271`.
+
+### Upcoming Deprecations
+
+### Bug Fixes
+
+- Loading external drives in the GUI now extends the simulation duration when needed,
+  preserving configured drive and tonic-bias stop times,
+  by [William Kang][] in {gh}`1348`.
+
+- [Camilo Diaz][] did considerable work in fixing our long-standing MPI Timeout issues
+  and putting in place a permanent solution that uses tempfiles instead of standard
+  input/output/error streams. Thanks Camilo!
+
+### Public API Changes
+
+### People who contributed to this release:
+
+- [Vaishnavi Baghel][]
+- [Arnesh Banerjee][]
+- [Shivansh Bhageria][]
+- [Camilo Diaz][]
+- [William Kang][]
+
+### Changelog
+
+- Improvements to some visualization documentation,
+  by [Arnesh Banerjee][] in {gh}`1332`.
+
+- Easier optimization custom function usage
+  by [Vaishnavi Baghel][] in {gh}`1271`.
+
+- Document and remove problematic MPI Timeouts (while keeping code intact), and
+  implement a new tempfile-based mechanism for transmitting MPI data from child
+  processes back to rank 0 child process then parent process,
+  by [Camilo Diaz][] in {gh}`1312` and {gh}`1315`.
+
+- Improve y-axis labels and ticks of LFP and CSD plotting,
+  by [Shivansh Bhageria][] in {gh}`1191`. This was their first PR, thanks Shivansh!
+
+
+## 0.6.1 Patch Release Notes
+
+This is an emergency patch release to fix an install misconfiguration (see
+{gh}`1302`).
+
+Recent changes to `Optimizer` from the new CMA optimization solver require `joblib` to
+be installed for any Optimization to be run. Since `joblib` is a required dependency of
+`scikit-learn`, installing with `pip install "hnn-core[opt]"` is sufficient, even
+though `[opt]` installs some, but not all, of HNN-Core's `[parallel]` install extras,
+which are `joblib` and `psutil`.
+
+Relatedly, since the GUI can now support optimization, its installation now requires
+the `[opt]` packages to be installed as well. This has been fixed.
+
+For the greater release notes that document what has been added since 0.5.0, including
+**important upcoming deprecations**, [see our Release Notes for 0.6.0
+here](https://github.com/jonescompneurolab/hnn-core/releases/tag/v0.6.0).
+
+## 0.6.0 Release Notes
+
+### Important Deprecations
+
+- `jones_2009_model` has been renamed to `neymotin_2020_model` to better reflect its
+  provenance. From now on, `neymotin_2020_model` is the recommended "default" model we
+  will be documenting and using going forward. However, for backwards compatibility,
+  `jonegs_2009_model` will still be retained as a simple "wrapper function" around
+  `neymotin_2020_model`, the latter being otherwise identical to the old
+  `jones_2009_model` behavior. We recommend you update your scripts to use
+  `neymotin_2020_model`, but `jones_2009_model` will still continue to work.
+
+- IMPORTANT: For the default model `neymotin_2020_model` (renamed from
+  `jones_2009_model`, see above), in the NEXT release (i.e. 0.7.0), some parameters will
+  be slightly changed, which will cause **your simulations to produce slightly different
+  output**. Again, this is only expected in the next major release, not this one. This
+  is necessary in order to fix certain parameters (e.g. synaptic delays) which are
+  slightly different than their values in the "Original HNN" code. Using the new
+  parameters, simulation results are expected to only be *quantitatively* different, but
+  not *qualitatively* different, and these changes are not expected to change the
+  significance of simulation results.
+
+### New Features
+
+- When installing `hnn-core` through `pip`, there is now an easy way to install all
+  extra dependencies (excluding development packages): `pip install "hnn-core[all]"`.
+  This installs the necessary dependencies for the GUI, Optimization, and parallelism
+  (excluding MPI itself, which you can find how to install at our
+  [Installation
+  Guide](https://jonescompneurolab.github.io/textbook/content/01_getting_started/installation.html)
+  ).
+
+- Major visual refresh and polishing of the GUI
+  by [Dylan Daniels][] in {gh}`1243`.
+
+- [Nick Tolley][] has added Optimization support for both the "Covariance matrix adaptation
+  evolutionary strategy" (CMA-ES) solver and correlation-coefficient as an objective
+  function, in {gh}`1221` and {gh}`1286`! CMA-ES is a very powerful optimization
+  option which can simulate multiple samples in a single epoch, and may possibly become
+  the default optimization solver in the future.
+
+- The GUI now includes an Optimization tab that can run optimization against any
+  parameter in the `Network`'s drives, using any of the available built-in solvers or
+  objective functions, including the new CMA-ES solver (see above).
+  By [Austin E. Soplata][] and [Nick Tolley][] in {gh}`1190`.
+
+### Bug Fixes
+
+- Accessibility of all HNN websites (excluding auto-generated Jupyter notebook output)
+  has been fixed to prevent basic accessibility errors,
+  by [Joyce Gao][] and [Austin E. Soplata][] in several PRs including
+  {gh}`1280`,
+  {gh}`1293`,
+  https://github.com/jonescompneurolab/textbook/pull/153 , and
+  https://github.com/GitHub-at-Brown/hnn-front-website/pull/56 .
+
+- The COBYLA Optimization solver now returns the `Network` with the best-performing
+  parameters instead of simply returning the parameters of the final iteration that was
+  run,
+  by [Carolina Fernandez Pujol][], [Nick Tolley][], and [Austin E. Soplata][] in
+  {gh}`1240`.
+
+- GUI dataset dropdowns have been fixed so that they show what is displayed in the plot,
+  by [Tushar Jamdade][] in {gh}`1223`.
+
+- When loading a network using the GUI, sometimes there would arise a `KeyError` due to
+  a lack of `n_trials` value. This has been fixed
+  by [Tushar Jamdade][] in {gh}`1216`.
+
+- Read-in of Network JSON files with custom `cell_types` or `pos_dict` entries has been
+  fixed in {gh}`1195`.
+
+### Public API Changes
+
+- `jones_2009_model`, the main function to spawn the default model, has been replaced
+  with `neymotin_2020_model` (see note above in 'Important Deprecations').
+  `jones_2009_model` will still continue to work, but users should migrate to the new
+  name for the function. Done in {gh}`1290`.
+
+- `simulate_dipole` now has a `verbose` flag to control how much output is printed,
+  by [Anna Cattani][] in {gh}`1228`. This was their first PR, thanks Anna!
+
+- `Section` can now consume an `v0` argument in order to set the initial voltage of the membrane
+  potential for that section. Merged in {gh}`1185`, adapted from work by [Katharina Duecker][].
+
+- `BatchSimulate` is now properly documented via our public API, thanks to
+  [M Yaswanth Reddy][] in {gh}`1218`.
+
+### People who contributed to this release:
+
+- [Muhammad Ahmad Amin][]
+- [Vaishnavi Baghel][]
+- [Anna Cattani][]
+- [Dylan Daniels][]
+- [Katharina Duecker][]
+- [Joyce Gao][]
+- [Tushar Jamdade][]
+- [Karthikeya Kodlai][]
+- [M Yaswanth Reddy][]
+- [Satvik Saluja][]
+- [Austin E. Soplata][]
+- [Nick Tolley][]
+- [Percival Villalva][]
+
+### Changelog
+
+- Where possible, all remaining imports have been moved to the top of source files,
+  by [Percival Villalva][] in {gh}`1285`.
+
+- In the GUI, when comparing two datasets, both the RMSE and the correlation values are
+  now displayed on the plot instead of just the RMSE,
+  by [Nick Tolley][] and [Austin E. Soplata][] in {gh}`1298`.
+
+- Javascript and CSS files in the repository are now included in the Python packaging,
+  in {gh}`1292`.
+
+- Enable MacOS Intel-CPU runners in CI,
+  by [Vaishnavi Baghel][] in {gh}`1287`.
+
+- Update and re-enable Codecov usage in CI,
+  by [Vaishnavi Baghel][] in {gh}`1272`. This was their first PR, thanks Vaishnavi!
+
+- We have removed the Gitter badge on our repository's homepage (in {gh}`1270`) in order
+  to push people towards the Github Discussions page.
+
+- Test coverage of Hamming smoothing via `hnn_core.utils.smooth_waveform` has been
+  improved,
+  by [Satvik Saluja][] in {gh}`1266`.
+
+- The `issue-metrics` Github Action workflow has been removed (in {gh}`1279`) entirely
+  in favor of https://github.com/jonescompneurolab/hnn-tracking/pull/1 .
+
+- Fix testing of `mesh_shape` to include all available network models,
+  by [Satvik Saluja][] in {gh}`1268`. This was their first PR, thanks Satvik!
+
+- Improve UX of GUI's "Delete all drives" button and small refactors of GUI codebase.
+  By [Muhammad Ahmad Amin][] in {gh}`1245`. This was their first PR, thanks Muhammad!
+
+- In the GUI, when simulating multiple trials and plotting the spectrogram, use the
+  averaged Time-Frequency-Representation of the dipoles for spectrogram calculation
+  instead of only the first dipole,
+  by [M Yaswanth Reddy][] in {gh}`1233`. This was their first PR, thanks Yaswanth!
+
+- The repository's AI policy has been clarified in {gh}`1224`.
+
+- Issue templates are now used in the `hnn_core` repository.
+
+- In the GUI, new simulations are now auto-renamed. This fixes an annoying issue with
+  the GUI where every time a user wanted to run a new simulation, they had to go back to
+  the Simulation tab and manually change the simulation name. Now, whenever they run a
+  new simulation without changing the name manually, the new simulation will use the old
+  name, but with a reasonable number appended.
+  By [Tushar Jamdade][] in {gh}`1213`.
+
+- Add support for printing a welcome message that asks the user to fill out the HNN
+  survey, which is printed to the standard output after (and only after) the first time
+  the `hnn_core` module is imported. Whether or not the message is displayed is
+  determined by the presence of a new file created in the module after first run.
+  by [Karthikeya Kodlai][] in {gh}`1158`. This was their first PR, thanks Karthikeya!
+
+- Add progressive minimal install and test to Github Actions,
+  by [Tushar Jamdade][] in {gh}`1214`. This was their first PR, thanks Tushar!
+
+----------------------------------------------------------------------------------------
+
+### Public API Changes
+
+- `BatchSimulate` now expects the `set_params` callback to accept arguments in the order `(net, param_values)` instead of `(param_values, net)`, aligning it with the `Optimizer` class, by [Rahul Tripathi][] in {gh}`1208`.
 
 ## 0.5.0 Release Notes
 
@@ -117,7 +366,7 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
   simulation. This offers a large degree of control over both the data of the spike
   trains and how you want to connect them to your simulation. There is a [new example
   script
-  here](https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/plot_replaying_spike_data_as_input.html#sphx-glr-auto-examples-howto-plot-replaying-spike-data-as-input-py)
+  here](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/replaying_spike_data_as_input.html)
   which illustrates its use.
   By [Maira Usman][] in {gh}`1064`.
 
@@ -157,8 +406,8 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
   behavior by setting the `n_trials` parameter in
   {func}`~hnn_core.optimization.Optimizer.fit`. To capture the model's average behavior,
   it is recommended to set `n_trials` > 1, as using `n_trials=1` may identify parameters
-  that work well for one simulation run but perform poorly on average. The optimization
-  example (`examples/howto/optimize_evoked.py`) has also been enhanced with improved
+  that work well for one simulation run but perform poorly on average. The [optimization
+  example](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/optimize_simulated_evoked_response_parameters.html) has also been enhanced with improved
   markdown and updated contents to better illustrate best practices.
   By [Carolina Fernandez Pujol][] in {gh}`1057`.
 
@@ -381,16 +630,16 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 
 - `hnn_core` now includes a fully-tested and robust GUI of its own. The `hnn_core` GUI was present as a prototype in v0.3, but it is now ready for production. New features and visual improvements will still be coming to it in the future, such as the ability to use optimization. See our new [Install page](https://jonescompneurolab.github.io/hnn-core/dev/install.html) for ways to install it, and we have already begun incorporating it into a new, fresh series of tutorials for our upcoming revamp of the HNN website. If you have installed it, you can start the GUI using `hnn-gui` in your terminal/command prompt window.
 
-- The `BatchSimulate` class: Thanks to [Abdul Samad Siddiqui][] and Google Summer of Code 2024, there is now the capability to run "batches" of simulations across multiple parameter sets, enabling easy analysis and simulation of behavior across parameter sweeps. See our [example for more details](https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/plot_batch_simulate.html#sphx-glr-auto-examples-howto-plot-batch-simulate-py). Note that currently, only its `loky` backend is supported, and the `"hnn-core[parallel]"` dependencies must be installed for it to be used.
+- The `BatchSimulate` class: Thanks to [Abdul Samad Siddiqui][] and Google Summer of Code 2024, there is now the capability to run "batches" of simulations across multiple parameter sets, enabling easy analysis and simulation of behavior across parameter sweeps. See our [example for more details](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/batch_simulation.html). Note that currently, only its `loky` backend is supported, and the `"hnn-core[parallel]"` dependencies must be installed for it to be used.
 
-- Significant improvements to the API, documentation, and pedagogical examples [especially for Optimization](https://jonescompneurolab.github.io/hnn-core/stable/auto_examples/howto/optimize_evoked.html#sphx-glr-auto-examples-howto-optimize-evoked-py), among others.
+- Significant improvements to the API, documentation, and pedagogical examples [especially for Optimization](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/optimize_simulated_evoked_response_parameters.html), among others.
 
 - Calcium concentration can now be recorded: recorded calcium concentration from either the soma,
   or all sections, are enabled by setting `record_ca` to `soma` or `all` in
   {func}`~hnn_core.simulate_dipole`. Recordings are accessed through
   {class}`~hnn_core.CellResponse.ca`.
 
-- There is now a new class {class}`~hnn_core.viz.NetworkPlotter` which can be used to visualize an entire network in 3D, including firing animations; [see our example of how to use it here](https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/plot_hnn_animation.html#sphx-glr-auto-examples-howto-plot-hnn-animation-py).
+- There is now a new class {class}`~hnn_core.viz.NetworkPlotter` which can be used to visualize an entire network in 3D, including firing animations; [see our example of how to use it here](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/animating_hnn_simulations.html).
 
 - There is now a new function {func}`~hnn_core.viz.plot_drive_strength` for illustrating the absolute or relative amount of strength that a particular drive provides to different cell types.
 
@@ -412,7 +661,7 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 - New argument to {class}`~hnn_core.Network` initialization: you can now set `mesh_shape` to easily make a grid of different sizes of `Network`s.
 - {class}`~hnn_core.Cell` initialization argument `topology` has had both its name changed to `cell_tree` and its data type significantly changed; see [the API docs of `Cell` for details](https://jonescompneurolab.github.io/hnn-core/dev/generated/hnn_core.Cell.html#hnn_core.Cell).
 - {func}`~hnn_core.jones_2009_model` and other built-in Network Models including {func}`~hnn_core.law_2021_model` and {func}`~hnn_core.calcium_model` all accept the aforementioned `mesh_shape` argument like {class}`~hnn_core.Network`.
-- The API for optimization has changed significantly. Instead of running the function `optimize_evoked` obtained using `from hnn_core.optimization import optimize_evoked`, you should use the new {class}`~hnn_core.Optimizer` class and its methods; [see our example of evoked-response optimization here](https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/optimize_evoked.html#sphx-glr-auto-examples-howto-optimize-evoked-py).
+- The API for optimization has changed significantly. Instead of running the function `optimize_evoked` obtained using `from hnn_core.optimization import optimize_evoked`, you should use the new {class}`~hnn_core.Optimizer` class and its methods; [see our example of evoked-response optimization here](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/optimize_simulated_evoked_response_parameters.html).
 - {func}`~hnn_core.viz.plot_spikes_hist` now accepts more arguments, including `invert_spike_types`, `color`, and any `**kwargs_hist` which can be applied to `matplotlib.axes.Axes.hist`. See the docstring for details.
 - {func}`~hnn_core.viz.plot_spikes_raster` now accepts many more arguments, including `cell_types`, `colors`, `show_legend`, `marker_size`, `dpl`, and `overlay_dipoles`. See the docstring for details.
 - {func}`~hnn_core.viz.plot_cell_morphology` now accepts more arguments, including `color` and several arguments related to its position and viewing window, including `pos`, `xlim`, `ylim`, and `zlim`. See the docstring for details.
@@ -498,7 +747,7 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
   files to new json format, by [George Dang][] in {gh}`772`
 
 - Add
-  [`BatchSimulate`](https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/plot_batch_simulate.html#sphx-glr-auto-examples-howto-plot-batch-simulate-py)
+  [`BatchSimulate`](https://jonescompneurolab.github.io/hnn-core/stable/generated/hnn_core.batch_simulate.BatchSimulate.html#hnn_core.batch_simulate.BatchSimulate)
   class for batch simulation capability, by [Abdul Samad Siddiqui][]
   in {gh}`782`
 
@@ -512,7 +761,7 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
   {gh}`815`
 
 - Refactor and improve documentation for
-  [`BatchSimulate`](https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/plot_batch_simulate.html#sphx-glr-auto-examples-howto-plot-batch-simulate-py), by [Abdul Samad Siddiqui][]
+  [`BatchSimulate`](https://jonescompneurolab.github.io/hnn-core/stable/generated/hnn_core.batch_simulate.BatchSimulate.html#hnn_core.batch_simulate.BatchSimulate), including a [tutorial](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/batch_simulation.html) by [Abdul Samad Siddiqui][]
   in {gh}`830` and {gh}`857`
 
 - Add argument to change colors of `plot_spikes_raster`, shortened line lengths to
@@ -939,16 +1188,13 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 
 ## Notable Changes
 
-- Local field potentials can now be recorded during simulations {ref}`[Example]
-  <sphx_glr_auto_examples_howto_plot_record_extracellular_potentials.py>`
+- Local field potentials can now be recorded during simulations [Example](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/record_and_plot_extracellular_potentials.html)
 
-- Ability to optimize parameters to reproduce event related potentials from real data
-  {ref}`[Example] <sphx_glr_auto_examples_howto_optimize_evoked.py>`
+- Ability to optimize parameters to reproduce event related potentials from real data [Example](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/optimize_simulated_evoked_response_parameters.html)
 
 - Published models using HNN were added and can be loaded via dedicated functions
 
-- Several improvements enabling easy modification of connectivity and cell properties
-  {ref}`[Example] <sphx_glr_auto_examples_howto_plot_connectivity.py>`
+- Several improvements enabling easy modification of connectivity and cell properties [Example](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/modifying_local_connectivity.html)
 
 - Improved visualization including spectral analysis, connectivity, and cell morphology
 
@@ -1239,9 +1485,22 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [Carolina Fernandez Pujol]: https://github.com/carolinafernandezp
 [Austin E. Soplata]: https://github.com/asoplata
 [Dikshant Jha]: https://github.com/dikshant182004
-[Dan Toms]: https://github.com/pynmash
+[Dan Toms]: https://github.com/bydtoms
 [Shehroz Kashif]: https://github.com/Shehrozkashif
 [Mohamed W. ElSayed]: https://github.com/wagdy88
 [Maira Usman]: https://github.com/Myrausman
 [Chetan Kandpal]: https://github.com/Chetank99
+[Rahul Tripathi]: https://github.com/Rahul-2k4
 [NEURON]: https://nrn.readthedocs.io
+[Karthikeya Kodlai]: https://github.com/sketch123456
+[Tushar Jamdade]: https://github.com/Tusharjamdade
+[M Yaswanth Reddy]: https://github.com/Yaswanth8390
+[Muhammad Ahmad Amin]: https://github.com/m-ahmad-amin
+[Satvik Saluja]: https://github.com/SatvikSaluja
+[Vaishnavi Baghel]: https://github.com/vshnvii
+[Joyce Gao]: https://github.com/xgao35
+[Percival Villalva]: https://github.com/pervillalva
+[Anna Cattani]: https://github.com/annacatt
+[Shivansh Bhageria]: https://github.com/Shivansh1205
+[Arnesh Banerjee]: https://github.com/ArneshBanerjee
+[William Kang]: https://github.com/WilliamK112

@@ -14,7 +14,7 @@ network_configs_path = Path(top_level_dir, "hnn_core", "param")
 input_flat_base_network_config_path = network_configs_path.joinpath("default.json")
 # This is the "hierarchical JSON" network file which we will build
 output_hier_base_network_config_path = network_configs_path.joinpath(
-    "jones2009_base.json"
+    "neymotin2020_base.json"
 )
 
 backup_path = Path(

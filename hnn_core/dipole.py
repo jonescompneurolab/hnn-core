@@ -3,15 +3,21 @@
 # Authors: Mainak Jas <mjas@mgh.harvard.edu>
 #          Sam Neymotin <samnemo@gmail.com>
 
-import os
+from pathlib import Path
 import warnings
+from copy import deepcopy
 from io import StringIO
+import json
 
 import numpy as np
-from copy import deepcopy
 from h5io import write_hdf5, read_hdf5
+from scipy import signal
+from scipy.stats import pearsonr
+
+import hnn_core
 from .externals.mne import _check_option
 
+from .utils import _savgol_filter, smooth_waveform
 from .viz import plot_dipole, plot_psd, plot_tfr_morlet
 
 
@@ -24,38 +30,46 @@ def simulate_dipole(
     record_isec=False,
     record_ca=False,
     postproc=False,
+    verbose=True,
+    baseline_correction=True,
 ):
     """Simulate a dipole given the experiment parameters.
 
     Parameters
     ----------
     net : Network object
-        The Network object specifying how cells are
-        connected.
+        The Network object specifying how cells are connected.
     tstop : float
         The simulation stop time (ms).
-    dt : float
+    dt : float, default=0.025
         The integration time step of h.CVode (ms)
-    n_trials : int | None
-        The number of trials to simulate. If None, the 'N_trials' value
-        of the ``params`` used to create ``net`` is used (must be >0)
-    record_vsec : 'all' | 'soma' | False
+    n_trials : int | None, default=None
+        The number of trials to simulate. If None (the default), the 'N_trials' value of
+        the ``params`` used to create ``net`` is used (must be >0)
+    record_vsec : 'all' | 'soma' | False, default=False
         Option to record voltages from all sections ('all'), or just
-        the soma ('soma'). Default: False.
-    record_isec : 'all' | 'soma' | False
+        the soma ('soma').
+    record_isec : 'all' | 'soma' | False, default=False
         Option to record synaptic currents from all sections ('all'), or just
-        the soma ('soma'). Default: False.
-    record_ca : 'all' | 'soma' | False
+        the soma ('soma').
+    record_ca : 'all' | 'soma' | False, default=False
         Option to record calcium concentration from all sections ('all'),
-        or just the soma ('soma'). Default: False.
-    postproc : bool
-        If True, smoothing (``dipole_smooth_win``) and scaling
-        (``dipole_scalefctr``) values are read from the parameter file, and
-        applied to the dipole objects before returning. Note that this setting
-        only affects the dipole waveforms, and not somatic voltages, possible
-        extracellular recordings etc. The preferred way is to use the
-        :meth:`~hnn_core.dipole.Dipole.smooth` and
-        :meth:`~hnn_core.dipole.Dipole.scale` methods instead. Default: False.
+        or just the soma ('soma').
+    postproc : bool, default=False
+        Deprecated. If True, smoothing (``dipole_smooth_win``) and scaling
+        (``dipole_scalefctr``) values are read from the ``Network``'s parameter file,
+        and applied to the dipole objects before returning (the default ``Network``
+        parameter file, `hnn_core/param/default.json`, uses a smoothing value of 30 ms
+        and a scaling factor of 3000). Note that this setting only affects the dipole
+        waveforms, and not somatic voltages, possible extracellular recordings etc. The
+        preferred way is to use the :meth:`~hnn_core.dipole.Dipole.smooth` and
+        :meth:`~hnn_core.dipole.Dipole.scale` methods after the simulation is run instead.
+    verbose : bool, default=True
+        If True, print build steps and simulation progress to console.
+    baseline_correction : bool, default=True
+        Whether to apply the baseline correction after simulation (which correction is
+        used depends on ``Network._model_variant``). Defaults to True, applying the
+        appropriate correction.
 
     Returns
     -------
@@ -69,14 +83,16 @@ def simulate_dipole(
         _BACKEND = JoblibBackend(n_jobs=1)
 
     if n_trials is None:
-        n_trials = net._params["N_trials"]
+        n_trials = net._params.get("N_trials", 1)
+        net._params["N_trials"] = n_trials
+
     if n_trials < 1:
         raise ValueError("Invalid number of simulations: %d" % n_trials)
 
     if not net.connectivity:
         warnings.warn(
             "No connections instantiated in network. Consider using "
-            "net = jones_2009_model() or net = law_2021_model() to "
+            "net = neymotin_2020_model() or net = law_2021_model() to "
             "create a predefined network from published models.",
             UserWarning,
         )
@@ -93,8 +109,9 @@ def simulate_dipole(
         for cell_type, bias_cell_type in bias.items():
             if bias_cell_type["tstop"] is None:
                 bias_cell_type["tstop"] = tstop
-            if bias_cell_type["tstop"] < 0.0:
-                raise ValueError("End time of tonic input cannot be negative")
+            # This check is also performed at Network.add_tonic_bias time, but if the
+            # user does not specify tstop at that time, then tstop is not known until
+            # simulation time, so we need to check it again here.
             duration = bias_cell_type["tstop"] - bias_cell_type["t0"]
             if duration < 0.0:
                 raise ValueError("Duration of tonic input cannot be negative")
@@ -123,15 +140,21 @@ def simulate_dipole(
             "The postproc-argument is deprecated and will be removed"
             " in a future release of hnn-core. Please define "
             "smoothing and scaling explicitly using Dipole methods.",
-            DeprecationWarning,
+            FutureWarning,
         )
-    dpls = _BACKEND.simulate(net, tstop, dt, n_trials, postproc)
+
+    net._verbose = verbose
+
+    dpls = _BACKEND.simulate(net, tstop, dt, n_trials, postproc, baseline_correction)
 
     return dpls
 
 
 def _read_dipole_txt(fname, extension=".txt"):
     """Read dipole values from a txt file and create a Dipole instance.
+
+    All Dipoles read this way are assumed to be of the "neymotin_2020_model" variant
+    type, and not the "duecker_ET_model" variant type.
 
     Parameters
     ----------
@@ -159,6 +182,9 @@ def _read_dipole_txt(fname, extension=".txt"):
 
 def _read_dipole_hdf5(fname):
     """Read dipole values from a hdf5 file and create a Dipole instance.
+
+    All Dipoles read this way are assumed to be of the "neymotin_2020_model" variant
+    type, and not the "duecker_ET_model" variant type.
 
     Parameters
     ----------
@@ -205,10 +231,10 @@ def read_dipole(fname):
         The instance of Dipole class
     """
 
-    fname = str(fname)
-    if not os.path.exists(fname):
-        raise FileNotFoundError("File not found at path %s." % (fname,))
-    file_extension = os.path.splitext(fname)[-1]
+    fname = Path(fname)
+    if not fname.exists():
+        raise FileNotFoundError(f"File not found at path {fname}.")
+    file_extension = fname.suffix
     if file_extension == ".txt":
         return _read_dipole_txt(fname)
     elif file_extension == ".hdf5":
@@ -216,7 +242,7 @@ def read_dipole(fname):
     else:
         raise NameError(
             "File extension should be either txt or hdf5, but the "
-            "given extension is %s" % (file_extension,)
+            f"given extension is {file_extension}."
         )
 
 
@@ -265,31 +291,9 @@ def average_dipoles(dpls):
     return avg_dpl
 
 
-def _rmse(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
-    """Calculates RMSE between data in dpl and exp_dpl
-    Parameters
-    ----------
-    dpl : instance of Dipole
-        A dipole object with simulated data
-    exp_dpl : instance of Dipole
-        A dipole object with experimental data
-    tstart : None | float
-        Time at beginning of range over which to calculate RMSE
-    tstop : None | float
-        Time at end of range over which to calculate RMSE
-    weights : None | array
-        An array of weights to be applied to each point in
-        simulated dpl. Must have length >= dpl.data
-        If None, weights will be replaced with 1's for typical RMSE
-        calculation.
-
-    Returns
-    -------
-    err : float
-        Weighted RMSE between data in dpl and exp_dpl
-    """
-    from scipy import signal
-
+def _resample_and_weight_dipole(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
+    """Resamples dpl and exp_dpl for to common sampling rate. Also scales time series
+    by weights if provided"""
     exp_times = exp_dpl.times
     sim_times = dpl.times
 
@@ -329,7 +333,276 @@ def _rmse(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
         # downsample exp timeseries to match simulation data
         dpl2 = signal.resample(dpl2, sim_length)
 
+    return dpl1, dpl2, weights
+
+
+def _rmse(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
+    """Calculates RMSE between data in dpl and exp_dpl
+    Parameters
+    ----------
+    dpl : instance of Dipole
+        A dipole object with simulated data
+    exp_dpl : instance of Dipole
+        A dipole object with experimental data
+    tstart : None | float
+        Time at beginning of range over which to calculate RMSE
+    tstop : None | float
+        Time at end of range over which to calculate RMSE
+    weights : None | array
+        An array of weights to be applied to each point in
+        simulated dpl. Must have length >= dpl.data
+        If None, weights will be replaced with 1's for typical RMSE
+        calculation.
+
+    Returns
+    -------
+    err : float
+        Weighted RMSE between data in dpl and exp_dpl
+    """
+    dpl1, dpl2, weights = _resample_and_weight_dipole(
+        dpl, exp_dpl, tstart, tstop, weights
+    )
+
     return np.sqrt((weights * ((dpl1 - dpl2) ** 2)).sum() / weights.sum())
+
+
+def _anticorr(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
+    """Calculates Anticorrelation (1 - corr) between data in dpl and exp_dpl
+
+    Parameters
+    ----------
+    dpl : instance of Dipole
+        A dipole object with simulated data
+    exp_dpl : instance of Dipole
+        A dipole object with experimental data
+    tstart : None | float
+        Time at beginning of range over which to calculate Anticorrelation
+    tstop : None | float
+        Time at end of range over which to calculate Anticorrelation
+    weights : None | array
+        An array of weights to be applied to each point in simulated dpl. Must have
+        length >= dpl.data . If None, weights will be replaced with 1's for typical
+        Anticorrelation calculation.
+
+    Returns
+    -------
+    err : float
+        Weighted anticorrelation between data in dpl and exp_dpl
+    """
+    dpl1, dpl2, weights = _resample_and_weight_dipole(
+        dpl, exp_dpl, tstart, tstop, weights
+    )
+
+    obj = (
+        1 - np.corrcoef(dpl1 * weights, dpl2 * weights)[0, 1]
+    )  # transform so that 0 is a perfect fit
+    return obj
+
+
+def _rmse_corr(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
+    """Calculates correlation-weighted RMSE between data in dpl and exp_dpl
+
+    Penalizes solutions with a low correlation, encouraging the optimizer to find
+    solutions that reproduce the waveform shape rather than regressing to the mean.
+    For small correlations (clipped at 1e-10), rmse will be
+    multiplied by a large positive number and the error is large.
+    For correlations close to 1, the error will be equal to the rmse.
+
+    Parameters
+    ----------
+    dpl : instance of Dipole
+        A dipole object with simulated data
+    exp_dpl : instance of Dipole
+        A dipole object with experimental data
+    tstart : float, default=0.0
+        Time at beginning of range over which to calculate RMSE
+    tstop : float, default=0.0
+        Time at end of range over which to calculate RMSE
+    weights : None | array
+        An array of weights to be applied to each point in simulated dpl. Must have
+        length >= dpl.data . If None, weights will be replaced with 1's for typical RMSE
+        calculation.
+
+    Returns
+    -------
+    err : float
+        Weighted RMSE between data in dpl and exp_dpl
+        err = rmse * (1 - np.log(sig_corr))
+
+    """
+    exp_times = exp_dpl.times
+    sim_times = dpl.times
+
+    for tseries in [exp_times, sim_times]:
+        if tstart < tseries[0]:
+            tstart = tseries[0]
+        if tstop > tseries[-1]:
+            tstop = tseries[-1]
+
+    # make sure start and end times are valid for both dipoles
+    exp_start_index = (np.abs(exp_times - tstart)).argmin()
+    exp_end_index = (np.abs(exp_times - tstop)).argmin()
+    exp_length = exp_end_index - exp_start_index
+
+    sim_start_index = (np.abs(sim_times - tstart)).argmin()
+    sim_end_index = (np.abs(sim_times - tstop)).argmin()
+    sim_length = sim_end_index - sim_start_index
+
+    if weights is None:
+        # weighted RMSE with weights of all 1's is equivalent to
+        # normal RMSE
+        weights = np.ones(len(sim_times[0:sim_end_index]))
+    weights = weights[sim_start_index:sim_end_index]
+
+    dpl1 = dpl.data["agg"][sim_start_index:sim_end_index]
+    dpl2 = exp_dpl.data["agg"][exp_start_index:exp_end_index]
+
+    if sim_length > exp_length:
+        # downsample simulation timeseries to match exp data
+        dpl1 = signal.resample(dpl1, exp_length)
+        weights = signal.resample(weights, exp_length)
+        indices = np.where(weights < 1e-4)
+        weights[indices] = 0
+    elif sim_length < exp_length:
+        # downsample exp timeseries to match simulation data
+        dpl2 = signal.resample(dpl2, sim_length)
+
+    rmse = np.sqrt((weights * (dpl1 - dpl2) ** 2).sum() / weights.sum())
+    sig_corr = pearsonr(dpl1, dpl2)[0]
+    if not np.isfinite(sig_corr):
+        sig_corr = 1e-10
+    sig_corr = np.clip(sig_corr, 1e-10, 1.0)  # avoid negative correlations
+    err = rmse * (1 - np.log(sig_corr))
+    return err if np.isfinite(err) else 1e6
+
+
+def _correct_baseline_dueckerET(dpl, N_pyr_x, N_pyr_y):
+    """Correct the baseline of the dipole based on the Duecker ET model.
+
+    Due to the unequal distribution of particular ion channels across the L2 and L5
+    pyramidal cells, the dipole moment's zero point needs to be corrected. This function
+    applies a correction based on the the results from Duecker model simulations without
+    external drives.
+
+    This assumes the dipole is currently in units of fAm. After this function is run,
+    the dipole is expected to be converted to units of nAm using
+    `Dipole._convert_fAm_to_nAm`.
+
+    This should be called via `Dipole._correct_baseline(N_pyr_x, N_pyr_y)`, not
+    independently. `Dipole` will use the correct version of the function based on
+    `Network._model_variant`.
+
+    Parameters
+    ----------
+    dpl : Dipole
+        The instance of Dipole class
+    N_pyr_x : int
+        Number of cells in the network along the x-axis (assuming a grid)
+    N_pyr_y : int
+        Number of cells in the network along the y-axis (assuming a grid)
+    """
+
+    # exponential decay function
+    def _exp_decay(t, A, C, b):
+        return ((C - A) * np.exp(-b * t)) + A
+
+    hnn_core_root = Path(hnn_core.__file__).parent
+    # load the baseline dipole
+    with open(hnn_core_root / "param" / "bsl_corr_duecker_ET.json", "r") as f:
+        bsl_dpl = json.load(f)
+
+    scale = N_pyr_x * N_pyr_y / bsl_dpl["N_pyr_ref"]
+
+    A_L2 = bsl_dpl["L2"][-1] * scale
+    A_L5 = bsl_dpl["L5"][-1] * scale
+
+    C_L2 = bsl_dpl["L2"][1] * scale
+    C_L5 = bsl_dpl["L5"][1] * scale
+
+    exp_fit_l2 = _exp_decay(np.array(dpl.times[1:]), A_L2, C_L2, bsl_dpl["popt_l2"][0])
+    exp_fit_l5 = _exp_decay(np.array(dpl.times[1:]), A_L5, C_L5, bsl_dpl["popt_l5"][0])
+
+    dpl.data["L2"][1:] -= exp_fit_l2
+    dpl.data["L5"][1:] -= exp_fit_l5
+
+    dpl.data["agg"] = dpl.data["L2"] + dpl.data["L5"]
+
+    return dpl
+
+
+def _correct_baseline_neymotin2020(dpl, N_pyr_x, N_pyr_y):
+    """Correct the baseline of the dipole based on the Neymotin 2020 model.
+
+    Due to the unequal distribution of particular ion channels across the L2 and L5
+    pyramidal cells, the dipole moment's zero point needs to be corrected. This function
+    applies a correction based on the Jones 2009 [1]_ and Neymotin 2020 [2]_ models.
+
+    This assumes the dipole is currently in units of fAm. After this function is run,
+    the dipole is expected to be converted to units of nAm using
+    `Dipole._convert_fAm_to_nAm`.
+
+    This should be called via `Dipole._correct_baseline(N_pyr_x, N_pyr_y)`, not
+    independently. `Dipole` will use the correct version of the function based on
+    `Network._model_variant`.
+
+    .. [1] Jones, Stephanie R., et al. "Quantitative Analysis and
+           Biophysically Realistic Neural Modeling of the MEG Mu Rhythm:
+           Rhythmogenesis and Modulation of Sensory-Evoked Responses."
+           Journal of Neurophysiology 102, 3554–3572 (2009).
+           https://doi.org/10.1152/jn.00535.2009
+
+    .. [2] Neymotin, Samuel A, et al. 2020. "Human Neocortical Neurosolver (HNN), a New
+           Software Tool for Interpreting the Cellular and Network Origin of Human
+           MEG/EEG Data." eLife 9 (January):e51214. https://doi.org/10.7554/eLife.51214
+
+    Parameters
+    ----------
+    dpl : Dipole
+        The instance of Dipole class
+    N_pyr_x : int
+        Number of cells in the network along the x-axis (assuming a grid)
+    N_pyr_y : int
+        Number of cells in the network along the y-axis (assuming a grid)
+    """
+    # N_pyr cells in grid. This is PER LAYER
+    N_pyr = N_pyr_x * N_pyr_y
+    # dipole offset calculation: increasing number of pyr
+    # cells (L2 and L5, simultaneously)
+    # with no inputs resulted in an aggregate dipole over the
+    # interval [50., 1000.] ms that
+    # eventually plateaus at -48 fAm. The range over this interval
+    # is something like 3 fAm
+    # so the resultant correction is here, per dipole
+    dpl_offset = {
+        # these values will be subtracted
+        "L2": N_pyr * 0.0443,
+        "L5": N_pyr * -49.0502,
+    }
+    # L2 dipole offset can be roughly baseline shifted over
+    # the entire range of t
+    dpl.data["L2"] -= dpl_offset["L2"]
+    # L5 dipole offset should be different for interval [50., 500.]
+    # and then it can be offset
+    # slope (m) and intercept (b) params for L5 dipole offset
+    # uncorrected for N_cells
+    # these values were fit over the range [37., 750.)
+    m = 3.4770508e-3
+    b = -51.231085
+    # these values were fit over the range [750., 5000]
+    t1 = 750.0
+    m1 = 1.01e-4
+    b1 = -48.412078
+    # piecewise normalization
+    dpl.data["L5"][dpl.times <= 37.0] -= dpl_offset["L5"]
+    dpl.data["L5"][(dpl.times > 37.0) & (dpl.times < t1)] -= N_pyr * (
+        m * dpl.times[(dpl.times > 37.0) & (dpl.times < t1)] + b
+    )
+    dpl.data["L5"][dpl.times >= t1] -= N_pyr * (m1 * dpl.times[dpl.times >= t1] + b1)
+    # recalculate the aggregate dipole based on the baseline
+    # normalized ones
+    dpl.data["agg"] = dpl.data["L2"] + dpl.data["L5"]
+
+    return dpl
 
 
 class Dipole(object):
@@ -367,7 +640,16 @@ class Dipole(object):
         :meth:`~hnn_core.dipole.Dipole.scale`).
     """
 
-    def __init__(self, times, data, nave=1):  # noqa: D102
+    def __init__(self, times, data, nave=1, model_variant=None):  # noqa: D102
+        from .network_models import MODEL_VARIANT_MAPPING
+
+        if model_variant not in MODEL_VARIANT_MAPPING:
+            raise ValueError(
+                "model_variant must be one of "
+                f"{sorted(k for k in MODEL_VARIANT_MAPPING if k is not None)}, "
+                f"got {model_variant}"
+            )
+
         self.times = np.array(times)
 
         if isinstance(data, dict):
@@ -383,6 +665,22 @@ class Dipole(object):
         self.nave = nave
         self.sfreq = 1000.0 / (times[1] - times[0])  # NB assumes len > 1
         self.scale_applied = 1  # for visualisation
+        self._model_variant = model_variant
+        self._baseline_correction_applied = False
+
+    def _correct_baseline(self, N_pyr_x, N_pyr_y):
+        """Apply the baseline correction appropriate to this model variant.
+
+        Parameters
+        ----------
+        N_pyr_x : int
+            Nr of cells (x)
+        N_pyr_y : int
+            Nr of cells (y)
+        """
+        from .network_models import MODEL_VARIANT_MAPPING
+
+        return MODEL_VARIANT_MAPPING[self._model_variant](self, N_pyr_x, N_pyr_y)
 
     def copy(self):
         """Return a copy of the Dipole instance
@@ -412,7 +710,7 @@ class Dipole(object):
     def _convert_fAm_to_nAm(self):
         """The NEURON simulator output is in fAm, convert to nAm
 
-        NB! Must be run `after` :meth:`Dipole.baseline_renormalization`
+        NB! Must be run `after` :meth:`Dipole._correct_baseline`
         """
         for key in self.data.keys():
             self.data[key] *= 1e-6
@@ -451,8 +749,6 @@ class Dipole(object):
         dpl_copy : instance of Dipole
             A copy of the modified Dipole instance.
         """
-        from .utils import smooth_waveform
-
         for key in self.data.keys():
             self.data[key] = smooth_waveform(self.data[key], window_len, self.sfreq)
 
@@ -482,8 +778,6 @@ class Dipole(object):
         dpl_copy : instance of Dipole
             A copy of the modified Dipole instance.
         """
-        from .utils import _savgol_filter
-
         if h_freq < 0:
             raise ValueError("h_freq cannot be negative")
         elif h_freq > 0.5 * self.sfreq:
@@ -677,60 +971,6 @@ class Dipole(object):
             show=show,
         )
 
-    def _baseline_renormalize(self, N_pyr_x, N_pyr_y):
-        """Only baseline renormalize if the units are fAm.
-
-        Parameters
-        ----------
-        N_pyr_x : int
-            Nr of cells (x)
-        N_pyr_y : int
-            Nr of cells (y)
-        """
-        # N_pyr cells in grid. This is PER LAYER
-        N_pyr = N_pyr_x * N_pyr_y
-        # dipole offset calculation: increasing number of pyr
-        # cells (L2 and L5, simultaneously)
-        # with no inputs resulted in an aggregate dipole over the
-        # interval [50., 1000.] ms that
-        # eventually plateaus at -48 fAm. The range over this interval
-        # is something like 3 fAm
-        # so the resultant correction is here, per dipole
-        # dpl_offset = N_pyr * 50.207
-        dpl_offset = {
-            # these values will be subtracted
-            "L2": N_pyr * 0.0443,
-            "L5": N_pyr * -49.0502,
-            # 'L5': N_pyr * -48.3642,
-            # will be calculated next, this is a placeholder
-            # 'agg': None,
-        }
-        # L2 dipole offset can be roughly baseline shifted over
-        # the entire range of t
-        self.data["L2"] -= dpl_offset["L2"]
-        # L5 dipole offset should be different for interval [50., 500.]
-        # and then it can be offset
-        # slope (m) and intercept (b) params for L5 dipole offset
-        # uncorrected for N_cells
-        # these values were fit over the range [37., 750.)
-        m = 3.4770508e-3
-        b = -51.231085
-        # these values were fit over the range [750., 5000]
-        t1 = 750.0
-        m1 = 1.01e-4
-        b1 = -48.412078
-        # piecewise normalization
-        self.data["L5"][self.times <= 37.0] -= dpl_offset["L5"]
-        self.data["L5"][(self.times > 37.0) & (self.times < t1)] -= N_pyr * (
-            m * self.times[(self.times > 37.0) & (self.times < t1)] + b
-        )
-        self.data["L5"][self.times >= t1] -= N_pyr * (
-            m1 * self.times[self.times >= t1] + b1
-        )
-        # recalculate the aggregate dipole based on the baseline
-        # normalized ones
-        self.data["agg"] = self.data["L2"] + self.data["L5"]
-
     def _write_txt(self, fname):
         """Write dipole values to a file.
 
@@ -807,13 +1047,13 @@ class Dipole(object):
         if isinstance(fname, StringIO):
             return self._write_txt(fname)
 
-        fname = str(fname)
-        if overwrite is False and os.path.exists(fname):
+        fname = Path(fname)
+        if overwrite is False and fname.exists():
             raise FileExistsError(
                 "File already exists at path %s. Rename "
                 "the file or set overwrite=True." % (fname,)
             )
-        file_extension = os.path.splitext(fname)[-1]
+        file_extension = fname.suffix
         if file_extension == ".txt":
             self._write_txt(fname)
         elif file_extension == ".hdf5":
@@ -821,5 +1061,5 @@ class Dipole(object):
         else:
             raise NameError(
                 "File extension should be either txt or hdf5, but "
-                "the given extension is %s." % (file_extension,)
+                f"the given extension is {file_extension}."
             )

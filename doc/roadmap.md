@@ -27,7 +27,7 @@ interactive GUI is essential for all new users of HNN to develop an
 intuition on how to interact with the large-scale computational model to
 study the multi-scale neural dynamics underlying their MEG/EEG data.
 Once this intuition is gained, users who chose to can dive into the
-computational neural modeling code, where further command line utily can
+computational neural modeling code, where further command line utility can
 be developed. As such, an equal goal is to enable the neural modeling
 and coding community to participate in HNN development. We are
 prioritizing best practices in open-source software design and the

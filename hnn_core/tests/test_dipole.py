@@ -1,4 +1,3 @@
-import os.path as op
 from urllib.request import urlretrieve
 from pathlib import Path
 
@@ -11,7 +10,7 @@ import pytest
 
 import hnn_core
 from hnn_core import read_params, read_dipole, average_dipoles
-from hnn_core import Network, jones_2009_model
+from hnn_core import Network, neymotin_2020_model
 from hnn_core.viz import plot_dipole
 from hnn_core.dipole import Dipole, simulate_dipole, _rmse
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
@@ -21,15 +20,15 @@ matplotlib.use("agg")
 
 def test_dipole(tmp_path, run_hnn_core_fixture):
     """Test dipole object."""
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, "param", "default.json")
+    hnn_core_root = Path(hnn_core.__file__).parent
+    params_fname = hnn_core_root / "param" / "default.json"
     dpl_out_fname = tmp_path / "dpl1.txt"
     dpl_out_hdf5_fname = tmp_path / "dpl.hdf5"
     params = read_params(params_fname)
     times = np.arange(0, 6000 * params["dt"], params["dt"])
     data = np.random.random((6000, 3))
     dipole = Dipole(times, data)
-    dipole._baseline_renormalize(params["N_pyr_x"], params["N_pyr_y"])
+    dipole._correct_baseline(params["N_pyr_x"], params["N_pyr_y"])
     dipole._convert_fAm_to_nAm()
 
     # test smoothing and scaling
@@ -164,7 +163,7 @@ def test_dipole(tmp_path, run_hnn_core_fixture):
         record_ca="soma",
     )
     # test deprecation of postproc
-    with pytest.warns(DeprecationWarning, match="The postproc-argument is deprecated"):
+    with pytest.warns(FutureWarning, match="The postproc-argument is deprecated"):
         dpls, _ = run_hnn_core_fixture(
             backend="joblib",
             n_jobs=1,
@@ -187,13 +186,13 @@ def test_dipole(tmp_path, run_hnn_core_fixture):
 
 def test_dipole_simulation():
     """Test data produced from simulate_dipole() call."""
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, "param", "default.json")
+    hnn_core_root = Path(hnn_core.__file__).parent
+    params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
     params.update(
         {"dipole_smooth_win": 5, "t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20}
     )
-    net = jones_2009_model(params, add_drives_from_params=True, mesh_shape=(3, 3))
+    net = neymotin_2020_model(params, add_drives_from_params=True, mesh_shape=(3, 3))
     with pytest.raises(ValueError, match="Invalid number of simulations: 0"):
         simulate_dipole(net, tstop=25.0, n_trials=0)
     with pytest.raises(ValueError, match="Invalid value for the"):
@@ -211,7 +210,6 @@ def test_dipole_simulation():
             record_isec=False,
             record_ca="abc",
         )
-
     # test Network.copy() returns 'bare' network after simulating
     dpl = simulate_dipole(net, tstop=25.0, n_trials=1)[0]
     assert net._dt == 0.025
@@ -320,7 +318,7 @@ def test_rmse():
         "https://raw.githubusercontent.com/jonescompneurolab/hnn/"
         "master/data/MEG_detection_data/yes_trial_S1_ERP_all_avg.txt"
     )
-    if not op.exists("yes_trial_S1_ERP_all_avg.txt"):
+    if not Path("yes_trial_S1_ERP_all_avg.txt").exists():
         urlretrieve(data_url, "yes_trial_S1_ERP_all_avg.txt")
     extdata = np.loadtxt("yes_trial_S1_ERP_all_avg.txt")
 
@@ -328,8 +326,8 @@ def test_rmse():
         times=extdata[:, 0], data=np.c_[extdata[:, 1], extdata[:, 1], extdata[:, 1]]
     )
 
-    hnn_core_root = op.join(op.dirname(hnn_core.__file__))
-    params_fname = op.join(hnn_core_root, "param", "default.json")
+    hnn_core_root = Path(hnn_core.__file__).parent
+    params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
 
     expected_rmse = 0.1
@@ -348,7 +346,7 @@ def test_rmse():
 
 def test_dipole_simulation_with_renamed_cells():
     """Test dipole simulation works with renamed pyramidal cells."""
-    net = jones_2009_model()
+    net = neymotin_2020_model()
 
     # renaming the pyramidal cells (their cell_metadata should remeain the same)
     rename_mapping = {"L2_pyramidal": "My_L2_Pyr", "L5_pyramidal": "My_L5_Pyr"}
@@ -372,3 +370,59 @@ def test_dipole_simulation_with_renamed_cells():
     assert isinstance(dpls[0], Dipole)
     assert len(dpls[0].times) > 0
     assert np.any(dpls[0].data["agg"] != 0)  # Check that dipole is not all zeros
+
+
+@requires_mpi4py
+@requires_psutil
+@pytest.mark.uses_mpi
+@pytest.mark.parametrize("baseline_correction", [True, False])
+def test_dipole_baseline_correction_mpi(run_hnn_core_fixture, baseline_correction):
+    """Test that baseline_correction works in simulate_dipole with MPIBackend."""
+    _, _ = run_hnn_core_fixture(
+        backend="mpi",
+        reduced=True,
+        baseline_correction=baseline_correction,
+    )
+
+
+def test_dipole_baseline_correction_flags():
+    """Test that all variants of baseline_correction work in simulate_dipole"""
+
+    hnn_core_root = Path(hnn_core.__file__).parent
+    params_fname = hnn_core_root / "param" / "default.json"
+    params = read_params(params_fname)
+
+    # Test that baseline_correction is flagged as true by default
+    net_yes_correct = neymotin_2020_model(
+        params, add_drives_from_params=True, mesh_shape=(3, 3)
+    )
+    assert net_yes_correct._baseline_correction_applied is False
+    dpl_yes_correct = simulate_dipole(
+        net_yes_correct, tstop=25.0, n_trials=1, baseline_correction=True
+    )[0]
+    assert net_yes_correct._baseline_correction_applied is True
+    assert dpl_yes_correct._baseline_correction_applied is True
+
+    # Test that baseline_correction, when set to False, is not applied
+    net_no_correct = neymotin_2020_model(
+        params, add_drives_from_params=True, mesh_shape=(3, 3)
+    )
+    assert net_no_correct._baseline_correction_applied is False
+    with pytest.warns(UserWarning, match="No baseline corr"):
+        dpl_no_correct = simulate_dipole(
+            net_no_correct, tstop=25.0, n_trials=1, baseline_correction=False
+        )[0]
+    assert net_no_correct._baseline_correction_applied is False
+    assert dpl_no_correct._baseline_correction_applied is False
+    assert not np.allclose(dpl_no_correct.data["agg"], dpl_yes_correct.data["agg"])
+
+    # Test that if a network has a SECOND simulation where the first had
+    # baseline_correction=True, but the second had baseline_correction=False, the second
+    # simulation will correctly not apply baseline correction.
+    with pytest.warns(UserWarning, match="No baseline corr"):
+        dpl_second_no_correct = simulate_dipole(
+            net_yes_correct, tstop=25.0, n_trials=1, baseline_correction=False
+        )[0]
+    assert net_yes_correct._baseline_correction_applied is False
+    assert dpl_second_no_correct._baseline_correction_applied is False
+    assert np.allclose(dpl_no_correct.data["agg"], dpl_second_no_correct.data["agg"])

@@ -5,14 +5,15 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
+from itertools import product
+from pathlib import Path
 import numpy as np
-import os
 from joblib import Parallel, delayed, parallel_config
 
 from .network import Network
 from .externals.mne import _validate_type, _check_option
 from .dipole import simulate_dipole
-from .network_models import jones_2009_model
+from .network_models import neymotin_2020_model
 
 
 class BatchSimulate(object):
@@ -31,11 +32,11 @@ class BatchSimulate(object):
         The network model to use for simulations. Examples include the
         returned value of the following functions:
 
-        - `jones_2009_model`: A network model based on Jones et al. (2009).
+        - `neymotin_2020_model`: A network model based on Jones et al. (2009).
         - `law_2021_model`: A network model based on Law et al. (2021).
         - `calcium_model`: A network model incorporating calcium dynamics.
 
-        Default is ``jones_2009_model()``.
+        Default is ``neymotin_2020_model()``.
     tstop : float, optional
         The stop time for the simulation. Default is 170 ms.
     dt : float, optional
@@ -79,17 +80,24 @@ class BatchSimulate(object):
     record_isec : {False, 'all', 'soma'}
         Option to record voltages from all sections ('all'), or just
         the soma ('soma'). Default: False.
-    postproc : bool, optional
-        If True, smoothing (``dipole_smooth_win``) and scaling
-        (``dipole_scalefctr``) values are read from the parameter file, and
-        applied to the dipole objects before returning.
-        Default: False.
+    postproc : bool, default=False
+        Deprecated. If True, smoothing (``dipole_smooth_win``) and scaling
+        (``dipole_scalefctr``) values are read from the ``Network``'s parameter file,
+        and applied to the dipole objects before returning (the default ``Network``
+        parameter file, `hnn_core/param/default.json`, uses a smoothing value of 30 ms
+        and a scaling factor of 3000). Note that this setting only affects the dipole
+        waveforms, and not somatic voltages, possible extracellular recordings etc. The
+        preferred way is to use the :meth:`~hnn_core.dipole.Dipole.smooth` and
+        :meth:`~hnn_core.dipole.Dipole.scale` methods after the simulation is run instead.
     clear_cache : bool, optional
         Whether to clear the results cache after saving each batch.
         Default is False.
     summary_func : func, optional
         A function to calculate summary statistics from the simulation
         results. Default is None.
+    baseline_correction : bool, default=True
+        Whether to apply the ``Network``'s baseline correction method, which is
+        determined by ``Network._model_variant``.
 
     Notes
     -----
@@ -105,7 +113,7 @@ class BatchSimulate(object):
     def __init__(
         self,
         set_params,
-        net=jones_2009_model(),
+        net=neymotin_2020_model(),
         tstop=170,
         dt=0.025,
         n_trials=1,
@@ -124,6 +132,7 @@ class BatchSimulate(object):
         postproc=False,
         clear_cache=False,
         summary_func=None,
+        baseline_correction=True,
     ):
         _validate_type(net, Network, "net", "Network")
         _validate_type(tstop, types="numeric", item_name="tstop")
@@ -168,6 +177,8 @@ class BatchSimulate(object):
         self.postproc = postproc
         self.clear_cache = clear_cache
         self.summary_func = summary_func
+        self._verbose = True
+        self.baseline_correction = baseline_correction
 
     def run(
         self,
@@ -176,7 +187,7 @@ class BatchSimulate(object):
         combinations=True,
         n_jobs=1,
         backend="loky",
-        verbose=50,
+        verbose=True,
     ):
         """Run batch simulations.
 
@@ -197,8 +208,8 @@ class BatchSimulate(object):
             `multiprocessing`, or `dask`. WARNING: currently only `loky` is
             completely operationable; all other backends are in
             development. Default is `loky`.
-        verbose : int, optional
-            The verbosity level for parallel execution. Default is 50.
+        verbose : bool
+            If True, print build steps and simulation progress to console. Default: True.
 
         Returns
         -------
@@ -217,7 +228,8 @@ class BatchSimulate(object):
         _check_option(
             "backend", backend, ["loky", "threading", "multiprocessing", "dask"]
         )
-        _validate_type(verbose, types="int", item_name="verbose")
+        _validate_type(verbose, types=(bool,), item_name="verbose")
+        self._verbose = verbose
 
         param_combinations = self._generate_param_combinations(param_grid, combinations)
         total_sims = len(param_combinations)
@@ -232,7 +244,6 @@ class BatchSimulate(object):
                 param_combinations[start_idx:end_idx],
                 n_jobs=n_jobs,
                 backend=backend,
-                verbose=verbose,
             )
 
             if self.save_outputs:
@@ -261,7 +272,6 @@ class BatchSimulate(object):
         param_combinations,
         n_jobs=1,
         backend="loky",
-        verbose=50,
     ):
         """Simulate a batch of parameter sets in parallel.
 
@@ -276,8 +286,6 @@ class BatchSimulate(object):
             `multiprocessing`, or `dask`. WARNING: currently only `loky` is
             completely operationable; all other backends are in
             development. Default is `loky`.
-        verbose : int, optional
-            The verbosity level for parallel execution. Default is 50.
 
         Returns
         -------
@@ -297,10 +305,9 @@ class BatchSimulate(object):
         _check_option(
             "backend", backend, ["loky", "threading", "multiprocessing", "dask"]
         )
-        _validate_type(verbose, types="int", item_name="verbose")
 
         with parallel_config(backend=backend):
-            res = Parallel(n_jobs=n_jobs, verbose=verbose)(
+            res = Parallel(n_jobs=n_jobs)(
                 delayed(self._run_single_sim)(params) for params in param_combinations
             )
         return res
@@ -324,7 +331,7 @@ class BatchSimulate(object):
         """
 
         net = self.net.copy()
-        self.set_params(param_values, net)
+        self.set_params(net, param_values)
 
         results = {"net": net, "param_values": param_values}
 
@@ -337,6 +344,8 @@ class BatchSimulate(object):
                 record_vsec=self.record_vsec,
                 record_isec=self.record_isec,
                 postproc=self.postproc,
+                verbose=self._verbose,
+                baseline_correction=self.baseline_correction,
             )
             results["dpl"] = dpl
 
@@ -378,7 +387,6 @@ class BatchSimulate(object):
         param_combinations: list
             List of parameter combinations.
         """
-        from itertools import product
 
         keys, values = zip(*param_grid.items())
         if combinations:
@@ -407,9 +415,8 @@ class BatchSimulate(object):
         _validate_type(start_idx, types="int", item_name="start_idx")
         _validate_type(end_idx, types="int", item_name="end_idx")
 
-        if not os.path.exists(self.save_folder):
-            os.makedirs(self.save_folder)
-
+        save_folder = Path(self.save_folder)
+        save_folder.mkdir(parents=True, exist_ok=True)
         save_data = {"param_values": [result["param_values"] for result in results]}
 
         attributes_to_save = [
@@ -432,13 +439,13 @@ class BatchSimulate(object):
         }
         save_data["metadata"] = metadata
 
-        file_name = os.path.join(self.save_folder, f"sim_run_{start_idx}-{end_idx}.npz")
-        if os.path.exists(file_name) and not self.overwrite:
+        file_path = save_folder / f"sim_run_{start_idx}-{end_idx}.npz"
+        if file_path.exists() and not self.overwrite:
             raise FileExistsError(
-                f"File {file_name} already exists and overwrite is set to False."
+                f"File {file_path} already exists and overwrite is set to False."
             )
 
-        np.savez(file_name, **save_data)
+        np.savez(file_path, **save_data)
 
     def load_results(self, file_path, return_data=None):
         """Load simulation results from a file.
@@ -488,9 +495,8 @@ class BatchSimulate(object):
             List of dictionaries containing all loaded simulation results.
         """
         all_results = []
-        for file_name in os.listdir(self.save_folder):
-            if file_name.startswith("sim_run_") and file_name.endswith(".npz"):
-                file_path = os.path.join(self.save_folder, file_name)
-                results = self.load_results(file_path)
-                all_results.append(results)
+        save_folder = Path(self.save_folder)
+        for file_path in save_folder.glob("sim_run_*.npz"):
+            results = self.load_results(file_path)
+            all_results.append(results)
         return all_results

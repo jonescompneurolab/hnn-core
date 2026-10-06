@@ -1,13 +1,13 @@
 include *.rst
 include hnn_core/__init__.py 
 
-recursive-include examples *.py
-recursive-include examples *.txt
-
 recursive-include hnn_core/mod *
 
 recursive-include hnn_core *.py
 recursive-include hnn_core *.ipynb
+
+recursive-include hnn_core *.css
+recursive-include hnn_core *.js
 
 ### Exclude
 

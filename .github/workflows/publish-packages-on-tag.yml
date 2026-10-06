@@ -26,8 +26,8 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        # Note that this uses the "newest available Python 3 release"
-        python-version: "3.x"
+        # Max version currently supported by HNN-Core
+        python-version: "3.13"
 
     - name: Install some preliminary build libs
       run: >-
