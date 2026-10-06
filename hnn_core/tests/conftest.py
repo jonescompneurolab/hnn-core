@@ -81,8 +81,8 @@ def run_hnn_core_fixture():
         record_ca=False,
         postproc=False,
         electrode_array=None,
-        bsl_cor=None,
         new_default_drives=False,
+        baseline_correction=True,
     ):
         hnn_core_root = Path(hnn_core.__file__).parent
 
@@ -133,7 +133,7 @@ def run_hnn_core_fixture():
                     record_ca=record_ca,
                     postproc=postproc,
                     tstop=tstop,
-                    bsl_cor=bsl_cor,
+                    baseline_correction=baseline_correction,
                 )
         elif backend == "joblib":
             with JoblibBackend(n_jobs=n_jobs):
@@ -144,7 +144,7 @@ def run_hnn_core_fixture():
                     record_ca=record_ca,
                     postproc=postproc,
                     tstop=tstop,
-                    bsl_cor=bsl_cor,
+                    baseline_correction=baseline_correction,
                 )
         else:
             dpls = simulate_dipole(
@@ -154,7 +154,7 @@ def run_hnn_core_fixture():
                 record_ca=record_ca,
                 postproc=postproc,
                 tstop=tstop,
-                bsl_cor=bsl_cor,
+                baseline_correction=baseline_correction,
             )
 
         # check that the network object is picklable after the simulation

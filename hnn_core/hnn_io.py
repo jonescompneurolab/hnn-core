@@ -588,6 +588,7 @@ def read_network_configuration(fname, read_drives=True, read_external_biases=Tru
     # Importing Network.
     # Cannot do this globally due to circular import.
     from .network import _check_global_synaptic_gains_uniformity
+    from .network_models import MODEL_VARIANT_MAPPING
 
     with open(fname, "r") as file:
         net_data = json.load(file)
@@ -599,7 +600,11 @@ def read_network_configuration(fname, read_drives=True, read_external_biases=Tru
             "type %s" % (net_data.get("object_type"))
         )
 
+    # Validate model_variant
+    #
     # ensure the cell types match the model variant
+    # TODO: AES delete this block after we ensure that all users of Duecker model are
+    # updated to use the latest code upon version 0.7 release.
     check_var = net_data.get("model_variant", None)
     if check_var is not None and "duecker_ET_model".startswith(check_var):
         missing_cells = [
@@ -628,7 +633,13 @@ def read_network_configuration(fname, read_drives=True, read_external_biases=Tru
                 f"model_variant duecker_ET_model: no "
                 f"{', '.join(missing_cells)} found.{hint}"
             )
+    if check_var not in MODEL_VARIANT_MAPPING.keys():
+        raise ValueError(
+            f"model_variant is {check_var} but has to be one of "
+            f"{list(MODEL_VARIANT_MAPPING.keys())}. Please check model_variant in your .json file."
+        )
 
+    # Finally, convert the data to a Network object
     net = dict_to_network(net_data, read_drives, read_external_biases)
     _check_global_synaptic_gains_uniformity(net)
 

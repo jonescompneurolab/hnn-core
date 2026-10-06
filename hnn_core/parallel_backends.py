@@ -15,7 +15,6 @@ from subprocess import Popen, PIPE, TimeoutExpired
 from queue import Queue, Empty
 from threading import Thread, Event
 from pathlib import Path
-import warnings
 
 from typing import Union
 
@@ -34,11 +33,37 @@ def _thread_handler(event, out, queue):
         queue.put(line)
 
 
-def _gather_trial_data(sim_data, net, n_trials, postproc, bsl_cor="jones"):
-    """Arrange data by trial
+def _gather_trial_data(sim_data, net, n_trials, postproc, baseline_correction):
+    """Arrange data by trial; to be called after ``<Backend>.simulate``
 
-    To be called after simulate(). Returns list of Dipoles, one for each trial,
-    and saves spiking info in net (instance of Network).
+    Parameters
+    ----------
+    sim_data : list of dict
+        List of dictionaries containing simulation data for each trial as returned by
+        either the ``parallel`` call in ``JoblibBackend`` or by ``run_subprocess`` in
+        ``MPIBackend``.
+    net : Network object
+        The Network object that was simulated.
+    n_trials : int
+        Number of trials simulated.
+    postproc : bool
+         Deprecated. If True, smoothing (``dipole_smooth_win``) and scaling
+        (``dipole_scalefctr``) values are read from the ``Network``'s parameter file,
+        and applied to the dipole objects before returning (the default ``Network``
+        parameter file, `hnn_core/param/default.json`, uses a smoothing value of 30 ms
+        and a scaling factor of 3000). Note that this setting only affects the dipole
+        waveforms, and not somatic voltages, possible extracellular recordings etc. The
+        preferred way is to use the :meth:`~hnn_core.dipole.Dipole.smooth` and
+        :meth:`~hnn_core.dipole.Dipole.scale` methods after the simulation is run instead. In all preceding
+        codepaths, this defaults to False.
+    baseline_correction : bool
+        Whether to apply the baseline correction after simulation (which correction is
+        used depends on ``Network._model_variant``).
+
+    Returns
+    -------
+    dpls : list of Dipole
+        Returns a list of Dipoles, one for each trial, and saves spiking info in ``net``
     """
     dpls = list()
 
@@ -78,33 +103,27 @@ def _gather_trial_data(sim_data, net, n_trials, postproc, bsl_cor="jones"):
             arr._times = sim_data[idx]["rec_times"][arr_name]
 
         # dipole
-        dpl = Dipole(times=sim_data[idx]["times"], data=sim_data[idx]["dpl_data"])
+        dpl = Dipole(
+            times=sim_data[idx]["times"],
+            data=sim_data[idx]["dpl_data"],
+            model_variant=net._model_variant,
+        )
 
+        # get number of pyramidal neurons
         N_pyr_x = net._N_pyr_x
         N_pyr_y = net._N_pyr_y
-        if bsl_cor == "neymotin" or bsl_cor == "jones":
-            if net._verbose:
-                print("Applying Neymotin baseline correction", flush=True)
-            dpl._baseline_renormalize(N_pyr_x, N_pyr_y)  # XXX cf. #270
-
-            if bsl_cor == "jones":
-                warnings.warn(
-                    "bsl_cor='jones' deprecated as the model has been renamed to neymotin_2020_model."
-                    "Please use bsl_cor='neymotin'.",
-                    FutureWarning,
-                )
-
-        dpl._convert_fAm_to_nAm()  # always applied, cf. #264
-
-        # The Duecker baseline correction was made after already converting from fAm to
-        # nAm.
-        if bsl_cor == "duecker":
-            if net._verbose:
-                print("Applying Duecker model baseline correction", flush=True)
-            dpl._baseline_renormalize_dueckerET()
-
-        if bsl_cor == "none":
-            print("No baseline correction applied.", flush=True)
+        if baseline_correction:
+            dpl._correct_baseline(N_pyr_x, N_pyr_y)
+            dpl._convert_fAm_to_nAm()  # always applied, cf. #264, convert after baseline correction
+            dpl._baseline_correction_applied = True
+            net._baseline_correction_applied = True
+        else:
+            warn("No baseline correction applied.")
+            dpl._convert_fAm_to_nAm()
+            # Only in case someone sets it to True, then runs a simulation, then sets it
+            # to False, and then runs another simulation.
+            dpl._baseline_correction_applied = False
+            net._baseline_correction_applied = False
 
         if postproc:
             window_len = net._params["dipole_smooth_win"]  # specified in ms
@@ -662,26 +681,35 @@ class JoblibBackend(object):
 
         _BACKEND = self._old_backend
 
-    def simulate(self, net, tstop, dt, n_trials, postproc=False, bsl_cor="jones"):
+    def simulate(
+        self, net, tstop, dt, n_trials, postproc=False, baseline_correction=True
+    ):
         """Simulate the HNN model
 
         Parameters
         ----------
         net : Network object
-            The Network object specifying how cells are
-            connected.
-        n_trials : int
-            Number of trials to simulate.
+            The Network object specifying how cells are connected.
         tstop : float
             The simulation stop time (ms).
         dt : float
             The integration time step of h.CVode (ms)
-        postproc : bool
-            If False, no postprocessing applied to the dipole
-        bsl_cor : {"jones", "duecker"}, default="jones"
-            Baseline correction method. For neymotin_2020_model and law_2021_model, use
-            method 'jones' (manual correction). For duecker_ET_model, use method
-            'duecker'.
+        n_trials : int
+            Number of trials to simulate.
+        postproc : bool, default=False
+            Deprecated. If True, smoothing (``dipole_smooth_win``) and scaling
+            (``dipole_scalefctr``) values are read from the ``Network``'s parameter
+            file, and applied to the dipole objects before returning (the default
+            ``Network`` parameter file, `hnn_core/param/default.json`, uses a smoothing
+            value of 30 ms and a scaling factor of 3000). Note that this setting only
+            affects the dipole waveforms, and not somatic voltages, possible
+            extracellular recordings etc. The preferred way is to use the
+            :meth:`~hnn_core.dipole.Dipole.smooth` and
+            :meth:`~hnn_core.dipole.Dipole.scale` methods after the simulation is run instead.
+        baseline_correction : bool, default=True
+            Whether to apply the baseline correction after simulation (which correction
+            is used depends on ``Network._model_variant``). Defaults to True, applying
+            the appropriate correction.
 
         Returns
         -------
@@ -699,7 +727,11 @@ class JoblibBackend(object):
         )
 
         dpls = _gather_trial_data(
-            sim_data, net=net, n_trials=n_trials, postproc=postproc, bsl_cor=bsl_cor
+            sim_data,
+            net=net,
+            n_trials=n_trials,
+            postproc=postproc,
+            baseline_correction=baseline_correction,
         )
 
         return dpls
@@ -1075,7 +1107,9 @@ class MPIBackend(object):
         if self.n_procs > 1:
             kill_proc_name("nrniv")
 
-    def simulate(self, net, tstop, dt, n_trials, postproc=False, bsl_cor="jones"):
+    def simulate(
+        self, net, tstop, dt, n_trials, postproc=False, baseline_correction=True
+    ):
         """Simulate the HNN model in parallel on all cores
 
         Parameters
@@ -1089,12 +1123,20 @@ class MPIBackend(object):
             The integration time step of h.CVode (ms)
         n_trials : int
             Number of trials to simulate.
-        postproc : bool
-            If False, no postprocessing applied to the dipole
-        bsl_cor : {"jones", "duecker"}, default="jones"
-            Baseline correction method. For neymotin_2020_model and law_2021_model, use
-            method 'jones' (manual correction). For duecker_ET_model, use method
-            'duecker'.
+        postproc : bool, default=False
+            Deprecated. If True, smoothing (``dipole_smooth_win``) and scaling
+            (``dipole_scalefctr``) values are read from the ``Network``'s parameter
+            file, and applied to the dipole objects before returning (the default
+            ``Network`` parameter file, `hnn_core/param/default.json`, uses a smoothing
+            value of 30 ms and a scaling factor of 3000). Note that this setting only
+            affects the dipole waveforms, and not somatic voltages, possible
+            extracellular recordings etc. The preferred way is to use the
+            :meth:`~hnn_core.dipole.Dipole.smooth` and
+            :meth:`~hnn_core.dipole.Dipole.scale` methods after the simulation is run instead.
+        baseline_correction : bool, default=True
+            Whether to apply the baseline correction after simulation (which correction
+            is used depends on ``Network._model_variant``). Defaults to True, applying
+            the appropriate correction.
 
         Returns
         -------
@@ -1114,7 +1156,7 @@ class MPIBackend(object):
                 dt=dt,
                 n_trials=n_trials,
                 postproc=postproc,
-                bsl_cor=bsl_cor,
+                baseline_correction=baseline_correction,
             )
 
         if self.n_procs > net._n_cells:
@@ -1143,7 +1185,9 @@ class MPIBackend(object):
             universal_newlines=True,
         )
 
-        dpls = _gather_trial_data(sim_data, net, n_trials, postproc, bsl_cor)
+        dpls = _gather_trial_data(
+            sim_data, net, n_trials, postproc, baseline_correction
+        )
         return dpls
 
     def terminate(self):
