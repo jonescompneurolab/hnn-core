@@ -217,6 +217,90 @@ def test_clear_drives(setup_net):
     assert net._n_gids == n_gids + len(net.gid_ranges["L5_pyramidal"])
 
 
+def test_remove_drive_compacts_gids(setup_net):
+    """Removing one drive compacts later GIDs and preserves their connectivity."""
+    net = setup_net
+    weights_ampa = {"L5_pyramidal": 0.3}
+    synaptic_delays = {"L5_pyramidal": 1.0}
+
+    for name, n_drive_cells in [("first", 1), ("removed", 2), ("last", 3)]:
+        net.add_evoked_drive(
+            name,
+            mu=40,
+            sigma=8.33,
+            numspikes=1,
+            weights_ampa=weights_ampa,
+            location="proximal",
+            synaptic_delays=synaptic_delays,
+            n_drive_cells=n_drive_cells,
+        )
+
+    removed_gids = net.gid_ranges["removed"]
+    last_gids_before = net.gid_ranges["last"]
+    last_connection_before = next(
+        conn for conn in net.connectivity if conn["src_type"] == "last"
+    )
+    last_src_gids_before = set(last_connection_before["src_gids"])
+    last_gid_pairs_before = dict(last_connection_before["gid_pairs"])
+    n_gids_before = net._n_gids
+
+    net.remove_drive("removed")
+
+    assert "removed" not in net.external_drives
+    assert "removed" not in net.gid_ranges
+    assert "removed" not in net.pos_dict
+    assert not any(conn["src_type"] == "removed" for conn in net.connectivity)
+    assert net._n_gids == n_gids_before - len(removed_gids)
+    assert net.gid_ranges["last"] == range(
+        last_gids_before.start - len(removed_gids),
+        last_gids_before.stop - len(removed_gids),
+    )
+
+    last_connection = next(
+        conn for conn in net.connectivity if conn["src_type"] == "last"
+    )
+    shifted_src_gids = {gid - len(removed_gids) for gid in last_src_gids_before}
+    assert last_connection["src_gids"] == shifted_src_gids
+    assert last_connection["gid_pairs"] == {
+        src_gid - len(removed_gids): target_gids
+        for src_gid, target_gids in last_gid_pairs_before.items()
+    }
+
+    all_gids = sorted(gid for gids in net.gid_ranges.values() for gid in gids)
+    assert all_gids == list(range(net._n_gids))
+    for gid in all_gids:
+        assert net.gid_to_type(gid) is not None
+
+    net.add_evoked_drive(
+        "new",
+        mu=40,
+        sigma=8.33,
+        numspikes=1,
+        weights_ampa=weights_ampa,
+        location="proximal",
+        synaptic_delays=synaptic_delays,
+        n_drive_cells=1,
+    )
+    assert net.gid_ranges["new"].start == net._n_gids - 1
+
+    with pytest.raises(ValueError, match="not an external drive"):
+        net.remove_drive("missing")
+
+
+def test_remove_connection(setup_net):
+    """Removing one connection only removes the selected connectivity entry."""
+    net = setup_net
+    original_connectivity = list(net.connectivity)
+
+    net.remove_connection(0)
+
+    assert net.connectivity == original_connectivity[1:]
+    with pytest.raises(IndexError, match="conn_idx"):
+        net.remove_connection(len(net.connectivity))
+    with pytest.raises(IndexError, match="conn_idx"):
+        net.remove_connection(-1)
+
+
 def test_add_drives():
     """Test methods for adding drives to a Network."""
     hnn_core_root = Path(hnn_core.__file__).parent
