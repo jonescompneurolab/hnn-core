@@ -5,9 +5,8 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
-import os
 from itertools import product
-
+from pathlib import Path
 import numpy as np
 from joblib import Parallel, delayed, parallel_config
 
@@ -81,17 +80,24 @@ class BatchSimulate(object):
     record_isec : {False, 'all', 'soma'}
         Option to record voltages from all sections ('all'), or just
         the soma ('soma'). Default: False.
-    postproc : bool, optional
-        If True, smoothing (``dipole_smooth_win``) and scaling
-        (``dipole_scalefctr``) values are read from the parameter file, and
-        applied to the dipole objects before returning.
-        Default: False.
+    postproc : bool, default=False
+        Deprecated. If True, smoothing (``dipole_smooth_win``) and scaling
+        (``dipole_scalefctr``) values are read from the ``Network``'s parameter file,
+        and applied to the dipole objects before returning (the default ``Network``
+        parameter file, `hnn_core/param/default.json`, uses a smoothing value of 30 ms
+        and a scaling factor of 3000). Note that this setting only affects the dipole
+        waveforms, and not somatic voltages, possible extracellular recordings etc. The
+        preferred way is to use the :meth:`~hnn_core.dipole.Dipole.smooth` and
+        :meth:`~hnn_core.dipole.Dipole.scale` methods after the simulation is run instead.
     clear_cache : bool, optional
         Whether to clear the results cache after saving each batch.
         Default is False.
     summary_func : func, optional
         A function to calculate summary statistics from the simulation
         results. Default is None.
+    baseline_correction : bool, default=True
+        Whether to apply the ``Network``'s baseline correction method, which is
+        determined by ``Network._model_variant``.
 
     Notes
     -----
@@ -126,6 +132,7 @@ class BatchSimulate(object):
         postproc=False,
         clear_cache=False,
         summary_func=None,
+        baseline_correction=True,
     ):
         _validate_type(net, Network, "net", "Network")
         _validate_type(tstop, types="numeric", item_name="tstop")
@@ -171,6 +178,7 @@ class BatchSimulate(object):
         self.clear_cache = clear_cache
         self.summary_func = summary_func
         self._verbose = True
+        self.baseline_correction = baseline_correction
 
     def run(
         self,
@@ -337,6 +345,7 @@ class BatchSimulate(object):
                 record_isec=self.record_isec,
                 postproc=self.postproc,
                 verbose=self._verbose,
+                baseline_correction=self.baseline_correction,
             )
             results["dpl"] = dpl
 
@@ -406,9 +415,8 @@ class BatchSimulate(object):
         _validate_type(start_idx, types="int", item_name="start_idx")
         _validate_type(end_idx, types="int", item_name="end_idx")
 
-        if not os.path.exists(self.save_folder):
-            os.makedirs(self.save_folder)
-
+        save_folder = Path(self.save_folder)
+        save_folder.mkdir(parents=True, exist_ok=True)
         save_data = {"param_values": [result["param_values"] for result in results]}
 
         attributes_to_save = [
@@ -431,13 +439,13 @@ class BatchSimulate(object):
         }
         save_data["metadata"] = metadata
 
-        file_name = os.path.join(self.save_folder, f"sim_run_{start_idx}-{end_idx}.npz")
-        if os.path.exists(file_name) and not self.overwrite:
+        file_path = save_folder / f"sim_run_{start_idx}-{end_idx}.npz"
+        if file_path.exists() and not self.overwrite:
             raise FileExistsError(
-                f"File {file_name} already exists and overwrite is set to False."
+                f"File {file_path} already exists and overwrite is set to False."
             )
 
-        np.savez(file_name, **save_data)
+        np.savez(file_path, **save_data)
 
     def load_results(self, file_path, return_data=None):
         """Load simulation results from a file.
@@ -487,9 +495,8 @@ class BatchSimulate(object):
             List of dictionaries containing all loaded simulation results.
         """
         all_results = []
-        for file_name in os.listdir(self.save_folder):
-            if file_name.startswith("sim_run_") and file_name.endswith(".npz"):
-                file_path = os.path.join(self.save_folder, file_name)
-                results = self.load_results(file_path)
-                all_results.append(results)
+        save_folder = Path(self.save_folder)
+        for file_path in save_folder.glob("sim_run_*.npz"):
+            results = self.load_results(file_path)
+            all_results.append(results)
         return all_results

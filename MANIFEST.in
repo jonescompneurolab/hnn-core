@@ -1,9 +1,6 @@
 include *.rst
 include hnn_core/__init__.py 
 
-recursive-include examples *.py
-recursive-include examples *.txt
-
 recursive-include hnn_core/mod *
 
 recursive-include hnn_core *.py

@@ -2,7 +2,7 @@
 #          Christopher Bailey <cjb@cfin.au.dk>
 
 from copy import deepcopy
-import os.path as op
+from pathlib import Path
 import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
 import pytest
@@ -19,8 +19,8 @@ from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 import matplotlib.pyplot as plt
 
 
-hnn_core_root = op.dirname(hnn_core.__file__)
-params_fname = op.join(hnn_core_root, "param", "default.json")
+hnn_core_root = Path(hnn_core.__file__).parent
+params_fname = hnn_core_root / "param" / "default.json"
 params = read_params(params_fname)
 
 
@@ -266,8 +266,8 @@ def test_extracellular_backends(run_hnn_core_fixture):
 
 def test_rec_array_calculation():
     """Test LFP/CSD calculation."""
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, "param", "default.json")
+    hnn_core_root = Path(hnn_core.__file__).parent
+    params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
     params.update({"t_evprox_1": 7, "t_evdist_1": 17})
     net = neymotin_2020_model(params, mesh_shape=(3, 3), add_drives_from_params=True)
@@ -323,8 +323,8 @@ def test_rec_array_calculation():
 
 def test_extracellular_viz():
     """Test if deprecation warning is raised in plot_laminar_lfp."""
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, "param", "default.json")
+    hnn_core_root = Path(hnn_core.__file__).parent
+    params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
     params.update({"t_evprox_1": 7, "t_evdist_1": 17})
     net = neymotin_2020_model(params, mesh_shape=(3, 3), add_drives_from_params=True)
@@ -335,7 +335,7 @@ def test_extracellular_viz():
     net.add_electrode_array("arr1", electrode_pos)
     _ = simulate_dipole(net, tstop=5, n_trials=1)
 
-    with pytest.deprecated_call():
+    with pytest.warns(FutureWarning, match="tmin and tmax are deprecated"):
         net.rec_arrays["arr1"].plot_lfp(show=False, tmin=10, tmax=100)
     with pytest.raises(
         RuntimeError,

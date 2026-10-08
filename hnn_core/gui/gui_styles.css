@@ -90,7 +90,7 @@
     -webkit-appearance: none;
     padding-right: 32px !important;
     text-overflow: ellipsis !important;
-    white-space: nowrap !important;
+    white-space: pre !important;
     overflow: hidden !important;
 }
 
@@ -956,4 +956,26 @@ Retrieved 2026-04-08, License - CC BY-SA 4.0
     clip: rect(1px, 1px, 1px, 1px); /*maybe deprecated but we need to support legacy browsers */
     clip-path: inset(50%); /*modern browsers, clip-path works inwards from each corner*/
     white-space: nowrap; /* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
+}
+
+.sim-status-box{ 
+    padding-left: 10px; 
+}
+.sim-status-box.status-not-running{ 
+    background: var(--acs-friendly-background); color: white; 
+}
+.sim-status-box.status-running{ 
+    background: var(--statusbar-running); color: black; 
+}
+.sim-status-box.status-opt-running{ 
+    background: var(--statusbar-running); color: white; 
+}
+.sim-status-box.status-finished{
+    background: var(--gentle-green); color: black; 
+}
+.sim-status-box.status-failed{ 
+    background: var(--gentle-red); color: black; 
+}
+.sim-status-box.status-warning{ 
+    background: var(--statusbar-running); color: black; font-weight: bold; 
 }

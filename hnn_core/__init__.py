@@ -12,8 +12,9 @@ from .network_models import (
     jones_2009_model,
     law_2021_model,
     calcium_model,
+    duecker_ET_model,
 )
-from .cell import Cell
+from .cell import Cell, Section
 from .cell_response import CellResponse, read_spikes
 from .cells_default import pyramidal, basket
 from .parallel_backends import MPIBackend, JoblibBackend

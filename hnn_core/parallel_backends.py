@@ -14,6 +14,7 @@ from warnings import warn
 from subprocess import Popen, PIPE, TimeoutExpired
 from queue import Queue, Empty
 from threading import Thread, Event
+from pathlib import Path
 
 from typing import Union
 
@@ -32,25 +33,64 @@ def _thread_handler(event, out, queue):
         queue.put(line)
 
 
-def _gather_trial_data(sim_data, net, n_trials, postproc):
-    """Arrange data by trial
+def _gather_trial_data(sim_data, net, n_trials, postproc, baseline_correction):
+    """Arrange data by trial; to be called after ``<Backend>.simulate``
 
-    To be called after simulate(). Returns list of Dipoles, one for each trial,
-    and saves spiking info in net (instance of Network).
+    Parameters
+    ----------
+    sim_data : list of dict
+        List of dictionaries containing simulation data for each trial as returned by
+        either the ``parallel`` call in ``JoblibBackend`` or by ``run_subprocess`` in
+        ``MPIBackend``.
+    net : Network object
+        The Network object that was simulated.
+    n_trials : int
+        Number of trials simulated.
+    postproc : bool
+         Deprecated. If True, smoothing (``dipole_smooth_win``) and scaling
+        (``dipole_scalefctr``) values are read from the ``Network``'s parameter file,
+        and applied to the dipole objects before returning (the default ``Network``
+        parameter file, `hnn_core/param/default.json`, uses a smoothing value of 30 ms
+        and a scaling factor of 3000). Note that this setting only affects the dipole
+        waveforms, and not somatic voltages, possible extracellular recordings etc. The
+        preferred way is to use the :meth:`~hnn_core.dipole.Dipole.smooth` and
+        :meth:`~hnn_core.dipole.Dipole.scale` methods after the simulation is run instead. In all preceding
+        codepaths, this defaults to False.
+    baseline_correction : bool
+        Whether to apply the baseline correction after simulation (which correction is
+        used depends on ``Network._model_variant``).
+
+    Returns
+    -------
+    dpls : list of Dipole
+        Returns a list of Dipoles, one for each trial, and saves spiking info in ``net``
     """
     dpls = list()
 
-    # Create array of equally sampled time points for simulating currents
+    # create CellResponse object with metadata
+    cell_type_metadata = {
+        name: entry["cell_metadata"] for name, entry in net.cell_types.items()
+    }
     cell_type_names = list(net.cell_types.keys())
     cell_response = CellResponse(
-        cell_type_names=cell_type_names, times=sim_data[0]["times"]
+        cell_type_names=cell_type_names,
+        cell_type_metadata=cell_type_metadata,
+        times=sim_data[0]["times"],
     )
     net.cell_response = cell_response
 
     for idx in range(n_trials):
         # cell response
-        net.cell_response._spike_times.append(sim_data[idx]["spike_times"])
-        net.cell_response._spike_gids.append(sim_data[idx]["spike_gids"])
+
+        spike_times_sorted = []
+        spike_gids_sorted = []
+        pairs = sorted(zip(sim_data[idx]["spike_times"], sim_data[idx]["spike_gids"]))
+        for spike_time, spike_gid in pairs:
+            spike_times_sorted.append(spike_time)
+            spike_gids_sorted.append(spike_gid)
+
+        net.cell_response._spike_times.append(spike_times_sorted)
+        net.cell_response._spike_gids.append(spike_gids_sorted)
         net.cell_response.update_types(net.gid_ranges)
         net.cell_response._vsec.append(sim_data[idx]["vsec"])
         net.cell_response._isec.append(sim_data[idx]["isec"])
@@ -63,12 +103,28 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
             arr._times = sim_data[idx]["rec_times"][arr_name]
 
         # dipole
-        dpl = Dipole(times=sim_data[idx]["times"], data=sim_data[idx]["dpl_data"])
+        dpl = Dipole(
+            times=sim_data[idx]["times"],
+            data=sim_data[idx]["dpl_data"],
+            model_variant=net._model_variant,
+        )
 
+        # get number of pyramidal neurons
         N_pyr_x = net._N_pyr_x
         N_pyr_y = net._N_pyr_y
-        dpl._baseline_renormalize(N_pyr_x, N_pyr_y)  # XXX cf. #270
-        dpl._convert_fAm_to_nAm()  # always applied, cf. #264
+        if baseline_correction:
+            dpl._correct_baseline(N_pyr_x, N_pyr_y)
+            dpl._convert_fAm_to_nAm()  # always applied, cf. #264, convert after baseline correction
+            dpl._baseline_correction_applied = True
+            net._baseline_correction_applied = True
+        else:
+            warn("No baseline correction applied.")
+            dpl._convert_fAm_to_nAm()
+            # Only in case someone sets it to True, then runs a simulation, then sets it
+            # to False, and then runs another simulation.
+            dpl._baseline_correction_applied = False
+            net._baseline_correction_applied = False
+
         if postproc:
             window_len = net._params["dipole_smooth_win"]  # specified in ms
             fctr = net._params["dipole_scalefctr"]
@@ -528,10 +584,7 @@ def _get_procs_running(proc_name):
     for p in process_iter(attrs=["name", "exe", "cmdline"]):
         if (
             proc_name == p.info["name"]
-            or (
-                p.info["exe"] is not None
-                and os.path.basename(p.info["exe"]) == proc_name
-            )
+            or (p.info["exe"] is not None and Path(p.info["exe"]).name == proc_name)
             or (p.info["cmdline"] and p.info["cmdline"][0] == proc_name)
         ):
             process_list.append(p)
@@ -628,22 +681,35 @@ class JoblibBackend(object):
 
         _BACKEND = self._old_backend
 
-    def simulate(self, net, tstop, dt, n_trials, postproc=False):
+    def simulate(
+        self, net, tstop, dt, n_trials, postproc=False, baseline_correction=True
+    ):
         """Simulate the HNN model
 
         Parameters
         ----------
         net : Network object
-            The Network object specifying how cells are
-            connected.
-        n_trials : int
-            Number of trials to simulate.
+            The Network object specifying how cells are connected.
         tstop : float
             The simulation stop time (ms).
         dt : float
             The integration time step of h.CVode (ms)
-        postproc : bool
-            If False, no postprocessing applied to the dipole
+        n_trials : int
+            Number of trials to simulate.
+        postproc : bool, default=False
+            Deprecated. If True, smoothing (``dipole_smooth_win``) and scaling
+            (``dipole_scalefctr``) values are read from the ``Network``'s parameter
+            file, and applied to the dipole objects before returning (the default
+            ``Network`` parameter file, `hnn_core/param/default.json`, uses a smoothing
+            value of 30 ms and a scaling factor of 3000). Note that this setting only
+            affects the dipole waveforms, and not somatic voltages, possible
+            extracellular recordings etc. The preferred way is to use the
+            :meth:`~hnn_core.dipole.Dipole.smooth` and
+            :meth:`~hnn_core.dipole.Dipole.scale` methods after the simulation is run instead.
+        baseline_correction : bool, default=True
+            Whether to apply the baseline correction after simulation (which correction
+            is used depends on ``Network._model_variant``). Defaults to True, applying
+            the appropriate correction.
 
         Returns
         -------
@@ -661,7 +727,11 @@ class JoblibBackend(object):
         )
 
         dpls = _gather_trial_data(
-            sim_data, net=net, n_trials=n_trials, postproc=postproc
+            sim_data,
+            net=net,
+            n_trials=n_trials,
+            postproc=postproc,
+            baseline_correction=baseline_correction,
         )
 
         return dpls
@@ -670,7 +740,7 @@ class JoblibBackend(object):
 def _determine_cores_hwthreading(
     use_hwthreading_if_found: bool = True,
     sensible_default_cores: bool = True,
-) -> [int, bool]:
+) -> tuple[int, bool]:
     """Return the available core number and if hardware-threading is detected.
 
     If the first argument 'use_hwthreading_if_found' is 'True', then the
@@ -1013,9 +1083,7 @@ class MPIBackend(object):
             " nrniv -python -mpi -nobanner "
             + sys.executable
             + " "
-            + os.path.join(
-                os.path.dirname(sys.modules[__name__].__file__), "mpi_child.py"
-            )
+            + str(Path(sys.modules[__name__].__file__).parent / "mpi_child.py")
         )
 
         # Split the command into shell arguments for passing to Popen
@@ -1039,7 +1107,9 @@ class MPIBackend(object):
         if self.n_procs > 1:
             kill_proc_name("nrniv")
 
-    def simulate(self, net, tstop, dt, n_trials, postproc=False):
+    def simulate(
+        self, net, tstop, dt, n_trials, postproc=False, baseline_correction=True
+    ):
         """Simulate the HNN model in parallel on all cores
 
         Parameters
@@ -1053,8 +1123,20 @@ class MPIBackend(object):
             The integration time step of h.CVode (ms)
         n_trials : int
             Number of trials to simulate.
-        postproc : bool
-            If False, no postprocessing applied to the dipole
+        postproc : bool, default=False
+            Deprecated. If True, smoothing (``dipole_smooth_win``) and scaling
+            (``dipole_scalefctr``) values are read from the ``Network``'s parameter
+            file, and applied to the dipole objects before returning (the default
+            ``Network`` parameter file, `hnn_core/param/default.json`, uses a smoothing
+            value of 30 ms and a scaling factor of 3000). Note that this setting only
+            affects the dipole waveforms, and not somatic voltages, possible
+            extracellular recordings etc. The preferred way is to use the
+            :meth:`~hnn_core.dipole.Dipole.smooth` and
+            :meth:`~hnn_core.dipole.Dipole.scale` methods after the simulation is run instead.
+        baseline_correction : bool, default=True
+            Whether to apply the baseline correction after simulation (which correction
+            is used depends on ``Network._model_variant``). Defaults to True, applying
+            the appropriate correction.
 
         Returns
         -------
@@ -1069,7 +1151,12 @@ class MPIBackend(object):
                 "simulation to JoblibBackend...."
             )
             return JoblibBackend(n_jobs=1).simulate(
-                net, tstop=tstop, dt=dt, n_trials=n_trials, postproc=postproc
+                net,
+                tstop=tstop,
+                dt=dt,
+                n_trials=n_trials,
+                postproc=postproc,
+                baseline_correction=baseline_correction,
             )
 
         if self.n_procs > net._n_cells:
@@ -1098,7 +1185,9 @@ class MPIBackend(object):
             universal_newlines=True,
         )
 
-        dpls = _gather_trial_data(sim_data, net, n_trials, postproc)
+        dpls = _gather_trial_data(
+            sim_data, net, n_trials, postproc, baseline_correction
+        )
         return dpls
 
     def terminate(self):
