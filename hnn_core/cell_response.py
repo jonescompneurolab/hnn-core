@@ -538,6 +538,7 @@ class CellResponse(object):
         ax=None,
         show=True,
         cell_types=None,
+        gid_ranges=None,
         colors=None,
         show_legend=True,
         marker_size=5.0,
@@ -561,6 +562,13 @@ class CellResponse(object):
             If True, show the figure.
         cell_types : list of str
             List of cell types to plot
+        gid_ranges : dict of lists or range objects | None
+            Dictionary with keys, e.g. net.gid_ranges containing the range of Cell or
+            input GIDs of different cell or input types. If provided, the raster spans
+            the full range of the plotted cell types, so that cells which never spiked
+            still occupy a row, and any overlaid dipoles are scaled to that range. If
+            None (default), the extent of the raster is inferred from the cells that
+            spiked.
         colors : list of str | None
             Optional custom colors to plot. Default will use the colors defined in cell metadata.
         show_legend : bool
@@ -597,6 +605,7 @@ class CellResponse(object):
             ax=ax,
             show=show,
             cell_types=cell_types,
+            gid_ranges=gid_ranges,
             colors=colors,
             show_legend=show_legend,
             marker_size=marker_size,
