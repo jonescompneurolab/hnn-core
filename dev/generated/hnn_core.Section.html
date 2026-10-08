@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>hnn_core.optimization.Optimizer &#8212; hnn-core 0.6.2.dev0 documentation</title>
+    <title>hnn_core.Section &#8212; hnn-core 0.6.2.dev0 documentation</title>
   
   
   
@@ -44,7 +44,7 @@
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=fd10adb8"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/hnn_core.optimization.Optimizer';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/hnn_core.Section';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.23.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
@@ -55,8 +55,8 @@
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="hnn_core.batch_simulate.BatchSimulate" href="hnn_core.batch_simulate.BatchSimulate.html" />
-    <link rel="prev" title="hnn_core.calcium_model" href="hnn_core.calcium_model.html" />
+    <link rel="next" title="hnn_core.CellResponse" href="hnn_core.CellResponse.html" />
+    <link rel="prev" title="hnn_core.Cell" href="hnn_core.Cell.html" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
@@ -481,7 +481,7 @@
     
     <li class="breadcrumb-item"><a href="../api.html" class="nav-link">API Documentation</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">hnn_core.optimization.Optimizer</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">hnn_core.Section</span></li>
   </ul>
 </nav>
 </div>
@@ -498,68 +498,50 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="hnn-core-optimization-optimizer">
-<h1>hnn_core.optimization.Optimizer<a class="headerlink" href="#hnn-core-optimization-optimizer" title="Link to this heading">#</a></h1>
+  <section id="hnn-core-section">
+<h1>hnn_core.Section<a class="headerlink" href="#hnn-core-section" title="Link to this heading">#</a></h1>
 <dl class="py class">
-<dt class="sig sig-object py" id="hnn_core.optimization.Optimizer">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">hnn_core.optimization.</span></span><span class="sig-name descname"><span class="pre">Optimizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bayesian'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_fun</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dipole_rmse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/optimization/general_optimization.html#Optimizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.optimization.Optimizer" title="Link to this definition">#</a></dt>
-<dd><p>Parameter optimization.</p>
-<dl class="field-list">
+<dt class="sig sig-object py" id="hnn_core.Section">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">hnn_core.</span></span><span class="sig-name descname"><span class="pre">Section</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-65</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_pts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Section"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Section" title="Link to this definition">#</a></dt>
+<dd><p>Section class.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl>
-<dt><strong>initial_net</strong><span class="classifier">instance of Network</span></dt><dd><p>The network object.</p>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>L</strong><span class="classifier">float</span></dt><dd><p>length of a section in microns.</p>
 </dd>
-<dt><strong>tstop</strong><span class="classifier">float</span></dt><dd><p>The simulated dipole’s duration.</p>
+<dt><strong>diam</strong><span class="classifier">float</span></dt><dd><p>diameter of a section in microns.</p>
 </dd>
-<dt><strong>constraints</strong><span class="classifier">dict</span></dt><dd><p>The user-defined constraints.</p>
+<dt><strong>cm</strong><span class="classifier">float</span></dt><dd><p>membrane capacitance in micro-Farads.</p>
 </dd>
-<dt><strong>set_params</strong><span class="classifier">func</span></dt><dd><p>User-defined function that sets parameters in network drives.</p>
-<blockquote>
-<div><p><code class="docutils literal notranslate"><span class="pre">set_params(net,</span> <span class="pre">params)</span> <span class="pre">-&gt;</span> <span class="pre">None</span></code></p>
-</div></blockquote>
-<p>where <code class="docutils literal notranslate"><span class="pre">net</span></code> is a Network object and <code class="docutils literal notranslate"><span class="pre">params</span></code> is a dictionary of the
-parameters that will be set inside the function.</p>
+<dt><strong>Ra</strong><span class="classifier">float</span></dt><dd><p>axial resistivity in ohm-cm</p>
 </dd>
-<dt><strong>initial_params</strong><span class="classifier">dict, optional</span></dt><dd><p>Initial parameters for the objective function. Keys are parameter names,
-values are initial parameters. The default is None. If None, the parameters
-will be set to the midpoints of parameter ranges.</p>
+<dt><strong>v0</strong><span class="classifier">float</span></dt><dd><p>start value for membrane potential in millivolts.</p>
 </dd>
-<dt><strong>solver</strong><span class="classifier">str</span></dt><dd><p>The optimizer, ‘bayesian’, ‘cobyla’, or ‘cma’.</p>
-</dd>
-<dt><strong>obj_fun</strong><span class="classifier">str | func</span></dt><dd><p>The objective function to be minimized. Can be ‘dipole_rmse’,
-‘maximize_psd’, ‘dipole_corr’, ‘custom’, or a user-defined function. See the
-docstring for <code class="docutils literal notranslate"><span class="pre">Optimizer.fit</span></code> to view the required and optional arguments
-for each of these cases. If a user-defined function is provided, it must
-have the same function signature as the existing objective functions
-(i.e. <em class="xref py py-obj">_rmse_evoked</em> and <em class="xref py py-obj">_maximize_psd</em> in objective_functions.py).The
-default is ‘dipole_rmse’.</p>
-</dd>
-<dt><strong>max_iter</strong><span class="classifier">int, optional</span></dt><dd><p>The max number of calls to the objective function. The default is 200.</p>
+<dt><strong>end_pts</strong><span class="classifier">list of [x, y, z], optional</span></dt><dd><p>The start and stop points of the section.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Attributes<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt><strong>constraints</strong><span class="classifier">dict</span></dt><dd><p>The user-defined constraints.</p>
+<dt><strong>mechs</strong><span class="classifier">dict</span></dt><dd><p>Mechanisms to insert in this section. The keys
+are the names of the mechanisms and values
+are the properties. For e.g., {‘ca’: {‘gbar_ca’: 60}}</p>
 </dd>
-<dt><strong>initial_params</strong><span class="classifier">dict, None</span></dt><dd><p>Initial parameters for the objective function. If None, initial_params
-is set to the midpoint of upper/lower bounds defined in constraints.</p>
+<dt><strong>syns</strong><span class="classifier">list of str</span></dt><dd><p>The synaptic mechanisms to add in this section</p>
 </dd>
-<dt><strong>max_iter</strong><span class="classifier">int</span></dt><dd><p>The max number of calls to the objective function.</p>
+<dt><strong>end_pts</strong><span class="classifier">list of [x, y, z]</span></dt><dd><p>The start and stop points of the section. Cannot be changed.</p>
 </dd>
-<dt><strong>solver</strong><span class="classifier">func</span></dt><dd><p>The optimization function.</p>
+<dt><strong>L</strong><span class="classifier">float</span></dt><dd><p>length of a section in microns.</p>
 </dd>
-<dt><strong>obj_fun</strong><span class="classifier">func</span></dt><dd><p>The objective function to be minimized.</p>
+<dt><strong>diam</strong><span class="classifier">float</span></dt><dd><p>diameter of a section in microns.</p>
 </dd>
-<dt><strong>obj_fun_name</strong><span class="classifier">str</span></dt><dd><p>The name of the template objective function.</p>
+<dt><strong>cm</strong><span class="classifier">float</span></dt><dd><p>membrane capacitance in micro-Farads.</p>
 </dd>
-<dt><strong>tstop</strong><span class="classifier">float</span></dt><dd><p>The simulated dipole’s duration.</p>
+<dt><strong>Ra</strong><span class="classifier">float</span></dt><dd><p>axial resistivity in ohm-cm.</p>
 </dd>
-<dt><strong>net_</strong><span class="classifier">instance of Network</span></dt><dd><p>The network object with optimized drives.</p>
+<dt><strong>v0</strong><span class="classifier">float</span></dt><dd><p>Initial value for membrane potential in millivolts.</p>
 </dd>
-<dt><strong>obj_</strong><span class="classifier">list</span></dt><dd><p>The objective function values.</p>
-</dd>
-<dt><strong>opt_params_</strong><span class="classifier">list</span></dt><dd><p>The list of optimized parameter values.</p>
+<dt><strong>nseg</strong><span class="classifier">int</span></dt><dd><p>Number of segments in the section</p>
 </dd>
 </dl>
 </dd>
@@ -567,110 +549,26 @@ is set to the midpoint of upper/lower bounds defined in constraints.</p>
 <p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.optimization.Optimizer.fit" title="hnn_core.optimization.Optimizer.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(**obj_fun_kwargs)</p></td>
-<td><p>Runs optimization routine.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.optimization.Optimizer.plot_convergence" title="hnn_core.optimization.Optimizer.plot_convergence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_convergence</span></code></a>([ax, show])</p></td>
-<td><p>Convergence plot.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Section.to_dict" title="hnn_core.Section.to_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dict</span></code></a>()</p></td>
+<td><p>Converts an object of Section class to a dictionary.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <dl class="py method">
-<dt class="sig sig-object py" id="hnn_core.optimization.Optimizer.__repr__">
-<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/optimization/general_optimization.html#Optimizer.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.optimization.Optimizer.__repr__" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="hnn_core.Section.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Section.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Section.__repr__" title="Link to this definition">#</a></dt>
 <dd><p>Return repr(self).</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="hnn_core.optimization.Optimizer.fit">
-<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">obj_fun_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/optimization/general_optimization.html#Optimizer.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.optimization.Optimizer.fit" title="Link to this definition">#</a></dt>
-<dd><p>Runs optimization routine.</p>
+<dt class="sig sig-object py" id="hnn_core.Section.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Section.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Section.to_dict" title="Link to this definition">#</a></dt>
+<dd><p>Converts an object of Section class to a dictionary.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>target</strong><span class="classifier">instance of Dipole (Required if obj_fun=’dipole_corr’, ‘dipole_rmse’, or ‘dipole_rmse_corr’)</span></dt><dd><p>A dipole object with experimental data.</p>
-</dd>
-<dt><strong>n_trials</strong><span class="classifier">int (Optional if obj_fun=’dipole_corr’, ‘dipole_rmse’, or ‘dipole_rmse_corr’)</span></dt><dd><p>Number of trials to simulate and average.</p>
-</dd>
-<dt><strong>tstart</strong><span class="classifier">float (Optional if obj_fun=’dipole_corr’, ‘dipole_rmse’, or ‘dipole_rmse_corr’)</span></dt><dd><p>Time at beginning of range over which to calculate the objective function</p>
-</dd>
-<dt><strong>weights</strong><span class="classifier">array (Optional if obj_fun=’dipole_corr’, ‘dipole_rmse’, or ‘dipole_rmse_corr’)</span></dt><dd><p>An array of weights to be applied to each point in simulated dpl. Must have
-length &gt;= dpl.data . If None, weights will be replaced with 1’s for typical
-objective function calculation.</p>
-</dd>
-<dt><strong>f_bands</strong><span class="classifier">list of tuples (Required if obj_fun=’maximize_psd’)</span></dt><dd><p>Lower and higher limit for each frequency band in Hz.</p>
-</dd>
-<dt><strong>relative_bandpower</strong><span class="classifier">list of float | float (Required if obj_fun=’maximize_psd’)</span></dt><dd><p>Weight for each frequency band in f_bands. If a single float is provided,
-the same weight is applied to all frequency bands.</p>
-</dd>
-<dt><strong>loss_fun</strong><span class="classifier">callable (Required if obj_fun=’custom’)</span></dt><dd><p>Objective loss function to be provided by user. The function must accept a
-single <code class="docutils literal notranslate"><span class="pre">Dipole</span></code> object as its first argument, and <em class="xref py py-obj">obj_fun_kwargs</em> as its
-second argument, where <em class="xref py py-obj">obj_fun_kwargs</em> is the same as the kwargs passed to
-this <a href="#id1"><span class="problematic" id="id2">``</span></a>Optimizer.fit` function.</p>
-</dd>
-<dt><strong>sigma0</strong><span class="classifier">float| array-like (Only used if solver=’cma’)</span></dt><dd><p>Initial standard deviation of CME-ES algorithm. If float, sigma0 is scaled
-by bounds defined in the constraints for each parameter. If array-like, The
-length of sigma0 must equal the length of constraints. Default: 0.25</p>
-</dd>
-<dt><strong>popsize</strong><span class="classifier">int (Only used if solver=’cma’)</span></dt><dd><p>Number of parameter samples simulated per epoch. Default: 16</p>
-</dd>
-<dt><strong>n_jobs</strong><span class="classifier">int (Only used if solver=’cma’)</span></dt><dd><p>The number of jobs to start in parallel. If None, then 1 trial will be
-started without parallelism.</p>
-</dd>
-<dt><strong>seed</strong><span class="classifier">int, optional (Only used if solver=’cma’)</span></dt><dd><p>Optional seed for random number generator of optimizer.</p>
-</dd>
-<dt><strong>tolfun</strong><span class="classifier">float (Only used if solver=’cma’)</span></dt><dd><p>Termination criteria. Stops if the range of the best objective function
-values of the last 10 + ((30 * n_parameters) / popsize) generations and all
-function values of the recent generation is below tolfun. Default 0.01.</p>
-</dd>
-<dt><strong>dt</strong><span class="classifier">float, default=0.025</span></dt><dd><p>The integration time step of h.CVode (in ms)</p>
-</dd>
-<dt><strong>scale_factor</strong><span class="classifier">float, optional</span></dt><dd><p>The dipole scale factor to use after every optimization iteration before
-data comparison. There is no scaling applied by default, so you must pass a
-value if you want any scaling.</p>
-</dd>
-<dt><strong>baseline_correction</strong><span class="classifier">bool, default=True</span></dt><dd><p>Whether to apply the baseline correction to the simulated dipole after every
-optimization iteration (which correction is used depends on
-<code class="docutils literal notranslate"><span class="pre">Network._model_variant</span></code>). Defaults to True, applying the appropriate
-correction.</p>
-</dd>
-<dt><strong>smooth_window_len</strong><span class="classifier">float, optional</span></dt><dd><p>The smooth window length to use after every optimization iteration before
-data comparison. There is no smoothing applied by default, so you must pass
-a value if you want any smoothing.</p>
-</dd>
-<dt><strong>verbose</strong><span class="classifier">bool, default=True</span></dt><dd><p>If True, print build steps and simulation progress to console.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>When defining sigma0 for CMA-ES as a float, the sigma0 applied to each parameter
-is calculated as sigma0 * (upper_bound - lower_bound) based on the constraints.
-It is recommended to choose a sigma0 such that the optimum is expected to lie
-within about initial_params +- 3*sigma0. A smaller sigma0 searches closer to
-initial_params.</p>
-<p>When defining popsize for CMA-ES, it is recommended to increase popsize relative
-to the number of parameters being optimized (N). 4+3*log(N)</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="hnn_core.optimization.Optimizer.plot_convergence">
-<span class="sig-name descname"><span class="pre">plot_convergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/optimization/general_optimization.html#Optimizer.plot_convergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.optimization.Optimizer.plot_convergence" title="Link to this definition">#</a></dt>
-<dd><p>Convergence plot.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>ax</strong><span class="classifier">instance of matplotlib figure, optional</span></dt><dd><p>The matplotlib axis. The default is None.</p>
-</dd>
-<dt><strong>show</strong><span class="classifier">bool</span></dt><dd><p>If True, show the figure. The default is True.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>fig</strong><span class="classifier">instance of plt.fig</span></dt><dd><p>The matplotlib figure handle.</p>
-</dd>
+<dt>dictionary form of an object of Section class.</dt><dd></dd>
 </dl>
 </dd>
 </dl>
@@ -691,20 +589,20 @@ to the number of parameters being optimized (N). 4+3*log(N)</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="hnn_core.calcium_model.html"
+       href="hnn_core.Cell.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">hnn_core.calcium_model</p>
+        <p class="prev-next-title">hnn_core.Cell</p>
       </div>
     </a>
     <a class="right-next"
-       href="hnn_core.batch_simulate.BatchSimulate.html"
+       href="hnn_core.CellResponse.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">hnn_core.batch_simulate.BatchSimulate</p>
+        <p class="prev-next-title">hnn_core.CellResponse</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -727,10 +625,9 @@ to the number of parameters being optimized (N). 4+3*log(N)</p>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.optimization.Optimizer"><code class="docutils literal notranslate"><span class="pre">Optimizer</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.optimization.Optimizer.__repr__"><code class="docutils literal notranslate"><span class="pre">Optimizer.__repr__()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.optimization.Optimizer.fit"><code class="docutils literal notranslate"><span class="pre">Optimizer.fit()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.optimization.Optimizer.plot_convergence"><code class="docutils literal notranslate"><span class="pre">Optimizer.plot_convergence()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Section"><code class="docutils literal notranslate"><span class="pre">Section</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Section.__repr__"><code class="docutils literal notranslate"><span class="pre">Section.__repr__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Section.to_dict"><code class="docutils literal notranslate"><span class="pre">Section.to_dict()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -739,7 +636,7 @@ to the number of parameters being optimized (N). 4+3*log(N)</p>
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../_sources/generated/hnn_core.optimization.Optimizer.rst.txt">
+    <a href="../_sources/generated/hnn_core.Section.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

@@ -1,0 +1,9 @@
+﻿hnn_core.Section
+================
+
+.. currentmodule:: hnn_core
+
+.. autoclass:: Section
+   :inherited-members:
+   :special-members: __getitem__, __repr__
+   :members:
