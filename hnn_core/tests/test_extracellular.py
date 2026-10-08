@@ -1,7 +1,6 @@
 # Authors: Nick Tolley <nicholas_tolley@brown.edu>
 #          Christopher Bailey <cjb@cfin.au.dk>
 
-from copy import deepcopy
 from pathlib import Path
 import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
@@ -26,7 +25,7 @@ params = read_params(params_fname)
 
 def test_extracellular_api():
     """Test extracellular recording API."""
-    net = neymotin_2020_model(deepcopy(params), add_drives_from_params=True)
+    net = neymotin_2020_model(add_erp_drives=True)
 
     # Test LFP electrodes
     electrode_pos = (1, 2, 3)

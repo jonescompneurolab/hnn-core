@@ -180,31 +180,35 @@ def neymotin_2020_model(
     add_drives_from_params=False,
     legacy_mode=False,
     mesh_shape=(10, 10),
+    add_erp_drives=False,
 ):
     """Instantiate the network model described in Neymotin et al. 2020
 
     Parameters
     ----------
+    add_erp_drives : bool, default=False
+        If True, add the canonical event-related potential (ERP) drives used to
+        reproduce the default ERP simulation behavior. This is the recommended way to
+        add default ERP drives. Incompatible with arguments ``add_drives_from_params``,
+        ``params``, and ``legacy_mode``.
+    mesh_shape : tuple of int (default: (10, 10))
+        Defines the (n_x, n_y) shape of the grid of pyramidal cells.
     params : str | Path | dict | None, default=None
-        Custom Network parameters to use, if any. If string or Path, it is assumed to be
-        a path to a legacy "flat" JSON file containing the parameters in the style of
-        `hnn_core/param/default.json` (NOT a modern "hierarchical" JSON file like
-        `hnn_core/param/neymotin2020_base.json`). If dict, it is assumed to be a
-        dictionary of parameters in the "flat" JSON style. If None (the default), the
+        Deprecated. Custom Network parameters to use, if any. If string or Path, it is
+        assumed to be a path to a legacy "flat" JSON file containing the parameters in
+        the style of `hnn_core/param/default.json` (NOT a modern "hierarchical" JSON
+        file like `hnn_core/param/neymotin2020_base.json`). If dict, it is assumed to be
+        a dictionary of parameters in the "flat" JSON style. If None (the default), the
         default parameters are used from `hnn_core/param/default.json`. Note that if you
         want to use any drives defined in the params (either your provided custom params
         or the default), then you must also set `add_drives_from_params` to True. If you
         pass any custom params, then no default params will be used, including for
         drives.
     add_drives_from_params : bool, default=False
-        If True, add drives as defined in the params-dict. NB this is mainly
-        for backward-compatibility with HNN GUI, and will be deprecated in a
-        future release. Default: False
+        Deprecated. If True, add drives as defined in the ``params`` dictionary.
     legacy_mode : bool, default=False
-        Set to False by default. Enables matching HNN GUI output when drives
-        are added suitably. Will be deprecated in a future release.
-    mesh_shape : tuple of int (default: (10, 10))
-        Defines the (n_x, n_y) shape of the grid of pyramidal cells.
+        Deprecated. Enables matching HNN Original GUI output when drives are added
+        suitably.
 
     Returns
     -------
@@ -236,6 +240,12 @@ def neymotin_2020_model(
            MEG/EEG Data." eLife 9 (January):e51214. https://doi.org/10.7554/eLife.51214
 
     """
+    if add_erp_drives and (add_drives_from_params or params is not None or legacy_mode):
+        raise ValueError(
+            "add_erp_drives=True cannot be used with the arguments "
+            "add_drives_from_params, params, or legacy_mode."
+        )
+
     hnn_core_root = Path(hnn_core.__file__).parent
     _validate_type(
         params, (str, Path, dict, type(None)), "params", "str | Path | dict | None"
@@ -414,6 +424,97 @@ def neymotin_2020_model(
     receptor = "ampa"
     net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
+    if add_erp_drives:
+        # As of HNN-Core v0.6.1 with NEURON 8.2.7, this adds drives that are equivalent
+        # to those added by calling `neymotin_2020_model(add_drives_from_params=True,
+        # legacy_mode=False)`.
+
+        # Add distal drive
+        weights_ampa_d1 = {
+            "L2_basket": 0.006562,
+            "L2_pyramidal": 7e-6,
+            "L5_pyramidal": 0.142300,
+        }
+        weights_nmda_d1 = {
+            "L2_basket": 0.019482,
+            "L2_pyramidal": 0.004317,
+            "L5_pyramidal": 0.080074,
+        }
+        # TODO Change delay for #1180 here
+        synaptic_delays_d1 = {
+            "L2_basket": 0.1,
+            "L2_pyramidal": 0.1,
+            "L5_pyramidal": 0.1,
+        }
+        net.add_evoked_drive(
+            "evdist1",
+            mu=63.53,
+            sigma=3.85,
+            numspikes=1,
+            weights_ampa=weights_ampa_d1,
+            weights_nmda=weights_nmda_d1,
+            location="distal",
+            synaptic_delays=synaptic_delays_d1,
+            event_seed=272,
+        )
+
+        # Add proximal drives
+        weights_ampa_p1 = {
+            "L2_basket": 0.08831,
+            "L2_pyramidal": 0.01525,
+            "L5_basket": 0.19934,
+            "L5_pyramidal": 0.00865,
+        }
+        # For testing full equality with 'neymotin2020_base.json'
+        weights_nmda_p1 = {
+            "L2_basket": 0.0,
+            "L2_pyramidal": 0.0,
+            "L5_basket": 0.0,
+            "L5_pyramidal": 0.0,
+        }
+        synaptic_delays_prox = {
+            "L2_basket": 0.1,
+            "L2_pyramidal": 0.1,
+            "L5_basket": 1.0,
+            "L5_pyramidal": 1.0,
+        }
+        net.add_evoked_drive(
+            "evprox1",
+            mu=26.61,
+            sigma=2.47,
+            numspikes=1,
+            weights_ampa=weights_ampa_p1,
+            weights_nmda=weights_nmda_p1,
+            location="proximal",
+            synaptic_delays=synaptic_delays_prox,
+            event_seed=507,
+        )
+
+        weights_ampa_p2 = {
+            "L2_basket": 0.000003,
+            "L2_pyramidal": 1.438840,
+            "L5_basket": 0.008958,
+            "L5_pyramidal": 0.684013,
+        }
+        # For testing full equality with 'neymotin2020_base.json'
+        weights_nmda_p2 = {
+            "L2_basket": 0.0,
+            "L2_pyramidal": 0.0,
+            "L5_basket": 0.0,
+            "L5_pyramidal": 0.0,
+        }
+        net.add_evoked_drive(
+            "evprox2",
+            mu=137.12,
+            sigma=8.33,
+            numspikes=1,
+            weights_ampa=weights_ampa_p2,
+            weights_nmda=weights_nmda_p2,
+            location="proximal",
+            synaptic_delays=synaptic_delays_prox,
+            event_seed=777,
+        )
+
     return net
 
 
@@ -491,7 +592,12 @@ def jones_2009_model(
         FutureWarning,
     )
 
-    net = neymotin_2020_model(params, add_drives_from_params, legacy_mode, mesh_shape)
+    net = neymotin_2020_model(
+        params=params,
+        add_drives_from_params=add_drives_from_params,
+        legacy_mode=legacy_mode,
+        mesh_shape=mesh_shape,
+    )
     return net
 
 
@@ -1074,7 +1180,16 @@ def add_erp_drives_to_jones_model(net, tstart=0.0):
     The first proximal input arrives at cortex ~20 ms after sensory
     stimulus. The exact delay depends random number generator due to
     random sampling of times from a gaussian.
+
+    .. deprecated:: 0.6.2
+        Use ``neymotin_2020_model(..., add_erp_drives=True)`` instead.
     """
+    warnings.warn(
+        "add_erp_drives_to_jones_model is deprecated and will be removed in a "
+        "future release. Use neymotin_2020_model(..., add_erp_drives=True) "
+        "instead.",
+        FutureWarning,
+    )
     _validate_type(net, Network, "net", "Network")
     _validate_type(tstart, (float, int), "tstart", "float or int")
 

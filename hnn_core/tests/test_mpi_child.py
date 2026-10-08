@@ -85,12 +85,7 @@ def test_extract_data_length():
 def test_str_to_net():
     """Test reading the network via a string"""
 
-    hnn_core_root = Path(hnn_core.__file__).parent
-
-    # prepare network
-    params_fname = hnn_core_root / "param" / "default.json"
-    params = read_params(params_fname)
-    net = neymotin_2020_model(params, add_drives_from_params=True)
+    net = neymotin_2020_model(add_erp_drives=True)
 
     pickled_net = base64.b64encode(pickle.dumps(net))
 
