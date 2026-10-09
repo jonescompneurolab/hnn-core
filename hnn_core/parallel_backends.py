@@ -137,8 +137,17 @@ def _gather_trial_data(sim_data, net, n_trials, postproc, baseline_correction):
     return dpls
 
 
-def _get_mpi_env():
-    """Set some MPI environment variables."""
+def _get_mpi_env(autoload_mpi_library=True):
+    """Set some MPI environment variables.
+
+    Parameters
+    ----------
+    autoload_mpi_library : bool, default=True
+        Whether to automatically locate the MPI library shipped by the PyPI 'openmpi'
+        package (if installed) and point NEURON to it via the 'MPI_LIB_NRN_PATH'
+        environment variable. If True (the default) and the MPI library is found,
+        'MPI_LIB_NRN_PATH' will be overwritten if it has already been set.
+    """
     my_env = os.environ.copy()
     # For Linux systems
     if sys.platform != "win32":
@@ -183,9 +192,10 @@ def _get_mpi_env():
     # https://pypi.org/project/openmpi/#history and verified that the filenames are
     # always the same for their respective OS's, so the regex should always work. It
     # is extremely unlikely that the filenames will change in the future.
-    mpi_lib = _get_pip_openmpi_lib()
-    if mpi_lib is not None:
-        my_env.setdefault("MPI_LIB_NRN_PATH", mpi_lib)
+    if autoload_mpi_library:
+        mpi_lib = _get_pip_openmpi_lib()
+        if mpi_lib is not None:
+            my_env["MPI_LIB_NRN_PATH"] = mpi_lib
 
     return my_env
 
@@ -1051,6 +1061,13 @@ class MPIBackend(object):
         that number exceeds the number of detected available cores. If this
         argument is set to 'True', then '--oversubscribe' will always be
         used. If 'False', then '--oversubscribe' will never be used.
+    verbose : bool, default False
+        If True, prints progress messages and status updates to stdout.
+    autoload_mpi_library : bool, default=True
+        Whether to automatically locate the MPI library shipped by the PyPI 'openmpi'
+        package (if installed) and point NEURON to it via the 'MPI_LIB_NRN_PATH'
+        environment variable. If True (the default) and the MPI library is found,
+        'MPI_LIB_NRN_PATH' will be overwritten if it has already been set.
 
     Attributes
     ----------
@@ -1080,8 +1097,10 @@ class MPIBackend(object):
         override_hwthreading_option: Union[None, bool] = None,
         override_oversubscribe_option: Union[None, bool] = None,
         verbose: bool = False,
+        autoload_mpi_library: bool = True,
     ) -> None:
         self.expected_data_length = 0
+        self.autoload_mpi_library = autoload_mpi_library
         self.proc = None
         self.proc_queue = Queue()
         self.verbose = verbose
@@ -1234,7 +1253,7 @@ class MPIBackend(object):
             f"distributing network neurons over {self.n_procs} processes."
         )
 
-        env = _get_mpi_env()
+        env = _get_mpi_env(autoload_mpi_library=self.autoload_mpi_library)
         self.proc, sim_data = run_subprocess(
             command=self.mpi_cmd,
             obj=[net, tstop, dt, n_trials],
