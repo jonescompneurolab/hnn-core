@@ -426,7 +426,9 @@ class Network:
         may be defined as unique keys. The values of the dictionary are
         instances of :class:`hnn_core.extracellular.ExtracellularArray`.
     threshold : float
-        Firing threshold of all cells.
+        Firing threshold of all cells. The value in place when the
+        network is built for simulation is used for every cell's spike
+        detector.
     delay : float
         Synaptic delay in ms.
 
@@ -2435,8 +2437,11 @@ class Network:
         lamtha : float
             Space constant.
         threshold : float, default=None
-            Firing threshold of cells for connection. If None (the default), inherit the
-            threshold from the Network object.
+            .. deprecated:: 0.6.2
+                Firing threshold of cells for connection. This argument is
+                deprecated and has no effect: the spike threshold is a property
+                of the source cell, not of an individual connection. Set
+                ``net.threshold`` instead.
         gain : float, default=1.0
             Multiplicative factor for synaptic weight.
         allow_autapses : bool, default=True
@@ -2456,9 +2461,14 @@ class Network:
         all its targets.
         """
         conn = _Connectivity()
-        # Threshold's value is validated later below with the rest of nc_dict
-        if threshold is None:
-            threshold = self.threshold
+        if threshold is not None:
+            warnings.warn(
+                "The `threshold` argument of `add_connection` is deprecated and "
+                "has no effect. The spike threshold is a property of the source "
+                "cell, not of an individual connection; set `net.threshold` "
+                "instead. This argument will be removed in a future release.",
+                FutureWarning,
+            )
         _validate_type(
             target_gids,
             (int, list, range, str),
@@ -2572,9 +2582,9 @@ class Network:
 
         # Create and validate nc_dict
         conn["nc_dict"] = dict()
-        arg_names = ["delay", "weight", "lamtha", "threshold", "gain"]
-        nc_dict_keys = ["A_delay", "A_weight", "lamtha", "threshold", "gain"]
-        nc_conn_items = [delay, weight, lamtha, threshold, gain]
+        arg_names = ["delay", "weight", "lamtha", "gain"]
+        nc_dict_keys = ["A_delay", "A_weight", "lamtha", "gain"]
+        nc_conn_items = [delay, weight, lamtha, gain]
         for key, arg_name, item in zip(nc_dict_keys, arg_names, nc_conn_items):
             _validate_type(item, (int, float), arg_name, "int or float")
             if arg_name == "gain":
@@ -3003,8 +3013,6 @@ class _Connectivity(dict):
             Synaptic delay in ms.
         lamtha : float
             Space constant.
-        threshold : float
-            Firing threshold of cells for connection.
         gain : float
             Multiplicative factor for synaptic weight.
     probability : float
@@ -3025,8 +3033,7 @@ class _Connectivity(dict):
         entr += f"\nloc: '{self['loc']}'; receptor: '{self['receptor']}'"
         entr += f"\nweight: {self['nc_dict']['A_weight']}; "
         entr += f"delay: {self['nc_dict']['A_delay']}; "
-        entr += f"lamtha: {self['nc_dict']['lamtha']}"
-        entr += f"threshold: {self['nc_dict']['threshold']}"
+        entr += f"lamtha: {self['nc_dict']['lamtha']}; "
         entr += f"gain: {self['nc_dict']['gain']}"
         entr += "\n "
 

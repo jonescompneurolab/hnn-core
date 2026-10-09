@@ -372,7 +372,7 @@ class NetworkBuilder(object):
         record_isec = self.net._params["record_isec"]
         record_ca = self.net._params["record_ca"]
         self._create_cells_and_drives(
-            threshold=self.net._params["threshold"],
+            threshold=self.net.threshold,
             record_vsec=record_vsec,
             record_isec=record_isec,
             record_ca=record_ca,
