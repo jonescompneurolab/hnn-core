@@ -137,8 +137,26 @@ def _gather_trial_data(sim_data, net, n_trials, postproc, baseline_correction):
     return dpls
 
 
-def _get_mpi_env():
-    """Set some MPI environment variables."""
+def _get_mpi_env(autoload_mpi_library=True, mpi_lib_path=None):
+    """Set some MPI environment variables.
+
+    Parameters
+    ----------
+    autoload_mpi_library : bool, default=True
+        Whether to automatically locate the MPI library file shipped by the PyPI
+        'openmpi' package (if installed) and point NEURON to it via the
+        'MPI_LIB_NRN_PATH' environment variable. If True (the default) and the MPI
+        library is found, 'MPI_LIB_NRN_PATH' will be overwritten if it has already been
+        set in your environment. Forced to False if 'mpi_lib_path' is provided.
+    mpi_lib_path : None | str | Path, default=None
+        Absolute path to a user-supplied MPI library file (NOT a directory) such as
+        '/usr/lib/libmpi.so.40' on Linux or '/usr/lib/libmpi.40.dylib' on macOS that
+        NEURON should load. This file path will be passed to NEURON via the
+        'MPI_LIB_NRN_PATH' environment variable. If provided, 'autoload_mpi_library' is
+        forced to False and 'MPI_LIB_NRN_PATH' will be overwritten if it has already
+        been set in your environment. Note that we do not validate the whether the file
+        is correct or will work with NEURON.
+    """
     my_env = os.environ.copy()
     # For Linux systems
     if sys.platform != "win32":
@@ -147,7 +165,71 @@ def _get_mpi_env():
     if "darwin" in sys.platform:
         my_env["PMIX_MCA_gds"] = "^ds12"  # open-mpi/ompi/issues/7516
         my_env["TMPDIR"] = "/tmp"  # open-mpi/ompi/issues/2956
+
+    # AES 2026-10-09: the below explains how and why we set our environment variables
+    # the way we do below, in order to be able to use the "openmpi" PyPI package. Claude
+    # Opus 5.5 was the one who figured this out.
+    #
+    # The "openmpi" PyPI package ships (among many other things), two files that both
+    # correspond to the important library file that NEURON needs in order to use MPI:
+    # libmpi.so.40 (linux) / libmpi.40.dylib (macos), and libmpi.so (linux) /
+    # libmpi.dylib (macos). The former is the ACTUAL library file that we need, while
+    # the latter is a linker script that points to the former.
+    #
+    # We face two problems:
+    # 1. Firstly, Python wheels cannot ship true symlinks, and so the "openmpi"'s
+    #   packaged libmpi.so / libmpi.dylib files are instead "linker scripts" that
+    #   consist simply of text that redirect to the proper file.
+    # 2. The second problem is that NEURON's MPI code uses C's "dlopen" to load the
+    #   library, and dlopen does not understand linker scripts.
+    #
+    # In other words, NEURON cannot read the linker script from the "openmpi" PyPI
+    # package, and so therefore setting our usual "LD_LIBRARY_PATH" /
+    # "DYLD_LIBRARY_PATH" environment variables do NOT work for this particular MPI
+    # install. (This is not an issue if we install openmpi from Conda, since Conda can
+    # ship true symlinks, meaning in that case we can simply use "LD_LIBRARY_PATH" /
+    # "DYLD_LIBRARY_PATH". However, the whole point of this is to get away from Conda.)
+    #
+    # We get around the problem in two ways:
+    # 1. We use NEURON's "MPI_LIB_NRN_PATH" environment variable, which points NEURON to
+    #   the *exact* library file.
+    # 2. We use a regular expression (written by Claude, of course) that matches the
+    #   library file (either libmpi.so.<number> or libmpi.<number>.dylib), then set the
+    #   "MPI_LIB_NRN_PATH" environment variable to that file.
+    #
+    # I've manually inspected all the linux x86_64 and macox arm64 wheels in
+    # https://pypi.org/project/openmpi/#history and verified that the filenames are
+    # always the same for their respective OS's, so the regex should always work. It
+    # is extremely unlikely that the filenames will change in the future.
+    if mpi_lib_path is not None:
+        my_env["MPI_LIB_NRN_PATH"] = str(mpi_lib_path)
+    elif autoload_mpi_library:
+        mpi_lib = _get_pip_openmpi_lib()
+        if mpi_lib is not None:
+            my_env["MPI_LIB_NRN_PATH"] = mpi_lib
+
     return my_env
+
+
+def _get_pip_openmpi_lib():
+    """Return the path of libmpi from the PyPI 'openmpi' package, if any."""
+    from importlib.metadata import PackageNotFoundError, distribution
+
+    try:
+        files = distribution("openmpi").files or []
+    except PackageNotFoundError:
+        print(
+            "PyPI 'openmpi' package not found; attempting to use system MPI if "
+            "available."
+        )
+        return None
+    for f in files:
+        # Should match libmpi.so.40 (linux) / libmpi.40.dylib (macos)
+        if re.fullmatch(r"libmpi(\.\d+\.dylib|\.so\.\d+)", f.name):
+            # Not using Path here since environment variables have to use strings, and
+            # we do NOT want to follow symlinks in this unique case:
+            return os.path.abspath(f.locate())
+    return None
 
 
 def run_subprocess(
@@ -990,6 +1072,22 @@ class MPIBackend(object):
         that number exceeds the number of detected available cores. If this
         argument is set to 'True', then '--oversubscribe' will always be
         used. If 'False', then '--oversubscribe' will never be used.
+    verbose : bool, default False
+        If True, prints progress messages and status updates to stdout.
+    autoload_mpi_library : bool, default=True
+        Whether to automatically locate the MPI library file shipped by the PyPI
+        'openmpi' package (if installed) and point NEURON to it via the
+        'MPI_LIB_NRN_PATH' environment variable. If True (the default) and the MPI
+        library is found, 'MPI_LIB_NRN_PATH' will be overwritten if it has already been
+        set in your environment. Forced to False if 'mpi_lib_path' is provided.
+    mpi_lib_path : None | str | Path, default=None
+        Absolute path to a user-supplied MPI library file (NOT a directory) such as
+        '/usr/lib/libmpi.so.40' on Linux or '/usr/lib/libmpi.40.dylib' on macOS that
+        NEURON should load. This file path will be passed to NEURON via the
+        'MPI_LIB_NRN_PATH' environment variable. If provided, 'autoload_mpi_library' is
+        forced to False and 'MPI_LIB_NRN_PATH' will be overwritten if it has already
+        been set in your environment. Note that we do not validate the whether the file
+        is correct or will work with NEURON.
 
     Attributes
     ----------
@@ -1019,8 +1117,20 @@ class MPIBackend(object):
         override_hwthreading_option: Union[None, bool] = None,
         override_oversubscribe_option: Union[None, bool] = None,
         verbose: bool = False,
+        autoload_mpi_library: bool = True,
+        mpi_lib_path: Union[None, str, Path] = None,
     ) -> None:
         self.expected_data_length = 0
+        if mpi_lib_path is not None:
+            mpi_lib_path = os.path.abspath(mpi_lib_path)
+            if not os.path.isfile(mpi_lib_path):
+                raise FileNotFoundError(
+                    f"MPI library file passed to 'mpi_lib_path' not found: "
+                    f"{mpi_lib_path}"
+                )
+            autoload_mpi_library = False
+        self.autoload_mpi_library = autoload_mpi_library
+        self.mpi_lib_path = mpi_lib_path
         self.proc = None
         self.proc_queue = Queue()
         self.verbose = verbose
@@ -1173,7 +1283,10 @@ class MPIBackend(object):
             f"distributing network neurons over {self.n_procs} processes."
         )
 
-        env = _get_mpi_env()
+        env = _get_mpi_env(
+            autoload_mpi_library=self.autoload_mpi_library,
+            mpi_lib_path=self.mpi_lib_path,
+        )
         self.proc, sim_data = run_subprocess(
             command=self.mpi_cmd,
             obj=[net, tstop, dt, n_trials],
