@@ -147,7 +147,68 @@ def _get_mpi_env():
     if "darwin" in sys.platform:
         my_env["PMIX_MCA_gds"] = "^ds12"  # open-mpi/ompi/issues/7516
         my_env["TMPDIR"] = "/tmp"  # open-mpi/ompi/issues/2956
+
+    # AES 2026-10-09: the below explains how and why we set our environment variables
+    # the way we do below, in order to be able to use the "openmpi" PyPI package. Claude
+    # Opus 5.5 was the one who figured this out.
+    #
+    # The "openmpi" PyPI package ships (among many other things), two files that both
+    # correspond to the important library file that NEURON needs in order to use MPI:
+    # libmpi.so.40 (linux) / libmpi.40.dylib (macos), and libmpi.so (linux) /
+    # libmpi.dylib (macos). The former is the ACTUAL library file that we need, while
+    # the latter is a linker script that points to the former.
+    #
+    # We face two problems:
+    # 1. Firstly, Python wheels cannot ship true symlinks, and so the "openmpi"'s
+    #   packaged libmpi.so / libmpi.dylib files are instead "linker scripts" that
+    #   consist simply of text that redirect to the proper file.
+    # 2. The second problem is that NEURON's MPI code uses C's "dlopen" to load the
+    #   library, and dlopen does not understand linker scripts.
+    #
+    # In other words, NEURON cannot read the linker script from the "openmpi" PyPI
+    # package, and so therefore setting our usual "LD_LIBRARY_PATH" /
+    # "DYLD_LIBRARY_PATH" environment variables do NOT work for this particular MPI
+    # install. (This is not an issue if we install openmpi from Conda, since Conda can
+    # ship true symlinks, meaning in that case we can simply use "LD_LIBRARY_PATH" /
+    # "DYLD_LIBRARY_PATH". However, the whole point of this is to get away from Conda.)
+    #
+    # We get around the problem in two ways:
+    # 1. We use NEURON's "MPI_LIB_NRN_PATH" environment variable, which points NEURON to
+    #   the *exact* library file.
+    # 2. We use a regular expression (written by Claude, of course) that matches the
+    #   library file (either libmpi.so.<number> or libmpi.<number>.dylib), then set the
+    #   "MPI_LIB_NRN_PATH" environment variable to that file.
+    #
+    # I've manually inspected all the linux x86_64 and macox arm64 wheels in
+    # https://pypi.org/project/openmpi/#history and verified that the filenames are
+    # always the same for their respective OS's, so the regex should always work. It
+    # is extremely unlikely that the filenames will change in the future.
+    mpi_lib = _get_pip_openmpi_lib()
+    if mpi_lib is not None:
+        my_env.setdefault("MPI_LIB_NRN_PATH", mpi_lib)
+
     return my_env
+
+
+def _get_pip_openmpi_lib():
+    """Return the path of libmpi from the PyPI 'openmpi' package, if any."""
+    from importlib.metadata import PackageNotFoundError, distribution
+
+    try:
+        files = distribution("openmpi").files or []
+    except PackageNotFoundError:
+        print(
+            "PyPI 'openmpi' package not found; attempting to use system MPI if "
+            "available."
+        )
+        return None
+    for f in files:
+        # Should match libmpi.so.40 (linux) / libmpi.40.dylib (macos)
+        if re.fullmatch(r"libmpi(\.\d+\.dylib|\.so\.\d+)", f.name):
+            # Not using Path here since environment variables have to use strings, and
+            # we do NOT want to follow symlinks in this unique case:
+            return os.path.abspath(f.locate())
+    return None
 
 
 def run_subprocess(
