@@ -53,11 +53,23 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ### Upcoming Deprecations
 
+- The `threshold` argument of {meth}`~hnn_core.Network.add_connection` is
+  deprecated and has no effect. A connection's threshold was silently applied
+  to the shared spike detector of the presynaptic cell, changing spike
+  detection and outgoing events on all of its other connections. Set
+  `net.threshold` instead; it is now the single value used for every cell's
+  spike detector when the network is built for simulation.
+
 ### Bug Fixes
 
 - Loading external drives in the GUI now extends the simulation duration when needed,
   preserving configured drive and tonic-bias stop times,
   by [William Kang][] in {gh}`1348`.
+
+- Setting `Network.threshold` now actually changes the spike-detection
+  threshold of all cells: the value in place when the network is built is
+  passed to every cell's source `NetCon`, instead of the simulation always
+  using the `threshold` stored in `net._params`.
 
 - [Camilo Diaz][] did considerable work in fixing our long-standing MPI Timeout issues
   and putting in place a permanent solution that uses tempfiles instead of standard
