@@ -132,7 +132,7 @@ def rerun_and_save_duecker_model(suffix="new", backend="mpi"):
     ----------
     suffix : str, default="new"
         String appended to the spike and dipole output filenames, used to
-        distinguish runs (e.g. ``"old"`` vs. ``"new"``).
+        distinguish runs. Accepted values are ``"old"`` and ``"new"``.
     backend : str, default="mpi"
         Parallel backend to simulate with, either ``"mpi"`` (runs inside an
         :class:`~hnn_core.MPIBackend` context using ``mpiexec``) or

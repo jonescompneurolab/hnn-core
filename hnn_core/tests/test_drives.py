@@ -754,31 +754,21 @@ def test_add_drives_duecker(fix_net_duecker_ET):
     )
 
     # Bursty drive
-    weights_ampa = {"L2_inhibitory": 1.0, "L2_pyramidal": 3.0, "L5_pyramidal": 4.0}
-    syn_delays = {"L2_inhibitory": 1.0, "L2_pyramidal": 2.0, "L5_pyramidal": 4.0}
-
-    n_drive_cells = 10
     net.add_bursty_drive(
         "bursty",
-        location="distal",
+        location="proximal",
         burst_rate=10,
         weights_ampa=weights_ampa,
         synaptic_delays=syn_delays,
-        n_drive_cells=n_drive_cells,
+        n_drive_cells=10,
     )
 
     # Poisson drive
-    weights_ampa_noise = {
-        "L2_inhibitory": 0.01,
-        "L2_pyramidal": 0.002,
-        "L5_pyramidal": 0.02,
-    }
-
     net.add_poisson_drive(
         "noise_global",
         rate_constant=2.0,
-        location="distal",
-        weights_ampa=weights_ampa_noise,
+        location="proximal",
+        weights_ampa=weights_ampa,
         space_constant=100,
         n_drive_cells="n_cells",
         cell_specific=True,

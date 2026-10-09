@@ -133,7 +133,7 @@ def test_rhythmic(solver, relative_bandpower, fix_net_model, request):
 
     # simulate a dipole to establish ground-truth drive parameters
     net_model = request.getfixturevalue(fix_net_model)
-    net_offset, inh_name = net_model(reduced=True)
+    net_offset, _ = net_model(reduced=True)
 
     # define set_params function and constraints
     def set_params(net_offset, params):

@@ -161,6 +161,7 @@ def test_dipole(
     dipole_exp_avg = average_dipoles([dipole_exp, dipole_exp])
     assert_allclose(dipole_exp.data["agg"], dipole_exp_avg.data["agg"])
 
+    # Two different networks to compare `postproc=True/False`
     net_raw, _ = net_model(add_drives_from_params=True, reduced=True)
     net_proc = deepcopy(net_raw)
 
