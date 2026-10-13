@@ -2603,21 +2603,77 @@ class Network:
                 connectivity.append(conn)
         self.connectivity = connectivity
 
+    def remove_connection(self, conn_idx):
+        """Remove a single connection from the network.
+
+        Parameters
+        ----------
+        conn_idx : int
+            Zero-based index of the connection in ``Network.connectivity``.
+        """
+        _validate_type(conn_idx, int, "conn_idx")
+        if conn_idx < 0 or conn_idx >= len(self.connectivity):
+            raise IndexError(
+                f"conn_idx must be between 0 and {len(self.connectivity) - 1}, "
+                f"got {conn_idx}."
+            )
+        self.connectivity.pop(conn_idx)
+
+    def remove_drive(self, drive_name):
+        """Remove a single external drive and its connections from the network.
+
+        Parameters
+        ----------
+        drive_name : str
+            Name of the external drive to remove.
+        """
+        _validate_type(drive_name, str, "drive_name")
+        if drive_name not in self.external_drives:
+            raise ValueError(f"'{drive_name}' is not an external drive.")
+
+        drive_gids = self.gid_ranges[drive_name]
+        stop_gid = drive_gids.stop
+        n_drive_gids = len(drive_gids)
+
+        self.external_drives.pop(drive_name)
+        self.pos_dict.pop(drive_name)
+        self.gid_ranges.pop(drive_name)
+        self._n_gids -= n_drive_gids
+
+        def _shift_gid(gid):
+            if gid >= stop_gid:
+                return gid - n_drive_gids
+            return gid
+
+        # Drop this drive's connections, then shift GIDs belonging to later
+        # cell types or drives so the remaining ranges stay contiguous.
+        connectivity = []
+        for conn in self.connectivity:
+            if conn["src_type"] == drive_name:
+                continue
+
+            conn["src_gids"] = {_shift_gid(gid) for gid in conn["src_gids"]}
+            conn["target_gids"] = {
+                _shift_gid(gid) for gid in conn["target_gids"]
+            }
+            conn["gid_pairs"] = {
+                _shift_gid(src_gid): [_shift_gid(gid) for gid in target_gids]
+                for src_gid, target_gids in conn["gid_pairs"].items()
+            }
+            connectivity.append(conn)
+        self.connectivity = connectivity
+
+        gid_ranges = OrderedDict()
+        for cell_name, gids in self.gid_ranges.items():
+            if gids.start >= stop_gid:
+                gids = range(gids.start - n_drive_gids, gids.stop - n_drive_gids)
+            gid_ranges[cell_name] = gids
+        self.gid_ranges = gid_ranges
+
     def clear_drives(self):
         """Remove all drives defined in Network.connectivity"""
-        self.connectivity = [
-            conn
-            for conn in self.connectivity
-            if conn["src_type"] not in self.external_drives.keys()
-        ]
-
-        for cell_name in list(self.gid_ranges.keys()):
-            if cell_name in self.external_drives:
-                self._n_gids -= len(self.gid_ranges[cell_name])
-                del self.gid_ranges[cell_name]
-                del self.pos_dict[cell_name]
-
-        self.external_drives = dict()
+        for drive_name in list(self.external_drives):
+            self.remove_drive(drive_name)
 
     def add_electrode_array(
         self, name, electrode_pos, *, conductivity=0.3, method="psa", min_distance=0.5
