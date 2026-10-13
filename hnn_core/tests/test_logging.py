@@ -262,6 +262,61 @@ def test_gui_shows_nonuniform_gain_warning(tmp_path):
     assert "[WARNING]" in text
 
 
+# ---------------------------------------------------------------------------
+# Forwarded child-process output
+# ---------------------------------------------------------------------------
+def test_forward_child_output(capsys, caplog, tmp_path):
+    """Child output goes to stdout once, and is logged without terminal duplicates."""
+    from hnn_core._logging import FORWARDED_ATTR
+    from hnn_core.parallel_backends import _forward_child_output
+
+    log_file = tmp_path / "fwd.log"
+    configure_logging(level="INFO", log_file=log_file, propagate=True)
+
+    _forward_child_output("Trial 1: 0.5 ms...\n")
+    _forward_child_output("")  # nothing to do
+    _forward_child_output("\n")  # whitespace only: written, but not logged
+
+    captured = capsys.readouterr()
+    assert captured.out == "Trial 1: 0.5 ms...\n\n"  # terminal forwarding unchanged
+    assert captured.err == ""  # no second copy through the stream handler
+
+    records = [r for r in caplog.records if "Trial 1" in r.getMessage()]
+    assert len(records) == 1
+    assert getattr(records[0], FORWARDED_ATTR) is True
+    assert records[0].levelno == logging.INFO
+    for handler in _owned():
+        handler.flush()
+    assert log_file.read_text().count("Trial 1: 0.5 ms...") == 1
+
+
+def test_echo_child_output_is_logged(capsys, caplog):
+    from queue import Queue
+    from hnn_core.parallel_backends import _echo_child_output
+
+    q = Queue()
+    q.put("Building the NEURON model\n")
+    with caplog.at_level(logging.INFO, logger="hnn_core"):
+        assert _echo_child_output(q) == "Building the NEURON model\n"
+    assert capsys.readouterr().out == "Building the NEURON model\n"
+    assert [r.getMessage() for r in caplog.records] == ["Building the NEURON model"]
+
+
+def test_gui_window_receives_forwarded_output_once(capsys):
+    pytest.importorskip("ipywidgets")
+    from hnn_core.gui.gui import HNNGUI
+    from hnn_core.parallel_backends import _forward_child_output
+
+    gui = HNNGUI()
+    configure_logging()  # also enable the terminal stream handler
+    _forward_child_output("MPI child says hi\n")
+    texts = [o["text"] for o in gui._log_out.outputs]
+    assert sum("MPI child says hi" in t for t in texts) == 1
+    captured = capsys.readouterr()
+    assert captured.out.count("MPI child says hi") == 1
+    assert captured.err == ""
+
+
 def test_stream_accepts_file_like(capsys):
     configure_logging(stream=sys.stdout)
     logging.getLogger("hnn_core.x").info("to stdout")
@@ -492,6 +547,42 @@ def test_optimize_evoked_maxiter_warning_nongui_and_gui(monkeypatch, recwarn):
         run()
     assert not [w for w in recwarn.list if "maxiter" in str(w.message)]
     assert "'maxiter' must be at least 12" in _gui_window_text(gui)
+
+
+@requires_mpi4py
+@requires_psutil
+@pytest.mark.uses_mpi
+def test_mpi_child_output_forwarded_to_stdout_and_logger(capsys, caplog, tmp_path):
+    """MPI child progress: on stdout exactly once, and visible to logging/GUI."""
+    from hnn_core import MPIBackend, neymotin_2020_model, simulate_dipole
+    from hnn_core._logging import FORWARDED_ATTR
+
+    pytest.importorskip("ipywidgets")
+    from hnn_core.gui.gui import HNNGUI
+
+    gui = HNNGUI()
+    log_file = tmp_path / "mpi_parent.log"
+    # stream handler on: forwarded text must not be duplicated on the terminal
+    configure_logging(level="INFO", log_file=log_file, propagate=True)
+
+    net = neymotin_2020_model(mesh_shape=(3, 3), add_drives_from_params=True)
+    with MPIBackend(n_procs=2):
+        simulate_dipole(net, tstop=10, dt=0.5, n_trials=1, verbose=True)
+
+    # Rank 0 prints this exactly once. (The ``Trial 1: ... ms...`` progress line is
+    # not used here: it is occasionally lost on its way back from the MPI child, also
+    # without any logging changes, so asserting on it would make this test flaky.)
+    msg = "Building the NEURON model"
+    captured = capsys.readouterr()
+    assert captured.out.count(msg) == 1  # forwarded child stdout
+    assert msg not in captured.err  # no duplicate via the stream handler
+
+    forwarded = [r for r in caplog.records if getattr(r, FORWARDED_ATTR, False)]
+    assert any(msg in r.getMessage() for r in forwarded)
+    assert _gui_window_text(gui).count(msg) == 1
+    for handler in _owned():
+        handler.flush()
+    assert msg in log_file.read_text()
 
 
 @requires_mpi4py

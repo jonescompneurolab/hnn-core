@@ -89,7 +89,7 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 - Importing `hnn_core.gui` no longer replaces `sys.stdout`. The GUI logger is now named
   `"hnn_core.gui"`; `hnn_core.gui._logging.logger` and messages emitted through the
   former `"hnn_gui"` logger keep working. The GUI log window now also shows messages
-  from the core library.
+  from the core library and from MPI child processes.
 
 ### People who contributed to this release:
 

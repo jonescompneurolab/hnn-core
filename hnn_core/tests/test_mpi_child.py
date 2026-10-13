@@ -229,6 +229,13 @@ def test_permission_error():
 
 @requires_mpi4py
 @pytest.mark.uses_mpi
-def test_logging():
+def test_logging(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    root_handlers = list(logging.getLogger().handlers)
     with MPISimulation(verbose_subprocess=True) as mpi_sim:
         assert "mpi_child.rank" in mpi_sim.logger.name
+        # per-rank logger with its own file, not propagating to the root logger
+        assert mpi_sim.logger.propagate is False
+        mpi_sim.logger.info("hello from rank")
+        assert logging.getLogger().handlers == root_handlers
+    assert "hello from rank" in (tmp_path / "process_0.log").read_text()

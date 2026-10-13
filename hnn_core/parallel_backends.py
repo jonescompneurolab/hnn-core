@@ -20,7 +20,7 @@ from pathlib import Path
 
 from typing import Union
 
-from ._logging import _enable_child_stdout_logging
+from ._logging import FORWARDED_ATTR, _enable_child_stdout_logging
 from .cell_response import CellResponse
 from .dipole import Dipole
 from .network_builder import _simulate_single_trial
@@ -360,8 +360,8 @@ def run_subprocess(
         # wait for output again after kill signal
         outs, errs = proc.communicate(timeout=2)
 
-    sys.stdout.write(outs)
-    sys.stdout.write(errs)
+    _forward_child_output(outs)
+    _forward_child_output(errs)
 
     if proc.returncode is None:
         # It's theoretically possible that we have received data
@@ -446,6 +446,21 @@ def _simulate_single_trial_in_worker(net, tstop, dt, trial_idx, stdout_logging=F
     return _simulate_single_trial(net, tstop, dt, trial_idx)
 
 
+def _forward_child_output(text):
+    """Forward output of a child process to the user.
+
+    The text is written to stdout exactly as before (this is the only terminal
+    output). It is additionally logged, flagged as already shown on stdout, so
+    that the GUI log window and log files receive it without duplicating it on
+    the terminal.
+    """
+    if not text:
+        return
+    sys.stdout.write(text)
+    if text.strip():
+        logger.info(text.strip(), extra={FORWARDED_ATTR: True})
+
+
 def _echo_child_output(out_q):
     out = ""
     while True:
@@ -458,7 +473,7 @@ def _echo_child_output(out_q):
     # tell if anything was received and check the actual content
     # (logging the first line of nrniv output).
     if len(out) > 0:
-        sys.stdout.write(out)
+        _forward_child_output(out)
         return out
     return ""
 
@@ -485,7 +500,7 @@ def _get_data_info_from_child_err(err_q):
         err = err[: file_match.start()] + err[file_match.end() :]
 
     # print the rest of the child's stderr to our stdout
-    sys.stdout.write(err)
+    _forward_child_output(err)
 
     return data_length, data_file
 

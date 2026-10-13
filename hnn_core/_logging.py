@@ -21,8 +21,19 @@ _FILE_FORMAT = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
 _OWNED_ATTR = "_hnn_core_owned"
 _CHILD_ATTR = "_hnn_core_child_stdout"
 
+# Records carrying this attribute are text that a child process already wrote to
+# our stdout (see ``_forward_child_output`` in ``parallel_backends``). They are
+# logged so that the GUI window, log files and ``caplog`` see them, but not
+# written to the terminal a second time by the stream handler.
+FORWARDED_ATTR = "forwarded_to_stdout"
+
 logger = logging.getLogger(_LOGGER_NAME)
 logger.addHandler(logging.NullHandler())
+
+
+class _SkipForwarded(logging.Filter):
+    def filter(self, record):
+        return not getattr(record, FORWARDED_ATTR, False)
 
 
 def _resolve_level(level):
@@ -89,6 +100,7 @@ def configure_logging(level="INFO", log_file=None, stream=True, propagate=False)
     if stream:
         stream_handler = logging.StreamHandler(sys.stderr if stream is True else stream)
         stream_handler.setFormatter(logging.Formatter(_STREAM_FORMAT))
+        stream_handler.addFilter(_SkipForwarded())
         new_handlers.append(_mark_owned(stream_handler))
     if log_file is not None:
         file_handler = logging.FileHandler(os.fspath(log_file), encoding="utf-8")
