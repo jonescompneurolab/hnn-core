@@ -55,7 +55,7 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
   New functions {func}`hnn_core.configure_logging` and {func}`hnn_core.set_log_level`
   let users choose the log level and, optionally, write a log file
   (`configure_logging(log_file="hnn.log")` or the `HNN_CORE_LOG_FILE` environment
-  variable).
+  variable). The GUI log window now also shows messages from the core library.
 
 ### Upcoming Deprecations
 
@@ -81,9 +81,15 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
   processes (`n_jobs > 1`) is still written to `stdout` as before; for workers, only if INFO
   messages are enabled in the parent process.
 
-- Warnings that users are expected to act on (`maxiter`
+- Warnings that users are expected to act on (non-uniform synaptic gains, `maxiter`
   being raised to 12, the number of trials being overwritten for `maximize_psd`) are now
-  emitted with `warnings.warn` instead of being printed.
+  emitted with `warnings.warn` instead of being printed. The GUI shows them in its log
+  window instead of the terminal.
+
+- Importing `hnn_core.gui` no longer replaces `sys.stdout`. The GUI logger is now named
+  `"hnn_core.gui"`; `hnn_core.gui._logging.logger` and messages emitted through the
+  former `"hnn_gui"` logger keep working. The GUI log window now also shows messages
+  from the core library.
 
 ### People who contributed to this release:
 

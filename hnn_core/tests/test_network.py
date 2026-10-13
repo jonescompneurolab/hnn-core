@@ -1,8 +1,6 @@
 # Authors: Mainak Jas <mainakjas@gmail.com>
 
-from contextlib import redirect_stdout
 from copy import deepcopy
-import io
 import logging
 from pathlib import Path
 import tempfile
@@ -3099,15 +3097,10 @@ def test_check_global_synaptic_gains_uniformity():
     net.connectivity[l2p_l2p_conns[0]]["nc_dict"]["gain"] = 1.0
     net.connectivity[l2p_l2p_conns[1]]["nc_dict"]["gain"] = 2.0
 
-    # Capture stdout to check for warning message
-    with io.StringIO() as buf, redirect_stdout(buf):
+    # With NON-uniform gains, check should return False and warn
+    with pytest.warns(UserWarning, match="custom synaptic gain values"):
         result = _check_global_synaptic_gains_uniformity(net)
-        stdout = buf.getvalue()
-
-    # With NON-uniform gains, check should return False
     assert result is False
-    assert "WARNING" in stdout
-    assert "custom synaptic gain values" in stdout
 
 
 def test_verbose(caplog, capsys):

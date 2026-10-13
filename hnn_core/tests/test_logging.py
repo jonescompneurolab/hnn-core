@@ -169,6 +169,99 @@ def test_set_log_level(caplog):
     assert not _owned()
 
 
+# ---------------------------------------------------------------------------
+# GUI integration
+# ---------------------------------------------------------------------------
+def test_gui_import_does_not_replace_stdout():
+    """Importing the GUI must not hijack ``sys.stdout``."""
+    pytest.importorskip("ipywidgets")
+    original = sys.stdout
+    import hnn_core.gui.gui as gui_module  # noqa: F401
+
+    assert sys.stdout is original
+    assert not hasattr(gui_module, "_GUI_PrintToLogger")
+
+
+def test_gui_logger_compat_alias():
+    pytest.importorskip("ipywidgets")
+    from hnn_core.gui._logging import logger as gui_logger
+
+    assert gui_logger is logging.getLogger("hnn_core.gui")
+    assert gui_logger.parent is pkg_logger
+
+
+def test_gui_log_window_integration(capsys):
+    """GUI window shows GUI and core messages, once, without duplicates."""
+    pytest.importorskip("ipywidgets")
+    from ipywidgets import Output
+    from hnn_core.gui.gui import HNNGUI, _OutputWidgetHandler
+    from hnn_core.gui._data_store import data_store
+    from hnn_core.gui._logging import logger as gui_logger
+
+    def widget_handlers():
+        return [h for h in pkg_logger.handlers if isinstance(h, _OutputWidgetHandler)]
+
+    # constructing the handler must not touch the data store
+    data_store.simulated_data["sentinel"] = {}
+    _OutputWidgetHandler(Output())
+    assert "sentinel" in data_store.simulated_data
+
+    gui = HNNGUI()
+    # creating the GUI is the point where the data store is reset
+    assert "sentinel" not in data_store.simulated_data
+    assert len(widget_handlers()) == 1
+
+    gui_logger.info("gui message")
+    logging.getLogger("hnn_core.network_builder").info("core message")
+    logging.getLogger("hnn_core.network_builder").debug("debug message")
+    text = "\n".join(o["text"] for o in gui._log_out.outputs)
+    assert text.count("gui message") == 1
+    assert text.count("core message") == 1
+    assert "debug message" not in text
+    assert "[INFO]" in text
+
+    # a second GUI replaces the first handler instead of adding another one
+    gui2 = HNNGUI()
+    assert len(widget_handlers()) == 1
+    gui_logger.warning("second window")
+    assert "second window" not in "\n".join(o["text"] for o in gui._log_out.outputs)
+    texts2 = [o["text"] for o in gui2._log_out.outputs]
+    assert sum("second window" in t for t in texts2) == 1
+
+    # nothing leaks to stdout; no duplicates when configure_logging is also used
+    configure_logging(level="INFO")
+    gui_logger.info("with stream handler")
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert captured.err.count("with stream handler") == 1
+    texts2 = [o["text"] for o in gui2._log_out.outputs]
+    assert sum("with stream handler" in t for t in texts2) == 1
+    assert len(widget_handlers()) == 1
+
+
+def test_gui_shows_nonuniform_gain_warning(tmp_path):
+    """The non-uniform gain ``UserWarning`` is mirrored in the GUI log window."""
+    pytest.importorskip("ipywidgets")
+    from hnn_core import neymotin_2020_model, write_network_configuration
+    from hnn_core.gui.gui import HNNGUI
+
+    net = neymotin_2020_model(mesh_shape=(3, 3))
+    picks = hnn_core.pick_connection(
+        net, src_gids="L2_pyramidal", target_gids="L2_pyramidal"
+    )
+    net.connectivity[picks[0]]["nc_dict"]["gain"] = 1.0
+    net.connectivity[picks[1]]["nc_dict"]["gain"] = 2.0
+    fname = tmp_path / "net.json"
+    write_network_configuration(net, fname)
+
+    gui = HNNGUI()
+    gui.compose()
+    gui._simulate_upload_connectivity(fname)
+    text = "\n".join(o["text"] for o in gui._log_out.outputs)
+    assert "custom synaptic gain values" in text
+    assert "[WARNING]" in text
+
+
 def test_stream_accepts_file_like(capsys):
     configure_logging(stream=sys.stdout)
     logging.getLogger("hnn_core.x").info("to stdout")
@@ -191,6 +284,53 @@ def test_child_stdout_logging_isolated_and_idempotent():
     )
     assert res.stdout == "child progress\n"
     assert _hnn_stderr(res.stderr).strip() == "0"
+
+
+# ---------------------------------------------------------------------------
+# Warnings in the GUI
+# ---------------------------------------------------------------------------
+def _gui_window_text(gui):
+    return "\n".join(o["text"] for o in gui._log_out.outputs)
+
+
+def test_warnings_to_log_window():
+    """GUI path: shown in the log window and nowhere else; hook is restored."""
+    pytest.importorskip("ipywidgets")
+    import warnings
+    from hnn_core.gui.gui import HNNGUI, _warnings_to_log_window
+
+    gui = HNNGUI()
+    original_hook = warnings.showwarning
+    shown = []
+    warnings.showwarning = lambda *args, **kwargs: shown.append(args)
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("always")
+            with _warnings_to_log_window():
+                warnings.warn("gui-path warning", UserWarning)
+            assert shown == []  # the default display hook was not used
+            # outside the context manager the previous hook is active again
+            warnings.warn("outside gui", UserWarning)
+            assert len(shown) == 1
+    finally:
+        warnings.showwarning = original_hook
+    text = _gui_window_text(gui)
+    assert text.count("gui-path warning") == 1 and "[WARNING]" in text
+    assert "UserWarning" in text
+    assert "outside gui" not in text
+
+
+def test_warnings_to_log_window_respects_filters():
+    pytest.importorskip("ipywidgets")
+    import warnings
+    from hnn_core.gui.gui import HNNGUI, _warnings_to_log_window
+
+    gui = HNNGUI()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        with _warnings_to_log_window():
+            warnings.warn("ignored warning", UserWarning)
+    assert "ignored warning" not in _gui_window_text(gui)
 
 
 # ---------------------------------------------------------------------------
@@ -239,9 +379,36 @@ def test_joblib_worker_helper_ignored_in_parent_process():
     assert pkg_logger.propagate == propagate
 
 
-def test_maximize_psd_trials_warning():
+def test_gains_warning_nongui_and_gui(recwarn):
+    """Network check warns (non-GUI); the GUI window shows it instead of stderr."""
+    pytest.importorskip("ipywidgets")
+    from hnn_core import neymotin_2020_model
+    from hnn_core.network import _check_global_synaptic_gains_uniformity
+    from hnn_core.gui.gui import HNNGUI, _warnings_to_log_window
+
+    net = neymotin_2020_model(mesh_shape=(3, 3))
+    picks = hnn_core.pick_connection(
+        net, src_gids="L2_pyramidal", target_gids="L2_pyramidal"
+    )
+    net.connectivity[picks[1]]["nc_dict"]["gain"] = 2.0
+
+    with pytest.warns(UserWarning, match="custom synaptic gain values") as record:
+        assert _check_global_synaptic_gains_uniformity(net) is False
+    assert len(record) == 1
+
+    gui = HNNGUI()
+    recwarn.clear()
+    with _warnings_to_log_window():
+        _check_global_synaptic_gains_uniformity(net)
+    assert len(recwarn.list) == 0  # not emitted a second time
+    assert "custom synaptic gain values" in _gui_window_text(gui)
+
+
+def test_maximize_psd_trials_warning_nongui_and_gui(recwarn):
+    pytest.importorskip("ipywidgets")
     from hnn_core import neymotin_2020_model
     from hnn_core.optimization import Optimizer
+    from hnn_core.gui.gui import HNNGUI, _warnings_to_log_window
 
     net = neymotin_2020_model(mesh_shape=(3, 3), add_drives_from_params=True)
     optim = Optimizer(
@@ -260,13 +427,24 @@ def test_maximize_psd_trials_warning():
         return [1e-4], [0.0], net
 
     optim._run_opt = fake_run_opt  # skip the actual optimization
+    fit_kwargs = dict(f_bands=[(8, 12)], relative_bandpower=[1], n_trials=3)
+
     with pytest.warns(UserWarning, match="only 1 trial is supported"):
-        optim.fit(f_bands=[(8, 12)], relative_bandpower=[1], n_trials=3)
+        optim.fit(**fit_kwargs)
     assert seen["n_trials"] == 1  # behavior preserved: overwritten to 1
 
+    gui = HNNGUI()
+    recwarn.clear()
+    with _warnings_to_log_window():
+        optim.fit(**fit_kwargs)
+    assert len(recwarn.list) == 0
+    assert "only 1 trial is supported" in _gui_window_text(gui)
 
-def test_optimize_evoked_maxiter_warning(monkeypatch):
+
+def test_optimize_evoked_maxiter_warning_nongui_and_gui(monkeypatch, recwarn):
+    pytest.importorskip("ipywidgets")
     from hnn_core import neymotin_2020_model, simulate_dipole
+    from hnn_core.gui.gui import HNNGUI, _warnings_to_log_window
 
     params = hnn_core.read_params(
         Path(hnn_core.__file__).parent / "param" / "default.json"
@@ -282,6 +460,7 @@ def test_optimize_evoked_maxiter_warning(monkeypatch):
     net = neymotin_2020_model(params, add_drives_from_params=True, mesh_shape=(3, 3))
     del net.external_drives["evprox2"]
     dpl = simulate_dipole(net, tstop=10.0, n_trials=1)[0]
+
     oe_module = importlib.import_module("hnn_core.optimization.optimize_evoked")
 
     class _Stop(Exception):
@@ -291,17 +470,28 @@ def test_optimize_evoked_maxiter_warning(monkeypatch):
         raise _Stop
 
     monkeypatch.setattr(oe_module, "_run_optimization", stop)  # after the warning
+
+    def run():
+        oe_module.optimize_evoked(
+            net,
+            tstop=10.0,
+            n_trials=1,
+            target_dpl=dpl,
+            initial_dpl=dpl,
+            maxiter=5,
+            which_drives=["evprox1"],
+        )
+
     with pytest.warns(UserWarning, match="'maxiter' must be at least 12"):
         with pytest.raises(_Stop):
-            oe_module.optimize_evoked(
-                net,
-                tstop=10.0,
-                n_trials=1,
-                target_dpl=dpl,
-                initial_dpl=dpl,
-                maxiter=5,
-                which_drives=["evprox1"],
-            )
+            run()
+
+    gui = HNNGUI()
+    recwarn.clear()
+    with _warnings_to_log_window(), pytest.raises(_Stop):
+        run()
+    assert not [w for w in recwarn.list if "maxiter" in str(w.message)]
+    assert "'maxiter' must be at least 12" in _gui_window_text(gui)
 
 
 @requires_mpi4py
@@ -450,3 +640,19 @@ def test_batch_simulate_worker_enables_logging_in_worker_process(monkeypatch, ca
     batch._run_single_sim({})
     assert "Building the NEURON model" in capsys.readouterr().out
     assert sum(getattr(h, _CHILD_ATTR, False) for h in pkg_logger.handlers) == 1
+
+
+def test_legacy_hnn_gui_logger_forwards_once(capsys):
+    """Messages emitted on the old ``hnn_gui`` logger reach the GUI window once."""
+    pytest.importorskip("ipywidgets")
+    from hnn_core.gui.gui import HNNGUI
+
+    gui = HNNGUI()
+    configure_logging()
+    logging.getLogger("hnn_gui").info("legacy message")
+    logging.getLogger("hnn_gui").debug("legacy debug")
+    assert _gui_window_text(gui).count("legacy message") == 1
+    assert "legacy debug" not in _gui_window_text(gui)
+    assert capsys.readouterr().err.count("legacy message") == 1
+    # the legacy logger must not also reach the root logger (no duplicates)
+    assert logging.getLogger("hnn_gui").propagate is False
