@@ -3,6 +3,7 @@
 # Authors: Mainak Jas <mjas@mgh.harvard.edu>
 #          Sam Neymotin <samnemo@gmail.com>
 
+import logging
 from pathlib import Path
 import warnings
 from copy import deepcopy
@@ -19,6 +20,9 @@ from .externals.mne import _check_option
 
 from .utils import _savgol_filter, smooth_waveform
 from .viz import plot_dipole, plot_psd, plot_tfr_morlet
+
+
+logger = logging.getLogger(__name__)
 
 
 def simulate_dipole(
@@ -65,7 +69,7 @@ def simulate_dipole(
         preferred way is to use the :meth:`~hnn_core.dipole.Dipole.smooth` and
         :meth:`~hnn_core.dipole.Dipole.scale` methods after the simulation is run instead.
     verbose : bool, default=True
-        If True, print build steps and simulation progress to console.
+        If True, log build steps and simulation progress (see :func:`~hnn_core.configure_logging` to display them).
     baseline_correction : bool, default=True
         Whether to apply the baseline correction after simulation (which correction is
         used depends on ``Network._model_variant``). Defaults to True, applying the
@@ -1014,7 +1018,7 @@ class Dipole(object):
         -------
         A hdf5 file containing the dipole object
         """
-        print(f"Writing file {fname}")
+        logger.info(f"Writing file {fname}")
         dpl_data = dict()
         dpl_data["object_type"] = "Dipole"
         dpl_data["times"] = self.times

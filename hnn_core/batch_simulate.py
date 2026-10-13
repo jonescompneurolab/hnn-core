@@ -5,15 +5,20 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
+import logging
+import multiprocessing
 from itertools import product
 from pathlib import Path
 import numpy as np
 from joblib import Parallel, delayed, parallel_config
 
+from ._logging import _enable_child_stdout_logging
 from .network import Network
 from .externals.mne import _validate_type, _check_option
 from .dipole import simulate_dipole
 from .network_models import neymotin_2020_model
+
+logger = logging.getLogger(__name__)
 
 
 class BatchSimulate(object):
@@ -178,6 +183,7 @@ class BatchSimulate(object):
         self.clear_cache = clear_cache
         self.summary_func = summary_func
         self._verbose = True
+        self._worker_stdout_logging = False
         self.baseline_correction = baseline_correction
 
     def run(
@@ -209,7 +215,7 @@ class BatchSimulate(object):
             completely operationable; all other backends are in
             development. Default is `loky`.
         verbose : bool
-            If True, print build steps and simulation progress to console. Default: True.
+            If True, log build steps and simulation progress (see :func:`~hnn_core.configure_logging` to display them). Default: True.
 
         Returns
         -------
@@ -306,6 +312,11 @@ class BatchSimulate(object):
             "backend", backend, ["loky", "threading", "multiprocessing", "dask"]
         )
 
+        # Worker processes do not share our logging configuration: if INFO messages
+        # are enabled here, let them write their progress to their own stdout.
+        self._worker_stdout_logging = (
+            self._verbose and n_jobs != 1 and logger.isEnabledFor(logging.INFO)
+        )
         with parallel_config(backend=backend):
             res = Parallel(n_jobs=n_jobs)(
                 delayed(self._run_single_sim)(params) for params in param_combinations
@@ -329,6 +340,10 @@ class BatchSimulate(object):
             - `dpl`: The simulated dipole.
             - `param_values`: The parameter values used for the simulation.
         """
+
+        # Only has an effect in a worker *process*, never in the parent or in threads.
+        if self._worker_stdout_logging and multiprocessing.parent_process() is not None:
+            _enable_child_stdout_logging()
 
         net = self.net.copy()
         self.set_params(net, param_values)
