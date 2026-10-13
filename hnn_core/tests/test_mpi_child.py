@@ -1,5 +1,6 @@
 from pathlib import Path
 import io
+import logging
 from contextlib import redirect_stdout, redirect_stderr
 from queue import Queue
 
@@ -119,7 +120,7 @@ def test_str_to_net():
         _str_to_net(input_str)
 
 
-def test_child_run():
+def test_child_run(caplog):
     """Test running the child process without MPI"""
 
     hnn_core_root = Path(hnn_core.__file__).parent
@@ -136,12 +137,11 @@ def test_child_run():
     net_reduced._instantiate_drives(tstop=tstop, n_trials=n_trials)
 
     with MPISimulation(skip_mpi_import=True) as mpi_sim:
-        with io.StringIO() as buf, redirect_stdout(buf):
+        with caplog.at_level(logging.INFO, logger="hnn_core"):
             sim_data = mpi_sim.run(
                 net_reduced, tstop=tstop, dt=0.025, n_trials=n_trials
             )
-            stdout = buf.getvalue()
-        assert "Trial 1: 0.03 ms..." in stdout
+        assert "Trial 1: 0.03 ms..." in caplog.text
 
         with io.StringIO() as buf_err, redirect_stderr(buf_err):
             mpi_sim._send_data_to_parent_process(sim_data)

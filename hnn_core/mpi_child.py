@@ -8,6 +8,7 @@ import sys
 import pickle
 import base64
 import re
+from hnn_core._logging import _enable_child_stdout_logging
 from hnn_core.parallel_backends import _extract_data, _extract_data_length
 import logging
 
@@ -213,6 +214,10 @@ if __name__ == "__main__":
 
     rc = 0
     verbose_subprocess = "--verbose-subprocess" in sys.argv
+
+    # The parent process forwards this process' stdout to the user, but does not
+    # share its logging configuration: send status messages there.
+    _enable_child_stdout_logging()
 
     try:
         with MPISimulation(verbose_subprocess=verbose_subprocess) as mpi_sim:
