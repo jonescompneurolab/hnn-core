@@ -670,7 +670,7 @@ def _lib_path_case(
 # 3. This uses the above hard-coded filepaths which are not valid on Windows BUT must be
 #   cast to strings in order to test proper environment variable usage, so we cannot use
 #   Path objects or other cross-platform path handling here.
-@pytest.mark.skipif(sys.platform == "win32")
+@pytest.mark.skipif(sys.platform == "win32", reason="MPI not supported on Windows")
 @pytest.mark.parametrize(
     "preexisting_env_value, pip_lib_found, autoload, user_lib_path, expected_env_value",
     [
