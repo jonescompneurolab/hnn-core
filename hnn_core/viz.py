@@ -871,13 +871,8 @@ def plot_spikes_raster(
     if gid_ranges is not None:
         raster_min = min(min(gid_ranges[cell_type]) for cell_type in cell_types)
         raster_max = max(max(gid_ranges[cell_type]) for cell_type in cell_types)
-        # Show every cell of the plotted types, including the silent ones, with
-        # enough padding for the markers of the outermost cells
-        ax.set_ylim(raster_max + marker_size / 2, raster_min - marker_size / 2)
     else:
         raster_max = max_gid
-        # invert y axis
-        ax.invert_yaxis()
 
     # Overlay dipoles on raster plot
     if overlay_dipoles:
