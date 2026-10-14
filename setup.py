@@ -159,7 +159,7 @@ if __name__ == "__main__":
             "h5io",
         ],
         extras_require=extras,
-        python_requires=">=3.9, <3.14",
+        python_requires=">=3.9, <3.15",
         packages=find_packages(),
         package_data={
             "hnn_core": [
