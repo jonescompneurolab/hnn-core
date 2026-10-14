@@ -15,6 +15,7 @@ from subprocess import Popen, PIPE, TimeoutExpired
 from queue import Queue, Empty
 from threading import Thread, Event
 from pathlib import Path
+from importlib.metadata import PackageNotFoundError, distribution
 
 from typing import Union
 
@@ -213,8 +214,6 @@ def _get_mpi_env(autoload_mpi_library=True, mpi_lib_path=None):
 
 def _get_pip_openmpi_lib():
     """Return the path of libmpi from the PyPI 'openmpi' package, if any."""
-    from importlib.metadata import PackageNotFoundError, distribution
-
     try:
         files = distribution("openmpi").files or []
     except PackageNotFoundError:

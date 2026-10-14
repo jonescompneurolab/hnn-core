@@ -2,6 +2,7 @@ import io
 import itertools
 import sys
 from contextlib import redirect_stdout
+from importlib.metadata import PackageNotFoundError, distribution
 from os import environ
 from pathlib import Path
 from threading import Thread, Event
@@ -34,8 +35,6 @@ from hnn_core.network_builder import NetworkBuilder
 
 def _has_pip_openmpi():
     """Check whether the PyPI 'openmpi' package is installed."""
-    from importlib.metadata import PackageNotFoundError, distribution
-
     try:
         distribution("openmpi")
     except PackageNotFoundError:
@@ -539,14 +538,16 @@ class _FakeDistribution:
 
 
 def _fake_openmpi_package(monkeypatch, file_paths):
-    """Make the PyPI 'openmpi' package appear to contain 'file_paths'."""
-    import importlib.metadata
+    """Make the PyPI 'openmpi' package appear to contain 'file_paths'.
+
+    Patches the 'distribution' name imported into hnn_core.parallel_backends, not
+    importlib.metadata.distribution, since the former is what _get_pip_openmpi_lib uses.
+    """
+    from hnn_core import parallel_backends
 
     files = [_FakePackageFile(path) for path in file_paths]
-    # _get_pip_openmpi_lib imports 'distribution' at call time, so we patch the source
-    # module rather than hnn_core.parallel_backends
     monkeypatch.setattr(
-        importlib.metadata, "distribution", lambda name: _FakeDistribution(files)
+        parallel_backends, "distribution", lambda name: _FakeDistribution(files)
     )
 
 
@@ -598,12 +599,12 @@ class TestGetPipOpenmpiLib:
 
     def test_not_installed(self, monkeypatch, capsys):
         """Test that None is returned and a message printed if not installed"""
-        import importlib.metadata
+        from hnn_core import parallel_backends
 
         def _not_installed(name):
-            raise importlib.metadata.PackageNotFoundError(name)
+            raise PackageNotFoundError(name)
 
-        monkeypatch.setattr(importlib.metadata, "distribution", _not_installed)
+        monkeypatch.setattr(parallel_backends, "distribution", _not_installed)
 
         assert _get_pip_openmpi_lib() is None
         assert "PyPI 'openmpi' package not found" in capsys.readouterr().out
