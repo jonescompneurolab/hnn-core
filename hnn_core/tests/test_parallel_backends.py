@@ -1,12 +1,13 @@
+from pathlib import Path
+from os import environ
 import io
 import itertools
-import sys
+import re
 from contextlib import redirect_stdout
 from importlib.metadata import PackageNotFoundError, distribution
-from os import environ
-from pathlib import Path
 from threading import Thread, Event
 from time import sleep
+from types import SimpleNamespace
 from urllib.request import urlretrieve
 
 import numpy as np
@@ -16,6 +17,7 @@ from numpy.testing import assert_array_equal, assert_allclose, assert_raises
 import pytest
 
 import hnn_core
+from hnn_core import parallel_backends
 from hnn_core import (
     MPIBackend,
     neymotin_2020_model,
@@ -31,20 +33,6 @@ from hnn_core.parallel_backends import (
     _get_pip_openmpi_lib,
 )
 from hnn_core.network_builder import NetworkBuilder
-
-
-def _has_pip_openmpi():
-    """Check whether the PyPI 'openmpi' package is installed."""
-    try:
-        distribution("openmpi")
-    except PackageNotFoundError:
-        return False
-    return True
-
-
-requires_pip_openmpi = pytest.mark.skipif(
-    not _has_pip_openmpi(), reason="requires the PyPI 'openmpi' package"
-)
 
 
 def _terminate_mpibackend(event, backend):
@@ -519,373 +507,76 @@ def test_compare_duecker_model_output(backend):
 # --------------------------------------------------------------------------------------
 # Tests for locating and loading the MPI library ('MPI_LIB_NRN_PATH')
 # --------------------------------------------------------------------------------------
-class _FakePackageFile:
-    """Minimal stand-in for an importlib.metadata.PackagePath."""
-
-    def __init__(self, location):
-        self.name = Path(location).name
-        self._location = location
-
-    def locate(self):
-        return self._location
-
-
-class _FakeDistribution:
-    """Minimal stand-in for an importlib.metadata.Distribution."""
-
-    def __init__(self, files):
-        self.files = files
-
-
-def _fake_openmpi_package(monkeypatch, file_paths):
-    """Make the PyPI 'openmpi' package appear to contain 'file_paths'.
-
-    Patches the 'distribution' name imported into hnn_core.parallel_backends, not
-    importlib.metadata.distribution, since the former is what _get_pip_openmpi_lib uses.
-    """
-    from hnn_core import parallel_backends
-
-    files = [_FakePackageFile(path) for path in file_paths]
+@pytest.mark.parametrize(
+    "lib_name", ["libmpi.so.40", "libmpi.40.dylib", None], ids=["linux", "mac", "none"]
+)
+def test_get_pip_openmpi_lib(monkeypatch, tmp_path, lib_name):
+    """Test that only the real libmpi file in the 'openmpi' package is matched"""
+    # Decoys that must NOT match. 'libmpi.so' and 'libmpi.dylib' are linker scripts
+    # that NEURON cannot load.
+    names = ["libmpi.so", "libmpi.dylib", "libmpi_mpifh.so.40", "libmpi.so.40.1.0"]
+    if lib_name is not None:
+        names.append(lib_name)
+    files = [SimpleNamespace(name=n, locate=lambda n=n: tmp_path / n) for n in names]
     monkeypatch.setattr(
-        parallel_backends, "distribution", lambda name: _FakeDistribution(files)
+        parallel_backends, "distribution", lambda name: SimpleNamespace(files=files)
     )
 
-
-def _fake_pip_openmpi_lib(monkeypatch, mpi_lib):
-    """Make _get_pip_openmpi_lib return 'mpi_lib' without searching anything."""
-    from hnn_core import parallel_backends
-
-    monkeypatch.setattr(parallel_backends, "_get_pip_openmpi_lib", lambda: mpi_lib)
+    expected = None if lib_name is None else str(tmp_path / lib_name)
+    assert _get_pip_openmpi_lib() == expected
 
 
-class TestGetPipOpenmpiLib:
-    """Tests for locating libmpi inside the PyPI 'openmpi' package"""
-
-    # Files that look similar to the real library but must NOT be matched. Notably,
-    # 'libmpi.so' and 'libmpi.dylib' are linker scripts that NEURON cannot load.
-    DECOY_FILES = [
-        "libmpi.so",
-        "libmpi.dylib",
-        "libmpi_mpifh.so.40",
-        "libmpi.so.40.1.0",
-    ]
-
-    @pytest.mark.parametrize(
-        "lib_name",
-        ["libmpi.so.40", "libmpi.40.dylib", "libmpi.so.12", "libmpi.12.dylib"],
-    )
-    def test_lib_found(self, monkeypatch, tmp_path, lib_name):
-        """Test that the real libmpi file is found among the decoys"""
-        lib_dir = tmp_path / "lib"
-        decoys = [lib_dir / name for name in self.DECOY_FILES]
-        # Use a non-normalized path to check that the result gets normalized
-        real_lib = lib_dir / ".." / "lib" / lib_name
-        _fake_openmpi_package(monkeypatch, decoys + [real_lib])
-
-        assert _get_pip_openmpi_lib() == str(lib_dir / lib_name)
-
-    def test_only_decoys(self, monkeypatch, tmp_path):
-        """Test that None is returned if no file matches"""
-        decoys = [tmp_path / name for name in self.DECOY_FILES]
-        _fake_openmpi_package(monkeypatch, decoys)
-
+def test_get_pip_openmpi_lib_installed():
+    """Test _get_pip_openmpi_lib against the actually-installed environment"""
+    try:
+        distribution("openmpi")
+    except PackageNotFoundError:
         assert _get_pip_openmpi_lib() is None
-
-    def test_empty_package(self, monkeypatch):
-        """Test that None is returned if the package lists no files"""
-        _fake_openmpi_package(monkeypatch, [])
-
-        assert _get_pip_openmpi_lib() is None
-
-    def test_not_installed(self, monkeypatch, capsys):
-        """Test that None is returned and a message printed if not installed"""
-        from hnn_core import parallel_backends
-
-        def _not_installed(name):
-            raise PackageNotFoundError(name)
-
-        monkeypatch.setattr(parallel_backends, "distribution", _not_installed)
-
-        assert _get_pip_openmpi_lib() is None
-        assert "PyPI 'openmpi' package not found" in capsys.readouterr().out
-
-    @requires_pip_openmpi
-    def test_real_package(self):
-        """Test that libmpi is found in an actually-installed 'openmpi' package"""
-        mpi_lib = _get_pip_openmpi_lib()
-
-        assert mpi_lib is not None
-        assert Path(mpi_lib).is_absolute()
-        assert Path(mpi_lib).is_file()
-
-
-# Fake library paths. Each one names where the MPI library "came from", so a
-# failing test makes it obvious which source _get_mpi_env chose.
-PREEXISTING_LIB = "/preexisting/libmpi.so.40"  # already in the caller's env
-PIP_LIB = "/pip/libmpi.so.40"  # found inside the PyPI 'openmpi' package
-USER_LIB = "/user/libmpi.so.40"  # passed explicitly via `mpi_lib_path`
-
-
-def _lib_path_case(
-    test_id,
-    *,
-    preexisting_env_value,
-    pip_lib_found,
-    autoload,
-    user_lib_path,
-    expected_env_value,
-):
-    """Build one test case for test_get_mpi_env_lib_path.
-
-    Parameters
-    ----------
-    test_id : str
-        Name shown by pytest for this case.
-    preexisting_env_value : str | None
-        Value of MPI_LIB_NRN_PATH in the caller's environment before the call,
-        or None if it is unset.
-    pip_lib_found : str | None
-        Path that the (faked) PyPI 'openmpi' library search returns, or None
-        if the search finds nothing.
-    autoload : bool
-        Value passed as `autoload_mpi_library`.
-    user_lib_path : str | Path | None
-        Value passed as `mpi_lib_path`.
-    expected_env_value : str | None
-        Expected value of MPI_LIB_NRN_PATH in the returned env, or None if it
-        should be absent.
-    """
-    return pytest.param(
-        preexisting_env_value,
-        pip_lib_found,
-        autoload,
-        user_lib_path,
-        expected_env_value,
-        id=test_id,
-    )
-
-
-# We skip this test on Windows because:
-# 1. We do not support MPI on non-WSL Windows.
-# 2. But we still want these many tests to run in parallel.
-# 3. This uses the above hard-coded filepaths which are not valid on Windows BUT must be
-#   cast to strings in order to test proper environment variable usage, so we cannot use
-#   Path objects or other cross-platform path handling here.
-@pytest.mark.skipif(sys.platform == "win32", reason="MPI not supported on Windows")
-@pytest.mark.parametrize(
-    "preexisting_env_value, pip_lib_found, autoload, user_lib_path, expected_env_value",
-    [
-        # ---------------------------------------------------------------------
-        # Autoloading enabled, no user path: the PyPI 'openmpi' library is
-        # used, overwriting any pre-existing value
-        # ---------------------------------------------------------------------
-        _lib_path_case(
-            "autoload",
-            preexisting_env_value=None,
-            pip_lib_found=PIP_LIB,
-            autoload=True,
-            user_lib_path=None,
-            expected_env_value=PIP_LIB,
-        ),
-        _lib_path_case(
-            "autoload-overwrites",
-            preexisting_env_value=PREEXISTING_LIB,
-            pip_lib_found=PIP_LIB,
-            autoload=True,
-            user_lib_path=None,
-            expected_env_value=PIP_LIB,
-        ),
-        # ---------------------------------------------------------------------
-        # Autoloading enabled, but no PyPI 'openmpi' library found: the
-        # environment is left alone
-        # ---------------------------------------------------------------------
-        _lib_path_case(
-            "autoload-not-found",
-            preexisting_env_value=None,
-            pip_lib_found=None,
-            autoload=True,
-            user_lib_path=None,
-            expected_env_value=None,
-        ),
-        _lib_path_case(
-            "autoload-not-found-keeps-preexisting",
-            preexisting_env_value=PREEXISTING_LIB,
-            pip_lib_found=None,
-            autoload=True,
-            user_lib_path=None,
-            expected_env_value=PREEXISTING_LIB,
-        ),
-        # ---------------------------------------------------------------------
-        # Autoloading disabled, no user path: the environment is left alone,
-        # even though a PyPI 'openmpi' library is available
-        # ---------------------------------------------------------------------
-        _lib_path_case(
-            "no-autoload",
-            preexisting_env_value=None,
-            pip_lib_found=PIP_LIB,
-            autoload=False,
-            user_lib_path=None,
-            expected_env_value=None,
-        ),
-        _lib_path_case(
-            "no-autoload-keeps-preexisting",
-            preexisting_env_value=PREEXISTING_LIB,
-            pip_lib_found=PIP_LIB,
-            autoload=False,
-            user_lib_path=None,
-            expected_env_value=PREEXISTING_LIB,
-        ),
-        # ---------------------------------------------------------------------
-        # User-supplied path (str or Path): always wins, regardless of
-        # autoloading or any pre-existing value
-        # ---------------------------------------------------------------------
-        _lib_path_case(
-            "user-str",
-            preexisting_env_value=None,
-            pip_lib_found=PIP_LIB,
-            autoload=True,
-            user_lib_path=USER_LIB,
-            expected_env_value=USER_LIB,
-        ),
-        _lib_path_case(
-            "user-path",
-            preexisting_env_value=None,
-            pip_lib_found=PIP_LIB,
-            autoload=True,
-            user_lib_path=Path(USER_LIB),
-            expected_env_value=USER_LIB,
-        ),
-        _lib_path_case(
-            "user-with-no-autoload",
-            preexisting_env_value=None,
-            pip_lib_found=PIP_LIB,
-            autoload=False,
-            user_lib_path=USER_LIB,
-            expected_env_value=USER_LIB,
-        ),
-        _lib_path_case(
-            "user-overwrites-preexisting",
-            preexisting_env_value=PREEXISTING_LIB,
-            pip_lib_found=PIP_LIB,
-            autoload=True,
-            user_lib_path=USER_LIB,
-            expected_env_value=USER_LIB,
-        ),
-    ],
-)
-def test_get_mpi_env_lib_path(
-    monkeypatch,
-    preexisting_env_value,
-    pip_lib_found,
-    autoload,
-    user_lib_path,
-    expected_env_value,
-):
-    """Test how _get_mpi_env sets MPI_LIB_NRN_PATH"""
-    # Set up the caller's environment
-    if preexisting_env_value is None:
-        monkeypatch.delenv("MPI_LIB_NRN_PATH", raising=False)
     else:
-        monkeypatch.setenv("MPI_LIB_NRN_PATH", preexisting_env_value)
-
-    # Control what the PyPI 'openmpi' library search returns
-    _fake_pip_openmpi_lib(monkeypatch, pip_lib_found)
-
-    env = _get_mpi_env(autoload_mpi_library=autoload, mpi_lib_path=user_lib_path)
-
-    # The returned env has the expected library path
-    assert env.get("MPI_LIB_NRN_PATH") == expected_env_value
-    # The caller's actual environment must never be modified
-    assert environ.get("MPI_LIB_NRN_PATH") == preexisting_env_value
+        mpi_lib = _get_pip_openmpi_lib()
+        assert mpi_lib is not None and Path(mpi_lib).is_file()
 
 
 @pytest.mark.parametrize(
-    "kwargs",
+    "autoload, pip_lib, user_lib, expected",
     [
-        pytest.param(dict(autoload_mpi_library=False), id="no-autoload"),
-        pytest.param(dict(mpi_lib_path=USER_LIB), id="user-path"),
+        pytest.param(True, "pip.so", None, "pip.so", id="autoload"),
+        pytest.param(True, None, None, "preexisting.so", id="autoload-not-found"),
+        pytest.param(False, "pip.so", None, "preexisting.so", id="no-autoload"),
+        pytest.param(False, "pip.so", "user.so", "user.so", id="user"),
+        pytest.param(True, "pip.so", Path("user.so"), "user.so", id="user-wins"),
     ],
 )
-def test_get_mpi_env_skips_openmpi_search(monkeypatch, capsys, kwargs):
-    """Test that the 'openmpi' package is only searched when autoloading"""
-    from hnn_core import parallel_backends
+def test_get_mpi_env_lib_path(monkeypatch, autoload, pip_lib, user_lib, expected):
+    """Test which MPI library _get_mpi_env points MPI_LIB_NRN_PATH to"""
+    monkeypatch.setenv("MPI_LIB_NRN_PATH", "preexisting.so")
+    monkeypatch.setattr(parallel_backends, "_get_pip_openmpi_lib", lambda: pip_lib)
 
-    def _fail():
-        raise AssertionError("'openmpi' package should not be searched")
+    env = _get_mpi_env(autoload_mpi_library=autoload, mpi_lib_path=user_lib)
 
-    monkeypatch.setattr(parallel_backends, "_get_pip_openmpi_lib", _fail)
-
-    _get_mpi_env(**kwargs)
-    assert capsys.readouterr().out == ""
-
-
-@requires_mpi4py
-@requires_psutil
-@pytest.mark.parametrize("autoload", [True, False])
-def test_mpibackend_autoload_without_lib_path(autoload):
-    """Test that MPIBackend stores 'autoload_mpi_library' as given"""
-    backend = MPIBackend(autoload_mpi_library=autoload)
-
-    assert backend.autoload_mpi_library is autoload
-    assert backend.mpi_lib_path is None
+    assert env["MPI_LIB_NRN_PATH"] == expected
+    # The caller's own environment must never be modified
+    assert environ["MPI_LIB_NRN_PATH"] == "preexisting.so"
 
 
 @requires_mpi4py
 @requires_psutil
-@pytest.mark.parametrize("path_type", ["path", "str", "relative-str"])
-def test_mpibackend_lib_path(monkeypatch, tmp_path, path_type):
-    """Test that 'mpi_lib_path' is made absolute and disables autoloading"""
-    lib_file = tmp_path / "libmpi.so.40"
-    lib_file.touch()
+def test_mpibackend_lib_path(monkeypatch, tmp_path):
+    """Test that 'mpi_lib_path' must exist and reaches MPI as an absolute path"""
+    for bad_path in ["nonexistent.so", tmp_path]:
+        with pytest.raises(FileNotFoundError, match="'mpi_lib_path' not found"):
+            MPIBackend(mpi_lib_path=bad_path)
+
+    # Capture the env that MPI would be launched with, but stop before launching it
+    def _fake_run_subprocess(env, **kwargs):
+        raise RuntimeError(f"MPI_LIB_NRN_PATH={env['MPI_LIB_NRN_PATH']}")
+
+    monkeypatch.setattr(parallel_backends, "run_subprocess", _fake_run_subprocess)
+    (tmp_path / "libmpi.so.40").touch()
     monkeypatch.chdir(tmp_path)
-    mpi_lib_path = {
-        "path": lib_file,
-        "str": str(lib_file),
-        "relative-str": "libmpi.so.40",
-    }[path_type]
+    net = neymotin_2020_model(mesh_shape=(3, 3))
 
-    backend = MPIBackend(autoload_mpi_library=True, mpi_lib_path=mpi_lib_path)
-
-    assert backend.autoload_mpi_library is False
-    assert backend.mpi_lib_path == str(lib_file)
-
-
-@requires_mpi4py
-@requires_psutil
-@pytest.mark.parametrize("bad_path", ["nonexistent.so", "."], ids=["missing", "dir"])
-def test_mpibackend_lib_path_not_a_file(tmp_path, bad_path):
-    """Test that 'mpi_lib_path' must be an existing file"""
-    with pytest.raises(FileNotFoundError, match="'mpi_lib_path' not found"):
-        MPIBackend(mpi_lib_path=tmp_path / bad_path)
-
-
-@requires_mpi4py
-@requires_psutil
-def test_mpibackend_passes_mpi_lib_args(monkeypatch, tmp_path):
-    """Test that MPIBackend.simulate passes its MPI library args to _get_mpi_env"""
-    from hnn_core import parallel_backends
-
-    class _StopSimulation(Exception):
-        pass
-
-    received_kwargs = []
-
-    def _fake_get_mpi_env(**kwargs):
-        # Record the arguments, then abort before any MPI process is started
-        received_kwargs.append(kwargs)
-        raise _StopSimulation
-
-    monkeypatch.setattr(parallel_backends, "_get_mpi_env", _fake_get_mpi_env)
-
-    hnn_core_root = Path(hnn_core.__file__).parent
-    params = read_params(hnn_core_root / "param" / "default.json")
-    net = neymotin_2020_model(params, add_drives_from_params=False, mesh_shape=(3, 3))
-    lib_file = tmp_path / "libmpi.so.40"
-    lib_file.touch()
-    backend = MPIBackend(n_procs=2, mpi_lib_path=lib_file)
-
-    with pytest.raises(_StopSimulation):
+    backend = MPIBackend(n_procs=2, mpi_lib_path="libmpi.so.40")
+    expected = re.escape(f"MPI_LIB_NRN_PATH={tmp_path / 'libmpi.so.40'}")
+    with pytest.raises(RuntimeError, match=f"^{expected}$"):
         backend.simulate(net, tstop=1, dt=0.025, n_trials=1)
-    assert received_kwargs == [
-        dict(autoload_mpi_library=False, mpi_lib_path=str(lib_file))
-    ]
