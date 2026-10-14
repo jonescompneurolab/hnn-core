@@ -1,8 +1,9 @@
-from pathlib import Path
-from os import environ
 import io
 import itertools
+import sys
 from contextlib import redirect_stdout
+from os import environ
+from pathlib import Path
 from threading import Thread, Event
 from time import sleep
 from urllib.request import urlretrieve
