@@ -687,7 +687,10 @@ class TestCellResponsePlotters:
             cell_types=["L2_basket", "L2_pyramidal"],
         )
         assert fig.axes[0].get_ylim() == pytest.approx(
-            (max(gid_ranges["L2_pyramidal"]) + marker_size, 0)
+            (
+                max(gid_ranges["L2_pyramidal"]) + marker_size,
+                min(gid_ranges["L2_basket"]),
+            )
         )
 
         # case 4: same as case 3, except for a cell type that is silent
@@ -699,7 +702,10 @@ class TestCellResponsePlotters:
                 cell_types=["L5_pyramidal"],
             )
         assert fig.axes[0].get_ylim() == pytest.approx(
-            (max(gid_ranges["L5_pyramidal"]) + marker_size, 0)
+            (
+                max(gid_ranges["L5_pyramidal"]) + marker_size,
+                min(gid_ranges["L5_pyramidal"]),
+            )
         )
 
         # case 5: test that overlay dipoles works correctly with gid_ranges

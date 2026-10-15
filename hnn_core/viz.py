@@ -872,6 +872,7 @@ def plot_spikes_raster(
         raster_min = min(min(gid_ranges[cell_type]) for cell_type in cell_types)
         raster_max = max(max(gid_ranges[cell_type]) for cell_type in cell_types)
     else:
+        raster_min = 0
         raster_max = max_gid
 
     # Overlay dipoles on raster plot
@@ -975,7 +976,7 @@ def plot_spikes_raster(
 
     ax.set_ylabel(ylabel)
     ax.set_xlabel(xlabel)
-    ax.set_ylim([0, raster_max + marker_size])
+    ax.set_ylim([raster_min, raster_max + marker_size])
     ax.invert_yaxis()
     # add title
     ax.set_title(title)
