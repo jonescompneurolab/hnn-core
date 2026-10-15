@@ -75,7 +75,7 @@ def base_network():
         )
         net.add_connection(
             src_gids="L5_basket",
-            target_gids="L2_pyramidal",
+            target_gids="L5_pyramidal",
             loc="soma",
             receptor=receptor,
             weight=5e-4,
