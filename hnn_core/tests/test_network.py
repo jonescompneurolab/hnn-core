@@ -606,7 +606,8 @@ def test_model_variant_matches_network(fix_default_params):
     with pytest.raises(ValueError, match="'model_variant' is required"):
         duecker_ET_model(params=params, mesh_shape=mesh_shape)
 
-    # models that predate 'model_variant' still build without it
+    # Using params that predate 'model_variant' (such as `param/default.json`) still
+    # build the network in a way that contains its model_variant
     assert (
         neymotin_2020_model(params=neymo_params, mesh_shape=mesh_shape)._model_variant
         == "neymotin_2020_model"
