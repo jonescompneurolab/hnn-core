@@ -1016,6 +1016,14 @@ def fix_use_cached_sims(_base_simulation_cached, request):
         net, dpls, _, _ = fix_use_cached_sims
     ```
 
+    In the example above, we pass tuples of parameters in the form of `(network_model,
+    variation)` tuples to indicate the subset of simulations to run. Including the
+    `indirect=True` argument is required to restrict the subset of combinations passed
+    to the fixture (without it, pytest passes each parameter to the test function itself
+    instead of using it to parametrize the fixture). The `ids` argument sets the name
+    pytest uses for each combination (e.g., "fix_net_neymotin_2020-yes_spikes" and
+    "fix_net_duecker_ET-yes_spikes" in this case).
+
     Parameters
     ----------
     This takes no user-provided arguments, and instead requires only other fixtures that
