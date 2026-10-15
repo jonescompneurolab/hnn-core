@@ -198,7 +198,6 @@ def test_dipole(
 def test_dipole_simulation(fix_net_neymotin_2020, fix_default_params):
     """Test data produced from simulate_dipole() call."""
     net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
-    net._params["dipole_smooth_win"] = 5
     with pytest.raises(ValueError, match="Invalid number of simulations: 0"):
         simulate_dipole(net, tstop=25.0, n_trials=0)
     with pytest.raises(ValueError, match="Invalid value for the"):
