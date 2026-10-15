@@ -526,10 +526,10 @@ def test_gids_from_spikes_trial_list():
 
     # gids are pooled over the listed trials only, sorted and without duplicates
     assert_array_equal(
-        cell_response._gids_from_spikes("L5_basket", trial_idx=[1, 0]), [7, 8]
+        cell_response._gids_from_spikes("L5_basket", trial_idx=[0, 1]), [7, 8]
     )
     assert_array_equal(
-        cell_response._gids_from_spikes("L5_basket", trial_idx=[2, 1]), [7, 9]
+        cell_response._gids_from_spikes("L5_basket", trial_idx=[1, 2]), [7, 9]
     )
     assert_array_equal(
         cell_response._gids_from_spikes("L5_pyramidal", trial_idx=[0]), []
@@ -543,7 +543,7 @@ def test_gids_from_spikes_trial_list():
         )
     assert_array_equal(
         cell_response._gids_from_spikes("L5_basket", trial_idx=[0, 1, 2]),
-        cell_response._gids_from_spikes("L5_basket"),
+        cell_response._gids_from_spikes("L5_basket", trial_idx=None),
     )
 
 
