@@ -886,10 +886,20 @@ def _base_simulation_cached():
         fixture (e.g. ``fix_net_neymotin_2020``).
     """
     cache = {}
-    # AMPA weights of the bursty drives for each variation
+    # AMPA weights of all drives for each variation.
     variation_weights_ampa = {
-        "yes_spikes": {"L2_pyramidal": 0.1, "L5_pyramidal": 1.0},
-        "no_spikes": {"L2_pyramidal": 5.4e-5, "L5_pyramidal": 5.4e-5},
+        "yes_spikes": {
+            "L2_pyramidal": 0.1,
+            "L5_pyramidal": 1.0,
+        },
+        "no_spikes": {
+            "L2_pyramidal": 1e-5,
+            "L5_pyramidal": 1e-5,
+        },
+    }
+    syn_delays = {
+        "L2_pyramidal": 0.1,
+        "L5_pyramidal": 1.0,
     }
 
     def _get_simulation(net_model_name, net_model, variation):
@@ -897,7 +907,21 @@ def _base_simulation_cached():
         if key not in cache:
             net, net_customizations = net_model(reduced=True)
             weights_ampa = variation_weights_ampa[variation]
-            syn_delays = {"L2_pyramidal": 0.1, "L5_pyramidal": 1.0}
+
+            # Add single Evoked drive
+            # --------------------------------------------------------------------------
+            net.add_evoked_drive(
+                "evprox1",
+                mu=5,
+                sigma=2.5,
+                numspikes=1,
+                weights_ampa=weights_ampa,
+                location="proximal",
+                synaptic_delays=syn_delays,
+            )
+
+            # Add two bursty drives
+            # --------------------------------------------------------------------------
             net.add_bursty_drive(
                 "beta_prox",
                 tstart=0.0,
@@ -925,6 +949,22 @@ def _base_simulation_cached():
                 synaptic_delays=syn_delays,
                 event_seed=14,
             )
+
+            # Add a Poisson drive
+            # --------------------------------------------------------------------------
+            rate_constants = {
+                "L2_pyramidal": 140.0,
+                "L5_pyramidal": 40.0,
+            }
+            net.add_poisson_drive(
+                "poisson",
+                rate_constant=rate_constants,
+                weights_ampa=weights_ampa,
+                location="distal",
+                synaptic_delays=syn_delays,
+                event_seed=1349,
+            )
+
             dpls = simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
             cache[key] = (net, dpls, net_customizations)
         # Deepcopy so each caller gets its own net, dpls, and net_customizations

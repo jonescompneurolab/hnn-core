@@ -591,10 +591,19 @@ class TestCellResponsePlotters:
     def test_spikes_hist_color(self, fix_use_cached_sims):
         """Test spike histogram with different color arguments."""
         net, _, _, _ = fix_use_cached_sims
+        # A color dict must define a color for every drive in the cached
+        # simulation. These correspond to the drive names used in
+        # `conftest.py::_base_simulation_cached`:
+        drive_colors = {
+            "evprox1": "b",
+            "beta_prox": "r",
+            "beta_dist": "g",
+            "poisson": "k",
+        }
 
         net.cell_response.plot_spikes_hist(color="r")
         net.cell_response.plot_spikes_hist(color=["C0", "C1"])
-        net.cell_response.plot_spikes_hist(color={"beta_prox": "r", "beta_dist": "g"})
+        net.cell_response.plot_spikes_hist(color=drive_colors)
         net.cell_response.plot_spikes_hist(
             spike_types={"group1": ["beta_prox", "beta_dist"]}, color={"group1": "r"}
         )
@@ -607,15 +616,17 @@ class TestCellResponsePlotters:
         with pytest.raises(ValueError):
             net.cell_response.plot_spikes_hist(color="z")
         with pytest.raises(ValueError):
-            net.cell_response.plot_spikes_hist(
-                color={"beta_prox": "z", "beta_dist": "g"}
-            )
+            net.cell_response.plot_spikes_hist(color={**drive_colors, "beta_prox": "z"})
         with pytest.raises(TypeError, match="Dictionary values of color must"):
-            net.cell_response.plot_spikes_hist(
-                color={"beta_prox": 123, "beta_dist": "g"}
-            )
+            net.cell_response.plot_spikes_hist(color={**drive_colors, "beta_prox": 123})
         with pytest.raises(ValueError, match="'beta_dist' must be"):
-            net.cell_response.plot_spikes_hist(color={"beta_prox": "r"})
+            net.cell_response.plot_spikes_hist(
+                color={
+                    drive: color
+                    for drive, color in drive_colors.items()
+                    if drive != "beta_dist"
+                }
+            )
 
     def test_spikes_hist_invert_spike_types(self, fix_use_cached_sims):
         """Test spike histogram with different invert_spike_types arguments."""
