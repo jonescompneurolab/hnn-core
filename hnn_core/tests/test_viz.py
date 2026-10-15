@@ -260,7 +260,7 @@ class TestCellResponsePlotters:
                         for collection in fig.axes[0].collections
                     ]
                 ), "No data plotted in raster plot when there should be some"
-                # when there are spikes there should be more # than 4 elements in the plot
+                # when there are spikes there should be more than 4 elements in the plot
                 assert len(fig.axes[0].collections) > 4
             elif spiking == "no_spikes":
                 assert all(
