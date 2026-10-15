@@ -1,5 +1,6 @@
 # import os.path as op
 # import tempfile
+from unittest.mock import patch
 
 import matplotlib
 from matplotlib import backend_bases
@@ -20,6 +21,8 @@ from hnn_core.viz import (
     plot_connectivity_matrix,
     plot_cell_connectivity,
     plot_drive_strength,
+    _add_arrows_to_dipole,
+    _collect_drive_arrow_markers,
     NetworkPlotter,
 )
 
@@ -107,6 +110,132 @@ class TestDipoleViz:
             dpl_sfreq = dpls[0].copy()
             dpl_sfreq.sfreq /= 10
             plot_psd([dpls[0], dpl_sfreq])
+
+    def test_plot_drive_arrows(self, fix_use_cached_sims):
+        net, dpls, _, _ = fix_use_cached_sims
+        # The cached simulation's only evoked drive is the proximal "evprox1"
+        drive_time = net.external_drives["evprox1"]["dynamics"]["mu"]
+        markers = _collect_drive_arrow_markers(net)
+        assert any(marker["label"] == "evprox1" for marker in markers)
+
+        _, ax = plt.subplots()
+        plot_dipole(dpls[0], ax=ax, show=False, net=net, show_drive_arrows=True)
+        annotations = [
+            child
+            for child in ax.get_children()
+            if isinstance(child, matplotlib.text.Annotation)
+        ]
+        assert annotations
+        proximal_arrows = [
+            ann
+            for ann in annotations
+            if ann.get_color() == "r" or ann.arrow_patch.get_edgecolor()[0] > 0.9
+        ]
+        assert proximal_arrows
+        assert all(ann.xy[1] > ann.xyann[1] for ann in proximal_arrows)
+        assert proximal_arrows[0].arrow_patch.get_linewidth() == 3.0
+        guide_lines = [
+            line
+            for line in ax.lines
+            if line.get_linestyle() == "--" and line.get_color() in ("0.75", 0.75)
+        ]
+        assert guide_lines
+        assert any(abs(line.get_xdata()[0] - drive_time) < 0.01 for line in guide_lines)
+        assert "evprox1" not in [text.get_text() for text in ax.texts]
+        plt.close("all")
+
+        with pytest.raises(ValueError, match="net must be provided"):
+            plot_dipole(dpls[0], show=False, show_drive_arrows=True)
+
+        _, ax = plt.subplots()
+        ax.set_xlim(0, 100)
+        _add_arrows_to_dipole(ax, net)
+        assert any(
+            isinstance(child, matplotlib.text.Annotation) for child in ax.get_children()
+        )
+        custom_arrow_width = 3.5
+        _, ax = plt.subplots()
+        ax.set_xlim(0, 100)
+        _add_arrows_to_dipole(ax, net, arrow_width=custom_arrow_width)
+        ann = next(
+            child
+            for child in ax.get_children()
+            if isinstance(child, matplotlib.text.Annotation)
+        )
+        assert ann.arrow_patch.get_linewidth() == custom_arrow_width
+
+    def test_collect_drive_arrow_markers_evoked_only(self, fix_use_cached_sims):
+        """Bursty and Poisson drives are not shown on dipole arrow overlays."""
+        net, _, _, _ = fix_use_cached_sims
+        drive_types = {drive["type"] for drive in net.external_drives.values()}
+        assert {"evoked", "bursty", "poisson"} <= drive_types
+
+        # Only the cached simulation's single evoked drive gets a marker
+        markers = _collect_drive_arrow_markers(net)
+        assert len(markers) == 1
+        assert markers[0]["label"] == "evprox1"
+        assert markers[0]["time"] == net.external_drives["evprox1"]["dynamics"]["mu"]
+
+        # Without the evoked drive, no arrows are drawn
+        del net.external_drives["evprox1"]
+        assert _collect_drive_arrow_markers(net) == []
+
+        _, ax = plt.subplots()
+        ax.set_xlim(0.0, 100.0)
+        ax.set_ylim(-1.0, 1.0)
+        _add_arrows_to_dipole(ax, net)
+        assert not any(
+            isinstance(child, matplotlib.text.Annotation) for child in ax.get_children()
+        )
+
+    def test_add_arrows_to_dipole_default_time_window(self, fix_use_cached_sims):
+        """Omitted tmin/tmax are taken from the axis x limits."""
+        net, _, _, _ = fix_use_cached_sims
+        # The cached simulation's only evoked drive is "evprox1"
+        drive_time = net.external_drives["evprox1"]["dynamics"]["mu"]
+
+        def _n_annotations(ax):
+            return sum(
+                1
+                for child in ax.get_children()
+                if isinstance(child, matplotlib.text.Annotation)
+            )
+
+        _, ax = plt.subplots()
+        ax.set_xlim(drive_time - 5.0, drive_time + 5.0)
+        ax.set_ylim(-1.0, 1.0)
+        _add_arrows_to_dipole(ax, net, tmin=None, tmax=None)
+        assert _n_annotations(ax) == 1
+
+        _, ax = plt.subplots()
+        ax.set_xlim(0.0, 100.0)
+        ax.set_ylim(-1.0, 1.0)
+        _add_arrows_to_dipole(ax, net, tmin=drive_time + 1.0, tmax=None)
+        assert _n_annotations(ax) == 0
+
+        _, ax = plt.subplots()
+        ax.set_xlim(0.0, 100.0)
+        ax.set_ylim(-1.0, 1.0)
+        _add_arrows_to_dipole(ax, net, tmin=None, tmax=drive_time - 1.0)
+        assert _n_annotations(ax) == 0
+
+    def test_add_arrows_to_dipole_flat_ylim(self, fix_use_cached_sims):
+        """A zero-height y axis still gets drive arrows."""
+        net, _, _, _ = fix_use_cached_sims
+
+        _, ax = plt.subplots()
+        ax.set_xlim(0.0, 100.0)
+        with patch.object(ax, "get_ylim", return_value=(10.0, 10.0)):
+            _add_arrows_to_dipole(ax, net)
+        annotations = [
+            child
+            for child in ax.get_children()
+            if isinstance(child, matplotlib.text.Annotation)
+        ]
+        assert annotations
+        ymin, ymax = ax.get_ylim()
+        assert ymin < 10.0
+        assert ymax == 10.0
 
 
 class TestCellResponsePlotters:

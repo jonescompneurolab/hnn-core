@@ -26,14 +26,15 @@ the ["`pip` Source Installation" section of our Installation Guide][] on our [Te
 website][]. Note that this is **different** from the "`pip` Package Installation" type
 on that webpage!
 
-We are experimenting with having once-monthly HNN Development meetings which are open to
-the public. These take place on the first Monday of every month at 1:00 PM, United
-States Eastern time (the [timezone of Providence, RI, viewable
-here](https://www.timeanddate.com/worldclock/usa/providence)). You can access the Zoom
-room here
-[https://brown.zoom.us/j/99212200748](https://brown.zoom.us/j/99212200748). Note that
-there is a waiting room and you *must raise your hand* before you will be granted
-audio/video privileges. We will kick out anyone causing disruptions during the meeting.
+Once a month, we host our HNN Development meetings publicly, which anyone interested is
+welcome to attend. These take place on the first Monday of every month at 11:00 AM,
+United States Eastern time (the [timezone of Providence, RI, viewable
+here](https://www.timeanddate.com/worldclock/usa/providence)). (Note that in the case of
+that Monday being a holiday according to [this
+calendar](https://hr.brown.edu/benefits-wellness/paid-time/holiday-schedule), then the
+meeting will be rescheduled to the same time on the next available workday). You can
+access the Zoom room here
+[https://brown.zoom.us/j/99212200748](https://brown.zoom.us/j/99212200748).
 
 ## How to contribute code
 
