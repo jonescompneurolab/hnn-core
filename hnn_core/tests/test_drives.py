@@ -759,7 +759,7 @@ def test_add_drives_duecker(fix_net_duecker_ET):
         location="proximal",
         burst_rate=10,
         weights_ampa=weights_ampa,
-        synaptic_delays=syn_delays,
+        synaptic_delays=synaptic_delays,
         n_drive_cells=10,
     )
 
