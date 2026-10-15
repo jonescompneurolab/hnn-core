@@ -209,7 +209,7 @@ def test_extracellular_backends(fix_net_model, fix_run_simulation, request):
     )
     mpi_net = deepcopy(joblib_net)
 
-    _, joblib_net = fix_run_simulation(
+    fix_run_simulation(
         joblib_net,
         tstop=40,
         backend="joblib",
@@ -218,7 +218,7 @@ def test_extracellular_backends(fix_net_model, fix_run_simulation, request):
         record_vsec="soma",
         record_ca="soma",
     )
-    _, mpi_net = fix_run_simulation(
+    fix_run_simulation(
         mpi_net,
         tstop=40,
         backend="mpi",

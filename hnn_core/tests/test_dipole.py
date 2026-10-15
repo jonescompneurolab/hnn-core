@@ -165,7 +165,7 @@ def test_dipole(
     net_raw, _ = net_model(add_drives_from_params=True, reduced=True)
     net_proc = deepcopy(net_raw)
 
-    dpls_raw, net_raw = fix_run_simulation(
+    dpls_raw = fix_run_simulation(
         net_raw,
         tstop=40,
         record_isec="soma",
@@ -173,7 +173,7 @@ def test_dipole(
         record_ca="soma",
     )
     with pytest.warns(FutureWarning, match="The postproc-argument is deprecated"):
-        dpls_proc, _ = fix_run_simulation(
+        dpls_proc = fix_run_simulation(
             net_proc,
             tstop=40,
             record_isec="soma",
@@ -253,7 +253,7 @@ def test_cell_response_backends(fix_net_model, fix_run_simulation, request):
     joblib_net, _ = net_model(add_drives_from_params=True, reduced=True)
     mpi_net = deepcopy(joblib_net)
 
-    _, joblib_net = fix_run_simulation(
+    fix_run_simulation(
         joblib_net,
         tstop=40,
         backend="joblib",
@@ -263,7 +263,7 @@ def test_cell_response_backends(fix_net_model, fix_run_simulation, request):
         record_isec="soma",
         record_ca="all",
     )
-    _, mpi_net = fix_run_simulation(
+    fix_run_simulation(
         mpi_net,
         tstop=40,
         backend="mpi",
@@ -473,7 +473,7 @@ def test_dipole_baseline_correction_mpi(
     """Test that baseline_correction works in simulate_dipole with MPIBackend."""
     net_model = request.getfixturevalue(fix_net_model)
     net, _ = net_model(reduced=True, add_drives_from_params=True)
-    _, _ = fix_run_simulation(
+    fix_run_simulation(
         net,
         tstop=20.0,
         dt=0.5,

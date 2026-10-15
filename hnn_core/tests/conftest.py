@@ -908,7 +908,7 @@ def fix_run_simulation():
 
     ```
     net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
-    dpls, net = fix_run_simulation(net, tstop=40, backend="joblib", n_jobs=2)
+    dpls = fix_run_simulation(net, tstop=40, backend="joblib", n_jobs=2)
     ```
 
     After simulating, this checks that the network is still picklable and that every
@@ -921,8 +921,8 @@ def fix_run_simulation():
     Parameters
     ----------
     net : Network object
-        The network to simulate. It is modified in place by the simulation, and also
-        returned by this fixture.
+        The network to simulate. It is modified in place by the simulation, so its
+        outputs (e.g. ``net.cell_response``) are available on the passed object.
     tstop : float
         The simulation stop time (ms).
     dt : float, default=0.025
@@ -956,8 +956,6 @@ def fix_run_simulation():
     -------
     dpls : list of Dipole
         The simulated dipoles, one per trial.
-    net : Network object
-        The simulated network (the same object passed in).
     """
 
     def _fix_run_simulation(
@@ -1028,7 +1026,7 @@ def fix_run_simulation():
             # compared to the number provided by the argument.
             assert len(drive["events"]) == n_trials
 
-        return dpls, net
+        return dpls
 
     return _fix_run_simulation
 

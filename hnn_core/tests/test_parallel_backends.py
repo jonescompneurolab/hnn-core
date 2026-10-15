@@ -106,7 +106,7 @@ class TestParallelBackends:
         """Test consistency between default backend simulation and master"""
         global dpls_reduced_default
         net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
-        dpls_reduced_default, _ = fix_run_simulation(net, tstop=40, backend=None)
+        dpls_reduced_default = fix_run_simulation(net, tstop=40, backend=None)
         # test consistency across all parallel backends for multiple trials
         assert_raises(
             AssertionError,
@@ -120,7 +120,7 @@ class TestParallelBackends:
         global dpls_reduced_default, dpls_reduced_joblib
 
         net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
-        dpls_reduced_joblib, _ = fix_run_simulation(
+        dpls_reduced_joblib = fix_run_simulation(
             net, tstop=40, backend="joblib", n_jobs=2
         )
 
@@ -164,7 +164,7 @@ class TestParallelBackends:
         """Test running a MPIBackend on reduced model"""
         global dpls_reduced_default, dpls_reduced_mpi
         net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
-        dpls_reduced_mpi, _ = fix_run_simulation(net, tstop=40, backend="mpi")
+        dpls_reduced_mpi = fix_run_simulation(net, tstop=40, backend="mpi")
         for trial_idx in range(len(dpls_reduced_default)):
             # account for rounding error incured during MPI parallelization
             assert_allclose(
@@ -386,7 +386,7 @@ class TestParallelBackends:
 
         # TODO AES: CURRENTLY NEEDS LEGACY MODE
         net, _ = fix_net_neymotin_2020(legacy_mode=True, add_drives_from_params=True)
-        dpls, net = fix_run_simulation(net, tstop=170, backend=backend)
+        dpls = fix_run_simulation(net, tstop=170, backend=backend)
         dpl = dpls[0].smooth(30).scale(3000)
 
         # write the dipole to a file and compare
@@ -432,7 +432,7 @@ def test_mpi_failure(fix_net_neymotin_2020, fix_run_simulation):
     with pytest.warns(UserWarning) as record:
         with io.StringIO() as buf, redirect_stdout(buf):
             with pytest.raises(RuntimeError, match="MPI simulation failed"):
-                _, _ = fix_run_simulation(net, tstop=40, backend="mpi", postproc=False)
+                fix_run_simulation(net, tstop=40, backend="mpi", postproc=False)
             stdout = buf.getvalue()
 
     assert "MPI processes are unable to reach each other" in stdout
