@@ -209,8 +209,16 @@ def test_add_drives(fix_default_params):
     net = Network(params, legacy_mode=False)
 
     # Ensure weights and delays are updated
-    weights_ampa = {"L2_basket": 1.0, "L2_pyramidal": 3.0, "L5_pyramidal": 4.0}
-    syn_delays = {"L2_basket": 1.0, "L2_pyramidal": 2.0, "L5_pyramidal": 4.0}
+    weights_ampa = {
+        "L2_basket": 1.0,
+        "L2_pyramidal": 3.0,
+        "L5_pyramidal": 4.0,
+    }
+    syn_delays = {
+        "L2_basket": 1.0,
+        "L2_pyramidal": 2.0,
+        "L5_pyramidal": 4.0,
+    }
 
     n_drive_cells = 10
     cell_specific = False  # default for bursty drive
@@ -279,8 +287,14 @@ def test_add_drives(fix_default_params):
     # Test drive targeting specific section
     # Section present on all cells indicated
     location = "apical_tuft"
-    weights_ampa_tuft = {"L2_pyramidal": 1.0, "L5_pyramidal": 2.0}
-    syn_delays_tuft = {"L2_pyramidal": 1.0, "L5_pyramidal": 2.0}
+    weights_ampa_tuft = {
+        "L2_pyramidal": 1.0,
+        "L5_pyramidal": 2.0,
+    }
+    syn_delays_tuft = {
+        "L2_pyramidal": 1.0,
+        "L5_pyramidal": 2.0,
+    }
     net.add_bursty_drive(
         "bursty_tuft",
         location=location,
@@ -293,8 +307,14 @@ def test_add_drives(fix_default_params):
 
     # Section not present on cells indicated
     location = "apical_tuft"
-    weights_ampa_no_tuft = {"L2_pyramidal": 1.0, "L5_basket": 2.0}
-    syn_delays_no_tuft = {"L2_pyramidal": 1.0, "L5_basket": 2.0}
+    weights_ampa_no_tuft = {
+        "L2_pyramidal": 1.0,
+        "L5_basket": 2.0,
+    }
+    syn_delays_no_tuft = {
+        "L2_pyramidal": 1.0,
+        "L5_basket": 2.0,
+    }
     match = "Invalid value for"
     with pytest.raises(ValueError, match=match):
         net.add_bursty_drive(
@@ -310,7 +330,11 @@ def test_add_drives(fix_default_params):
     # drive with cell_specific=False
     n_drive_cells = 10
     probability = 0.5  # test that only half of possible connections are made
-    weights_nmda = {"L2_basket": 1.0, "L2_pyramidal": 3.0, "L5_pyramidal": 4.0}
+    weights_nmda = {
+        "L2_basket": 1.0,
+        "L2_pyramidal": 3.0,
+        "L5_pyramidal": 4.0,
+    }
     net.add_bursty_drive(
         "bursty_prob",
         location="distal",
@@ -336,7 +360,11 @@ def test_add_drives(fix_default_params):
             ).astype(int)
 
     # drives with cell_specific=True
-    probability = {"L2_basket": 0.1, "L2_pyramidal": 0.25, "L5_pyramidal": 0.5}
+    probability = {
+        "L2_basket": 0.1,
+        "L2_pyramidal": 0.25,
+        "L5_pyramidal": 0.5,
+    }
     net.add_evoked_drive(
         "evoked_prob",
         mu=1.0,
@@ -497,8 +525,14 @@ def test_add_drives(fix_default_params):
         net.add_poisson_drive(
             "poisson1",
             location="distal",
-            rate_constant={"L2_pyramidal": 10.0, "bogus_celltype": 20.0},
-            weights_ampa={"L2_pyramidal": 0.01, "bogus_celltype": 0.01},
+            rate_constant={
+                "L2_pyramidal": 10.0,
+                "bogus_celltype": 20.0,
+            },
+            weights_ampa={
+                "L2_pyramidal": 0.01,
+                "bogus_celltype": 0.01,
+            },
             synaptic_delays=0.1,
         )
 
