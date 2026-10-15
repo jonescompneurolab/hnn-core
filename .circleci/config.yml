@@ -53,7 +53,7 @@ jobs:
                   export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
                   python -c "
                   from hnn_core import jones_2009_model, MPIBackend, simulate_dipole
-                  with MPIBackend():
+                  with MPIBackend(n_procs=2):
                       simulate_dipole(jones_2009_model(), tstop=20)
                   print('--> SUCCESS: The test worked')
                   "

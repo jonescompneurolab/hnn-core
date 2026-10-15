@@ -73,7 +73,10 @@ def pytest_runtest_setup(item):
 def run_hnn_core_fixture():
     def _run_hnn_core_fixture(
         backend=None,
-        n_procs=None,
+        # Use 2 procs explicitly, since the MPIBackend default (non-hwthreaded
+        # cores minus one) may be only 1 on CI runners, which would silently
+        # transfer the simulation to JoblibBackend.
+        n_procs=2,
         n_jobs=1,
         reduced=False,
         record_vsec=False,

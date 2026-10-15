@@ -15,11 +15,13 @@ import pytest
 
 import hnn_core
 from hnn_core import (
+    JoblibBackend,
     MPIBackend,
     neymotin_2020_model,
     read_params,
     read_spikes,
 )
+from hnn_core import parallel_backends
 from hnn_core.dipole import simulate_dipole
 from hnn_core.parallel_backends import (
     requires_mpi4py,
@@ -127,33 +129,94 @@ class TestParallelBackends:
                 dpls_reduced_joblib[trial_idx].data["agg"],
             )
 
-    @requires_mpi4py
     @requires_psutil
-    @pytest.mark.parametrize("sensible_default", [False, True])
-    def test_detect_cores(self, sensible_default):
+    @pytest.mark.parametrize("use_hwthreading_if_found", [False, True])
+    def test_detect_cores(self, use_hwthreading_if_found):
         """Test that multiple cores can be detected"""
-        [detected_cores_nohw, detected_hwthreading] = _determine_cores_hwthreading(
-            use_hwthreading_if_found=False, sensible_default_cores=sensible_default
+        [detected_cores, detected_hwthreading] = _determine_cores_hwthreading(
+            use_hwthreading_if_found=use_hwthreading_if_found,
+            sensible_default_cores=False,
         )
-        assert detected_cores_nohw > 1
+        assert detected_cores > 1
         assert isinstance(detected_hwthreading, bool)
+        if not use_hwthreading_if_found:
+            assert detected_hwthreading is False
 
-        [detected_cores_yeshw, detected_hwthreading] = _determine_cores_hwthreading(
-            use_hwthreading_if_found=True, sensible_default_cores=sensible_default
+        # Sensible defaults leave exactly one core free
+        [sensible_cores, _] = _determine_cores_hwthreading(
+            use_hwthreading_if_found=use_hwthreading_if_found,
+            sensible_default_cores=True,
         )
-        assert detected_cores_yeshw > 1
-        assert isinstance(detected_hwthreading, bool)
+        assert sensible_cores == detected_cores - 1
 
-        assert detected_cores_yeshw >= detected_cores_nohw
+        [detected_cores_nohw, _] = _determine_cores_hwthreading(
+            use_hwthreading_if_found=False, sensible_default_cores=False
+        )
+        assert detected_cores >= detected_cores_nohw
+
+    def test_detect_cores_no_psutil(self, monkeypatch):
+        """Test that a single core is used if psutil is not installed"""
+        monkeypatch.setattr(parallel_backends, "_has_psutil", lambda: False)
+        with pytest.warns(UserWarning, match="psutil not installed"):
+            [detected_cores, detected_hwthreading] = _determine_cores_hwthreading()
+        assert detected_cores == 1
+        assert detected_hwthreading is False
+
+        with pytest.warns(UserWarning, match="psutil not installed"):
+            backend = JoblibBackend()
+        assert backend.n_jobs == 1
+
+    @requires_psutil
+    def test_joblib_njobs(self):
+        """Test JoblibBackend uses all non-hwthreaded cores minus one"""
+        [n_cores, _] = _determine_cores_hwthreading(
+            use_hwthreading_if_found=False, sensible_default_cores=False
+        )
+        with JoblibBackend() as backend:
+            assert backend.n_jobs == max(n_cores - 1, 1)
+
+        # a user-specified number of jobs is always respected
+        with JoblibBackend(n_jobs=n_cores + 1) as backend:
+            assert backend.n_jobs == n_cores + 1
+
+    def test_joblib_njobs_capped_by_trials(self, capsys):
+        """Test JoblibBackend never starts more jobs than there are trials"""
+        net = neymotin_2020_model(mesh_shape=(3, 3))
+        n_trials = 2
+        with JoblibBackend(n_jobs=n_trials + 1) as backend:
+            dpls = simulate_dipole(net, tstop=10.0, n_trials=n_trials)
+            # the cap only applies to this simulation, not to the backend
+            assert backend.n_jobs == n_trials + 1
+        assert len(dpls) == n_trials
+        assert f"distributing trials over {n_trials} jobs" in capsys.readouterr().out
 
     @requires_mpi4py
     @requires_psutil
     def test_mpi_nprocs(self):
-        """Test that MPIBackend can use more than 1 processor"""
+        """Test MPIBackend uses all non-hwthreaded cores minus one"""
+        [n_cores, _] = _determine_cores_hwthreading(
+            use_hwthreading_if_found=False, sensible_default_cores=False
+        )
         # if only 1 processor is available, then MPIBackend tests will not
         # be valid
+        assert n_cores > 1
+
         with MPIBackend() as backend:
-            assert backend.n_procs > 1
+            assert backend.n_procs == n_cores - 1
+            assert "--use-hwthread-cpus" not in " ".join(backend.mpi_cmd)
+            assert "--oversubscribe" not in " ".join(backend.mpi_cmd)
+
+        # Using every available core is not oversubscription
+        with MPIBackend(n_procs=n_cores) as backend:
+            assert backend.n_procs == n_cores
+            assert "--oversubscribe" not in " ".join(backend.mpi_cmd)
+
+    def test_mpi_nprocs_no_mpi4py(self, monkeypatch):
+        """Test that MPIBackend uses 1 process if mpi4py is not installed"""
+        monkeypatch.setattr(parallel_backends, "_has_mpi4py", lambda: False)
+        with pytest.warns(UserWarning, match="mpi4py not installed"):
+            backend = MPIBackend(n_procs=2)
+        assert backend.n_procs == 1
 
     @requires_mpi4py
     @requires_psutil
@@ -184,7 +247,7 @@ class TestParallelBackends:
             params, add_drives_from_params=True, mesh_shape=(3, 3)
         )
 
-        with MPIBackend() as backend:
+        with MPIBackend(n_procs=2) as backend:
             event = Event()
             # start background thread that will kill all MPIBackends
             # until event.set()

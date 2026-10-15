@@ -86,7 +86,7 @@ pip install -e ".[dev]"
 ```
 python -c "
 from hnn_core import neymotin_2020_model, MPIBackend, simulate_dipole
-with MPIBackend():
+with MPIBackend(n_procs=2):
     simulate_dipole(neymotin_2020_model(), tstop=20)
 print('--> SUCCESS: The test worked')
 "

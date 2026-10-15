@@ -640,30 +640,40 @@ class JoblibBackend(object):
     Parameters
     ----------
     n_jobs : int | None
-        The number of jobs to start in parallel. If None, then 1 trial will be
-        started without parallelism
+        The number of jobs to start in parallel. Defaults to 'None', in which
+        case it will use the number of available physical
+        (non-hardware-threaded) CPU cores minus one, so that one core is left
+        free for the OS. At least 1 job is always used. Note that detecting
+        the number of cores requires psutil; if it is not installed, 1 job
+        will be used. In all cases, if fewer trials are simulated than
+        'n_jobs', only one job per trial is started.
 
     Attributes
     ----------
     n_jobs : int
-        The number of jobs to start in parallel
+        The maximum number of jobs to start in parallel
     """
 
-    def __init__(self, n_jobs=1):
+    def __init__(self, n_jobs=None):
+        if n_jobs is None:
+            [n_jobs, _] = _determine_cores_hwthreading(
+                use_hwthreading_if_found=False,
+                sensible_default_cores=True,
+            )
         self.n_jobs = n_jobs
 
-    def _parallel_func(self, func):
-        if self.n_jobs != 1:
+    def _parallel_func(self, func, n_jobs):
+        if n_jobs != 1:
             try:
                 from joblib import Parallel, delayed
             except ImportError:
                 warn("joblib not installed. Cannot run in parallel.")
-                self.n_jobs = 1
-        if self.n_jobs == 1:
+                n_jobs = 1
+        if n_jobs == 1:
             my_func = func
             parallel = list
         else:
-            parallel = Parallel(self.n_jobs)
+            parallel = Parallel(n_jobs)
             my_func = delayed(func)
 
         return parallel, my_func
@@ -716,12 +726,16 @@ class JoblibBackend(object):
         dpl: list of Dipole
             The Dipole results from each simulation trial
         """
+        # Starting more jobs than there are trials only adds overhead. This is
+        # not stored in `self.n_jobs`, since the backend may be reused for a
+        # different number of trials.
+        n_jobs = min(self.n_jobs, n_trials)
         if net._verbose:
             print(
                 f"Joblib will run {n_trials} trial(s) in parallel by "
-                f"distributing trials over {self.n_jobs} jobs."
+                f"distributing trials over {n_jobs} jobs."
             )
-        parallel, myfunc = self._parallel_func(_simulate_single_trial)
+        parallel, myfunc = self._parallel_func(_simulate_single_trial, n_jobs)
         sim_data = parallel(
             myfunc(net, tstop, dt, trial_idx) for trial_idx in range(n_trials)
         )
@@ -738,7 +752,7 @@ class JoblibBackend(object):
 
 
 def _determine_cores_hwthreading(
-    use_hwthreading_if_found: bool = True,
+    use_hwthreading_if_found: bool = False,
     sensible_default_cores: bool = True,
 ) -> tuple[int, bool]:
     """Return the available core number and if hardware-threading is detected.
@@ -769,20 +783,18 @@ def _determine_cores_hwthreading(
     Hyperthreading are all terms used interchangeably, and are essentially
     equivalent.
 
+    Note that only psutil is required to detect the number of cores. Whether
+    mpi4py is installed is checked separately by `MPIBackend`.
+
     Parameters
     ----------
     use_hwthreading_if_found : bool
         Whether to detect support for hardware-threading. Defaults to
-        'True'. See above for description of behavior.
+        'False'. See above for description of behavior.
     sensible_default_cores : bool
-        Whether to decrease the number of cores returned in a "reasonable
-        manner", such that it balances speed with the user
-        experience. Specifically, this means that if the number of available
-        cores is greater than some threshold (default 12), the threshold number
-        of cores will be used instead of the total. If the number of cores is
-        greater than 2 but less than the threshold (default 12), then the
-        number of cores used will be subtracted by 1, so that there is a core
-        left unused for the sake of the OS. Defaults to 'True'.
+        Whether to subtract 1 from the number of cores returned, so that there
+        is a core left unused for the sake of the OS. At least 1 core is always
+        returned. Defaults to 'True'.
 
     Returns
     -------
@@ -792,9 +804,9 @@ def _determine_cores_hwthreading(
         Whether or not hardware-threading is present on some or all of the
         logical CPU cores.
     """
-    # Needs its own import checks since it may be called by the GUI before
-    # MPIBackend()
-    if _has_mpi4py() and _has_psutil():
+    # Needs its own import checks since it may be called by the GUI or
+    # JoblibBackend()
+    if _has_psutil():
         import platform
         import psutil
 
@@ -921,24 +933,12 @@ def _determine_cores_hwthreading(
             core_count = physical_core_count
             hwthreading_present = False
 
-        default_threshold = 12
         if sensible_default_cores:
-            if core_count > default_threshold:
-                core_count = default_threshold
-            elif core_count > 2:
-                # This way, sensible defaults still always returns multiple
-                # cores if multiple are available.
-                core_count = core_count - 1
+            core_count = max(core_count - 1, 1)
     else:
-        missing_packages = list()
-        if not _has_mpi4py():
-            missing_packages += ["mpi4py"]
-        if not _has_psutil():
-            missing_packages += ["psutil"]
-        missing_packages = " and ".join(missing_packages)
         warn(
-            f"{missing_packages} not installed. Will run on single "
-            "processor, with no hardware-threading."
+            "psutil not installed. Will run on single processor, with no "
+            "hardware-threading."
         )
         core_count = 1
         hwthreading_present = False
@@ -953,28 +953,26 @@ class MPIBackend(object):
     ----------
     n_procs : None | int
         The number of MPI processes requested by the user. Defaults to 'None',
-        in which case it will attempt to detect the number of cores (including
-        hardware-threads) and start parallel simulation over all of them.
+        in which case it will use the number of available physical
+        (non-hardware-threaded) CPU cores minus one, so that one core is left
+        free for the OS. See 'use_hwthreading_if_found' and
+        'sensible_default_cores' to change this behavior. If mpi4py is not
+        installed, 1 process will always be used.
     mpi_cmd : str
         The name of the mpi launcher executable. Will use 'mpiexec' (openmpi)
         by default.
     use_hwthreading_if_found : bool
         Specifies whether the class should try to detect hardware-threading,
         and, if it is found, then both use MPI's '--use-hwthread-cpus' option
-        and change the number of CPU cores used. Defaults to 'True'. Note that
+        and change the number of CPU cores used. Defaults to 'False'. Note that
         this is passed to an option of the same name in
         `_determine_cores_hwthreading`; see that function for more details.
     sensible_default_cores : bool
-        Whether to decrease the number of cores returned in a "reasonable
-        manner", such that it balances speed with the user
-        experience. Specifically, this means that if the number of available
-        cores is greater than some threshold (default 12), the threshold number
-        of cores will be used instead of the total. If the number of cores is
-        greater than 2 but less than the threshold (default 12), then the
-        number of cores used will be subtracted by 1, so that there is a core
-        left unused for the sake of the OS. Defaults to 'True'. Note that this
-        is passed to an option of the same name in
-        `_determine_cores_hwthreading`
+        Whether to subtract 1 from the number of available cores when
+        'n_procs' is 'None', so that there is a core left unused for the sake
+        of the OS. At least 1 core is always used. Defaults to 'True'. Note
+        that this is passed to an option of the same name in
+        `_determine_cores_hwthreading`.
     override_hwthreading_option : None | bool
         Force use of MPI's '--use-hwthread-cpus' support if changed from its
         default value of 'None'. By default, '--use-hwthread-cpus' is only
@@ -1014,7 +1012,7 @@ class MPIBackend(object):
         self,
         n_procs: Union[None, int] = None,
         mpi_cmd: str = "mpiexec",
-        use_hwthreading_if_found: bool = True,
+        use_hwthreading_if_found: bool = False,
         sensible_default_cores: bool = True,
         override_hwthreading_option: Union[None, bool] = None,
         override_oversubscribe_option: Union[None, bool] = None,
@@ -1025,15 +1023,31 @@ class MPIBackend(object):
         self.proc_queue = Queue()
         self.verbose = verbose
 
-        # Check of psutil and mpi4py import has been moved into this function,
-        # since this function is called by GUI before MPIBackend()
-        # instantiated.
-        n_available_cores, hwthreading_available = _determine_cores_hwthreading(
-            use_hwthreading_if_found=use_hwthreading_if_found,
-            sensible_default_cores=sensible_default_cores,
-        )
-
-        self.n_procs = n_available_cores if (n_procs is None) else n_procs
+        # The check for psutil is inside `_determine_cores_hwthreading`, since
+        # that function is also called by the GUI and JoblibBackend().
+        if _has_mpi4py():
+            # Oversubscription (see below) is checked against all available
+            # cores, while 'sensible_default_cores' only affects the default
+            # number of processes.
+            n_available_cores, hwthreading_available = _determine_cores_hwthreading(
+                use_hwthreading_if_found=use_hwthreading_if_found,
+                sensible_default_cores=False,
+            )
+            if n_procs is None:
+                [n_procs, _] = _determine_cores_hwthreading(
+                    use_hwthreading_if_found=use_hwthreading_if_found,
+                    sensible_default_cores=sensible_default_cores,
+                )
+            self.n_procs = n_procs
+        else:
+            # MPI cannot run without mpi4py, so always transfer the simulation
+            # to JoblibBackend (see `MPIBackend.simulate`).
+            warn(
+                "mpi4py not installed. Will run on single processor, with no "
+                "hardware-threading."
+            )
+            n_available_cores, hwthreading_available = 1, False
+            self.n_procs = 1
 
         # Begin constructing the main command.
         self.mpi_cmd = mpi_cmd

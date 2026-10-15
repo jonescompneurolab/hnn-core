@@ -65,6 +65,16 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ### Public API Changes
 
+- {class}`~hnn_core.parallel_backends.MPIBackend` and
+  {class}`~hnn_core.parallel_backends.JoblibBackend` now both default to using the
+  number of available physical (non-hardware-threaded) CPU cores minus one.
+  Previously, `MPIBackend` included hardware-threads and capped the number at 12, and
+  `JoblibBackend` used a single job. Accordingly, the default of `MPIBackend`'s
+  `use_hwthreading_if_found` is now `False`, and `sensible_default_cores` now only
+  subtracts one core. You can still pass `n_procs` or `n_jobs` explicitly. Also,
+  `JoblibBackend` now never starts more jobs than there are trials,
+  by [Austin E. Soplata][].
+
 ### People who contributed to this release:
 
 - [Vaishnavi Baghel][]
@@ -72,6 +82,7 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 - [Shivansh Bhageria][]
 - [Camilo Diaz][]
 - [William Kang][]
+- [Austin E. Soplata][]
 
 ### Changelog
 
