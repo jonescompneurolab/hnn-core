@@ -1000,14 +1000,14 @@ def fix_use_cached_sims(_base_simulation_cached, request):
     own deep copy, so tests may modify the returned objects.
 
     To restrict a test to a subset of combinations, override the parameters using
-    "indirect parametrization" (aka ask AI for help), e.g.
+    "indirect parametrization", as illustrated in the example below:
 
     ```
     @pytest.mark.parametrize(
         "fix_use_cached_sims",
         [
-            (net_model_name, "yes_spikes")
-            for net_model_name in ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+            ("fix_net_neymotin_2020", "yes_spikes")
+            ("fix_net_duecker_ET", "yes_spikes")
         ],
         ids=lambda param: f"{param[0]}-{param[1]}",
         indirect=True,
