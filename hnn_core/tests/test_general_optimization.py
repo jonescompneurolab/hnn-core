@@ -31,19 +31,20 @@ def test_optimize_evoked(solver, obj_fun, fix_net_model, request):
 
     # simulate a dipole to establish ground-truth drive parameters
     net_model = request.getfixturevalue(fix_net_model)
-    net_orig, inh_name = net_model(reduced=True)
+    net_orig, net_customizations = net_model(reduced=True)
+    inh_name_suffix = net_customizations["inh_name_suffix"]
 
     mu_orig = 2.0
     weights_ampa = {
-        f"L2_{inh_name}": 0.5,
+        f"L2_{inh_name_suffix}": 0.5,
         "L2_pyramidal": 0.5,
-        f"L5_{inh_name}": 0.5,
+        f"L5_{inh_name_suffix}": 0.5,
         "L5_pyramidal": 0.5,
     }
     synaptic_delays = {
-        f"L2_{inh_name}": 0.1,
+        f"L2_{inh_name_suffix}": 0.1,
         "L2_pyramidal": 0.1,
-        f"L5_{inh_name}": 1.0,
+        f"L5_{inh_name_suffix}": 1.0,
         "L5_pyramidal": 1.0,
     }
     net_orig.add_evoked_drive(
@@ -62,15 +63,15 @@ def test_optimize_evoked(solver, obj_fun, fix_net_model, request):
 
     def set_params(net_offset, params):
         weights_ampa = {
-            f"L2_{inh_name}": 0.5,
+            f"L2_{inh_name_suffix}": 0.5,
             "L2_pyramidal": 0.5,
-            f"L5_{inh_name}": 0.5,
+            f"L5_{inh_name_suffix}": 0.5,
             "L5_pyramidal": 0.5,
         }
         synaptic_delays = {
-            f"L2_{inh_name}": 0.1,
+            f"L2_{inh_name_suffix}": 0.1,
             "L2_pyramidal": 0.1,
-            f"L5_{inh_name}": 1.0,
+            f"L5_{inh_name_suffix}": 1.0,
             "L5_pyramidal": 1.0,
         }
         net_offset.add_evoked_drive(
@@ -769,19 +770,20 @@ def test_optimize_options_baseline_correction(
 
     # simulate a dipole to establish ground-truth drive parameters
     net_model = request.getfixturevalue(fix_net_model)
-    net_orig, inh_name = net_model(reduced=True)
+    net_orig, net_customizations = net_model(reduced=True)
+    inh_name_suffix = net_customizations["inh_name_suffix"]
 
     mu_orig = 2.0
     weights_ampa = {
-        f"L2_{inh_name}": 0.5,
+        f"L2_{inh_name_suffix}": 0.5,
         "L2_pyramidal": 0.5,
-        f"L5_{inh_name}": 0.5,
+        f"L5_{inh_name_suffix}": 0.5,
         "L5_pyramidal": 0.5,
     }
     synaptic_delays = {
-        f"L2_{inh_name}": 0.1,
+        f"L2_{inh_name_suffix}": 0.1,
         "L2_pyramidal": 0.1,
-        f"L5_{inh_name}": 1.0,
+        f"L5_{inh_name_suffix}": 1.0,
         "L5_pyramidal": 1.0,
     }
     net_orig.add_evoked_drive(
@@ -796,19 +798,20 @@ def test_optimize_options_baseline_correction(
     dpl_orig = simulate_dipole(net_orig, tstop=tstop, dt=0.5, n_trials=n_trials)[0]
 
     # define set_params function and constraints
-    net_offset, inh_name = net_model(reduced=True)
+    net_offset, net_customizations = net_model(reduced=True)
+    inh_name_suffix = net_customizations["inh_name_suffix"]
 
     def set_params(net_offset, params):
         weights_ampa = {
-            f"L2_{inh_name}": 0.5,
+            f"L2_{inh_name_suffix}": 0.5,
             "L2_pyramidal": 0.5,
-            f"L5_{inh_name}": 0.5,
+            f"L5_{inh_name_suffix}": 0.5,
             "L5_pyramidal": 0.5,
         }
         synaptic_delays = {
-            f"L2_{inh_name}": 0.1,
+            f"L2_{inh_name_suffix}": 0.1,
             "L2_pyramidal": 0.1,
-            f"L5_{inh_name}": 1.0,
+            f"L5_{inh_name_suffix}": 1.0,
             "L5_pyramidal": 1.0,
         }
         net_offset.add_evoked_drive(

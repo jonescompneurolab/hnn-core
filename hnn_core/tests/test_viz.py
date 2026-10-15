@@ -145,7 +145,8 @@ class TestCellResponsePlotters:
 
     def test_spikes_raster_colors(self, fix_use_cached_sims):
         """Plotting with different color arguments"""
-        net, _, inh_name, spiking = fix_use_cached_sims
+        net, _, net_customizations, spiking = fix_use_cached_sims
+        inh_name_suffix = net_customizations["inh_name_suffix"]
 
         def _get_line_hex_colors(fig):
             colors = [
@@ -197,9 +198,9 @@ class TestCellResponsePlotters:
         # Colors as dict mapping
         if spiking == "yes_spikes":
             dict_mapping = {
-                f"L2_{inh_name}": "#daf7a6",
+                f"L2_{inh_name_suffix}": "#daf7a6",
                 "L2_pyramidal": "#ffc300",
-                f"L5_{inh_name}": "#ff5733",
+                f"L5_{inh_name_suffix}": "#ff5733",
                 "L5_pyramidal": "#c70039",
             }
         elif spiking == "no_spikes":
@@ -241,7 +242,8 @@ class TestCellResponsePlotters:
 
     def test_firing_rate_time_colors(self, fix_use_cached_sims):
         """Plotting firing rates over time with different color arguments"""
-        net, _, inh_name, _ = fix_use_cached_sims
+        net, _, net_customizations, _ = fix_use_cached_sims
+        inh_name_suffix = net_customizations["inh_name_suffix"]
         cell_response = net.cell_response
         cell_types = cell_response._cell_type_names
 
@@ -286,9 +288,9 @@ class TestCellResponsePlotters:
 
         # Colors as a dict mapping every cell type
         dict_mapping = {
-            f"L2_{inh_name}": "#daf7a6",
+            f"L2_{inh_name_suffix}": "#daf7a6",
             "L2_pyramidal": "#ffc300",
-            f"L5_{inh_name}": "#ff5733",
+            f"L5_{inh_name_suffix}": "#ff5733",
             "L5_pyramidal": "#c70039",
         }
         axes = cell_response.plot_firing_rate_time(
@@ -513,7 +515,8 @@ class TestCellResponsePlotters:
     # # TODO AES: also currently broken due to a bug with lack of detection of when https://github.com/satviksaluja/hnn-core/blob/ce7fcb9c87c8fca606068ac38691d2712deb841d/hnn_core/viz.py#L804 plot_spikes_raster cell_type_gids is empty
     # def test_spikes_from_read_spikes(self, fix_use_cached_sims):
     #     """Test hist and raster plots on a CellResponse loaded via read_spikes"""
-    #     net, dpls, inh_name, _ = fix_use_cached_sims
+    #     net, dpls, net_customizations, _ = fix_use_cached_sims
+    #     inh_name_suffix = net_customizations["inh_name_suffix"]
     #     with tempfile.TemporaryDirectory() as tmp_dir_name:
     #         net.cell_response.write(
     #             op.join(tmp_dir_name, f"spk_{net._model_variant}_%d.txt")
@@ -521,9 +524,9 @@ class TestCellResponsePlotters:
     #         cell_response = read_spikes(op.join(tmp_dir_name, "spk_*.txt"))
 
     #     cell_type_names = [
-    #         f"L2_{inh_name}",
+    #         f"L2_{inh_name_suffix}",
     #         "L2_pyramidal",
-    #         f"L5_{inh_name}",
+    #         f"L5_{inh_name_suffix}",
     #         "L5_pyramidal",
     #     ]
     #     n_cell_spikes = sum(
@@ -674,7 +677,8 @@ def _fake_click(fig, ax, point, button=1):
 def test_network_visualization(fix_net_model, request):
     """Test network visualisations."""
     net_model = request.getfixturevalue(fix_net_model)
-    net, inh_name = net_model(reduced=True)
+    net, net_customizations = net_model(reduced=True)
+    inh_name_suffix = net_customizations["inh_name_suffix"]
     plot_cells(net)
     ax = net.cell_types["L2_pyramidal"]["cell_object"].plot_morphology()
     assert len(ax.lines) == 8
@@ -714,7 +718,7 @@ def test_network_visualization(fix_net_model, request):
         section_color = {sect_name: f"C{idx}" for idx, sect_name in enumerate(sections)}
         cell_type["cell_object"].plot_morphology(color=section_color)
 
-    cell_type = net.cell_types[f"L2_{inh_name}"]
+    cell_type = net.cell_types[f"L2_{inh_name_suffix}"]
     with pytest.raises(ValueError):
         cell_type["cell_object"].plot_morphology(color="z")
     with pytest.raises(ValueError):
@@ -755,7 +759,7 @@ def test_network_visualization(fix_net_model, request):
     conn_idx = len(net.connectivity) - 1
     net.add_connection(
         net.gid_ranges["L2_pyramidal"][::2],
-        f"L5_{inh_name}",
+        f"L5_{inh_name_suffix}",
         "soma",
         "ampa",
         0.00025,
@@ -808,14 +812,23 @@ def test_plot_cells_default_markers(fix_net_neymotin_2020):
 def test_drive_strength(fix_net_model, request):
     """Adds empty external drives to check there strength across each cell types"""
     net_model = request.getfixturevalue(fix_net_model)
-    net, inh_name = net_model(reduced=True)
+    net, net_customizations = net_model(reduced=True)
+    inh_name_suffix = net_customizations["inh_name_suffix"]
 
-    weights_ampa = {"L2_pyramidal": 0.0, "L5_pyramidal": 0.0, f"L2_{inh_name}": 0.0}
-    synaptic_delays = {"L2_pyramidal": 0.0, "L5_pyramidal": 0.0, f"L2_{inh_name}": 0.0}
+    weights_ampa = {
+        "L2_pyramidal": 0.0,
+        "L5_pyramidal": 0.0,
+        f"L2_{inh_name_suffix}": 0.0,
+    }
+    synaptic_delays = {
+        "L2_pyramidal": 0.0,
+        "L5_pyramidal": 0.0,
+        f"L2_{inh_name_suffix}": 0.0,
+    }
     rate_constant = {
         "L2_pyramidal": 140.0,
         "L5_pyramidal": 40.0,
-        f"L2_{inh_name}": 100.0,
+        f"L2_{inh_name_suffix}": 100.0,
     }
 
     net.add_poisson_drive(

@@ -622,17 +622,22 @@ def test_model_variant_matches_network(fix_default_params):
 
 
 @pytest.mark.parametrize(
-    "network_model, short_inh_name",
+    "network_model, fix_net_model",
     [
-        (neymotin_2020_model, "Basket"),
-        (law_2021_model, "Basket"),
-        (calcium_model, "Basket"),
-        (duecker_ET_model, "Inh"),  # codespell:ignore
+        (neymotin_2020_model, "fix_net_neymotin_2020"),
+        (law_2021_model, "fix_net_law_2021"),
+        (calcium_model, "fix_net_calcium"),
+        (duecker_ET_model, "fix_net_duecker_ET"),
     ],
 )
-def test_network_models_cell_params(network_model, short_inh_name, fix_default_params):
+def test_network_models_cell_params(
+    network_model, fix_net_model, fix_default_params, request
+):
     """Test that the network models check the cell types defined in params"""
     mesh_shape = (3, 3)
+    net_model = request.getfixturevalue(fix_net_model)
+    _, net_customizations = net_model(reduced=True)
+    short_inh_name_suffix = net_customizations["short_inh_name_suffix"]
 
     if network_model == duecker_ET_model:
         duecker_params_fname = hnn_core_root / "param" / "default_duecker_ET.json"
@@ -642,7 +647,12 @@ def test_network_models_cell_params(network_model, short_inh_name, fix_default_p
 
     # law_2021_model and calcium_model inherit the check from the
     # neymotin_2020_model network they are built on
-    for cell_name in ["L2Pyr", "L5Pyr", f"L2{short_inh_name}", f"L5{short_inh_name}"]:
+    for cell_name in [
+        "L2Pyr",
+        "L5Pyr",
+        f"L2{short_inh_name_suffix}",
+        f"L5{short_inh_name_suffix}",
+    ]:
         params = default_params.copy()
         for key in [key for key in params if cell_name in key]:
             del params[key]
@@ -988,8 +998,9 @@ def test_network_drives(fix_default_params, fix_net_model, request):
 
     params = fix_default_params
     net_model = request.getfixturevalue(fix_net_model)
-    net, inh_name = net_model()
-    short_inh_name = "Inh" if inh_name == "inhibitory" else "Basket"  # codespell:ignore
+    net, net_customizations = net_model()
+    inh_name_suffix = net_customizations["inh_name_suffix"]
+    short_inh_name_suffix = net_customizations["short_inh_name_suffix"]
 
     # add all drives explicitly and ensure that the expected number of drive
     # cells get instantiated for each case
@@ -1000,13 +1011,13 @@ def test_network_drives(fix_default_params, fix_net_model, request):
     n_drive_cells_list.append(n_drive_cells)
     drive_weights = dict()
     drive_weights["evdist1"] = {
-        f"L2_{inh_name}": 0.01,
+        f"L2_{inh_name_suffix}": 0.01,
         "L2_pyramidal": 0.02,
         "L5_pyramidal": 0.03,
     }
     drive_delays = dict()
     drive_delays["evdist1"] = {
-        f"L2_{inh_name}": 0.1,
+        f"L2_{inh_name_suffix}": 0.1,
         "L2_pyramidal": 0.2,
         "L5_pyramidal": 0.3,
     }
@@ -1027,15 +1038,15 @@ def test_network_drives(fix_default_params, fix_net_model, request):
     n_drive_cells = "n_cells"
     n_drive_cells_list.append(n_drive_cells)
     drive_weights["evprox1"] = {
-        f"L2_{inh_name}": 0.04,
+        f"L2_{inh_name_suffix}": 0.04,
         "L2_pyramidal": 0.05,
-        f"L5_{inh_name}": 0.06,
+        f"L5_{inh_name_suffix}": 0.06,
         "L5_pyramidal": 0.07,
     }
     drive_delays["evprox1"] = {
-        f"L2_{inh_name}": 0.4,
+        f"L2_{inh_name_suffix}": 0.4,
         "L2_pyramidal": 0.5,
-        f"L5_{inh_name}": 0.6,
+        f"L5_{inh_name_suffix}": 0.6,
         "L5_pyramidal": 0.7,
     }
     net.add_evoked_drive(
@@ -1055,15 +1066,15 @@ def test_network_drives(fix_default_params, fix_net_model, request):
     n_drive_cells = "n_cells"
     n_drive_cells_list.append(n_drive_cells)
     drive_weights["evprox2"] = {
-        f"L2_{inh_name}": 0.08,
+        f"L2_{inh_name_suffix}": 0.08,
         "L2_pyramidal": 0.09,
-        f"L5_{inh_name}": 0.1,
+        f"L5_{inh_name_suffix}": 0.1,
         "L5_pyramidal": 0.11,
     }
     drive_delays["evprox2"] = {
-        f"L2_{inh_name}": 0.8,
+        f"L2_{inh_name_suffix}": 0.8,
         "L2_pyramidal": 0.9,
-        f"L5_{inh_name}": 1.0,
+        f"L5_{inh_name_suffix}": 1.0,
         "L5_pyramidal": 1.1,
     }
     net.add_evoked_drive(
@@ -1084,15 +1095,15 @@ def test_network_drives(fix_default_params, fix_net_model, request):
     n_drive_cells = 10
     n_drive_cells_list.append(n_drive_cells)
     drive_weights["bursty1"] = {
-        f"L2_{inh_name}": 0.12,
+        f"L2_{inh_name_suffix}": 0.12,
         "L2_pyramidal": 0.13,
-        f"L5_{inh_name}": 0.14,
+        f"L5_{inh_name_suffix}": 0.14,
         "L5_pyramidal": 0.15,
     }
     drive_delays["bursty1"] = {
-        f"L2_{inh_name}": 1.2,
+        f"L2_{inh_name_suffix}": 1.2,
         "L2_pyramidal": 1.3,
-        f"L5_{inh_name}": 1.4,
+        f"L5_{inh_name_suffix}": 1.4,
         "L5_pyramidal": 1.5,
     }
     net.add_bursty_drive(
@@ -1117,12 +1128,12 @@ def test_network_drives(fix_default_params, fix_net_model, request):
     n_drive_cells = "n_cells"
     n_drive_cells_list.append(n_drive_cells)
     drive_weights["poisson1"] = {
-        f"L2_{inh_name}": 0.16,
+        f"L2_{inh_name_suffix}": 0.16,
         "L2_pyramidal": 0.17,
         "L5_pyramidal": 0.18,
     }
     drive_delays["poisson1"] = {
-        f"L2_{inh_name}": 1.6,
+        f"L2_{inh_name_suffix}": 1.6,
         "L2_pyramidal": 1.7,
         "L5_pyramidal": 1.8,
     }
@@ -1266,9 +1277,9 @@ def test_network_drives(fix_default_params, fix_net_model, request):
     with pytest.raises(TypeError, match="'times' is an np.ndarray of simulation times"):
         _ = CellResponse(
             cell_type_names=[
-                f"L2_{inh_name}",
+                f"L2_{inh_name_suffix}",
                 "L2_pyramidal",
-                f"L5_{inh_name}",
+                f"L5_{inh_name_suffix}",
                 "L5_pyramidal",
             ],
             cell_type_metadata=None,
@@ -1279,13 +1290,13 @@ def test_network_drives(fix_default_params, fix_net_model, request):
     # of artificial cells assuming legacy_mode=False (i.e., dependent on
     # drive targets).
     prox_targets = (
-        len(net.gid_ranges[f"L2_{inh_name}"])
+        len(net.gid_ranges[f"L2_{inh_name_suffix}"])
         + len(net.gid_ranges["L2_pyramidal"])
-        + len(net.gid_ranges[f"L5_{inh_name}"])
+        + len(net.gid_ranges[f"L5_{inh_name_suffix}"])
         + len(net.gid_ranges["L5_pyramidal"])
     )
     dist_targets = (
-        len(net.gid_ranges[f"L2_{inh_name}"])
+        len(net.gid_ranges[f"L2_{inh_name_suffix}"])
         + len(net.gid_ranges["L2_pyramidal"])
         + len(net.gid_ranges["L5_pyramidal"])
     )
@@ -1308,7 +1319,7 @@ def test_network_drives(fix_default_params, fix_net_model, request):
 
     # check that Network drive connectivity transfers to NetworkBuilder
     n_pyr = len(net.gid_ranges["L2_pyramidal"])
-    n_inh = len(net.gid_ranges[f"L2_{inh_name}"])
+    n_inh = len(net.gid_ranges[f"L2_{inh_name_suffix}"])
 
     # Check bursty drives which use cell_specific=False
     assert "bursty1_L2Pyr_ampa" in network_builder.ncs
@@ -1319,10 +1330,13 @@ def test_network_drives(fix_default_params, fix_net_model, request):
     assert nc.threshold == params["threshold"]
 
     # Check evoked drives which use cell_specific=True
-    assert f"evdist1_L2{short_inh_name}_nmda" in network_builder.ncs
+    assert f"evdist1_L2{short_inh_name_suffix}_nmda" in network_builder.ncs
     n_connections = n_inh  # 1 synapse / cell
-    assert len(network_builder.ncs[f"evdist1_L2{short_inh_name}_nmda"]) == n_connections
-    nc = network_builder.ncs[f"evdist1_L2{short_inh_name}_nmda"][0]
+    assert (
+        len(network_builder.ncs[f"evdist1_L2{short_inh_name_suffix}_nmda"])
+        == n_connections
+    )
+    nc = network_builder.ncs[f"evdist1_L2{short_inh_name_suffix}_nmda"][0]
     assert nc.threshold == params["threshold"]
 
 
@@ -1673,8 +1687,9 @@ def test_network_connectivity(base_network):
 def test_add_cell_type(fix_net_model, fix_default_params, request):
     """Test adding a new cell type."""
     net_model = request.getfixturevalue(fix_net_model)
-    net, inh_name = net_model()
-    short_inh_name = "Inh" if inh_name == "inhibitory" else "Basket"  # codespell:ignore
+    net, net_customizations = net_model()
+    inh_name_suffix = net_customizations["inh_name_suffix"]
+    short_inh_name_suffix = net_customizations["short_inh_name_suffix"]
     params = fix_default_params
     # instantiate drive events for NetworkBuilder
     net._instantiate_drives(tstop=params["tstop"], n_trials=params["N_trials"])
@@ -1683,7 +1698,7 @@ def test_add_cell_type(fix_net_model, fix_default_params, request):
     pos = [(0, idx, 0) for idx in range(10)]
     tau1 = 0.6
 
-    new_cell = net.cell_types[f"L2_{inh_name}"].copy()
+    new_cell = net.cell_types[f"L2_{inh_name_suffix}"].copy()
     net._add_cell_type("new_type", pos=pos, cell_template=new_cell)
     assert "new_type" in net.cell_types.keys()
     net.cell_types["new_type"]["cell_object"].synapses["gabaa"]["tau1"] = tau1
@@ -1691,7 +1706,7 @@ def test_add_cell_type(fix_net_model, fix_default_params, request):
     n_new_type = len(net.gid_ranges["new_type"])
     assert n_new_type == len(pos)
     net.add_connection(
-        f"L2_{inh_name}",
+        f"L2_{inh_name_suffix}",
         "new_type",
         loc="proximal",
         receptor="gabaa",
@@ -1702,12 +1717,13 @@ def test_add_cell_type(fix_net_model, fix_default_params, request):
 
     network_builder = NetworkBuilder(net)
     assert net._n_cells == n_total_cells + len(pos)
-    n_inh = len(net.gid_ranges[f"L2_{inh_name}"])
+    n_inh = len(net.gid_ranges[f"L2_{inh_name_suffix}"])
     n_connections = n_inh * n_new_type
     assert (
-        len(network_builder.ncs[f"L2{short_inh_name}_new_type_gabaa"]) == n_connections
+        len(network_builder.ncs[f"L2{short_inh_name_suffix}_new_type_gabaa"])
+        == n_connections
     )
-    nc = network_builder.ncs[f"L2{short_inh_name}_new_type_gabaa"][0]
+    nc = network_builder.ncs[f"L2{short_inh_name_suffix}_new_type_gabaa"][0]
     assert nc.syn().tau1 == tau1
 
 
@@ -1717,21 +1733,23 @@ def test_add_cell_type(fix_net_model, fix_default_params, request):
 def test_tonic_biases_non_gid(fix_net_model, request):
     """Test that tonic biases work and simulate correctly (excluding gid argument)."""
     net_model = request.getfixturevalue(fix_net_model)
-    net, inh_name = net_model()
+    net, net_customizations = net_model()
+    inh_name_suffix = net_customizations["inh_name_suffix"]
     tonic_bias_1 = {"L2_pyramidal": 1.0}
     net.add_tonic_bias(amplitude=tonic_bias_1, t0=0.0, tstop=4.0)
     assert net.external_biases["tonic"]["L2_pyramidal"] is not None
 
     # Reset biases to create them anew
     net.external_biases = dict()
-    tonic_bias_2 = {"L2_pyramidal": 1.0, f"L5_{inh_name}": 0.5}
+    tonic_bias_2 = {"L2_pyramidal": 1.0, f"L5_{inh_name_suffix}": 0.5}
 
     net.add_tonic_bias(amplitude=tonic_bias_2, bias_name="tonic_2", t0=100)
     assert "tonic_2" in net.external_biases
     assert np.isclose(net.external_biases["tonic_2"]["L2_pyramidal"]["t0"], 100)
 
     # Taken from first example of `Network.add_tonic_bias` docstring
-    net, inh_name = net_model()
+    net, net_customizations = net_model()
+    inh_name_suffix = net_customizations["inh_name_suffix"]
     net.add_tonic_bias(amplitude={"L2_pyramidal": 1.0, "L5_pyramidal": 2.0})
     assert np.isclose(net.external_biases["tonic"]["L2_pyramidal"]["amplitude"], 1.0)
     assert np.isclose(net.external_biases["tonic"]["L5_pyramidal"]["amplitude"], 2.0)
@@ -1752,9 +1770,10 @@ def test_tonic_biases_non_gid(fix_net_model, request):
     )
 
     # Reset and test that remaining non-gid arguments work as expected
-    net, inh_name = net_model()
+    net, net_customizations = net_model()
+    inh_name_suffix = net_customizations["inh_name_suffix"]
     net.add_tonic_bias(
-        amplitude={f"L2_{inh_name}": 1.0, "L5_pyramidal": 2.0},
+        amplitude={f"L2_{inh_name_suffix}": 1.0, "L5_pyramidal": 2.0},
         bias_name="tonic_soma",
         section="soma",
         t0=0.0,
@@ -1762,23 +1781,27 @@ def test_tonic_biases_non_gid(fix_net_model, request):
     )
     assert "tonic_soma" in net.external_biases
     assert np.isclose(
-        net.external_biases["tonic_soma"][f"L2_{inh_name}"]["amplitude"], 1.0
+        net.external_biases["tonic_soma"][f"L2_{inh_name_suffix}"]["amplitude"], 1.0
     )
     assert np.isclose(
         net.external_biases["tonic_soma"]["L5_pyramidal"]["amplitude"], 2.0
     )
-    assert net.external_biases["tonic_soma"][f"L2_{inh_name}"]["gid"] == list(
-        net.gid_ranges[f"L2_{inh_name}"]
+    assert net.external_biases["tonic_soma"][f"L2_{inh_name_suffix}"]["gid"] == list(
+        net.gid_ranges[f"L2_{inh_name_suffix}"]
     )
     assert net.external_biases["tonic_soma"]["L5_pyramidal"]["gid"] == list(
         net.gid_ranges["L5_pyramidal"]
     )
-    assert net.external_biases["tonic_soma"][f"L2_{inh_name}"]["section"] == "soma"
+    assert (
+        net.external_biases["tonic_soma"][f"L2_{inh_name_suffix}"]["section"] == "soma"
+    )
     assert net.external_biases["tonic_soma"]["L5_pyramidal"]["section"] == "soma"
-    assert np.isclose(net.external_biases["tonic_soma"][f"L2_{inh_name}"]["t0"], 0.0)
+    assert np.isclose(
+        net.external_biases["tonic_soma"][f"L2_{inh_name_suffix}"]["t0"], 0.0
+    )
     assert np.isclose(net.external_biases["tonic_soma"]["L5_pyramidal"]["t0"], 0.0)
     assert np.isclose(
-        net.external_biases["tonic_soma"][f"L2_{inh_name}"]["tstop"], 10.0
+        net.external_biases["tonic_soma"][f"L2_{inh_name_suffix}"]["tstop"], 10.0
     )
     assert np.isclose(net.external_biases["tonic_soma"]["L5_pyramidal"]["tstop"], 10.0)
 
@@ -2389,12 +2412,13 @@ def test_network_models_mesh(fix_net_model, request):
 def test_set_global_synaptic_gains(fix_net_model, request):
     """Test synaptic gains setter"""
     net_model = request.getfixturevalue(fix_net_model)
-    net, inh_name = net_model()
-    short_inh_name = "Inh" if inh_name == "inhibitory" else "Basket"  # codespell:ignore
+    net, net_customizations = net_model()
+    inh_name_suffix = net_customizations["inh_name_suffix"]
+    short_inh_name_suffix = net_customizations["short_inh_name_suffix"]
     nb_base = NetworkBuilder(net)
 
     e_cell_names = ["L2_pyramidal", "L5_pyramidal"]
-    i_cell_names = [f"L2_{inh_name}", f"L5_{inh_name}"]
+    i_cell_names = [f"L2_{inh_name_suffix}", f"L5_{inh_name_suffix}"]
 
     # Type check on gains
     arg_names = ["e_e", "e_i", "i_e", "i_i"]
@@ -2444,18 +2468,22 @@ def test_set_global_synaptic_gains(fix_net_model, request):
     nb_updated = NetworkBuilder(net)
     # i_e check
     assert (
-        _get_weight(nb_updated, f"L2{short_inh_name}_L2Pyr_gabaa")
-        / _get_weight(nb_base, f"L2{short_inh_name}_L2Pyr_gabaa")
+        _get_weight(nb_updated, f"L2{short_inh_name_suffix}_L2Pyr_gabaa")
+        / _get_weight(nb_base, f"L2{short_inh_name_suffix}_L2Pyr_gabaa")
     ) == 0.5
     # i_i check
     assert (
-        _get_weight(nb_updated, f"L2{short_inh_name}_L2{short_inh_name}_gabaa")
-        / _get_weight(nb_base, f"L2{short_inh_name}_L2{short_inh_name}_gabaa")
+        _get_weight(
+            nb_updated, f"L2{short_inh_name_suffix}_L2{short_inh_name_suffix}_gabaa"
+        )
+        / _get_weight(
+            nb_base, f"L2{short_inh_name_suffix}_L2{short_inh_name_suffix}_gabaa"
+        )
     ) == 0.25
     # Unaltered check
     assert (
-        _get_weight(nb_updated, f"L2Pyr_L5{short_inh_name}_ampa")
-        / _get_weight(nb_base, f"L2Pyr_L5{short_inh_name}_ampa")
+        _get_weight(nb_updated, f"L2Pyr_L5{short_inh_name_suffix}_ampa")
+        / _get_weight(nb_base, f"L2Pyr_L5{short_inh_name_suffix}_ampa")
     ) == 1
 
     # Verify network can be simulated with very heterogeneous gains
@@ -3004,11 +3032,12 @@ def test_offline_spike_replay(fix_net_model, request):
 def test_filter_cell_types(fix_net_model, request):
     """Test filtering of cell types based on cell_metadata."""
     net_model = request.getfixturevalue(fix_net_model)
-    net, inh_name = net_model()
+    net, net_customizations = net_model()
+    inh_name_suffix = net_customizations["inh_name_suffix"]
 
     # Test filtering by a single attribute: layer
     filtered_types = net.filter_cell_types(layer="5")
-    assert sorted(filtered_types) == [f"L5_{inh_name}", "L5_pyramidal"]
+    assert sorted(filtered_types) == [f"L5_{inh_name_suffix}", "L5_pyramidal"]
 
     # Test filtering by multiple attributes: layer and electro_type
     filtered_types = net.filter_cell_types(layer="2", electro_type="excitatory")
@@ -3066,13 +3095,14 @@ def test_get_global_synaptic_gains(fix_net_neymotin_2020):
 def test_add_connection_threshold_and_gain(fix_net_model, request):
     """Test adding connections with custom threshold and gain parameters."""
     net_model = request.getfixturevalue(fix_net_model)
-    net, inh_name = net_model()
+    net, net_customizations = net_model()
+    inh_name_suffix = net_customizations["inh_name_suffix"]
 
     # Add connection with custom threshold
     custom_threshold = 15.0
     net.add_connection(
         src_gids="L2_pyramidal",
-        target_gids=f"L2_{inh_name}",
+        target_gids=f"L2_{inh_name_suffix}",
         loc="soma",
         receptor="ampa",
         weight=1e-3,
@@ -3083,7 +3113,10 @@ def test_add_connection_threshold_and_gain(fix_net_model, request):
 
     # Check that the threshold was set correctly
     conn_idx = pick_connection(
-        net, src_gids="L2_pyramidal", target_gids=f"L2_{inh_name}", receptor="ampa"
+        net,
+        src_gids="L2_pyramidal",
+        target_gids=f"L2_{inh_name_suffix}",
+        receptor="ampa",
     )[-1]
     assert net.connectivity[conn_idx]["nc_dict"]["threshold"] == custom_threshold
 
@@ -3091,7 +3124,7 @@ def test_add_connection_threshold_and_gain(fix_net_model, request):
     custom_gain = 2.5
     net.add_connection(
         src_gids="L5_pyramidal",
-        target_gids=f"L5_{inh_name}",
+        target_gids=f"L5_{inh_name_suffix}",
         loc="soma",
         receptor="ampa",
         weight=1e-3,
@@ -3102,13 +3135,16 @@ def test_add_connection_threshold_and_gain(fix_net_model, request):
 
     # Check that the gain was set correctly
     conn_idx = pick_connection(
-        net, src_gids="L5_pyramidal", target_gids=f"L5_{inh_name}", receptor="ampa"
+        net,
+        src_gids="L5_pyramidal",
+        target_gids=f"L5_{inh_name_suffix}",
+        receptor="ampa",
     )[-1]
     assert net.connectivity[conn_idx]["nc_dict"]["gain"] == custom_gain
 
     # Add connection with both custom threshold and gain
     net.add_connection(
-        src_gids=f"L2_{inh_name}",
+        src_gids=f"L2_{inh_name_suffix}",
         target_gids="L2_pyramidal",
         loc="soma",
         receptor="gabaa",
@@ -3121,14 +3157,17 @@ def test_add_connection_threshold_and_gain(fix_net_model, request):
 
     # Check that both were set correctly
     conn_idx = pick_connection(
-        net, src_gids=f"L2_{inh_name}", target_gids="L2_pyramidal", receptor="gabaa"
+        net,
+        src_gids=f"L2_{inh_name_suffix}",
+        target_gids="L2_pyramidal",
+        receptor="gabaa",
     )[-1]
     assert net.connectivity[conn_idx]["nc_dict"]["threshold"] == custom_threshold
     assert net.connectivity[conn_idx]["nc_dict"]["gain"] == custom_gain
 
     # Test that default threshold is inherited from network when threshold=None
     net.add_connection(
-        src_gids=f"L5_{inh_name}",
+        src_gids=f"L5_{inh_name_suffix}",
         target_gids="L5_pyramidal",
         loc="soma",
         receptor="gabaa",
@@ -3140,7 +3179,10 @@ def test_add_connection_threshold_and_gain(fix_net_model, request):
     )
 
     conn_idx = pick_connection(
-        net, src_gids=f"L5_{inh_name}", target_gids="L5_pyramidal", receptor="gabaa"
+        net,
+        src_gids=f"L5_{inh_name_suffix}",
+        target_gids="L5_pyramidal",
+        receptor="gabaa",
     )[-1]
     assert net.connectivity[conn_idx]["nc_dict"]["threshold"] == net.threshold
     assert net.connectivity[conn_idx]["nc_dict"]["gain"] == 1.5

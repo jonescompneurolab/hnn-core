@@ -48,9 +48,18 @@ def _terminate_mpibackend(event, backend):
 def test_gid_assignment(fix_net_model, request):
     """Test that gids are assigned without overlap across ranks"""
     net_model = request.getfixturevalue(fix_net_model)
-    net, inh_name = net_model()
-    weights_ampa = {f"L2_{inh_name}": 1.0, "L2_pyramidal": 2.0, "L5_pyramidal": 3.0}
-    syn_delays = {f"L2_{inh_name}": 0.1, "L2_pyramidal": 0.2, "L5_pyramidal": 0.3}
+    net, net_customizations = net_model()
+    inh_name_suffix = net_customizations["inh_name_suffix"]
+    weights_ampa = {
+        f"L2_{inh_name_suffix}": 1.0,
+        "L2_pyramidal": 2.0,
+        "L5_pyramidal": 3.0,
+    }
+    syn_delays = {
+        f"L2_{inh_name_suffix}": 0.1,
+        "L2_pyramidal": 0.2,
+        "L5_pyramidal": 0.3,
+    }
 
     net.add_bursty_drive(
         "bursty_dist",

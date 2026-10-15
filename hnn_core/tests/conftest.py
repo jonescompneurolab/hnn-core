@@ -140,7 +140,7 @@ def fix_net_duecker_ET():
     described below, e.g.
 
     ```
-    net, inh_name = net_model(add_drives_from_params=True, reduced=True)
+    net, net_customizations = net_model(add_drives_from_params=True, reduced=True)
     ```
 
     This is what actually deploys the appropriate fixture and builds your model, using
@@ -175,9 +175,16 @@ def fix_net_duecker_ET():
     -------
     net : Network object
         The Duecker ET model network.
-    inh_name : "inhibitory"
-        Name suffix of the inhibitory cell types, which is ``"inhibitory"`` for the
-        Duecker model. Used to account for naming differences between model versions.
+    net_customizations : dict
+        Model-specific information about the network. Contains the keys:
+
+        - ``"inh_name_suffix"``: ``"inhibitory"``, the name suffix of the inhibitory cell
+          types. Used to account for cell type naming differences between Duecker and
+          non-Duecker model versions.
+        - ``"short_inh_name_suffix"``: the abbreviated name suffix of the inhibitory cell
+          types (i.e. the suffix of ``"L2Inh"``), as used in parameter and connection
+          names. Used to account for cell type naming differences between Duecker and
+          non-Duecker model versions.
 
     Raises
     ------
@@ -198,7 +205,10 @@ def fix_net_duecker_ET():
             )
 
         # Account for Duecker name variations
-        inh_name = "inhibitory"
+        net_customizations = {
+            "inh_name_suffix": "inhibitory",
+            "short_inh_name_suffix": "Inh",  # codespell:ignore
+        }
 
         if reduced:
             mesh_shape = (3, 3)
@@ -311,7 +321,7 @@ def fix_net_duecker_ET():
             for name, positions in electrode_array.items():
                 net.add_electrode_array(name, positions)
 
-        return net, inh_name
+        return net, net_customizations
 
     return _fix_net_duecker_ET
 
@@ -377,7 +387,7 @@ def fix_net_neymotin_2020():
     described below, e.g.
 
     ```
-    net, inh_name = net_model(add_drives_from_params=True, reduced=True)
+    net, net_customizations = net_model(add_drives_from_params=True, reduced=True)
     ```
 
     This is what actually deploys the appropriate fixture and builds your model, using
@@ -423,9 +433,14 @@ def fix_net_neymotin_2020():
     -------
     net : Network object
         The Neymotin 2020 model network.
-    inh_name : "basket"
-        Name suffix of the inhibitory cell types, which is ``"basket"`` for the
-        non-Duecker models.
+    net_customizations : dict
+        Model-specific information about the network. Contains the keys:
+
+        - ``"inh_name_suffix"``: ``"basket"``, the name suffix of the inhibitory cell types
+          for the non-Duecker models.
+        - ``"short_inh_name_suffix"``: ``"Basket"``, the abbreviated name suffix of the
+          inhibitory cell types, as used in parameter and connection names (e.g.
+          ``"L2Basket"``).
 
     Raises
     ------
@@ -459,7 +474,10 @@ def fix_net_neymotin_2020():
         params_fname = hnn_core_root / "param" / "default.json"
         params = read_params(params_fname)
         # Account for Duecker name variations
-        inh_name = "basket"
+        net_customizations = {
+            "inh_name_suffix": "basket",
+            "short_inh_name_suffix": "Basket",
+        }
 
         if not featureful_reduced_network:
             if reduced and mesh_shape:
@@ -580,7 +598,7 @@ def fix_net_neymotin_2020():
             electrode_pos = [(1, 2, 3), (-1, -2, -3)]
             net.add_electrode_array("arr1", electrode_pos)
 
-        return net, inh_name
+        return net, net_customizations
 
     return _fix_net_neymotin_2020
 
@@ -681,7 +699,7 @@ def fix_net_calcium():
     described below, e.g.
 
     ```
-    net, inh_name = net_model(add_drives_from_params=True, reduced=True)
+    net, net_customizations = net_model(add_drives_from_params=True, reduced=True)
     ```
 
     This is what actually deploys the appropriate fixture and builds your model, using
@@ -714,9 +732,14 @@ def fix_net_calcium():
     -------
     net : Network object
         The Calcium model network.
-    inh_name : "basket"
-        Name suffix of the inhibitory cell types, which is ``"basket"`` for the
-        non-Duecker models.
+    net_customizations : dict
+        Model-specific information about the network. Contains the keys:
+
+        - ``"inh_name_suffix"``: ``"basket"``, the name suffix of the inhibitory cell types
+          for the non-Duecker models.
+        - ``"short_inh_name_suffix"``: ``"Basket"``, the abbreviated name suffix of the
+          inhibitory cell types, as used in parameter and connection names (e.g.
+          ``"L2Basket"``).
 
     Raises
     ------
@@ -736,7 +759,10 @@ def fix_net_calcium():
                 "Cannot specify both `reduced=True` and `mesh_shape` argument."
             )
         # Account for Duecker name variations
-        inh_name = "basket"
+        net_customizations = {
+            "inh_name_suffix": "basket",
+            "short_inh_name_suffix": "Basket",
+        }
 
         if reduced:
             mesh_shape = (3, 3)
@@ -755,7 +781,7 @@ def fix_net_calcium():
             for name, positions in electrode_array.items():
                 net.add_electrode_array(name, positions)
 
-        return net, inh_name
+        return net, net_customizations
 
     return _fix_net_calcium
 
@@ -821,7 +847,7 @@ def fix_net_law_2021():
     described below, e.g.
 
     ```
-    net, inh_name = net_model(add_drives_from_params=True, reduced=True)
+    net, net_customizations = net_model(add_drives_from_params=True, reduced=True)
     ```
 
     This is what actually deploys the appropriate fixture and builds your model, using
@@ -854,9 +880,14 @@ def fix_net_law_2021():
     -------
     net : Network object
         The Law model network.
-    inh_name : "basket"
-        Name suffix of the inhibitory cell types, which is ``"basket"`` for the
-        non-Duecker models.
+    net_customizations : dict
+        Model-specific information about the network. Contains the keys:
+
+        - ``"inh_name_suffix"``: ``"basket"``, the name suffix of the inhibitory cell types
+          for the non-Duecker models.
+        - ``"short_inh_name_suffix"``: ``"Basket"``, the abbreviated name suffix of the
+          inhibitory cell types, as used in parameter and connection names (e.g.
+          ``"L2Basket"``).
 
     Raises
     ------
@@ -877,7 +908,10 @@ def fix_net_law_2021():
             )
 
         # Account for Duecker name variations
-        inh_name = "basket"
+        net_customizations = {
+            "inh_name_suffix": "basket",
+            "short_inh_name_suffix": "Basket",
+        }
         if reduced:
             mesh_shape = (3, 3)
         elif mesh_shape is not None:
@@ -894,7 +928,7 @@ def fix_net_law_2021():
             for name, positions in electrode_array.items():
                 net.add_electrode_array(name, positions)
 
-        return net, inh_name
+        return net, net_customizations
 
     return _fix_net_law_2021
 
@@ -1064,7 +1098,7 @@ def _base_simulation_cached():
     net_model : callable
         The network fixture's callable (e.g. obtained via
         ``request.getfixturevalue(net_model_name)``), which must accept
-        ``reduced=True`` and return ``(net, inh_name)``.
+        ``reduced=True`` and return ``(net, net_customizations)``.
     variation : "yes_spikes" | "no_spikes"
         Which set of drive weights to use.
 
@@ -1074,9 +1108,9 @@ def _base_simulation_cached():
         A deep copy of the simulated network, including its ``cell_response``.
     dpls : list of Dipole
         A deep copy of the simulated dipoles, one per trial.
-    inh_name : str
-        Name suffix of the inhibitory cell types for this network model (e.g.
-        ``"basket"``).
+    net_customizations : dict
+        Model-specific information about the network, as returned by the network
+        fixture (e.g. ``fix_net_neymotin_2020``).
     """
     cache = {}
     # AMPA weights of the bursty drives for each variation
@@ -1088,7 +1122,7 @@ def _base_simulation_cached():
     def _get_simulation(net_model_name, net_model, variation):
         key = (net_model_name, variation)
         if key not in cache:
-            net, inh_name = net_model(reduced=True)
+            net, net_customizations = net_model(reduced=True)
             weights_ampa = variation_weights_ampa[variation]
             syn_delays = {"L2_pyramidal": 0.1, "L5_pyramidal": 1.0}
             net.add_bursty_drive(
@@ -1119,8 +1153,8 @@ def _base_simulation_cached():
                 event_seed=14,
             )
             dpls = simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
-            cache[key] = (net, dpls, inh_name)
-        # Deepcopy so each caller gets its own net and dpls
+            cache[key] = (net, dpls, net_customizations)
+        # Deepcopy so each caller gets its own net, dpls, and net_customizations
         return copy.deepcopy(cache[key])
 
     return _get_simulation
@@ -1180,19 +1214,21 @@ def fix_use_cached_sims(_base_simulation_cached, request):
         A copy of the simulated network, including its ``cell_response``.
     dpls : list of Dipole
         A copy of the simulated dipoles, one per trial.
-    inh_name : str
-        Name suffix of the inhibitory cell types for this network model (e.g.
-        ``"basket"``). Useful for building cell type names that work across models.
+    net_customizations : dict
+        Model-specific information about the network, as returned by the network
+        fixture (e.g. ``fix_net_neymotin_2020``). Its keys, such as
+        ``"inh_name_suffix"``, are useful for building cell type names that work across
+        models.
     variation : "yes_spikes" | "no_spikes"
         Which variation was simulated, so that tests can branch on whether spikes are
         expected.
     """
     net_model_name, variation = request.param
     net_model = request.getfixturevalue(net_model_name)
-    net, dpls, inh_name = _base_simulation_cached(
+    net, dpls, net_customizations = _base_simulation_cached(
         net_model_name, net_model, variation=variation
     )
-    return net, dpls, inh_name, variation
+    return net, dpls, net_customizations, variation
 
 
 @pytest.fixture
