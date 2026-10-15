@@ -675,10 +675,12 @@ class HNNGUI:
         # load default parameters
         self.params = self.load_parameters(network_configuration)
 
-        # Number of available cores
+        # Number of available cores, used as the maximum the user can select.
+        # Unlike the backends' defaults, we do not leave a core free here, so
+        # that MPI can still be used on machines with only 2 cores.
         [self.n_cores, _] = _determine_cores_hwthreading(
             use_hwthreading_if_found=False,
-            sensible_default_cores=True,
+            sensible_default_cores=False,
         )
 
         # ==================================================
