@@ -353,6 +353,27 @@ def test_order_drives(jones_2009_network):
 def test_read_configuration_json(jones_2009_network):
     """Read-in of a hdf5 file"""
     net = read_network_configuration(Path(assets_path, "neymotin2020_3x3_drives.json"))
+    if net != jones_2009_network:
+        print("\nNetwork mismatch detected!")
+        for name in net.cell_types:
+            cell_a = net.cell_types[name]["cell_object"]
+            cell_b = jones_2009_network.cell_types[name]["cell_object"]
+
+            for section_name in cell_a.sections:
+                sec_a = cell_a.sections[section_name]
+                sec_b = cell_b.sections.get(section_name)
+
+                if sec_b is None:
+                    print(f"\n{name}.{section_name}: missing from fixture")
+                elif sec_a != sec_b:
+                    print(f"\n{name}.{section_name}:")
+                    for attr in vars(sec_a):
+                        a = getattr(sec_a, attr, None)
+                        b = getattr(sec_b, attr, None)
+                        if a != b:
+                            print(f"  {attr}:")
+                            print(f"    Loaded JSON: {a!r}")
+                            print(f"    Fixture:    {b!r}")
     assert net == jones_2009_network
 
     # Read without drives
@@ -382,6 +403,8 @@ def test_read_configuration_json(jones_2009_network):
     net_no_bias = read_network_configuration(
         Path(assets_path, "neymotin2020_3x3_drives.json"), read_external_biases=False
     )
+
+    
     assert len(net_no_bias.external_biases) == 0
     assert len(net_no_bias.external_drives) > 0
 
