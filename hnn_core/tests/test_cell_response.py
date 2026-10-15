@@ -475,6 +475,8 @@ def test_rate_over_time_n_cells():
     spike_gids = [[7, 8], [7, 1]]
     spike_types = [["L5_basket", "L5_basket"], ["L5_basket", "L5_pyramidal"]]
     gid_ranges = {"L5_pyramidal": range(0, 2), "L5_basket": range(7, 11)}
+    n_pyr = len(gid_ranges["L5_pyramidal"])
+    n_basket = len(gid_ranges["L5_basket"])
     sim_times = np.arange(0.0, 20.0, 0.1)
     dt = np.diff(sim_times)[0]
 
@@ -500,8 +502,10 @@ def test_rate_over_time_n_cells():
     assert_allclose(_spikes_per_cell(rates_spiked["L5_pyramidal"]), [0.0, 1.0])
 
     # with gid_ranges, every cell of the type in the network is counted
-    assert_allclose(_spikes_per_cell(rates_network["L5_basket"]), [2 / 4, 1 / 4])
-    assert_allclose(_spikes_per_cell(rates_network["L5_pyramidal"]), [0.0, 1 / 2])
+    assert_allclose(
+        _spikes_per_cell(rates_network["L5_basket"]), [2 / n_basket, 1 / n_basket]
+    )
+    assert_allclose(_spikes_per_cell(rates_network["L5_pyramidal"]), [0.0, 1 / n_pyr])
 
     # a silent trial has zero spiking cells, which must not be divided by
     assert_array_equal(rates_spiked["L5_pyramidal"][0], np.zeros(len(sim_times)))
