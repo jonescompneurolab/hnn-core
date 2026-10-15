@@ -586,6 +586,15 @@ def test_cma_checkpoint(tmp_path, fix_net_neymotin_2020):
     assert checkpoint["es"].countiter == 10
     assert len(checkpoint["obj_values"]) == 10
 
+    # The checkpoint saved at the 20th iteration can be loaded to resume from
+    backup_dir = tmp_path / "20_iter"
+    backup_dir.mkdir()
+    _run_cma(max_iter=20, backup_dir=backup_dir)
+    with open(backup_dir / "cma_checkpoint.pkl", "rb") as f:
+        checkpoint = pickle.load(f)
+    assert checkpoint["es"].countiter == 20
+    assert len(checkpoint["obj_values"]) == 20
+
 
 @pytest.mark.parametrize("solver", ["bayesian", "cma", "cobyla"])
 def test_custom_loss_fun(solver, fix_net_neymotin_2020):
