@@ -164,7 +164,7 @@ class TestParallelBackends:
         """Test that MPIBackend can use more than 1 processor"""
         # if only 1 processor is available, then MPIBackend tests will not
         # be valid
-        with MPIBackend() as backend:
+        with MPIBackend(n_cores=None) as backend:  # Use all available cores
             assert backend.n_procs > 1
 
     @requires_mpi4py
@@ -173,6 +173,7 @@ class TestParallelBackends:
         """Test running a MPIBackend on reduced model"""
         global dpls_reduced_default, dpls_reduced_mpi
         net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+        # Use all available cores
         dpls_reduced_mpi = fix_run_simulation(net, tstop=40, backend="mpi")
         for trial_idx in range(len(dpls_reduced_default)):
             # account for rounding error incured during MPI parallelization
@@ -188,7 +189,7 @@ class TestParallelBackends:
     def test_terminate_mpibackend(self, fix_net_neymotin_2020):
         """Test terminating MPIBackend from thread"""
         net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
-        with MPIBackend() as backend:
+        with MPIBackend(n_cores=None) as backend:  # Use all available cores
             event = Event()
             # start background thread that will kill all MPIBackends
             # until event.set()
@@ -441,6 +442,7 @@ def test_mpi_failure(fix_net_neymotin_2020, fix_run_simulation):
     with pytest.warns(UserWarning) as record:
         with io.StringIO() as buf, redirect_stdout(buf):
             with pytest.raises(RuntimeError, match="MPI simulation failed"):
+                # Use all available cores
                 fix_run_simulation(net, tstop=40, backend="mpi", postproc=False)
             stdout = buf.getvalue()
 

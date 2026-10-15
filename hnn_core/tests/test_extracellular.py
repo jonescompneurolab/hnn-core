@@ -221,7 +221,7 @@ def test_extracellular_backends(fix_net_model, fix_run_simulation, request):
     fix_run_simulation(
         mpi_net,
         tstop=40,
-        backend="mpi",
+        backend="mpi",  # Use all available cores
         record_isec="soma",
         record_vsec="soma",
         record_ca="soma",

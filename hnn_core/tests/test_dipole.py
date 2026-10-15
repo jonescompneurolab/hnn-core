@@ -265,7 +265,7 @@ def test_cell_response_backends(fix_net_model, fix_run_simulation, request):
     fix_run_simulation(
         mpi_net,
         tstop=40,
-        backend="mpi",
+        backend="mpi",  # Use all available cores
         n_trials=n_trials,
         record_vsec="all",
         record_isec="soma",
@@ -476,7 +476,7 @@ def test_dipole_baseline_correction_mpi(
         net,
         tstop=20.0,
         dt=0.5,
-        backend="mpi",
+        backend="mpi",  # Use all available cores
         baseline_correction=baseline_correction,
     )
 
