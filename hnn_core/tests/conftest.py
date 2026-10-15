@@ -26,85 +26,36 @@ _test_failed_incremental: Dict[str, Dict[Tuple[int, ...], str]] = {}
 
 hnn_core_root = Path(hnn_core.__file__).parent
 
+"""
+Description of how to use the network fixtures in this file:
+------------------------------------------------------------
 
-def pytest_runtest_makereport(item, call):
-    if "incremental" in item.keywords:
-        # incremental marker is used
+You can use `fix_net_neymotin_2020` and other network fixtures in one of two ways:
 
-        # The following condition was modified from the example linked above.
-        # We don't want to step out of the incremental testing block if
-        # a previous test was marked "Skipped". For instance if MPI tests
-        # are skipped because mpi4py is not installed, still continue with
-        # all other tests that do not require mpi4py
-        if call.excinfo is not None and not call.excinfo.typename == "Skipped":
-            # the test has failed, but was not skipped
+--------------------------------
 
-            # retrieve the class name of the test
-            cls_name = str(item.cls)
-            # retrieve the index of the test (if parametrize is used in
-            # combination with incremental)
-            parametrize_index = (
-                tuple(item.callspec.indices.values())
-                if hasattr(item, "callspec")
-                else ()
-            )
-            # retrieve the name of the test function
-            test_name = item.originalname or item.name
-            # store in _test_failed_incremental the original name of the
-            # failed test
-            _test_failed_incremental.setdefault(cls_name, {}).setdefault(
-                parametrize_index, test_name
-            )
+1. If you only want to use a single network fixture, and do not want to parametrize the
+test across multiple network models, then you can use a single network fixture like a
+fixture that accepts arguments. For example, in
+``test_dipole.py::test_dipole_simulation``, you would include the fixture in the test's
+arguments:
 
+```
+def test_dipole_simulation(fix_net_neymotin_2020, fix_default_params):
+```
 
-def pytest_runtest_setup(item):
-    if "incremental" in item.keywords:
-        # retrieve the class name of the test
-        cls_name = str(item.cls)
-        # check if a previous test has failed for this class
-        if cls_name in _test_failed_incremental:
-            # retrieve the index of the test (if parametrize is used in
-            # combination with incremental)
-            parametrize_index = (
-                tuple(item.callspec.indices.values())
-                if hasattr(item, "callspec")
-                else ()
-            )
-            # retrieve the name of the first test function to fail for this
-            # class name and index
-            test_name = _test_failed_incremental[cls_name].get(parametrize_index, None)
-            # if name found, test has failed for the combination of class name
-            # and test name
-            if test_name is not None:
-                pytest.xfail("previous test failed ({})".format(test_name))
+and then use the fixture similarly to a regular network models function:
 
+```
+net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+```
 
-@pytest.fixture(scope="session")
-def fix_net_duecker_ET():
-    """Network fixture for tests of the Duecker ET model network (``duecker_ET_model``).
+--------------------------------
 
-    You can use this and other network fixtures in one of two ways. All network fixtures
-    can be used in the following ways:
-
-    1. If you only want to use this network, and do not want to parametrize the test
-    across multiple network models, then you can use this like a fixture that accepts
-    arguments. For example, in ``test_dipole.py::test_dipole_simulation``, you include
-    the fixture in the test's arguments:
-
-    ```
-    def test_dipole_simulation(fix_net_neymotin_2020, fix_default_params):
-    ```
-
-    and then use the fixture similarly to a regular network models function:
-
-    ```
-    net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
-    ```
-
-    2. If you want to use this network fixture while parametrizing a test to use other
-    network fixtures as well, such as in
-    ``test_extracellular.py::test_transmembrane_currents``, then you have to do four
-    separate things:
+2. If you want to use a network fixture while parametrizing a test to use other
+network fixtures as well, such as in
+``test_extracellular.py::test_transmembrane_currents``, then you have to do four
+separate things:
 
     2.1. Add this fixture as an entry to the ``@pytest.mark.parametrize`` decorator such
     that this network fixture is a value in the list of values given to the "parameter"
@@ -116,9 +67,9 @@ def fix_net_duecker_ET():
     )
     ```
 
-    In the above, ``fix_net_model`` will be a variable that you pass to the argument list
-    of the test, and the entries in the list are the values that that parameter will
-    take, as the test is re-run once per parameter set.
+    In the above, ``fix_net_model`` will be a variable that you pass to the argument
+    list of the test, and the entries in the list are the values that that parameter
+    will take, as the test is re-run once per parameter set.
 
     2.2. Add both the built-in ``request`` fixture along with the above "parameter"
     variable to your test function's arguments, e.g.
@@ -127,8 +78,8 @@ def fix_net_duecker_ET():
     def test_transmembrane_currents(fix_net_model, request):
     ```
 
-    2.2. Create the callable network function by requesting the factory fixture's value,
-    e.g.
+    2.2. Inside the actual test body, create the callable network function by
+    "requesting" the factory fixture's value, e.g.
     ```
     net_model = request.getfixturevalue(fix_net_model)
     ```
@@ -137,17 +88,22 @@ def fix_net_duecker_ET():
     *function/callable* to create the network).
 
     2.3. Finally, use your new callable to create the network, using the Parameters
-    described below, e.g.
+    described below in each network fixture, e.g.
 
     ```
     net, net_customizations = net_model(add_drives_from_params=True, reduced=True)
     ```
+"""
+
+
+@pytest.fixture(scope="session")
+def fix_net_duecker_ET():
+    """Network fixture for tests of the Duecker ET model network (``duecker_ET_model``).
 
     This is what actually deploys the appropriate fixture and builds your model, using
-    the arguments provided below.
-
-    There are many examples of this pattern in the tests, so if you are unsure how to
-    use this, see existing tests.
+    the arguments provided below. There are many examples of this pattern in the tests,
+    so if you are unsure how to use this, see existing tests, or the comment at the top
+    of ``conftest.py``.
 
     Parameters
     ----------
@@ -330,71 +286,10 @@ def fix_net_duecker_ET():
 def fix_net_neymotin_2020():
     """Network fixture for tests of the Neymotin 2020 model network (``neymotin_2020_model``).
 
-    You can use this and other network fixtures in one of two ways. All network fixtures
-    can be used in the following ways:
-
-    1. If you only want to use this network, and do not want to parametrize the test
-    across multiple network models, then you can use this like a fixture that accepts
-    arguments. For example, in ``test_dipole.py::test_dipole_simulation``, you include
-    the fixture in the test's arguments:
-
-    ```
-    def test_dipole_simulation(fix_net_neymotin_2020, fix_default_params):
-    ```
-
-    and then use the fixture similarly to a regular network models function:
-
-    ```
-    net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
-    ```
-
-    2. If you want to use this network fixture while parametrizing a test to use other
-    network fixtures as well, such as in
-    ``test_extracellular.py::test_transmembrane_currents``, then you have to do four
-    separate things:
-
-    2.1. Add this fixture as an entry to the ``@pytest.mark.parametrize`` decorator such
-    that this network fixture is a value in the list of values given to the "parameter"
-    variable. For example:
-
-    ```
-    @pytest.mark.parametrize(
-        "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
-    )
-    ```
-
-    In the above, ``fix_net_model`` will be a variable that you pass to the argument list
-    of the test, and the entries in the list are the values that that parameter will
-    take, as the test is re-run once per parameter set.
-
-    2.2. Add both the built-in ``request`` fixture along with the above "parameter"
-    variable to your test function's arguments, e.g.
-
-    ```
-    def test_transmembrane_currents(fix_net_model, request):
-    ```
-
-    2.2. Create the callable network function by requesting the factory fixture's value,
-    e.g.
-    ```
-    net_model = request.getfixturevalue(fix_net_model)
-    ```
-
-    (Note that this does NOT create the actual network, it only creates the
-    *function/callable* to create the network).
-
-    2.3. Finally, use your new callable to create the network, using the Parameters
-    described below, e.g.
-
-    ```
-    net, net_customizations = net_model(add_drives_from_params=True, reduced=True)
-    ```
-
     This is what actually deploys the appropriate fixture and builds your model, using
-    the arguments provided below.
-
-    There are many examples of this pattern in the tests, so if you are unsure how to
-    use this, see existing tests.
+    the arguments provided below. There are many examples of this pattern in the tests,
+    so if you are unsure how to use this, see existing tests, or the comment at the top
+    of ``conftest.py``.
 
     Parameters
     ----------
@@ -642,71 +537,10 @@ def fix_load_featureful_tmp_path(tmp_path_factory, fix_net_neymotin_2020):
 def fix_net_calcium():
     """Network fixture for tests of the "Calcium" model network (``calcium_model``).
 
-    You can use this and other network fixtures in one of two ways. All network fixtures
-    can be used in the following ways:
-
-    1. If you only want to use this network, and do not want to parametrize the test
-    across multiple network models, then you can use this like a fixture that accepts
-    arguments. For example, in ``test_dipole.py::test_dipole_simulation``, you include
-    the fixture in the test's arguments:
-
-    ```
-    def test_dipole_simulation(fix_net_neymotin_2020, fix_default_params):
-    ```
-
-    and then use the fixture similarly to a regular network models function:
-
-    ```
-    net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
-    ```
-
-    2. If you want to use this network fixture while parametrizing a test to use other
-    network fixtures as well, such as in
-    ``test_extracellular.py::test_transmembrane_currents``, then you have to do four
-    separate things:
-
-    2.1. Add this fixture as an entry to the ``@pytest.mark.parametrize`` decorator such
-    that this network fixture is a value in the list of values given to the "parameter"
-    variable. For example:
-
-    ```
-    @pytest.mark.parametrize(
-        "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
-    )
-    ```
-
-    In the above, ``fix_net_model`` will be a variable that you pass to the argument list
-    of the test, and the entries in the list are the values that that parameter will
-    take, as the test is re-run once per parameter set.
-
-    2.2. Add both the built-in ``request`` fixture along with the above "parameter"
-    variable to your test function's arguments, e.g.
-
-    ```
-    def test_transmembrane_currents(fix_net_model, request):
-    ```
-
-    2.2. Create the callable network function by requesting the factory fixture's value,
-    e.g.
-    ```
-    net_model = request.getfixturevalue(fix_net_model)
-    ```
-
-    (Note that this does NOT create the actual network, it only creates the
-    *function/callable* to create the network).
-
-    2.3. Finally, use your new callable to create the network, using the Parameters
-    described below, e.g.
-
-    ```
-    net, net_customizations = net_model(add_drives_from_params=True, reduced=True)
-    ```
-
     This is what actually deploys the appropriate fixture and builds your model, using
-    the arguments provided below.
-
-    There are many examples of this pattern in the tests, so if you are unsure how to
-    use this, see existing tests.
+    the arguments provided below. There are many examples of this pattern in the tests,
+    so if you are unsure how to use this, see existing tests, or the comment at the top
+    of ``conftest.py``.
 
     Parameters
     ----------
@@ -790,71 +624,10 @@ def fix_net_calcium():
 def fix_net_law_2021():
     """Network fixture for tests of the "Law" model network (``law_2021_model``).
 
-    You can use this and other network fixtures in one of two ways. All network fixtures
-    can be used in the following ways:
-
-    1. If you only want to use this network, and do not want to parametrize the test
-    across multiple network models, then you can use this like a fixture that accepts
-    arguments. For example, in ``test_dipole.py::test_dipole_simulation``, you include
-    the fixture in the test's arguments:
-
-    ```
-    def test_dipole_simulation(fix_net_neymotin_2020, fix_default_params):
-    ```
-
-    and then use the fixture similarly to a regular network models function:
-
-    ```
-    net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
-    ```
-
-    2. If you want to use this network fixture while parametrizing a test to use other
-    network fixtures as well, such as in
-    ``test_extracellular.py::test_transmembrane_currents``, then you have to do four
-    separate things:
-
-    2.1. Add this fixture as an entry to the ``@pytest.mark.parametrize`` decorator such
-    that this network fixture is a value in the list of values given to the "parameter"
-    variable. For example:
-
-    ```
-    @pytest.mark.parametrize(
-        "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
-    )
-    ```
-
-    In the above, ``fix_net_model`` will be a variable that you pass to the argument list
-    of the test, and the entries in the list are the values that that parameter will
-    take, as the test is re-run once per parameter set.
-
-    2.2. Add both the built-in ``request`` fixture along with the above "parameter"
-    variable to your test function's arguments, e.g.
-
-    ```
-    def test_transmembrane_currents(fix_net_model, request):
-    ```
-
-    2.2. Create the callable network function by requesting the factory fixture's value,
-    e.g.
-    ```
-    net_model = request.getfixturevalue(fix_net_model)
-    ```
-
-    (Note that this does NOT create the actual network, it only creates the
-    *function/callable* to create the network).
-
-    2.3. Finally, use your new callable to create the network, using the Parameters
-    described below, e.g.
-
-    ```
-    net, net_customizations = net_model(add_drives_from_params=True, reduced=True)
-    ```
-
     This is what actually deploys the appropriate fixture and builds your model, using
-    the arguments provided below.
-
-    There are many examples of this pattern in the tests, so if you are unsure how to
-    use this, see existing tests.
+    the arguments provided below. There are many examples of this pattern in the tests,
+    so if you are unsure how to use this, see existing tests, or the comment at the top
+    of ``conftest.py``.
 
     Parameters
     ----------
@@ -1245,3 +1018,55 @@ def fix_default_params():
     """
     params_fname = hnn_core_root / "param" / "default.json"
     return read_params(params_fname)
+
+
+def pytest_runtest_makereport(item, call):
+    if "incremental" in item.keywords:
+        # incremental marker is used
+
+        # The following condition was modified from the example linked above.
+        # We don't want to step out of the incremental testing block if
+        # a previous test was marked "Skipped". For instance if MPI tests
+        # are skipped because mpi4py is not installed, still continue with
+        # all other tests that do not require mpi4py
+        if call.excinfo is not None and not call.excinfo.typename == "Skipped":
+            # the test has failed, but was not skipped
+
+            # retrieve the class name of the test
+            cls_name = str(item.cls)
+            # retrieve the index of the test (if parametrize is used in
+            # combination with incremental)
+            parametrize_index = (
+                tuple(item.callspec.indices.values())
+                if hasattr(item, "callspec")
+                else ()
+            )
+            # retrieve the name of the test function
+            test_name = item.originalname or item.name
+            # store in _test_failed_incremental the original name of the
+            # failed test
+            _test_failed_incremental.setdefault(cls_name, {}).setdefault(
+                parametrize_index, test_name
+            )
+
+
+def pytest_runtest_setup(item):
+    if "incremental" in item.keywords:
+        # retrieve the class name of the test
+        cls_name = str(item.cls)
+        # check if a previous test has failed for this class
+        if cls_name in _test_failed_incremental:
+            # retrieve the index of the test (if parametrize is used in
+            # combination with incremental)
+            parametrize_index = (
+                tuple(item.callspec.indices.values())
+                if hasattr(item, "callspec")
+                else ()
+            )
+            # retrieve the name of the first test function to fail for this
+            # class name and index
+            test_name = _test_failed_incremental[cls_name].get(parametrize_index, None)
+            # if name found, test has failed for the combination of class name
+            # and test name
+            if test_name is not None:
+                pytest.xfail("previous test failed ({})".format(test_name))
