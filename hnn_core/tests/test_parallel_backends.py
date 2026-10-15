@@ -164,7 +164,7 @@ class TestParallelBackends:
         """Test that MPIBackend can use more than 1 processor"""
         # if only 1 processor is available, then MPIBackend tests will not
         # be valid
-        with MPIBackend(n_cores=None) as backend:  # Use all available cores
+        with MPIBackend(n_procs=None) as backend:  # Use all available cores
             assert backend.n_procs > 1
 
     @requires_mpi4py
@@ -189,7 +189,7 @@ class TestParallelBackends:
     def test_terminate_mpibackend(self, fix_net_neymotin_2020):
         """Test terminating MPIBackend from thread"""
         net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
-        with MPIBackend(n_cores=None) as backend:  # Use all available cores
+        with MPIBackend(n_procs=None) as backend:  # Use all available cores
             event = Event()
             # start background thread that will kill all MPIBackends
             # until event.set()
