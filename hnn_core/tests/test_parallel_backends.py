@@ -97,13 +97,9 @@ def test_gid_assignment():
 @pytest.mark.incremental
 @pytest.mark.uses_mpi
 class TestParallelBackends:
-    dpls_reduced_mpi = None
-    dpls_reduced_default = None
-    dpls_reduced_joblib = None
 
     def test_run_default(self, run_hnn_core_fixture):
         """Test consistency between default backend simulation and master"""
-        global dpls_reduced_default
         dpls_reduced_default, _ = run_hnn_core_fixture(None, reduced=True)
         # test consistency across all parallel backends for multiple trials
         assert_raises(
@@ -115,8 +111,7 @@ class TestParallelBackends:
 
     def test_run_joblibbackend(self, run_hnn_core_fixture):
         """Test consistency between joblib backend simulation with master"""
-        global dpls_reduced_default, dpls_reduced_joblib
-
+        dpls_reduced_default, _ = run_hnn_core_fixture(None, reduced=True)
         dpls_reduced_joblib, _ = run_hnn_core_fixture(
             backend="joblib", n_jobs=2, reduced=True
         )
@@ -159,10 +154,13 @@ class TestParallelBackends:
     @requires_psutil
     def test_run_mpibackend(self, run_hnn_core_fixture):
         """Test running a MPIBackend on reduced model"""
-        global dpls_reduced_default, dpls_reduced_mpi
-        dpls_reduced_mpi, _ = run_hnn_core_fixture(backend="mpi", reduced=True)
+        dpls_reduced_default, _ = run_hnn_core_fixture(None, reduced=True)
+        dpls_reduced_mpi, _ = run_hnn_core_fixture(
+            backend="mpi", reduced=True
+        )
+
         for trial_idx in range(len(dpls_reduced_default)):
-            # account for rounding error incured during MPI parallelization
+            # Account for rounding error incurred during MPI parallelization
             assert_allclose(
                 dpls_reduced_default[trial_idx].data["agg"],
                 dpls_reduced_mpi[trial_idx].data["agg"],
@@ -482,8 +480,9 @@ def test_compare_duecker_model_output(backend):
     # will determine where the output files are saved, so make sure to run the script
     # from the "top-level" repository directory (i.e. the one that contains the
     # `setup.py` file).
-    dpl_old = loadtxt("dipole_duecker_output_old.txt")
-    cell_response_old = read_spikes("spikes_duecker_output_old.txt")
+    reference_dir = Path(__file__).resolve().parents[2]
+    dpl_old = loadtxt(reference_dir / "dipole_duecker_output_old.txt")
+    cell_response_old = read_spikes(reference_dir / "spikes_duecker_output_old.txt")
 
     # Compare our dipole data EXACTLY (single-float precision)
     # ----------------------------------------------------------------------------------

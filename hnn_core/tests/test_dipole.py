@@ -270,6 +270,8 @@ def test_cell_response_backends(run_hnn_core_fixture):
     assert len(joblib_net.cell_response.vsec[trial_idx][gid]) == 8  # num sec
     assert len(joblib_net.cell_response.isec[trial_idx][gid]) == 1
     assert len(joblib_net.cell_response.vsec[trial_idx][gid]["apical_1"]) == n_times
+    #i replaced the hardcoded "soma_gabaa" key with dynamic filtering because synapse keys can vary from both use_dtaframe true and false. 
+    # The test now checks that GABAA responsesexist and each has n_times samples for both joblib and MPI backends.
     soma_isec = joblib_net.cell_response.isec[trial_idx][gid]["soma"]
     gabaa_keys = [key for key in soma_isec if "gabaa" in key]
 
