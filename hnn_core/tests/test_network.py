@@ -427,9 +427,9 @@ def test_custom_network_coords_validation(fix_default_params):
     Network(params, pos_dict=custom_pos_dict, cell_types=custom_cell_types)
 
 
-def test_network_models(
-    fix_net_law_2021, fix_net_neymotin_2020, fix_net_calcium, fix_net_duecker_ET
-):
+# `neymotin_2020_model` is used explicitly here for testing params etc., so its fixture
+# is not used here intentionally.
+def test_network_models(fix_net_law_2021, fix_net_calcium, fix_net_duecker_ET):
     """Test model instantiations of the network object"""
     # Law 2021 model
     # ----------------------------------------------------------------------------------
