@@ -270,18 +270,21 @@ def test_cell_response_backends(run_hnn_core_fixture):
     assert len(joblib_net.cell_response.vsec[trial_idx][gid]) == 8  # num sec
     assert len(joblib_net.cell_response.isec[trial_idx][gid]) == 1
     assert len(joblib_net.cell_response.vsec[trial_idx][gid]["apical_1"]) == n_times
-    assert (
-        len(joblib_net.cell_response.isec[trial_idx][gid]["soma"]["soma_gabaa"])
-        == n_times
-    )
+    soma_isec = joblib_net.cell_response.isec[trial_idx][gid]["soma"]
+    gabaa_keys = [key for key in soma_isec if "gabaa" in key]
+
+    assert gabaa_keys
+    assert all(len(soma_isec[key]) == n_times for key in gabaa_keys)
     assert len(mpi_net.cell_response.vsec) == n_trials
     assert len(mpi_net.cell_response.isec) == n_trials
     assert len(mpi_net.cell_response.vsec[trial_idx][gid]) == 8  # num sec
     assert len(mpi_net.cell_response.isec[trial_idx][gid]) == 1
     assert len(mpi_net.cell_response.vsec[trial_idx][gid]["apical_1"]) == n_times
-    assert (
-        len(mpi_net.cell_response.isec[trial_idx][gid]["soma"]["soma_gabaa"]) == n_times
-    )
+    soma_isec = mpi_net.cell_response.isec[trial_idx][gid]["soma"]
+    gabaa_keys = [key for key in soma_isec if "gabaa" in key]
+
+    assert gabaa_keys
+    assert all(len(soma_isec[key]) == n_times for key in gabaa_keys)
     assert mpi_net.cell_response.vsec == joblib_net.cell_response.vsec
     assert mpi_net.cell_response.isec == joblib_net.cell_response.isec
 
