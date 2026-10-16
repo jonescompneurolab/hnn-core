@@ -508,21 +508,31 @@ def test_compare_duecker_model_output(backend):
 # Tests for locating and loading the MPI library ('MPI_LIB_NRN_PATH')
 # --------------------------------------------------------------------------------------
 @pytest.mark.parametrize(
-    "lib_name", ["libmpi.so.40", "libmpi.40.dylib", None], ids=["linux", "mac", "none"]
+    "real_lib_name",
+    ["libmpi.so.40", "libmpi.so.12", "libmpi.40.dylib", "libmpi.12.dylib", None],
+    ids=["linux-openmpi", "linux-mpich", "mac-openmpi", "mac-mpich", "none"],
 )
-def test_get_pip_openmpi_lib(monkeypatch, tmp_path, lib_name):
+def test_get_pip_openmpi_lib(monkeypatch, tmp_path, real_lib_name):
     """Test that only the real libmpi file in the 'openmpi' package is matched"""
     # Decoys that must NOT match. 'libmpi.so' and 'libmpi.dylib' are linker scripts
     # that NEURON cannot load.
-    names = ["libmpi.so", "libmpi.dylib", "libmpi_mpifh.so.40", "libmpi.so.40.1.0"]
-    if lib_name is not None:
-        names.append(lib_name)
+    fake_lib_names = [
+        "libmpi.so",
+        "libmpi.dylib",
+        "libmpi_mpifh.so.40",
+        "libmpi.so.40.1.0",
+    ]
+    names = (
+        fake_lib_names + [real_lib_name]
+        if real_lib_name is not None
+        else fake_lib_names
+    )
     files = [SimpleNamespace(name=n, locate=lambda n=n: tmp_path / n) for n in names]
     monkeypatch.setattr(
         parallel_backends, "distribution", lambda name: SimpleNamespace(files=files)
     )
 
-    expected = None if lib_name is None else str(tmp_path / lib_name)
+    expected = None if real_lib_name is None else str(tmp_path / real_lib_name)
     assert _get_pip_openmpi_lib() == expected
 
 
