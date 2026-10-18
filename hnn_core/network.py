@@ -2771,7 +2771,7 @@ class Network:
                 # Extract the gain from the first connection
                 values[conn_type] = self.connectivity[picks[0]]["nc_dict"]["gain"]
 
-        # This writes the warning to stdout
+        # This may emit a warning
         _check_global_synaptic_gains_uniformity(self)
 
         return values
@@ -3135,10 +3135,9 @@ def _check_global_synaptic_gains_uniformity(net):
                 )
             ):
                 output_indicator = False
-                print(
-                    """
-                    WARNING: Your imported Network uses custom synaptic gain values. Global synaptic gain values such as "Excitatory-to-Inhibitory" etc. will NOT be read or displayed properly. This is because Global synaptic gain values assume that initially, all gains are the same. If you continue to modify your Global synaptic gain values, double-check each connection's final synaptic gain value. To stop this warning, change your synaptic weights instead of your synaptic gains.
-                    """
+                warnings.warn(
+                    'Your imported Network uses custom synaptic gain values. Global synaptic gain values such as "Excitatory-to-Inhibitory" etc. will NOT be read or displayed properly. This is because Global synaptic gain values assume that initially, all gains are the same. If you continue to modify your Global synaptic gain values, double-check each connection\'s final synaptic gain value. To stop this warning, change your synaptic weights instead of your synaptic gains.',
+                    UserWarning,
                 )
                 break
 

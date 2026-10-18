@@ -6,7 +6,6 @@ import io
 import os
 import json
 import logging
-import sys
 import tempfile
 import time
 from pathlib import Path
@@ -30,7 +29,6 @@ from hnn_core.gui._viz_manager import (
     _experimental_data_templates,
 )
 from hnn_core.gui.gui import (
-    _GUI_PrintToLogger,
     _init_network_from_widgets,
     _simulate_prepare_upload_file,
     _update_nested_dict,
@@ -230,12 +228,6 @@ def test_gui_upload_connectivity():
 def test_gui_smart_gains_upload_connectivity(setup_gui):
     """Test if gui 'smartly' handles upload of Network with non-default global gains."""
     gui = setup_gui
-    # The non-uniform-gain warning is emitted via ``print`` and only reaches the
-    # GUI log window because, in a notebook, the GUI globally redirects stdout to
-    # its logger (``_GUI_PrintToLogger``). pytest's stdout capture clobbers that
-    # redirect, so we reuse it here to ensure we catch everything.
-    sys.stdout = _GUI_PrintToLogger()
-
     global_gain_test_value_1 = 1.2
     global_gain_test_value_2 = 0.9
 
@@ -2195,7 +2187,7 @@ def test_gui_optimization_no_target_data(setup_gui):
 
 
 def test_traceback_logging(setup_gui, monkeypatch):
-    logger = logging.getLogger("hnn_gui")
+    logger = logging.getLogger("hnn_core.gui")
     gui = setup_gui
     tstop_trials_tstep = [(10, 1, 0.25)]
     gui.widget_backend_selection.value = "Joblib"

@@ -4,6 +4,7 @@
 #          Sam Neymotin <samnemo@gmail.com>
 #          Blake Caldwell <blake_caldwell@brown.edu>
 
+import logging
 import os
 from copy import deepcopy
 from pathlib import Path
@@ -30,6 +31,9 @@ _CVODE = None
 # pc is global, if pc.gid_clear() is called within a new
 # NetworkBuilder, it will seg fault.
 _LAST_NETWORK = None
+
+
+logger = logging.getLogger(__name__)
 
 
 def _simulate_single_trial(net, tstop, dt, trial_idx):
@@ -72,7 +76,7 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
 
     def simulation_time():
         if net._verbose:
-            print(f"Trial {trial_idx + 1}: {round(h.t, 2)} ms...")
+            logger.info(f"Trial {trial_idx + 1}: {round(h.t, 2)} ms...")
 
     if rank == 0:
         for tt in range(0, int(h.tstop), 10):
@@ -200,7 +204,7 @@ def load_custom_mechanisms(net_verbose=True):
     h.nrn_load_dll(mech_fname[0])
 
     if net_verbose:
-        print("Loading custom mechanism files from %s" % mech_fname[0])
+        logger.info("Loading custom mechanism files from %s" % mech_fname[0])
 
     if not _is_loaded_mechanisms():
         raise ValueError("The custom mechanisms could not be loaded")
@@ -358,7 +362,7 @@ class NetworkBuilder(object):
         load_custom_mechanisms(self.net._verbose)
 
         if self._rank == 0 and self.net._verbose:
-            print("Building the NEURON model")
+            logger.info("Building the NEURON model")
 
         self._clear_last_network_objects()
 
@@ -393,7 +397,7 @@ class NetworkBuilder(object):
             self._record_extracellular()
 
         if self._rank == 0 and self.net._verbose:
-            print("[Done]")
+            logger.info("[Done]")
 
     def _gid_assign(self, rank=None, n_hosts=None):
         """Assign cell IDs to this node

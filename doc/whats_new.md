@@ -51,6 +51,12 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
       `optimization/objective_functions.py` and run a simulation.
       by [Vaishnavi Baghel][] in {gh}`1271`.
 
+- Logging is now unified on Python's standard `logging` library (see {gh}`1133`).
+  New functions {func}`hnn_core.configure_logging` and {func}`hnn_core.set_log_level`
+  let users choose the log level and, optionally, write a log file
+  (`configure_logging(log_file="hnn.log")` or the `HNN_CORE_LOG_FILE` environment
+  variable). The GUI log window now also shows messages from the core library.
+
 ### Upcoming Deprecations
 
 ### Bug Fixes
@@ -64,6 +70,26 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
   input/output/error streams. Thanks Camilo!
 
 ### Public API Changes
+
+- **Behavior change:** progress and status messages that were previously written with
+  `print()` (e.g. `Trial 1: ...`, `Building the NEURON model`, optimization progress,
+  `Writing file ...`) are now `logging` messages and are **no longer shown by default**.
+  Call `hnn_core.configure_logging()` (INFO messages are then written to `stderr`; pass
+  `stream=sys.stdout` to use `stdout`) or your own `logging` configuration on the
+  `"hnn_core"` logger to see them again. The `verbose` options keep their meaning.
+  Output of MPI child processes and of `JoblibBackend` and `BatchSimulate` worker
+  processes (`n_jobs > 1`) is still written to `stdout` as before; for workers, only if INFO
+  messages are enabled in the parent process.
+
+- Warnings that users are expected to act on (non-uniform synaptic gains, `maxiter`
+  being raised to 12, the number of trials being overwritten for `maximize_psd`) are now
+  emitted with `warnings.warn` instead of being printed. The GUI shows them in its log
+  window instead of the terminal.
+
+- Importing `hnn_core.gui` no longer replaces `sys.stdout`. The GUI logger is now named
+  `"hnn_core.gui"`; `hnn_core.gui._logging.logger` and messages emitted through the
+  former `"hnn_gui"` logger keep working. The GUI log window now also shows messages
+  from the core library.
 
 ### People who contributed to this release:
 
