@@ -448,7 +448,7 @@ def _update_ax(fig, ax, data, data_name, plot_type, plot_config):
             if plot_config.get("overlay_drive_arrows", False) and net_copied:
                 _add_arrows_to_dipole(ax, net_copied)
         else:
-            print("No dipole data")
+            logger.warning("No dipole data")
 
     elif plot_type == "network":
         if net_copied:
@@ -1021,7 +1021,7 @@ def _close_figure(b, widgets, data, fig_idx):
         # Get the index based on the title
         tab_idx = titles.index(_idx2figname(fig_idx))
         # Remove the child and title specified
-        print(f"Del fig_idx={fig_idx}, fig_idx={fig_idx}")
+        logger.debug(f"Del fig_idx={fig_idx}")
         tab_children.pop(tab_idx)
         titles.pop(tab_idx)
         # Reset children and titles of the tab object

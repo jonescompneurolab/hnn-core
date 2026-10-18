@@ -13,7 +13,9 @@ import sys
 import textwrap
 import urllib.parse
 import urllib.request
+import warnings
 import zipfile
+from contextlib import contextmanager
 from copy import deepcopy
 from datetime import datetime
 from functools import partial
@@ -193,9 +195,27 @@ def _status_box_html(css_class, message):
     return f"<div class='sim-status-box {css_class}'>{message}</div>"
 
 
+@contextmanager
+def _warnings_to_log_window():
+    """Show Python warnings raised in the block in the GUI log window.
+
+    Warnings still go through the normal ``warnings`` filters (so e.g. ignored
+    categories stay ignored), but their display is redirected to the GUI logger
+    instead of ``stderr``, so each warning appears in exactly one place. The
+    previous display hook is restored on exit, so non-GUI use of the library is
+    unaffected.
+    """
+
+    def _show_in_log_window(message, category, filename, lineno, file=None, line=None):
+        logger.warning(f"{category.__name__}: {message}")
+
+    with warnings.catch_warnings():
+        warnings.showwarning = _show_in_log_window
+        yield
+
+
 class _OutputWidgetHandler(logging.Handler):
     def __init__(self, output_widget, *args, **kwargs):
-        data_store.reset()
         super(_OutputWidgetHandler, self).__init__(*args, **kwargs)
         self.out = output_widget
 
@@ -213,25 +233,6 @@ class _OutputWidgetHandler(logging.Handler):
             "text": formatted_record + "\n",
         }
         self.out.outputs = (new_output,) + self.out.outputs
-
-
-class _GUI_PrintToLogger:
-    """Class to redirect print messages to the logger in the GUI"""
-
-    # when print is used, call the write method instead
-    def write(self, message):
-        # avoid logging empty/new lines
-        if message.strip():
-            # send the message to the logger
-            logger.info(message.strip())
-
-    # The flush method is required for compatibility with print
-    def flush(self):
-        pass
-
-
-# assign class to stdout to redirect print statements to the logger
-sys.stdout = _GUI_PrintToLogger()
 
 
 class HNNGUI:
@@ -1014,6 +1015,7 @@ class HNNGUI:
         # Run initialization functions
         # ----------------------------------------------------------------------
         self._init_ui_components()
+        data_store.reset()
         self.add_logging_window_logger()
 
     @staticmethod
@@ -1067,11 +1069,28 @@ class HNNGUI:
         return html_widget
 
     def add_logging_window_logger(self):
+        """Show messages from the ``hnn_core`` logger in the GUI log window.
+
+        The handler is attached to the package logger, so messages from both the
+        GUI and the core library are shown. Handlers from a previous GUI are
+        removed to avoid duplicated messages and stale widget references.
+        """
+        pkg_logger = logging.getLogger("hnn_core")
+        for old_handler in list(pkg_logger.handlers):
+            if isinstance(old_handler, _OutputWidgetHandler):
+                pkg_logger.removeHandler(old_handler)
+
         handler = _OutputWidgetHandler(self._log_out)
         handler.setFormatter(
             logging.Formatter("%(asctime)s  - [%(levelname)s] %(message)s")
         )
-        logger.addHandler(handler)
+        pkg_logger.addHandler(handler)
+        # The log window shows INFO messages unless the user chose a level
+        # explicitly (e.g. with ``hnn_core.configure_logging``).
+        if pkg_logger.level == logging.NOTSET and not pkg_logger.isEnabledFor(
+            logging.INFO
+        ):
+            pkg_logger.setLevel(logging.INFO)
 
     def _init_ui_components(self):
         """Initialize larger UI components and dynamical output windows.
@@ -4474,7 +4493,12 @@ def add_network_connectivity_tab(
     # itself, since the only "state" that contains the global gain information will be
     # the GUI itself! (This is because the Network can only store one gain value per
     # connection, but the GUI offers multiple ways to change gains...).
-    if _check_global_synaptic_gains_uniformity(net):
+    # The check reports non-uniform gains with a ``UserWarning``, which is shown in
+    # the log window.
+    with _warnings_to_log_window():
+        gains_are_uniform = _check_global_synaptic_gains_uniformity(net)
+
+    if gains_are_uniform:
         # If the check passes, then we can faithfully rely on the getter function to get
         # the global gain of each class, including the non-default ones.
         gui_global_gain_values = net.get_global_synaptic_gains()
@@ -4949,7 +4973,7 @@ def run_button_clicked(
         simulation_status_bar.value = simulation_status_contents["simulation_failed"]
         return
 
-    with log_out:
+    with log_out, _warnings_to_log_window():
         try:
             if (
                 _sim_name in simulation_data
@@ -5831,7 +5855,9 @@ def _generate_constraints_and_func(net, opt_drive_widgets):
                         _create_parametrized_syn_dicts_if_exist(syn_type, drive, params)
                     )
 
-                print(f"drive type is {drive['type']}, location={drive['location']}")
+                logger.info(
+                    f"drive type is {drive['type']}, location={drive['location']}"
+                )
                 if drive["type"] == "Poisson":
                     deployed_syn_dicts.update(
                         _create_parametrized_syn_dicts_if_exist(
@@ -5952,7 +5978,7 @@ def run_opt_button_clicked(
 
     This was built based off of `run_button_clicked`.
     """
-    with log_out:
+    with log_out, _warnings_to_log_window():
         simulation_data = data_store.simulated_data
         experimental_data = data_store.experimental_data
         try:
@@ -6281,7 +6307,7 @@ def run_opt_button_clicked(
                     )
                 else:
                     backend = JoblibBackend(n_jobs=n_jobs.value)
-                    print(f"Using Joblib with {n_jobs.value} core(s).")
+                    logger.info(f"Using Joblib with {n_jobs.value} core(s).")
 
                 with backend:
                     if opt_obj_fun == "maximize_psd":

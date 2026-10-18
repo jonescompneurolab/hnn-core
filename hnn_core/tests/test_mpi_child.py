@@ -1,5 +1,6 @@
 from pathlib import Path
 import io
+import logging
 from contextlib import redirect_stdout, redirect_stderr
 from queue import Queue
 
@@ -119,7 +120,7 @@ def test_str_to_net():
         _str_to_net(input_str)
 
 
-def test_child_run():
+def test_child_run(caplog):
     """Test running the child process without MPI"""
 
     hnn_core_root = Path(hnn_core.__file__).parent
@@ -136,12 +137,11 @@ def test_child_run():
     net_reduced._instantiate_drives(tstop=tstop, n_trials=n_trials)
 
     with MPISimulation(skip_mpi_import=True) as mpi_sim:
-        with io.StringIO() as buf, redirect_stdout(buf):
+        with caplog.at_level(logging.INFO, logger="hnn_core"):
             sim_data = mpi_sim.run(
                 net_reduced, tstop=tstop, dt=0.025, n_trials=n_trials
             )
-            stdout = buf.getvalue()
-        assert "Trial 1: 0.03 ms..." in stdout
+        assert "Trial 1: 0.03 ms..." in caplog.text
 
         with io.StringIO() as buf_err, redirect_stderr(buf_err):
             mpi_sim._send_data_to_parent_process(sim_data)
@@ -229,6 +229,13 @@ def test_permission_error():
 
 @requires_mpi4py
 @pytest.mark.uses_mpi
-def test_logging():
+def test_logging(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    root_handlers = list(logging.getLogger().handlers)
     with MPISimulation(verbose_subprocess=True) as mpi_sim:
         assert "mpi_child.rank" in mpi_sim.logger.name
+        # per-rank logger with its own file, not propagating to the root logger
+        assert mpi_sim.logger.propagate is False
+        mpi_sim.logger.info("hello from rank")
+        assert logging.getLogger().handlers == root_handlers
+    assert "hello from rank" in (tmp_path / "process_0.log").read_text()

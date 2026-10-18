@@ -3,6 +3,8 @@
 # Authors: Blake Caldwell <blake_caldwell@brown.edu>
 #          Mainak Jas <mainakjas@gmail.com>
 
+import logging
+import multiprocessing
 import os
 import sys
 import re
@@ -18,11 +20,15 @@ from pathlib import Path
 
 from typing import Union
 
+from ._logging import FORWARDED_ATTR, _enable_child_stdout_logging
 from .cell_response import CellResponse
 from .dipole import Dipole
 from .network_builder import _simulate_single_trial
 
 _BACKEND = None
+
+
+logger = logging.getLogger(__name__)
 
 
 def _thread_handler(event, out, queue):
@@ -164,7 +170,7 @@ def run_subprocess(
     timeout : float
         The number of seconds to wait for a process without output.
     verbose : bool, default False
-        If True, prints progress messages and status updates to stdout.
+        If True, logs progress messages and status updates (see :func:`~hnn_core.configure_logging`).
     *args, **kwargs : arguments
         Additional arguments to pass to subprocess.Popen.
     Returns
@@ -182,9 +188,8 @@ def run_subprocess(
     raw_pickle = pickle.dumps(obj)
     pickled_obj = base64.b64encode(raw_pickle)
     if verbose:
-        print(
-            f"Network size': {len(raw_pickle)} bytes ({len(raw_pickle) / 1024:.2f} KB)",
-            flush=True,
+        logger.info(
+            f"Network size': {len(raw_pickle)} bytes ({len(raw_pickle) / 1024:.2f} KB)"
         )
 
     # non-blocking adapted from https://stackoverflow.com/questions/375427/non-blocking-read-on-a-subprocess-pipe-in-python#4896288  # noqa: E501
@@ -260,10 +265,9 @@ def run_subprocess(
                 if child_out:
                     if not first_output_received:
                         if verbose:
-                            print(
+                            logger.info(
                                 f"nrniv startup time: {time.time() - t_start:.2f}s | "
-                                f"first output: {repr(child_out[:200])}",
-                                flush=True,
+                                f"first output: {repr(child_out[:200])}"
                             )
                         first_output_received = True
 
@@ -313,11 +317,10 @@ def run_subprocess(
                     t_now = time.time()
                     if t_now - last_alive_t >= stay_alive_interval:
                         elapsed_time = t_now - t_start
-                        print(
-                            "MPI simulation is still running. This may take several minutes."
-                            f"({elapsed_time:.1f}s elapsed)"
-                            "You may cancel if there is no response for a long time.",
-                            flush=True,
+                        logger.info(
+                            "MPI simulation is still running. This may take several minutes. "
+                            f"({elapsed_time:.1f}s elapsed) "
+                            "You may cancel if there is no response for a long time."
                         )
                         last_alive_t = t_now
                     count_since_last_output = 0
@@ -334,7 +337,9 @@ def run_subprocess(
                 # both exit conditions have been met (also we know that
                 # the network has been sent)
                 if verbose:
-                    print(f"process terminated after {time.time() - t_start:.2f}s")
+                    logger.info(
+                        f"process terminated after {time.time() - t_start:.2f}s"
+                    )
                 break
 
     except KeyboardInterrupt:
@@ -355,8 +360,8 @@ def run_subprocess(
         # wait for output again after kill signal
         outs, errs = proc.communicate(timeout=2)
 
-    sys.stdout.write(outs)
-    sys.stdout.write(errs)
+    _forward_child_output(outs)
+    _forward_child_output(errs)
 
     if proc.returncode is None:
         # It's theoretically possible that we have received data
@@ -430,6 +435,32 @@ def _process_child_data(path_data_file, data_len):
 
 # This is the input side.
 # sending the network configuration to NEURON
+def _simulate_single_trial_in_worker(net, tstop, dt, trial_idx, stdout_logging=False):
+    """Run `_simulate_single_trial`, optionally enabling progress output.
+
+    Only has an effect in a worker *process* (e.g. a loky worker), never in the
+    parent process or in threads, which already share the logging configuration.
+    """
+    if stdout_logging and multiprocessing.parent_process() is not None:
+        _enable_child_stdout_logging()
+    return _simulate_single_trial(net, tstop, dt, trial_idx)
+
+
+def _forward_child_output(text):
+    """Forward output of a child process to the user.
+
+    The text is written to stdout exactly as before (this is the only terminal
+    output). It is additionally logged, flagged as already shown on stdout, so
+    that the GUI log window and log files receive it without duplicating it on
+    the terminal.
+    """
+    if not text:
+        return
+    sys.stdout.write(text)
+    if text.strip():
+        logger.info(text.strip(), extra={FORWARDED_ATTR: True})
+
+
 def _echo_child_output(out_q):
     out = ""
     while True:
@@ -442,7 +473,7 @@ def _echo_child_output(out_q):
     # tell if anything was received and check the actual content
     # (logging the first line of nrniv output).
     if len(out) > 0:
-        sys.stdout.write(out)
+        _forward_child_output(out)
         return out
     return ""
 
@@ -469,7 +500,7 @@ def _get_data_info_from_child_err(err_q):
         err = err[: file_match.start()] + err[file_match.end() :]
 
     # print the rest of the child's stderr to our stdout
-    sys.stdout.write(err)
+    _forward_child_output(err)
 
     return data_length, data_file
 
@@ -717,13 +748,17 @@ class JoblibBackend(object):
             The Dipole results from each simulation trial
         """
         if net._verbose:
-            print(
+            logger.info(
                 f"Joblib will run {n_trials} trial(s) in parallel by "
                 f"distributing trials over {self.n_jobs} jobs."
             )
-        parallel, myfunc = self._parallel_func(_simulate_single_trial)
+        parallel, myfunc = self._parallel_func(_simulate_single_trial_in_worker)
+        # Worker processes do not share our logging configuration: if INFO messages
+        # are enabled here, let them write their progress to their own stdout.
+        worker_stdout_logging = self.n_jobs != 1 and logger.isEnabledFor(logging.INFO)
         sim_data = parallel(
-            myfunc(net, tstop, dt, trial_idx) for trial_idx in range(n_trials)
+            myfunc(net, tstop, dt, trial_idx, worker_stdout_logging)
+            for trial_idx in range(n_trials)
         )
 
         dpls = _gather_trial_data(
@@ -1007,7 +1042,7 @@ class MPIBackend(object):
         There will be a valid process handle present the queue when a MPI
         simulation is running.
     verbose : bool, default False
-        If True, prints progress messages and status updates to stdout.
+        If True, logs progress messages and status updates (see :func:`~hnn_core.configure_logging`).
     """
 
     def __init__(
@@ -1146,7 +1181,7 @@ class MPIBackend(object):
 
         # just use the joblib backend for a single core
         if self.n_procs == 1:
-            print(
+            logger.info(
                 "MPIBackend is set to use 1 core: transferring the "
                 "simulation to JoblibBackend...."
             )
@@ -1168,7 +1203,7 @@ class MPIBackend(object):
                 f"distribute the {net._n_cells} network neurons."
             )
 
-        print(
+        logger.info(
             f"MPI will run {n_trials} trial(s) sequentially by "
             f"distributing network neurons over {self.n_procs} processes."
         )

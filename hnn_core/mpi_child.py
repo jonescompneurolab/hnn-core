@@ -8,6 +8,7 @@ import sys
 import pickle
 import base64
 import re
+from hnn_core._logging import _enable_child_stdout_logging
 from hnn_core.parallel_backends import _extract_data, _extract_data_length
 import logging
 
@@ -63,19 +64,29 @@ class MPISimulation(object):
             size = self.comm.Get_size()
 
             if verbose_subprocess:
+                # Each rank writes to its own file through its own logger. The
+                # root logger is deliberately left alone.
                 log_filename = f"process_{self.rank}.log"
-                logging.basicConfig(
-                    filename=log_filename,
-                    filemode="w",
-                    level=logging.INFO,
-                    format=f"[Rank {self.rank}/{size}] %(asctime)s - %(levelname)s - %(message)s",
+                handler = logging.FileHandler(log_filename, mode="w")
+                handler.setFormatter(
+                    logging.Formatter(
+                        f"[Rank {self.rank}/{size}] %(asctime)s - %(levelname)s - "
+                        "%(message)s"
+                    )
                 )
-                self.logger = logging.getLogger(f"mpi_child.rank{self.rank}")
+                self.logger = logging.getLogger(f"hnn_core.mpi_child.rank{self.rank}")
+                self.logger.setLevel(logging.INFO)
+                self.logger.propagate = False
+                self.logger.addHandler(handler)
 
     def __enter__(self):
         return self
 
     def __exit__(self, type, value, traceback):
+        if self.logger is not None:
+            for handler in list(self.logger.handlers):
+                self.logger.removeHandler(handler)
+                handler.close()
         # skip Finalize() if we didn't import MPI on __init__
         if hasattr(self, "comm"):
             from mpi4py import MPI
@@ -213,6 +224,10 @@ if __name__ == "__main__":
 
     rc = 0
     verbose_subprocess = "--verbose-subprocess" in sys.argv
+
+    # The parent process forwards this process' stdout to the user, but does not
+    # share its logging configuration: send status messages there.
+    _enable_child_stdout_logging()
 
     try:
         with MPISimulation(verbose_subprocess=verbose_subprocess) as mpi_sim:
