@@ -6,6 +6,8 @@ from pathlib import Path
 from copy import deepcopy
 import warnings
 
+import numpy as np
+
 import hnn_core
 from hnn_core import read_params
 from .network import Network, _create_cell_coords
@@ -621,7 +623,7 @@ def calcium_model(
     return net
 
 
-def duecker_ET_model(params=None, add_default_drives=False, mesh_shape=(10, 10)):
+def duecker_ET_model(params=None, add_erp_drives=False, mesh_shape=(10, 10)):
     """Instantiate the Duecker human-derived model (publication pending)
 
     Parameters
@@ -630,9 +632,11 @@ def duecker_ET_model(params=None, add_default_drives=False, mesh_shape=(10, 10))
         The path to the parameter file for constructing the network.
         If None, parameters loaded from 'default_duecker_ET.json'
         Default: None
-    add_default_drives : bool, default=False
-        If True, add drives as commonly used. Note that these drives, like the model
-        itself, are subject to change until the time of release.
+    add_erp_drives : bool, default=False
+        If True, add evoked drives used to generate Event-Related Potentials (ERPs) in
+        the upcoming Duecker model publication. Note that these drives are SUBJECT TO
+        CHANGE until the time of publication! The current values will probably not be
+        the final values used in the publication.
     mesh_shape : tuple of int (default: (10, 10))
         Defines the (n_x, n_y) shape of the grid of pyramidal cells.
 
@@ -954,77 +958,78 @@ def duecker_ET_model(params=None, add_default_drives=False, mesh_shape=(10, 10))
 
     # Add drives, if requested
     # ----------------------------------------------------------------------------------
-    if add_default_drives:
+    if add_erp_drives:
         weights_ampa_p1 = {
-            "L2_inhibitory": 0.01,
-            "L2_pyramidal": 0.015,
-            "L5_inhibitory": 0.0,
-            "L5_pyramidal": 0.03,
+            "L2_inhibitory": np.float64(0.007588122527131926),
+            "L2_pyramidal": np.float64(0.018642951414638384),
+            "L5_inhibitory": np.float64(7.6438985456048e-15),
+            "L5_pyramidal": np.float64(0.013984204478845295),
         }
         weights_nmda_p1 = {
-            "L2_inhibitory": 0.01,
-            "L2_pyramidal": 0.05,
-            "L5_inhibitory": 0.0,
-            "L5_pyramidal": 0.025,
+            "L2_inhibitory": np.float64(0.012050887238347885),
+            "L2_pyramidal": np.float64(0.029485349160794205),
+            "L5_inhibitory": np.float64(1.002171790226989e-15),
+            "L5_pyramidal": np.float64(0.005379056342376538),
         }
-        synaptic_delays_prox = {
+        synaptic_delays_p1 = {
             "L2_inhibitory": 0.1,
             "L2_pyramidal": 0.1,
-            "L5_inhibitory": 1,
-            "L5_pyramidal": 1,
+            "L5_inhibitory": 1.0,
+            "L5_pyramidal": 1.0,
         }
-
         net.add_evoked_drive(
             "prox1",
-            mu=18,
-            sigma=2.5,
+            location="proximal",
+            cell_specific=True,
+            mu=15.59527767691755,
+            sigma=2.792948035872017,
             numspikes=1,
             weights_ampa=weights_ampa_p1,
             weights_nmda=weights_nmda_p1,
-            location="proximal",
-            synaptic_delays=synaptic_delays_prox,
+            synaptic_delays=synaptic_delays_p1,
         )
 
         weights_ampa_d1 = {
-            "L2_inhibitory": 0.005,
-            "L2_pyramidal": 0.01,
-            "L5_pyramidal": 1.0,
+            "L2_inhibitory": np.float64(4.378900714089845e-06),
+            "L2_pyramidal": np.float64(8.300973449010934e-05),
+            "L5_pyramidal": np.float64(1.1808240677861086),
         }
         weights_nmda_d1 = {
-            "L2_inhibitory": 0.0,
-            "L2_pyramidal": 0.01,
-            "L5_pyramidal": 1.0,
+            "L2_inhibitory": np.float64(2.1176135674160224e-12),
+            "L2_pyramidal": np.float64(0.00010941280722617688),
+            "L5_pyramidal": np.float64(0.013519066989944073),
         }
-        synaptic_delays_dist = {
+        synaptic_delays_d1 = {
             "L2_inhibitory": 0.1,
             "L2_pyramidal": 0.1,
             "L5_pyramidal": 0.1,
         }
-
         net.add_evoked_drive(
             "dist1",
-            mu=62,
-            sigma=5,
-            numspikes=2,
+            location="distal",
+            cell_specific=True,
+            mu=59.187666976120305,
+            sigma=4.446160189077672,
+            numspikes=4,
             weights_ampa=weights_ampa_d1,
             weights_nmda=weights_nmda_d1,
-            location="distal",
-            synaptic_delays=synaptic_delays_dist,
+            synaptic_delays=synaptic_delays_d1,
         )
 
         weights_ampa_p2 = {
-            "L2_inhibitory": 0.01,
-            "L2_pyramidal": 0.3,
-            "L5_inhibitory": 0.001,
-            "L5_pyramidal": 0.3,
+            "L2_inhibitory": np.float64(1.0000447086287455e-15),
+            "L2_pyramidal": np.float64(0.015172234470615126),
+            "L5_inhibitory": np.float64(2.247668491134226e-07),
+            "L5_pyramidal": np.float64(0.2984173605845747),
         }
         weights_nmda_p2 = {
-            "L2_inhibitory": 0.01,
-            "L2_pyramidal": 0.2,
-            "L5_inhibitory": 0.001,
-            "L5_pyramidal": 0.2,
+            "L2_inhibitory": np.float64(1.495423386739259e-15),
+            "L2_pyramidal": np.float64(1.9874771611430298e-05),
+            "L5_inhibitory": np.float64(7.46394548638012e-08),
+            "L5_pyramidal": np.float64(0.0012506313370813725),
         }
-        synaptic_delays_prox = {
+
+        synaptic_delays_p2 = {
             "L2_inhibitory": 0.1,
             "L2_pyramidal": 0.1,
             "L5_inhibitory": 1.0,
@@ -1032,13 +1037,14 @@ def duecker_ET_model(params=None, add_default_drives=False, mesh_shape=(10, 10))
         }
         net.add_evoked_drive(
             "prox2",
-            mu=100,
-            sigma=15,
-            numspikes=1,
+            location="proximal",
+            cell_specific=True,
+            mu=122.49858703637535,
+            sigma=14.42431814878363,
+            numspikes=3,
             weights_ampa=weights_ampa_p2,
             weights_nmda=weights_nmda_p2,
-            location="proximal",
-            synaptic_delays=synaptic_delays_prox,
+            synaptic_delays=synaptic_delays_p2,
         )
 
     return net
