@@ -2003,7 +2003,7 @@
             "type": "evoked",
             "location": "distal",
             "n_drive_cells": 21,
-            "event_seed": 26,
+            "event_seed": 272,
             "conn_seed": 3,
             "dynamics": {
                 "mu": 63.53,
@@ -2039,7 +2039,7 @@
             "type": "evoked",
             "location": "proximal",
             "n_drive_cells": 24,
-            "event_seed": 47,
+            "event_seed": 507,
             "conn_seed": 3,
             "dynamics": {
                 "mu": 26.61,
@@ -2079,7 +2079,7 @@
             "type": "evoked",
             "location": "proximal",
             "n_drive_cells": 24,
-            "event_seed": 71,
+            "event_seed": 777,
             "conn_seed": 3,
             "dynamics": {
                 "mu": 137.12,
