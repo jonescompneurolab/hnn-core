@@ -15,7 +15,7 @@ hnn_core_root = Path(__file__).parents[1]
 assets_path = Path(hnn_core_root, "tests", "assets")
 
 
-@pytest.fixture(params=["jones", "duecker"])
+@pytest.fixture(params=[True, False])
 def batch_simulate_instance(tmp_path, request):
     """Fixture for creating a BatchSimulate instance with custom parameters."""
 
@@ -54,7 +54,7 @@ def batch_simulate_instance(tmp_path, request):
         save_folder=tmp_path,
         batch_size=3,
         n_trials=3,
-        bsl_cor=request.param,
+        baseline_correction=request.param,
     )
 
 

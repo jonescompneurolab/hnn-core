@@ -26,14 +26,15 @@ the ["`pip` Source Installation" section of our Installation Guide][] on our [Te
 website][]. Note that this is **different** from the "`pip` Package Installation" type
 on that webpage!
 
-We are experimenting with having once-monthly HNN Development meetings which are open to
-the public. These take place on the first Monday of every month at 1:00 PM, United
-States Eastern time (the [timezone of Providence, RI, viewable
-here](https://www.timeanddate.com/worldclock/usa/providence)). You can access the Zoom
-room here
-[https://brown.zoom.us/j/99212200748](https://brown.zoom.us/j/99212200748). Note that
-there is a waiting room and you *must raise your hand* before you will be granted
-audio/video privileges. We will kick out anyone causing disruptions during the meeting.
+Once a month, we host our HNN Development meetings publicly, which anyone interested is
+welcome to attend. These take place on the first Monday of every month at 11:00 AM,
+United States Eastern time (the [timezone of Providence, RI, viewable
+here](https://www.timeanddate.com/worldclock/usa/providence)). (Note that in the case of
+that Monday being a holiday according to [this
+calendar](https://hr.brown.edu/benefits-wellness/paid-time/holiday-schedule), then the
+meeting will be rescheduled to the same time on the next available workday). You can
+access the Zoom room here
+[https://brown.zoom.us/j/99212200748](https://brown.zoom.us/j/99212200748).
 
 ## How to contribute code
 
@@ -575,11 +576,7 @@ We provide multiple sources of documentation (including websites) for HNN:
    API documentation is *automatically generated* from the [NumPy-style
    docstrings](https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard)
    in our Python code by [`sphinx`](https://www.sphinx-doc.org/en/master/index.html),
-   which creates nice-looking webpages to display the docstrings. This also
-   automatically executes the scripts in our `examples` directory, subsequently and
-   automatically creating webpages for the scripts (including executed output) and
-   Jupyter notebooks for the scripts (not including executed output). We are currently
-   in the process of moving this notebook execution to the Textbook repo. You can build
+   which creates nice-looking webpages to display the docstrings. You can build
    a local version of the Developer Portal (including the Public API Documentation) for
    inspection by following [this section
    below](#building-developer-documentation-locally).
@@ -650,20 +647,11 @@ The Developer Portal website, including the Public API Documentation, can be bui
 Installation" section of our Installation Guide][]), which you already did if you used
 the above installation instructions.
 
-You can build a local version of the Developer Portal, **including execution of most
-`examples` scripts**, using the following command:
+You can build a local version of the Developer Portal using the following command:
 
 ```
 cd doc/  # Unnecessary if you're already in the "hnn-core/doc" directory
 make html
-```
-
-Alternatively, if you want to build the Developer Portal website locally **without
-executing** any `examples` scripts, use the command:
-
-```
-cd doc/  # Unnecessary if you're already in the "hnn-core/doc" directory
-make html-noplot
 ```
 
 Finally, to view the website, do:

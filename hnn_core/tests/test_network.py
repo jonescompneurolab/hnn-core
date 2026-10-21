@@ -445,8 +445,18 @@ def test_network_models():
             == 200.0
         )
 
-    # Check add_default_erp()
+    # Check add_default_erp() and input arguments to neymotin_2020_model
     net_default = neymotin_2020_model()
+
+    net_params_str = neymotin_2020_model(params=str(params_fname))
+    assert net_default == net_params_str
+    net_params_path = neymotin_2020_model(params=params_fname)
+    assert net_default == net_params_path
+    net_params_dict = neymotin_2020_model(params=read_params(params_fname))
+    assert net_default == net_params_dict
+    net_params_none = neymotin_2020_model(params=None)
+    assert net_default == net_params_none
+
     with pytest.raises(TypeError, match="net must be"):
         add_erp_drives_to_jones_model(net="invalid_input")
     with pytest.raises(TypeError, match="tstart must be"):

@@ -157,9 +157,9 @@ def test_child_run():
         sim_data = _process_child_data(data_path, data_len)
         n_trials = 1
         postproc = False
-        for bsl_cor in {"jones", "duecker"}:
+        for baseline_correction in [True, False]:
             dpls = _gather_trial_data(
-                sim_data, net_reduced, n_trials, postproc, bsl_cor
+                sim_data, net_reduced, n_trials, postproc, baseline_correction
             )
             assert len(dpls) == 1
 
