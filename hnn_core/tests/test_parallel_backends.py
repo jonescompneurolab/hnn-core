@@ -481,7 +481,7 @@ def test_compare_duecker_model_output(backend):
     # Note: If you need to regenerate the "old" data, then where you run the script from
     # will determine where the output files are saved, so make sure to run the script
     # from the "top-level" repository directory (i.e. the one that contains the
-    # `setup.py` file).
+    # `pyproject.toml` file).
     dpl_old = loadtxt("dipole_duecker_output_old.txt")
     cell_response_old = read_spikes("spikes_duecker_output_old.txt")
 
