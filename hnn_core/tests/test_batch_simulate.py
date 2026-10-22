@@ -8,10 +8,11 @@ import time
 import pytest
 import numpy as np
 
+import hnn_core
 from hnn_core.batch_simulate import BatchSimulate
 from hnn_core import neymotin_2020_model
 
-hnn_core_root = Path(__file__).parents[1]
+hnn_core_root = Path(hnn_core.__file__).parent
 assets_path = Path(hnn_core_root, "tests", "assets")
 
 
@@ -50,7 +51,7 @@ def batch_simulate_instance(tmp_path, request):
     return BatchSimulate(
         net=net,
         set_params=set_params,
-        tstop=30,
+        tstop=40,
         save_folder=tmp_path,
         batch_size=3,
         n_trials=3,
