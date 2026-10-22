@@ -118,20 +118,21 @@ cp -r _build/html/* ~/new-docs
 
 12. Next, install the dependencies we need for building a local version of our package using:
 ```
-pip install -U setuptools twine
+pip install -U build twine
 ```
 
-13. Build our package locally using the following:
+13. Build our package locally using the following (clearing out old build output first matters, since stale files listed there, such as old compiled mechanisms, can get packed into the packages):
 ```
-python setup.py sdist
+make clean-packaging  # same as `rm -rf build dist hnn_core.egg-info`
+python -m build
 ```
-This will create a "source tarball" package file of the new version in a new directory at `dist/hnn_core-<version>.tar.gz`. Note that we *do not build wheels*, we only build source tarballs.
+This will create both a source tarball (`dist/hnn_core-<version>.tar.gz`) and a wheel (`dist/hnn_core-<version>-py3-none-any.whl`) of the new version in a new `dist` directory.
 
 14. Check some metadata of our package, using:
 ```
 twine check dist/*
 ```
-After this step, you can delete the package file inside `dist` or the `dist` directory itself, we will not be using that package file.
+After this step, you can delete the package files inside `dist` or the `dist` directory itself, we will not be using those package files.
 
 ## 4. Create your release PR
 

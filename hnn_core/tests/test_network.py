@@ -4,6 +4,7 @@ from contextlib import redirect_stdout
 from copy import deepcopy
 import io
 from pathlib import Path
+import subprocess
 import tempfile
 import warnings
 
@@ -31,7 +32,11 @@ from hnn_core.network import (
     _get_cell_index_by_synapse_type,
     pick_connection,
 )
-from hnn_core.network_builder import NetworkBuilder
+from hnn_core.network_builder import (
+    NetworkBuilder,
+    _build_mechanisms,
+    _find_mech_library,
+)
 from hnn_core.network_models import add_erp_drives_to_jones_model
 from hnn_core.viz import plot_dipole
 
@@ -3128,3 +3133,35 @@ def test_deprecated_jones_2009_model():
         net = jones_2009_model(add_drives_from_params=True, mesh_shape=(3, 3))
 
     simulate_dipole(net, dt=0.5, tstop=20.0, verbose=True)
+
+
+def test_find_mech_library(tmp_path):
+    """Test that only a compiled library counts as built mechanisms."""
+    # a leftover architecture directory from a failed build is not enough
+    arch_dir = tmp_path / "arm64"
+    arch_dir.mkdir()
+    (arch_dir / "hh2.c").touch()
+    assert _find_mech_library(tmp_path) is None
+
+    mech_fname = arch_dir / ".libs" / "libnrnmech.so"
+    mech_fname.parent.mkdir()
+    mech_fname.touch()
+    assert _find_mech_library(tmp_path) == mech_fname
+
+
+def test_build_mechanisms_errors(tmp_path, monkeypatch):
+    """Test that failing to compile the mechanisms raises informative errors."""
+    monkeypatch.setattr("hnn_core.network_builder.shutil.which", lambda cmd: None)
+    with pytest.raises(FileNotFoundError, match="Could not find 'nrnivmodl'"):
+        _build_mechanisms(tmp_path, verbose=False)
+
+    monkeypatch.setattr("hnn_core.network_builder.shutil.which", lambda cmd: cmd)
+    failed_build = subprocess.CompletedProcess(
+        args=["nrnivmodl"], returncode=1, stdout="", stderr="fake compiler error"
+    )
+    monkeypatch.setattr(
+        "hnn_core.network_builder.subprocess.run",
+        lambda *args, **kwargs: failed_build,
+    )
+    with pytest.raises(RuntimeError, match="fake compiler error"):
+        _build_mechanisms(tmp_path, verbose=False)

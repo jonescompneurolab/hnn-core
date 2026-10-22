@@ -3,6 +3,7 @@ name: Publish Python 🐍 distribution package to PyPI and TestPyPI
 # Relevant documentation links:
 # - https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
 # - https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#running-your-workflow-only-when-a-push-of-specific-tags-occurs
+# - https://jonescompneurolab.github.io/hnn-core/stable/how_to_create_releases.html
 
 on:
   push:
@@ -23,17 +24,26 @@ jobs:
       with:
         persist-credentials: false
 
+    - name: Find max Python version supported by HNN-Core
+      id: max-python
+      # Reads the highest "Programming Language :: Python :: 3.X" classifier
+      # in pyproject.toml
+      run: |
+        version=$(grep -oE '"Programming Language :: Python :: [0-9]+\.[0-9]+"' pyproject.toml \
+          | grep -oE '[0-9]+\.[0-9]+' | sort -V | tail -n1)
+        [ -n "$version" ] || { echo "No Python version classifiers found in pyproject.toml"; exit 1; }
+        echo "version=$version" >> "$GITHUB_OUTPUT"
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        # Max version currently supported by HNN-Core
-        python-version: "3.13"
+        python-version: ${{ steps.max-python.outputs.version }}
 
     - name: Install some preliminary build libs
       run: >-
         python3 -m
         pip install
-        setuptools twine
+        build twine
         --user
 
     - name: Install HNN-Core
@@ -47,11 +57,11 @@ jobs:
       run: |
         make clean
 
-    - name: Build ONLY a source tarball
+    - name: Build a source tarball and a wheel
       run: |
-        python setup.py sdist
+        python3 -m build
 
-    - name: Check source tarball
+    - name: Check distribution packages
       run: |
         twine check dist/*
 

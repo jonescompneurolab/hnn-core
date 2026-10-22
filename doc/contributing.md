@@ -231,7 +231,7 @@ contribution to `doc/whats_new.md` so that you can can publicly receive credit.
        which commands do which things.
 
 14. Test your code: go to the "top-level" directory of your repository (i.e. `cd` into
-    the folder that has the file `setup.py` in it), then run the following command:
+    the folder that has the file `pyproject.toml` in it), then run the following command:
 
     ```
     make test
