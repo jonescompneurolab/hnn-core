@@ -3,13 +3,16 @@
 
 # make rules
 
-.PHONY: all clean lint modl regenerate-test-network test
+.PHONY: all clean clean-packaging lint modl regenerate-test-network test
 
 all: modl
 
-clean :
+clean:
 	rm -rf hnn_core/mod/x86_64
 	rm -rf hnn_core/mod/arm64
+
+clean-packaging:
+	rm -rf build dist hnn_core.egg-info
 
 format-check:
 	@if command -v ruff > /dev/null; then \

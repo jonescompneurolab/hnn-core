@@ -121,8 +121,9 @@ cp -r _build/html/* ~/new-docs
 pip install -U build twine
 ```
 
-13. Build our package locally using the following:
+13. Build our package locally using the following (clearing out old build output first matters, since stale files listed there can get packed into the package):
 ```
+make clean-packaging  # same as `rm -rf build dist hnn_core.egg-info`
 python -m build --sdist
 ```
 This will create a "source tarball" package file of the new version in a new directory at `dist/hnn_core-<version>.tar.gz`. Note that we *do not build wheels*, we only build source tarballs.
