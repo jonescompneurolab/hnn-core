@@ -1,6 +1,7 @@
 # HNN-core build
 hnn_core/mod/x86_64/
 hnn_core/mod/arm64/
+hnn_core/mod/.build.lock
 
 # Distribution / packaging
 .Python

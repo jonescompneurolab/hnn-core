@@ -5,6 +5,10 @@
 #          Blake Caldwell <blake_caldwell@brown.edu>
 
 import os
+import platform
+import shutil
+import subprocess
+from contextlib import contextmanager
 from copy import deepcopy
 from pathlib import Path
 import numpy as np
@@ -181,26 +185,112 @@ def _is_loaded_mechanisms():
         return True
 
 
-def load_custom_mechanisms(net_verbose=True):
-    if _is_loaded_mechanisms():
-        return
+def _find_mech_library(mod_dir):
+    """Recursively find the compiled .so / .dll mechanism library.
 
-    # recursively find the .so / .dll library
-    mech_fname = list()
-    mod_dir = Path(__file__).parent / "mod"
+    Returns
+    -------
+    mech_fname : Path | None
+        Path to the library, or None if the mechanisms have not been compiled.
+    """
     for root, dirnames, filenames in os.walk(mod_dir):
         for filename in filenames:
             if filename.endswith((".so", ".dll")):
-                mech_fname.append(str(Path(root) / filename))
-                break
+                return Path(root) / filename
+    return None
 
-    if len(mech_fname) == 0:
-        raise FileNotFoundError(f"No .so or .dll file found in {mod_dir}")
 
-    h.nrn_load_dll(mech_fname[0])
+@contextmanager
+def _mod_build_lock(mod_dir):
+    """Hold an exclusive lock so only one process compiles mod_dir at a time.
+
+    Parallel workers (MPI ranks, joblib jobs, pytest-xdist workers) can all
+    reach this point at once. If mod_dir is read-only, nothing can be compiled
+    there anyway, so no lock is taken.
+    """
+    try:
+        lock_file = open(Path(mod_dir) / ".build.lock", "w")
+    except OSError:
+        lock_file = None
+
+    if lock_file is None:
+        yield
+        return
+
+    with lock_file:
+        if platform.system() == "Windows":
+            import msvcrt
+
+            # LK_LOCK gives up after 10 one-second retries, but another
+            # process may still be compiling, so keep waiting
+            while True:
+                try:
+                    msvcrt.locking(lock_file.fileno(), msvcrt.LK_LOCK, 1)
+                    break
+                except OSError:
+                    continue
+        else:
+            import fcntl
+
+            fcntl.flock(lock_file, fcntl.LOCK_EX)
+        # closing lock_file releases the lock
+        yield
+
+
+def _build_mechanisms(mod_dir, verbose=True):
+    """Compile the NEURON mechanisms (.mod files) in mod_dir with nrnivmodl.
+
+    Returns
+    -------
+    mech_fname : Path
+        Path to the compiled library.
+    """
+    if shutil.which("nrnivmodl") is None:
+        raise FileNotFoundError(
+            "Could not find 'nrnivmodl', which is needed to compile the NEURON "
+            "mechanisms used by HNN-Core. Make sure NEURON is installed and its "
+            "binaries are on your PATH."
+        )
+
+    if verbose:
+        print(f"Compiling NEURON mechanisms in {mod_dir} (only needed once) ...")
+
+    result = subprocess.run(
+        ["nrnivmodl"],
+        cwd=mod_dir,
+        capture_output=True,
+        text=True,
+        shell=platform.system() == "Windows",
+    )
+    mech_fname = _find_mech_library(mod_dir)
+    if result.returncode != 0 or mech_fname is None:
+        raise RuntimeError(
+            f"nrnivmodl failed to compile the NEURON mechanisms in {mod_dir} "
+            f"(exit code {result.returncode}). You can retry by running "
+            f"'nrnivmodl' in that directory.\n"
+            f"stdout:\n{result.stdout}\n"
+            f"stderr:\n{result.stderr}"
+        )
+    return mech_fname
+
+
+def load_custom_mechanisms(net_verbose=True):
+    """Load HNN-Core's NEURON mechanisms, compiling them on first use."""
+    if _is_loaded_mechanisms():
+        return
+
+    mod_dir = Path(__file__).parent / "mod"
+    # Hold the lock even when only looking for the library, so a process never
+    # loads a library that another process is still writing
+    with _mod_build_lock(mod_dir):
+        mech_fname = _find_mech_library(mod_dir)
+        if mech_fname is None:
+            mech_fname = _build_mechanisms(mod_dir, verbose=net_verbose)
+
+    h.nrn_load_dll(str(mech_fname))
 
     if net_verbose:
-        print("Loading custom mechanism files from %s" % mech_fname[0])
+        print("Loading custom mechanism files from %s" % mech_fname)
 
     if not _is_loaded_mechanisms():
         raise ValueError("The custom mechanisms could not be loaded")

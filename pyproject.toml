@@ -1,7 +1,9 @@
+# [build-system]
+# requires = ["setuptools>=40.8.0", "NEURON >=7.7, <=8.2.7; platform_system != 'Windows'"]
+# build-backend = "setuptools.build_meta:__legacy__"
 [build-system]
-# >=77 is needed for the SPDX `license` string and `license-files`. NEURON is
-# needed because setup.py compiles the mechanisms (.mod files) at build time.
-requires = ["setuptools>=77", "NEURON >=7.7, <=8.2.7; platform_system != 'Windows'"]
+# >=77 is needed for the SPDX `license` string and `license-files`
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
