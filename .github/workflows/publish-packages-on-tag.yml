@@ -36,9 +36,9 @@ jobs:
         with open("pyproject.toml", "rb") as f:
             classifiers = tomllib.load(f)["project"]["classifiers"]
         versions = [
-            tuple(int(part) for part in m.group(1).split("."))
-            for c in classifiers
-            if (m := re.fullmatch(r"Programming Language :: Python :: (\d+\.\d+)", c))
+            tuple(int(part) for part in matches.group(1).split("."))
+            for classifier in classifiers
+            if (matches := re.fullmatch(r"Programming Language :: Python :: (\d+\.\d+)", classifier))
         ]
         print("version=" + ".".join(str(part) for part in max(versions)))
         EOF
@@ -66,11 +66,11 @@ jobs:
       run: |
         make clean
 
-    - name: Build ONLY a source tarball
+    - name: Build a source tarball and a wheel
       run: |
-        python3 -m build --sdist
+        python3 -m build
 
-    - name: Check source tarball
+    - name: Check distribution packages
       run: |
         twine check dist/*
 
