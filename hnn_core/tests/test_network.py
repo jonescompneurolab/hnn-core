@@ -1111,7 +1111,7 @@ def test_network_drives(fix_default_params, fix_net_model, request):
         name="bursty1",
         tstart=10.0,
         tstart_std=0.5,
-        tstop=30.0,
+        tstop=40,
         location="proximal",
         burst_rate=100.0,
         burst_std=0.0,
@@ -1141,7 +1141,7 @@ def test_network_drives(fix_default_params, fix_net_model, request):
     net.add_poisson_drive(
         name="poisson1",
         tstart=10.0,
-        tstop=30.0,
+        tstop=40.0,
         rate_constant=50.0,
         location="distal",
         n_drive_cells=n_drive_cells,
@@ -1679,7 +1679,7 @@ def test_network_connectivity(base_network):
     assert len(net.connectivity) == 0
 
     with pytest.warns(UserWarning, match="No connections"):
-        simulate_dipole(net, tstop=10, dt=0.5)
+        simulate_dipole(net, tstop=40, dt=0.5)
 
 
 @pytest.mark.parametrize(
@@ -1894,7 +1894,7 @@ def test_tonic_biases_gid_routing(fix_net_model, request):
             # Check if input GID(s) stored correctly -- these should always be lists
             assert all_biased_gids == expected_spiking_gid_list
             # Simulate
-            dpl = simulate_dipole(net, tstop=20, dt=0.5)
+            dpl = simulate_dipole(net, tstop=40, dt=0.5)
             # Check that only the target gid spiked
             only_spiking_gids = np.unique(
                 np.array(net.cell_response.spike_gids, dtype=int)
@@ -2089,7 +2089,7 @@ def test_tonic_biases_gid_routing(fix_net_model, request):
                 net.gid_ranges[cell_type]
             )
             # Simulate
-            dpl = simulate_dipole(net, tstop=20, dt=0.5)
+            dpl = simulate_dipole(net, tstop=40, dt=0.5)
             # Check that only this cell type spiked
             assert (
                 np.unique(np.array(net.cell_response.spike_gids))
@@ -2396,7 +2396,7 @@ def test_network_models_mesh(fix_net_model, request):
 
     net_model = request.getfixturevalue(fix_net_model)
     net, _ = net_model(mesh_shape=mesh_shape)
-    dp = simulate_dipole(net, tstop=20.0, dt=0.5)
+    dp = simulate_dipole(net, tstop=40.0, dt=0.5)
     assert dp is not None
     assert len(dp[0].times) > 0
     assert np.all(np.isfinite(dp[0].data["agg"]))
@@ -2489,7 +2489,7 @@ def test_set_global_synaptic_gains(fix_net_model, request):
 
     # Verify network can be simulated with very heterogeneous gains
     net.connectivity[1]["nc_dict"]["gain"] = 0.37
-    dpls = simulate_dipole(net, tstop=10.0, dt=0.5, n_trials=1)
+    dpls = simulate_dipole(net, tstop=40.0, dt=0.5, n_trials=1)
     assert len(dpls[0].times) > 0
 
 
@@ -2769,12 +2769,12 @@ def test_rename_cell_types(base_network, fix_load_featureful_tmp_path):
     #
     # Test that the networks actually run
     #
-    dpls1 = simulate_dipole(net1, tstop=10.0, dt=0.5, n_trials=1)
+    dpls1 = simulate_dipole(net1, tstop=40.0, dt=0.5, n_trials=1)
     plot_dipole(dpls1, show=False)
     net1.cell_response.plot_spikes_raster(show=False)
     net1.cell_response.plot_spikes_hist(show=False)
 
-    dpls2 = simulate_dipole(net2, tstop=10.0, dt=0.5, n_trials=1)
+    dpls2 = simulate_dipole(net2, tstop=40.0, dt=0.5, n_trials=1)
     plot_dipole(dpls2, show=False)
     # Currently, `CellResponse` plotters only auto-display cell-types if they
     # are the canonical four; if we are using different cell-type names, like
@@ -2786,7 +2786,7 @@ def test_rename_cell_types(base_network, fix_load_featureful_tmp_path):
     # `plot_spikes_hist()` does work.
     net2.cell_response.plot_spikes_hist(show=False)
 
-    dpls3 = simulate_dipole(net3, tstop=10.0, dt=0.5, n_trials=1)
+    dpls3 = simulate_dipole(net3, tstop=40.0, dt=0.5, n_trials=1)
     plot_dipole(dpls3, show=False)
     net3.cell_response.plot_spikes_raster(show=False)
     net3.cell_response.plot_spikes_hist(show=False)
@@ -2795,7 +2795,7 @@ def test_rename_cell_types(base_network, fix_load_featureful_tmp_path):
     net4 = hnn_core.hnn_io.read_network_configuration(fix_load_featureful_tmp_path)
 
     net4._rename_cell_types(cell_type_rename_mapping)
-    dpls4 = simulate_dipole(net4, tstop=10.0, dt=0.5, n_trials=1)
+    dpls4 = simulate_dipole(net4, tstop=40.0, dt=0.5, n_trials=1)
     plot_dipole(dpls4, show=False)
     net4.cell_response.plot_spikes_raster(
         show=False, cell_types=list(cell_type_rename_mapping.values())
@@ -3249,11 +3249,11 @@ def test_verbose():
     net = neymotin_2020_model(mesh_shape=(3, 3))
 
     with io.StringIO() as buf, redirect_stdout(buf):
-        simulate_dipole(net, dt=0.5, tstop=20.0, verbose=True)
+        simulate_dipole(net, dt=0.5, tstop=40.0, verbose=True)
         assert "Trial 1" in buf.getvalue()
 
     with io.StringIO() as buf, redirect_stdout(buf):
-        simulate_dipole(net, dt=0.5, tstop=20.0, verbose=False)
+        simulate_dipole(net, dt=0.5, tstop=40.0, verbose=False)
         assert buf.getvalue() == ""
 
 
@@ -3261,4 +3261,4 @@ def test_deprecated_jones_2009_model():
     with pytest.warns(FutureWarning, match="default model with `jones_2009_model`"):
         net = jones_2009_model(add_drives_from_params=True, mesh_shape=(3, 3))
 
-    simulate_dipole(net, dt=0.5, tstop=20.0, verbose=True)
+    simulate_dipole(net, dt=0.5, tstop=40.0, verbose=True)

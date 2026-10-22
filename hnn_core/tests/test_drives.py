@@ -22,7 +22,7 @@ def test_external_drive_times():
 
     drive_type = "invalid_drive"
     dynamics = dict(mu=5, sigma=0.5, numspikes=1)
-    tstop = 10
+    tstop = 40
     pytest.raises(ValueError, _drive_cell_event_times, "invalid_drive", dynamics, tstop)
     pytest.raises(
         ValueError, _drive_cell_event_times, "ss", dynamics, tstop

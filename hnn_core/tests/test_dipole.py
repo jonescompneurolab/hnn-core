@@ -199,26 +199,24 @@ def test_dipole_simulation(fix_net_neymotin_2020, fix_default_params):
     """Test data produced from simulate_dipole() call."""
     net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
     with pytest.raises(ValueError, match="Invalid number of simulations: 0"):
-        simulate_dipole(net, tstop=25.0, n_trials=0)
+        simulate_dipole(net, tstop=40, n_trials=0)
     with pytest.raises(ValueError, match="Invalid value for the"):
-        simulate_dipole(net, tstop=25.0, n_trials=1, record_vsec="abc")
+        simulate_dipole(net, tstop=40, n_trials=1, record_vsec="abc")
     with pytest.raises(ValueError, match="Invalid value for the"):
-        simulate_dipole(
-            net, tstop=25.0, n_trials=1, record_vsec=False, record_isec="abc"
-        )
+        simulate_dipole(net, tstop=40, n_trials=1, record_vsec=False, record_isec="abc")
     with pytest.raises(ValueError, match="Invalid value for the"):
         simulate_dipole(
             net,
-            tstop=25.0,
+            tstop=40,
             n_trials=1,
             record_vsec=False,
             record_isec=False,
             record_ca="abc",
         )
     # test Network.copy() returns 'bare' network after simulating
-    dpl = simulate_dipole(net, tstop=25.0, n_trials=1)[0]
+    dpl = simulate_dipole(net, tstop=40, n_trials=1)[0]
     assert net._dt == 0.025
-    assert net._tstop == 25.0
+    assert net._tstop == 40
     net_copy = net.copy()
     assert len(net_copy.external_drives["evprox1"]["events"]) == 0
 
@@ -474,7 +472,7 @@ def test_dipole_baseline_correction_mpi(
     net, _ = net_model(reduced=True, add_drives_from_params=True)
     fix_run_simulation(
         net,
-        tstop=20.0,
+        tstop=40.0,
         dt=0.5,
         backend="mpi",  # Use all available cores
         baseline_correction=baseline_correction,

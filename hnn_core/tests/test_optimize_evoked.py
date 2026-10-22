@@ -98,6 +98,7 @@ def test_optimize_evoked(fix_net_neymotin_2020):
     net_orig.external_drives["evdist1"]["dynamics"]["sigma"] = 2.0
     del net_orig.external_drives["evprox2"]
 
+    # Not increasing the tstop further because this is already a compute-expensive test
     tstop = 10.0
     n_trials = 1
     dpl_orig = simulate_dipole(net_orig, tstop=tstop, n_trials=n_trials)[0]

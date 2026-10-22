@@ -118,7 +118,7 @@ def test_child_run(fix_net_model, request):
     """Test running the child process without MPI"""
     net_model = request.getfixturevalue(fix_net_model)
     net_reduced, _ = net_model(add_drives_from_params=True, reduced=True)
-    tstop, n_trials = 25, 2
+    tstop, n_trials = 40, 2
     net_reduced._instantiate_drives(tstop=tstop, n_trials=n_trials)
 
     with MPISimulation(skip_mpi_import=True) as mpi_sim:

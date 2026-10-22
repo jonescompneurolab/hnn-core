@@ -26,6 +26,8 @@ def test_optimize_evoked(solver, obj_fun, fix_net_model, request):
     """Test optimization routines for evoked drives in a reduced network."""
 
     max_iter = 2
+    # Keeping tstop short to keep the test fast through many iterations and
+    # parametrizations
     tstop = 10.0
     n_trials = 1
 

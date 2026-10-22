@@ -51,7 +51,7 @@ def batch_simulate_instance(tmp_path, request):
     return BatchSimulate(
         net=net,
         set_params=set_params,
-        tstop=30,
+        tstop=40,
         save_folder=tmp_path,
         batch_size=3,
         n_trials=3,

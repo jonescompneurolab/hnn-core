@@ -311,7 +311,8 @@ def test_cell_response(tmp_path, input_metadata):
     spike_times = [[1.0, 2.0, 3.0]]
     spike_gids = [[1, 1, 3]]
     spike_types = [["L2_pyramidal", "L2_pyramidal", "L2_basket"]]
-    tstart, tstop = 0.0, 10.0
+    # Keeping tstop short since tests assume a specific number of spikes
+    tstart, tstop = 0.0, 10
     gid_ranges = {
         "L2_pyramidal": range(1, 2),
         "L2_basket": range(3, 4),
@@ -363,7 +364,7 @@ def test_rate_over_time_trial_idx():
     spike_times = [[2.0], [8.0], [14.0]]
     spike_gids = [[7], [7], [7]]
     spike_types = [["L5_basket"], ["L5_basket"], ["L5_basket"]]
-    tstart, tstop, fs = 0.0, 20.0, 10.0
+    tstart, tstop, fs = 0.0, 40, 10.0
     sim_times = np.arange(tstart, tstop, 1 / fs)
 
     cell_response = CellResponse(
@@ -552,7 +553,7 @@ def test_rate_over_time_validation():
     spike_times = [[2.0], [8.0]]
     spike_gids = [[7], [7]]
     spike_types = [["L5_basket"], ["L5_basket"]]
-    tstart, tstop, fs = 0.0, 20.0, 10.0
+    tstart, tstop, fs = 0.0, 40, 10.0
     sim_times = np.arange(tstart, tstop, 1 / fs)
     total_duration = sim_times[-1] - sim_times[0]
     dt = np.diff(sim_times)[0]

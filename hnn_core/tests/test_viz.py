@@ -1039,7 +1039,7 @@ def test_network_plotter_simulation(fix_net_neymotin_2020):
         net_plot.export_movie("demo.gif", dpi=200)
 
     # Errors if vsec isn't recorded with record_vsec='all'
-    _ = simulate_dipole(net, dt=0.5, tstop=10, record_vsec="soma")
+    _ = simulate_dipole(net, dt=0.5, tstop=40, record_vsec="soma")
     net_plot = NetworkPlotter(net)
 
     assert net_plot.vsec_array.shape == (159, 1)
@@ -1050,7 +1050,7 @@ def test_network_plotter_simulation(fix_net_neymotin_2020):
         net_plot.export_movie("demo.gif", dpi=200)
 
     net, _ = fix_net_neymotin_2020(reduced=True)
-    _ = simulate_dipole(net, dt=0.5, tstop=10, record_vsec="all", n_trials=2)
+    _ = simulate_dipole(net, dt=0.5, tstop=40, record_vsec="all", n_trials=2)
     net_plot = NetworkPlotter(net)
     # setter/getter test for time_idx and trial_idx
     net_plot.time_idx = 5
@@ -1058,8 +1058,8 @@ def test_network_plotter_simulation(fix_net_neymotin_2020):
     net_plot.trial_idx = 1
     assert net_plot.trial_idx == 1
 
-    assert net_plot.vsec_array.shape == (159, 21)
-    assert net_plot.color_array.shape == (159, 21, 4)
+    assert net_plot.vsec_array.shape == (159, 81)
+    assert net_plot.color_array.shape == (159, 81, 4)
     assert net_plot._vsec_recorded is True
     assert isinstance(net_plot._cbar, Colorbar)
 
@@ -1116,7 +1116,7 @@ def test_network_plotter_setter(fix_net_neymotin_2020):
 def test_network_plotter_export(tmp_path, fix_net_neymotin_2020):
     """Test NetworkPlotter class export methods."""
     net, _ = fix_net_neymotin_2020(reduced=True)
-    _ = simulate_dipole(net, dt=0.5, tstop=10, n_trials=1, record_vsec="all")
+    _ = simulate_dipole(net, dt=0.5, tstop=40, n_trials=1, record_vsec="all")
     net_plot = NetworkPlotter(net)
 
     # Check no file is already written
