@@ -20,7 +20,7 @@ from pathlib import Path
 
 from typing import Union
 
-from ._logging import _enable_child_stdout_logging
+from ._logging import _configure_child_logging
 from .cell_response import CellResponse
 from .dipole import Dipole
 from .network_builder import _simulate_single_trial
@@ -436,13 +436,13 @@ def _process_child_data(path_data_file, data_len):
 # This is the input side.
 # sending the network configuration to NEURON
 def _simulate_single_trial_in_worker(net, tstop, dt, trial_idx, stdout_logging=False):
-    """Run `_simulate_single_trial`, optionally enabling progress output.
+    """Run `_simulate_single_trial`, following the parent's logging choice.
 
     Only has an effect in a worker *process* (e.g. a loky worker), never in the
     parent process or in threads, which already share the logging configuration.
     """
-    if stdout_logging and multiprocessing.parent_process() is not None:
-        _enable_child_stdout_logging()
+    if multiprocessing.parent_process() is not None:
+        _configure_child_logging(stdout_logging)
     return _simulate_single_trial(net, tstop, dt, trial_idx)
 
 
@@ -740,7 +740,7 @@ class JoblibBackend(object):
         parallel, myfunc = self._parallel_func(_simulate_single_trial_in_worker)
         # Worker processes do not share our logging configuration: if INFO messages
         # are enabled here, let them write their progress to their own stdout.
-        worker_stdout_logging = self.n_jobs != 1 and logger.isEnabledFor(logging.INFO)
+        worker_stdout_logging = logger.isEnabledFor(logging.INFO)
         sim_data = parallel(
             myfunc(net, tstop, dt, trial_idx, worker_stdout_logging)
             for trial_idx in range(n_trials)

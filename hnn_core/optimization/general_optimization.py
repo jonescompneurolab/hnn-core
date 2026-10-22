@@ -233,7 +233,7 @@ class Optimizer:
             data comparison. There is no smoothing applied by default, so you must pass
             a value if you want any smoothing.
         verbose : bool, default=True
-            If True, log build steps and simulation progress (see :func:`~hnn_core.configure_logging` to display them).
+            If True, log build steps and simulation progress (shown by default, see :func:`~hnn_core.configure_logging`).
 
         Notes
         -----

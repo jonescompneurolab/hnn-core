@@ -69,7 +69,7 @@ def simulate_dipole(
         preferred way is to use the :meth:`~hnn_core.dipole.Dipole.smooth` and
         :meth:`~hnn_core.dipole.Dipole.scale` methods after the simulation is run instead.
     verbose : bool, default=True
-        If True, log build steps and simulation progress (see :func:`~hnn_core.configure_logging` to display them).
+        If True, log build steps and simulation progress (shown by default, see :func:`~hnn_core.configure_logging`).
     baseline_correction : bool, default=True
         Whether to apply the baseline correction after simulation (which correction is
         used depends on ``Network._model_variant``). Defaults to True, applying the

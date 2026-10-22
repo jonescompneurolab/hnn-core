@@ -1,6 +1,8 @@
 """Tests for the centralized logging configuration."""
 
+import contextlib
 import importlib
+import io
 import logging
 import subprocess
 import sys
@@ -47,19 +49,40 @@ def _owned():
     return [h for h in pkg_logger.handlers if getattr(h, _OWNED_ATTR, False)]
 
 
-def test_import_is_silent():
-    """Importing hnn_core must not configure logging or write output."""
+def test_import_shows_progress_by_default():
+    """Importing hnn_core shows INFO messages on stdout and leaves the root alone."""
     code = (
         "import logging, hnn_core;"
         "l = logging.getLogger('hnn_core');"
         "print(len(logging.getLogger().handlers),"
-        " [type(h).__name__ for h in l.handlers], l.level)"
+        " [type(h).__name__ for h in l.handlers], l.level);"
+        "logging.getLogger('hnn_core.x').info('progress');"
+        "logging.getLogger('hnn_core.x').debug('hidden')"
     )
     res = subprocess.run(
         [sys.executable, "-c", code], capture_output=True, text=True, check=True
     )
     assert _hnn_stderr(res.stderr) == ""
-    assert res.stdout.strip() == "0 ['NullHandler'] 0"
+    assert res.stdout.splitlines() == [
+        "0 ['NullHandler', '_StdoutHandler'] 20",
+        "progress",
+    ]
+
+
+def test_default_handler_follows_stdout_redirection(capsys):
+    """Like ``print``, the default handler writes to the *current* ``sys.stdout``."""
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        logging.getLogger("hnn_core.x").info("redirected")
+    assert buf.getvalue() == "redirected\n"
+    assert capsys.readouterr().out == ""
+
+
+def test_stream_false_silences_default_output(capsys):
+    configure_logging(stream=False)
+    logging.getLogger("hnn_core.x").info("silent")
+    captured = capsys.readouterr()
+    assert captured.out == "" and captured.err == ""
 
 
 def test_public_api():
@@ -72,13 +95,13 @@ def test_levels_and_stream(capsys):
     child.info("hidden info")
     child.warning("shown warning")
     child.error("shown error")
-    err = capsys.readouterr().err
-    assert "hidden info" not in err
-    assert "shown warning" in err and "shown error" in err
+    out = capsys.readouterr().out
+    assert "hidden info" not in out
+    assert "shown warning" in out and "shown error" in out
 
     configure_logging(level=logging.DEBUG)
     child.debug("shown debug")
-    assert "shown debug" in capsys.readouterr().err
+    assert "shown debug" in capsys.readouterr().out
 
 
 def test_invalid_level():
@@ -100,20 +123,20 @@ def test_idempotent_and_host_handlers_kept(tmp_path):
 
 
 def test_no_duplicate_with_root_handler(caplog, capsys):
-    root_stream = logging.StreamHandler(sys.stdout)
+    root_stream = logging.StreamHandler(sys.stderr)
     logging.getLogger().addHandler(root_stream)
     try:
         configure_logging()
         logging.getLogger("hnn_core.x").info("only-once")
         captured = capsys.readouterr()
-        assert captured.err.count("only-once") == 1
-        assert "only-once" not in captured.out
+        assert captured.out.count("only-once") == 1
+        assert "only-once" not in captured.err
 
         configure_logging(propagate=True, stream=False)
         logging.getLogger("hnn_core.x").info("via-root")
         captured = capsys.readouterr()
-        assert captured.out.count("via-root") == 1
-        assert "via-root" not in captured.err
+        assert captured.err.count("via-root") == 1
+        assert "via-root" not in captured.out
     finally:
         logging.getLogger().removeHandler(root_stream)
 
@@ -163,17 +186,20 @@ def test_failed_configure_keeps_previous(tmp_path):
     assert _owned() == before
 
 
-def test_set_log_level(caplog):
+def test_set_log_level():
+    before = _owned()
     set_log_level("ERROR")
     assert pkg_logger.level == logging.ERROR
-    assert not _owned()
+    assert _owned() == before
 
 
 def test_stream_accepts_file_like(capsys):
-    configure_logging(stream=sys.stdout)
-    logging.getLogger("hnn_core.x").info("to stdout")
+    buf = io.StringIO()
+    configure_logging(stream=buf)
+    logging.getLogger("hnn_core.x").info("to buffer")
     captured = capsys.readouterr()
-    assert "to stdout" in captured.out and captured.err == ""
+    assert buf.getvalue() == "to buffer\n"
+    assert captured.out == "" and captured.err == ""
 
 
 def test_child_stdout_logging_isolated_and_idempotent():
@@ -199,30 +225,30 @@ def test_child_stdout_logging_isolated_and_idempotent():
 _JOBLIB_SCRIPT = """
 import sys
 from hnn_core import neymotin_2020_model, simulate_dipole, JoblibBackend
-if {configure}:
+if {silence}:
     from hnn_core import configure_logging
-    configure_logging()
+    configure_logging(level="WARNING")
 net = neymotin_2020_model(mesh_shape=(3, 3), add_drives_from_params=True)
 with JoblibBackend(n_jobs=2):
     simulate_dipole(net, tstop=10, n_trials=2, dt=0.5, verbose=True)
 """
 
 
-@pytest.mark.parametrize("configure", [False, True])
-def test_joblib_workers_progress_follows_parent_logging(configure):
-    """Worker-process progress appears (on stdout) only if INFO is enabled."""
+@pytest.mark.parametrize("silence", [False, True])
+def test_joblib_workers_progress_follows_parent_logging(silence):
+    """Worker-process progress appears (on stdout) unless the parent silenced INFO."""
     res = subprocess.run(
-        [sys.executable, "-c", _JOBLIB_SCRIPT.format(configure=configure)],
+        [sys.executable, "-c", _JOBLIB_SCRIPT.format(silence=silence)],
         capture_output=True,
         text=True,
         check=True,
     )
-    if configure:
-        assert "Trial 1" in res.stdout and "Trial 2" in res.stdout
-        assert "Building the NEURON model" in res.stdout
-    else:
+    if silence:
         assert "Trial" not in res.stdout + res.stderr
         assert "Building" not in res.stdout + res.stderr
+    else:
+        assert "Trial 1" in res.stdout and "Trial 2" in res.stdout
+        assert "Building the NEURON model" in res.stdout
 
 
 def test_joblib_worker_helper_ignored_in_parent_process():
@@ -237,6 +263,23 @@ def test_joblib_worker_helper_ignored_in_parent_process():
     _simulate_single_trial_in_worker(net, 5, 0.5, 0, True)
     assert len(pkg_logger.handlers) == n_handlers
     assert pkg_logger.propagate == propagate
+
+
+def test_joblib_worker_helper_silent_when_parent_logging_is_off(
+    monkeypatch, capsys
+):
+    """A worker process stays silent if INFO messages are disabled in the parent."""
+    import multiprocessing
+
+    from hnn_core import neymotin_2020_model
+    from hnn_core.parallel_backends import _simulate_single_trial_in_worker
+
+    monkeypatch.setattr(multiprocessing, "parent_process", lambda: object())
+    net = neymotin_2020_model(mesh_shape=(3, 3), add_drives_from_params=True)
+    net._instantiate_drives(tstop=5, n_trials=1)
+    _simulate_single_trial_in_worker(net, 5, 0.5, 0, False)
+    assert "Building the NEURON model" not in capsys.readouterr().out
+    assert not _owned()
 
 
 def test_maximize_psd_trials_warning():
@@ -396,9 +439,9 @@ _BATCH_SCRIPT = """
 import sys, tempfile
 from hnn_core import neymotin_2020_model
 from hnn_core.batch_simulate import BatchSimulate
-if {configure}:
+if {silence}:
     from hnn_core import configure_logging
-    configure_logging()
+    configure_logging(level="WARNING")
 
 def set_params(net, p):
     net.add_evoked_drive(
@@ -417,19 +460,19 @@ batch.run({{"mu": [10, 20]}}, n_jobs=2, backend="loky", verbose=True,
 """
 
 
-@pytest.mark.parametrize("configure", [False, True])
-def test_batch_simulate_workers_progress_follows_parent_logging(configure):
-    """BatchSimulate worker progress appears (on stdout) only if INFO is enabled."""
+@pytest.mark.parametrize("silence", [False, True])
+def test_batch_simulate_workers_progress_follows_parent_logging(silence):
+    """BatchSimulate worker progress appears (on stdout) unless INFO was silenced."""
     res = subprocess.run(
-        [sys.executable, "-c", _BATCH_SCRIPT.format(configure=configure)],
+        [sys.executable, "-c", _BATCH_SCRIPT.format(silence=silence)],
         capture_output=True,
         text=True,
         check=True,
     )
-    if configure:
-        assert "Building the NEURON model" in res.stdout
-    else:
+    if silence:
         assert "Building the NEURON model" not in res.stdout + res.stderr
+    else:
+        assert "Building the NEURON model" in res.stdout
 
 
 def test_batch_simulate_worker_enables_logging_in_worker_process(monkeypatch, capsys):

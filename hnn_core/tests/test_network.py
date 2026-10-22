@@ -3245,19 +3245,20 @@ def test_check_global_synaptic_gains_uniformity():
 
 
 def test_verbose(caplog, capsys):
-    """Test that verbose flag controls log messages (and nothing goes to stdout)."""
+    """Test that the verbose flag controls whether progress is logged and shown."""
 
     net = neymotin_2020_model(mesh_shape=(3, 3))
 
     with caplog.at_level(logging.INFO, logger="hnn_core"):
         simulate_dipole(net, dt=0.5, tstop=40.0, verbose=True)
     assert "Trial 1" in caplog.text
-    assert "Trial 1" not in capsys.readouterr().out
+    assert "Trial 1" in capsys.readouterr().out  # shown by default
 
     caplog.clear()
     with caplog.at_level(logging.INFO, logger="hnn_core"):
         simulate_dipole(net, dt=0.5, tstop=40.0, verbose=False)
     assert "Trial 1" not in caplog.text
+    assert "Trial 1" not in capsys.readouterr().out
 
 
 def test_deprecated_jones_2009_model():

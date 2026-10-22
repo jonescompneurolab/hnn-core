@@ -256,7 +256,7 @@ def _rmse_evoked(
         n_trials : int, default=1
             Number of trials to simulate and average.
         verbose : bool, optional
-            If True, log build steps and simulation progress (see :func:`~hnn_core.configure_logging` to display them). Default: True.
+            If True, log build steps and simulation progress (shown by default, see :func:`~hnn_core.configure_logging`). Default: True.
 
     best : dict, optional
         Dictionary with keys "obj" and "params" to store the best objective value and
@@ -334,7 +334,7 @@ def _maximize_psd(
             Weight for each frequency band in f_bands. If a single float is provided,
             the same weight is applied to all frequency bands.
         verbose : bool, optional
-            If True, log build steps and simulation progress (see :func:`~hnn_core.configure_logging` to display them). Default: True.
+            If True, log build steps and simulation progress (shown by default, see :func:`~hnn_core.configure_logging`). Default: True.
 
     best : dict, optional
         Dictionary with keys "obj" and "params" to store the best objective value and
@@ -419,7 +419,7 @@ def _anticorr_evoked(
         n_trials : int, default=1
             Number of trials to simulate and average.
         verbose : bool, optional
-            If True, log build steps and simulation progress (see :func:`~hnn_core.configure_logging` to display them). Default: True.
+            If True, log build steps and simulation progress (shown by default, see :func:`~hnn_core.configure_logging`). Default: True.
 
     best : dict, optional
         Dictionary with keys "obj" and "params" to store the best objective value and
@@ -501,7 +501,7 @@ def _rmse_corr_evoked(
         n_trials : int, default=1
             Number of trials to simulate and average.
         verbose : bool, optional
-            If True, log build steps and simulation progress (see :func:`~hnn_core.configure_logging` to display them). Default: True.
+            If True, log build steps and simulation progress (shown by default, see :func:`~hnn_core.configure_logging`). Default: True.
 
     best : dict, optional
         Dictionary with keys "obj" and "params" to store the best objective value and

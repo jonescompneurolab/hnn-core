@@ -53,7 +53,7 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 - Logging is now unified on Python's standard `logging` library (see {gh}`1133`).
   New functions {func}`hnn_core.configure_logging` and {func}`hnn_core.set_log_level`
-  let users choose the log level and, optionally, write a log file
+  let users choose the log level, silence the output and, optionally, write a log file
   (`configure_logging(log_file="hnn.log")` or the `HNN_CORE_LOG_FILE` environment
   variable).
 
@@ -71,15 +71,16 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ### Public API Changes
 
-- **Behavior change:** progress and status messages that were previously written with
-  `print()` (e.g. `Trial 1: ...`, `Building the NEURON model`, optimization progress,
-  `Writing file ...`) are now `logging` messages and are **no longer shown by default**.
-  Call `hnn_core.configure_logging()` (INFO messages are then written to `stderr`; pass
-  `stream=sys.stdout` to use `stdout`) or your own `logging` configuration on the
-  `"hnn_core"` logger to see them again. The `verbose` options keep their meaning.
-  Output of MPI child processes and of `JoblibBackend` and `BatchSimulate` worker
-  processes (`n_jobs > 1`) is still written to `stdout` as before; for workers, only if INFO
-  messages are enabled in the parent process.
+- Progress and status messages that were previously written with `print()` (e.g.
+  `Trial 1: ...`, `Building the NEURON model`, optimization progress,
+  `Writing file ...`) are now `logging` messages. They are still **shown by default**, on
+  `stdout`, and the `verbose` options keep their meaning. Use
+  `hnn_core.configure_logging()` to change the level or silence them
+  (`configure_logging(stream=False)`), or to also write them to a log file. When your
+  application configures the root logger and wants to receive the messages there, pass
+  `propagate=True`. Output of MPI child processes and of `JoblibBackend` and
+  `BatchSimulate` worker processes (`n_jobs > 1`) is written to `stdout` as before, and
+  follows the logging level set in the parent process.
 
 - Warnings that users are expected to act on (`maxiter`
   being raised to 12, the number of trials being overwritten for `maximize_psd`) are now

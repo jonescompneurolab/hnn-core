@@ -5,6 +5,7 @@ https://pytest.org/en/stable/example/simple.html#incremental-testing-test-steps
 
 from typing import Dict, Tuple
 import copy
+import logging
 import pytest
 import pickle
 
@@ -1066,6 +1067,20 @@ def fix_default_params():
     """
     params_fname = hnn_core_root / "param" / "default.json"
     return read_params(params_fname)
+
+
+@pytest.fixture(autouse=True)
+def propagate_hnn_core_logs():
+    """Let pytest's ``caplog`` (a root logger handler) see ``hnn_core`` messages.
+
+    ``hnn_core`` does not propagate its messages to the root logger by default, so
+    that they are not printed twice when an application configures the root logger.
+    """
+    logger = logging.getLogger("hnn_core")
+    propagate = logger.propagate
+    logger.propagate = True
+    yield
+    logger.propagate = propagate
 
 
 def pytest_runtest_makereport(item, call):

@@ -12,7 +12,7 @@ from pathlib import Path
 import numpy as np
 from joblib import Parallel, delayed, parallel_config
 
-from ._logging import _enable_child_stdout_logging
+from ._logging import _configure_child_logging
 from .network import Network
 from .externals.mne import _validate_type, _check_option
 from .dipole import simulate_dipole
@@ -215,7 +215,7 @@ class BatchSimulate(object):
             completely operationable; all other backends are in
             development. Default is `loky`.
         verbose : bool
-            If True, log build steps and simulation progress (see :func:`~hnn_core.configure_logging` to display them). Default: True.
+            If True, log build steps and simulation progress (shown by default, see :func:`~hnn_core.configure_logging`). Default: True.
 
         Returns
         -------
@@ -314,9 +314,7 @@ class BatchSimulate(object):
 
         # Worker processes do not share our logging configuration: if INFO messages
         # are enabled here, let them write their progress to their own stdout.
-        self._worker_stdout_logging = (
-            self._verbose and n_jobs != 1 and logger.isEnabledFor(logging.INFO)
-        )
+        self._worker_stdout_logging = logger.isEnabledFor(logging.INFO)
         with parallel_config(backend=backend):
             res = Parallel(n_jobs=n_jobs)(
                 delayed(self._run_single_sim)(params) for params in param_combinations
@@ -342,8 +340,8 @@ class BatchSimulate(object):
         """
 
         # Only has an effect in a worker *process*, never in the parent or in threads.
-        if self._worker_stdout_logging and multiprocessing.parent_process() is not None:
-            _enable_child_stdout_logging()
+        if multiprocessing.parent_process() is not None:
+            _configure_child_logging(self._worker_stdout_logging)
 
         net = self.net.copy()
         self.set_params(net, param_values)
