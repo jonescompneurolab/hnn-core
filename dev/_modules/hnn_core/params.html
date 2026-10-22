@@ -831,6 +831,22 @@
             <span class="k">if</span> <span class="s2">"duecker_ET_model"</span> <span class="ow">in</span> <span class="p">(</span><span class="n">params_input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"model_variant"</span><span class="p">),):</span>
                 <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params_input</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                     <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">params_input</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="c1"># The below is needed for an obscure problem: In the Neymotin model,</span>
+                <span class="c1"># `params_default.py` is used to add blank `record_XXX` keys to</span>
+                <span class="c1"># `net._params` before network build time. These keys are needed at the</span>
+                <span class="c1"># time of `NetworkBuilder._build()`. In the case of `simulate_dipole`,</span>
+                <span class="c1"># these keys are filled in using the passed parameters. However, there</span>
+                <span class="c1"># is a case where we try to execute a simulation WITHOUT using</span>
+                <span class="c1"># `simulate_dipole`, which is when we are testing</span>
+                <span class="c1"># `mpi_child.py::MPISimulation.run()` by itself. In this case,</span>
+                <span class="c1"># `NetworkBuilder._build()` still needs these keys to be present, but</span>
+                <span class="c1"># the Duecker model fails here because 1. it does not inherit params</span>
+                <span class="c1"># from `params_default.py` and 2. `simulate_dipole` has not been</span>
+                <span class="c1"># called. Therefore, these three keys need to be artificially added so</span>
+                <span class="c1"># that we can test `mpi_child.py::MPISimulation.run()` by itself.</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"record_vsec"</span><span class="p">,</span> <span class="s2">"record_isec"</span><span class="p">,</span> <span class="s2">"record_ca"</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params_input</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">params_default</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params_default</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                     <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params_input</span><span class="p">:</span>
