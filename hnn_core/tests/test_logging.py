@@ -265,9 +265,7 @@ def test_joblib_worker_helper_ignored_in_parent_process():
     assert pkg_logger.propagate == propagate
 
 
-def test_joblib_worker_helper_silent_when_parent_logging_is_off(
-    monkeypatch, capsys
-):
+def test_joblib_worker_helper_silent_when_parent_logging_is_off(monkeypatch, capsys):
     """A worker process stays silent if INFO messages are disabled in the parent."""
     import multiprocessing
 
