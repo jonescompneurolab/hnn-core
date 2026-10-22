@@ -1166,10 +1166,11 @@ class MPIBackend(object):
 
         # just use the joblib backend for a single core
         if self.n_procs == 1:
-            logger.info(
-                "MPIBackend is set to use 1 core: transferring the "
-                "simulation to JoblibBackend...."
-            )
+            if net._verbose:
+                logger.info(
+                    "MPIBackend is set to use 1 core: transferring the "
+                    "simulation to JoblibBackend...."
+                )
             return JoblibBackend(n_jobs=1).simulate(
                 net,
                 tstop=tstop,
@@ -1188,10 +1189,11 @@ class MPIBackend(object):
                 f"distribute the {net._n_cells} network neurons."
             )
 
-        logger.info(
-            f"MPI will run {n_trials} trial(s) sequentially by "
-            f"distributing network neurons over {self.n_procs} processes."
-        )
+        if net._verbose:
+            logger.info(
+                f"MPI will run {n_trials} trial(s) sequentially by "
+                f"distributing network neurons over {self.n_procs} processes."
+            )
 
         env = _get_mpi_env()
         self.proc, sim_data = run_subprocess(

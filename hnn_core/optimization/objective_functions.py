@@ -187,6 +187,7 @@ def _calculate_obj_fun(
             dt=obj_fun_kwargs.get("dt", 0.025),
             n_trials=obj_fun_kwargs.get("n_trials", 1),
             baseline_correction=obj_fun_kwargs.get("baseline_correction", True),
+            verbose=obj_fun_kwargs.get("verbose", True),
         )
 
         # smooth & scale all dipoles
@@ -201,7 +202,8 @@ def _calculate_obj_fun(
             best["obj"] = obj
             best["params"] = predicted_params.copy()
 
-    logger.info(f"Mean Loss: {np.mean(obj):.2f}; Min Loss: {np.min(obj):.2f}")
+    if obj_fun_kwargs.get("verbose", True):
+        logger.info(f"Mean Loss: {np.mean(obj):.2f}; Min Loss: {np.min(obj):.2f}")
     # Update the store of objective function values via a "side-effect" in-place in the
     # parent scope
     obj_values.append(obj)
