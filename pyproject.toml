@@ -93,6 +93,7 @@ include = ["hnn_core*"]
 # Match `find_packages()`: skip directories without an `__init__.py`
 namespaces = false
 
+# This replaces MANIFEST.in
 [tool.setuptools.package-data]
 hnn_core = [
     "mod/*.mod",
