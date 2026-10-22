@@ -33,7 +33,7 @@ jobs:
       run: >-
         python3 -m
         pip install
-        setuptools twine
+        build twine
         --user
 
     - name: Install HNN-Core
@@ -49,7 +49,7 @@ jobs:
 
     - name: Build ONLY a source tarball
       run: |
-        python setup.py sdist
+        python3 -m build --sdist
 
     - name: Check source tarball
       run: |

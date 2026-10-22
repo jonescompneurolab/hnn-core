@@ -1,32 +1,13 @@
 #! /usr/bin/env python
+# All package metadata and configuration lives in pyproject.toml. This file only
+# exists to compile the NEURON mechanisms (.mod files) at build time.
 import platform
 from pathlib import Path
-import os
 import subprocess
 import shutil
 
-from setuptools import setup, find_packages, Command
+from setuptools import setup, Command
 from setuptools.command.build_py import build_py
-
-descr = """Code for biophysical simulation of a cortical column using Neuron"""
-
-DISTNAME = "hnn-core"
-DESCRIPTION = descr
-MAINTAINER = "Mainak Jas"
-MAINTAINER_EMAIL = "mainakjas@gmail.com"
-URL = ""
-LICENSE = "BSD (3-clause)"
-DOWNLOAD_URL = "http://github.com/jonescompneurolab/hnn-core"
-
-# get the version
-version = None
-with open(Path("hnn_core") / "__init__.py", "r") as fid:
-    for line in (line.strip() for line in fid):
-        if line.startswith("__version__"):
-            version = line.split("=")[1].strip().strip('"')
-            break
-if version is None:
-    raise RuntimeError("Could not determine version")
 
 
 # test install with:
@@ -78,97 +59,5 @@ class build_py_mod(build_py):
         build_py.run(self)
 
 
-# `scikit-learn` requires installation of `joblib`, so technically, running optimization
-# code does not strictly require installation of the `[parallel]` extras. However, it
-# *does* require some of the same packages that are installed in the `[parallel]`
-# extras. `joblib` will thus be installed in the `[gui]` extras case, but via the
-# `scikit-learn` dependency, not via the `[parallel]` extras.
 if __name__ == "__main__":
-    extras = {
-        "opt": ["cma", "scikit-learn"],
-        "parallel": ["joblib", "psutil"],
-        "test": [
-            "codespell",
-            "pytest",
-            "pytest-cov",
-            "pytest-xdist",
-            "ruff<0.16.0",
-        ],
-        "docs": [
-            "mne",
-            "myst-parser",
-            "nibabel",
-            "numpydoc",
-            "pillow",
-            "pooch<1.9.0",
-            "pydata-sphinx-theme",
-            "sphinx",
-            "sphinx-copybutton",
-            "tdqm",
-        ],
-    }
-    extras["gui"] = extras["opt"] + [
-        "ipywidgets>=8.0.0",
-        "ipykernel",
-        "ipympl",
-        "voila",
-    ]
-    extras["all"] = extras["opt"] + extras["parallel"] + extras["gui"]
-    extras["dev"] = (
-        extras["opt"]
-        + extras["parallel"]
-        + extras["test"]
-        + extras["docs"]
-        + extras["gui"]
-    )
-
-    setup(
-        name=DISTNAME,
-        maintainer=MAINTAINER,
-        maintainer_email=MAINTAINER_EMAIL,
-        description=DESCRIPTION,
-        license=LICENSE,
-        url=URL,
-        version=version,
-        download_url=DOWNLOAD_URL,
-        long_description=open("README.md").read(),
-        long_description_content_type="text/markdown",
-        classifiers=[
-            "Intended Audience :: Science/Research",
-            "Intended Audience :: Developers",
-            "License :: OSI Approved",
-            "Programming Language :: Python",
-            "Topic :: Software Development",
-            "Topic :: Scientific/Engineering",
-            "Operating System :: Microsoft :: Windows",
-            "Operating System :: POSIX",
-            "Operating System :: Unix",
-            "Operating System :: MacOS",
-            "Programming Language :: Python :: 3.9",
-            "Programming Language :: Python :: 3.10",
-            "Programming Language :: Python :: 3.11",
-            "Programming Language :: Python :: 3.12",
-            "Programming Language :: Python :: 3.13",
-        ],
-        platforms="any",
-        install_requires=[
-            "numpy >=1.14",
-            'NEURON >=7.7, <=8.2.7; platform_system != "Windows"',
-            "matplotlib>=3.5.3",
-            "scipy",
-            "h5io",
-        ],
-        extras_require=extras,
-        python_requires=">=3.9, <3.14",
-        packages=find_packages(),
-        package_data={
-            "hnn_core": [
-                "param/*.json",
-                "gui/*.css",
-                "gui/*.ipynb",
-                "gui/*.js",
-            ]
-        },
-        cmdclass={"build_py": build_py_mod, "build_mod": BuildMod},
-        entry_points={"console_scripts": ["hnn-gui=hnn_core.gui.gui:launch"]},
-    )
+    setup(cmdclass={"build_py": build_py_mod, "build_mod": BuildMod})
