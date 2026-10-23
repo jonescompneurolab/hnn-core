@@ -342,21 +342,18 @@ def test_dask_backend(batch_simulate_instance, param_grid):
     cluster = LocalCluster(processes=True, n_workers=2, threads_per_worker=1)
     client = Client(cluster)
 
-    try:
-        results = batch_simulate_instance.simulate_batch(
-            param_combinations, n_jobs=2, backend="dask"
-        )
+    results = batch_simulate_instance.simulate_batch(
+        param_combinations, n_jobs=2, backend="dask"
+    )
 
-        # Verify results structure and completeness
-        assert len(results) == len(param_combinations)
-        for result in results:
-            assert "net" in result
-            assert isinstance(result["net"], Network)
-            assert "dpl" in result
-            assert len(result["dpl"][0].times) > 0
-            assert "param_values" in result
+    # Verify results structure and completeness
+    assert len(results) == len(param_combinations)
+    for result in results:
+        assert "net" in result
+        assert isinstance(result["net"], Network)
+        assert "dpl" in result
+        assert len(result["dpl"][0].times) > 0
+        assert "param_values" in result
 
-    finally:
-        # Clean up resources
-        client.close()
-        cluster.close()
+    client.close()
+    cluster.close()
