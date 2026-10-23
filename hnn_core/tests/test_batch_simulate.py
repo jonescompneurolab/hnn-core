@@ -10,7 +10,7 @@ import numpy as np
 
 import hnn_core
 from hnn_core.batch_simulate import BatchSimulate
-from hnn_core import neymotin_2020_model
+from hnn_core import Network, neymotin_2020_model
 
 hnn_core_root = Path(hnn_core.__file__).parent
 assets_path = Path(hnn_core_root, "tests", "assets")
@@ -328,3 +328,33 @@ def test_parallel_execution(batch_simulate_instance, param_grid):
     assert serial_time > parallel_time, (
         "Parallel execution is not faster than serial execution!"
     )
+
+
+def test_dask_backend(batch_simulate_instance, param_grid):
+    """Test using the dask backend for parallel execution."""
+    pytest.importorskip("dask.distributed")
+
+    from dask.distributed import Client, LocalCluster
+
+    param_combinations = batch_simulate_instance._generate_param_combinations(
+        param_grid
+    )
+
+    cluster = LocalCluster(processes=True, n_workers=2, threads_per_worker=1)
+    client = Client(cluster)
+
+    results = batch_simulate_instance.simulate_batch(
+        param_combinations, n_jobs=2, backend="dask"
+    )
+
+    # Verify results structure and completeness
+    assert len(results) == len(param_combinations)
+    for result in results:
+        assert "net" in result
+        assert isinstance(result["net"], Network)
+        assert "dpl" in result
+        assert len(result["dpl"][0].times) > 0
+        assert "param_values" in result
+
+    client.close()
+    cluster.close()
