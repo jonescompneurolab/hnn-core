@@ -16,7 +16,6 @@ from numpy.testing import assert_array_equal, assert_allclose, assert_raises
 
 import pytest
 
-import hnn_core
 from hnn_core import parallel_backends
 from hnn_core import (
     MPIBackend,
