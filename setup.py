@@ -86,7 +86,12 @@ class build_py_mod(build_py):
 if __name__ == "__main__":
     extras = {
         "opt": ["cma", "scikit-learn"],
-        "parallel": ["joblib", "psutil"],
+        "parallel": [
+            "joblib",
+            "psutil",
+            "mpi4py ; platform_system != 'Windows'",
+            "openmpi>5.0.0 ; platform_system != 'Windows'",
+        ],
         "test": [
             "codespell",
             "pytest",
