@@ -89,9 +89,8 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
   by [Sourav Rajvi][] in {gh}`1381`.
 
 - Warnings that users are expected to act on (`maxiter`
-  being raised to 12, the number of trials being overwritten for `maximize_psd`,
-  non-uniform custom synaptic gains) are now emitted with `warnings.warn` instead of
-  being printed,
+  being raised to 12, the number of trials being overwritten for `maximize_psd`) are now
+  emitted with `warnings.warn` instead of being printed,
   by [Sourav Rajvi][] in {gh}`1381`.
 
 ### People who contributed to this release:

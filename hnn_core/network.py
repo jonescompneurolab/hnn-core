@@ -8,6 +8,7 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 
 import itertools as it
+import logging
 from copy import deepcopy
 from collections import OrderedDict, defaultdict
 from typing import Dict
@@ -28,6 +29,8 @@ from .check import _check_gids, _gid_to_type, _string_input_to_list
 from .hnn_io import write_network_configuration, network_to_dict
 from .externals.mne import copy_doc
 from .utils import _replace_dict_identifier
+
+logger = logging.getLogger(__name__)
 
 
 def _create_cell_coords(n_pyr_x, n_pyr_y, z_coord, inplane_distance):
@@ -3135,7 +3138,7 @@ def _check_global_synaptic_gains_uniformity(net):
                 )
             ):
                 output_indicator = False
-                warnings.warn(
+                logger.warning(
                     "Your imported Network uses custom synaptic gain values. "
                     'Global synaptic gain values such as "Excitatory-to-Inhibitory" '
                     "etc. will NOT be read or displayed properly. This is because "
@@ -3143,8 +3146,7 @@ def _check_global_synaptic_gains_uniformity(net):
                     "are the same. If you continue to modify your Global synaptic "
                     "gain values, double-check each connection's final synaptic "
                     "gain value. To stop this warning, change your synaptic "
-                    "weights instead of your synaptic gains.",
-                    UserWarning,
+                    "weights instead of your synaptic gains."
                 )
                 break
 

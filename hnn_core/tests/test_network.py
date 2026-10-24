@@ -3210,7 +3210,7 @@ def test_get_cell_index_by_synapse_type():
     assert len(set(e_gids).intersection(set(i_gids))) == 0
 
 
-def test_check_global_synaptic_gains_uniformity():
+def test_check_global_synaptic_gains_uniformity(caplog):
     """Test _check_global_synaptic_gains_uniformity function."""
     net = neymotin_2020_model()
 
@@ -3231,11 +3231,12 @@ def test_check_global_synaptic_gains_uniformity():
     net.connectivity[l2p_l2p_conns[0]]["nc_dict"]["gain"] = 1.0
     net.connectivity[l2p_l2p_conns[1]]["nc_dict"]["gain"] = 2.0
 
-    with pytest.warns(UserWarning, match="custom synaptic gain values"):
+    with caplog.at_level(logging.WARNING, logger="hnn_core"):
         result = _check_global_synaptic_gains_uniformity(net)
 
-    # With NON-uniform gains, check should return False
+    # With NON-uniform gains, check should return False and log a warning
     assert result is False
+    assert "custom synaptic gain values" in caplog.text
 
 
 def test_verbose(caplog, capsys):
