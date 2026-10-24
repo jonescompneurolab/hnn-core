@@ -20,7 +20,11 @@ from pathlib import Path
 
 from typing import Union
 
-from ._logging import _CHILD_STDOUT_SILENCE_FLAG, _configure_child_logging
+from ._logging import (
+    _CHILD_STDOUT_SILENCE_FLAG,
+    _configure_child_logging,
+    _parent_displays_info,
+)
 from .cell_response import CellResponse
 from .dipole import Dipole
 from .network_builder import _simulate_single_trial
@@ -147,11 +151,12 @@ def _mpi_child_command(mpi_cmd):
     """Copy ``mpi_cmd`` and tell the child whether to write progress to stdout.
 
     MPI ranks are new processes and do not inherit this process' logging
-    handlers. When INFO is disabled here, append the silence flag so
-    ``mpi_child`` drops its default stdout handler, matching Joblib workers.
+    handlers. When this process would not display INFO on a stream, append the
+    silence flag so ``mpi_child`` drops its default stdout handler, matching
+    Joblib workers (including ``configure_logging(stream=False)``).
     """
     command = list(mpi_cmd)
-    if not logger.isEnabledFor(logging.INFO):
+    if not _parent_displays_info():
         command.append(_CHILD_STDOUT_SILENCE_FLAG)
     return command
 
@@ -751,9 +756,9 @@ class JoblibBackend(object):
                 f"distributing trials over {self.n_jobs} jobs."
             )
         parallel, myfunc = self._parallel_func(_simulate_single_trial_in_worker)
-        # Worker processes do not share our logging configuration: if INFO messages
-        # are enabled here, let them write their progress to their own stdout.
-        worker_stdout_logging = logger.isEnabledFor(logging.INFO)
+        # Worker processes do not share our logging configuration. Let them write
+        # progress to inherited stdout only if this process would display INFO.
+        worker_stdout_logging = _parent_displays_info()
         sim_data = parallel(
             myfunc(net, tstop, dt, trial_idx, worker_stdout_logging)
             for trial_idx in range(n_trials)

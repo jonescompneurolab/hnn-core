@@ -80,7 +80,9 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
   application configures the root logger and wants to receive the messages there, pass
   `propagate=True`. Output of MPI child processes and of `JoblibBackend` and
   `BatchSimulate` worker processes (`n_jobs > 1`) is written to `stdout` as before, and
-  follows the logging level set in the parent process.
+  follows whether the parent would display INFO on a stream: raising the level
+  (`configure_logging(level="WARNING")`) or `configure_logging(stream=False)` keeps
+  those workers quiet too.
 
 - Warnings that users are expected to act on (`maxiter`
   being raised to 12, the number of trials being overwritten for `maximize_psd`) are now

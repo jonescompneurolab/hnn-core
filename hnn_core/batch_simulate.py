@@ -12,7 +12,7 @@ from pathlib import Path
 import numpy as np
 from joblib import Parallel, delayed, parallel_config
 
-from ._logging import _configure_child_logging
+from ._logging import _configure_child_logging, _parent_displays_info
 from .network import Network
 from .externals.mne import _validate_type, _check_option
 from .dipole import simulate_dipole
@@ -312,9 +312,9 @@ class BatchSimulate(object):
             "backend", backend, ["loky", "threading", "multiprocessing", "dask"]
         )
 
-        # Worker processes do not share our logging configuration: if INFO messages
-        # are enabled here, let them write their progress to their own stdout.
-        self._worker_stdout_logging = logger.isEnabledFor(logging.INFO)
+        # Worker processes do not share our logging configuration. Let them write
+        # progress to inherited stdout only if this process would display INFO.
+        self._worker_stdout_logging = _parent_displays_info()
         with parallel_config(backend=backend):
             res = Parallel(n_jobs=n_jobs)(
                 delayed(self._run_single_sim)(params) for params in param_combinations

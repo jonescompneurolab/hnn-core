@@ -93,7 +93,10 @@ def configure_logging(level="INFO", log_file=None, stream=True, propagate=False)
     stream : bool | file-like, default=True
         Where to write messages (without decoration). True writes to
         ``sys.stdout`` (as by default), False disables terminal output, and a
-        file-like object (e.g. ``sys.stderr``) writes there.
+        file-like object (e.g. ``sys.stderr``) writes there. ``stream=False``
+        also keeps ``JoblibBackend``, ``BatchSimulate`` and MPI worker
+        processes quiet: they inherit this process' stdout, so they only write
+        progress there when this process would itself display INFO on a stream.
     propagate : bool, default=False
         Whether records should also reach the root logger's handlers. This is
         False by default so that messages are not printed twice when the host
@@ -184,6 +187,26 @@ def _configure_child_logging(enabled):
 def _apply_parent_logging_from_argv(argv):
     """Configure this MPI child from the flag sent by ``MPIBackend.simulate``."""
     _configure_child_logging(_CHILD_STDOUT_SILENCE_FLAG not in argv)
+
+
+def _parent_displays_info():
+    """Whether this process would write INFO messages to a stream (not a file).
+
+    Joblib, BatchSimulate and MPI workers inherit stdout from the parent. They
+    should stay silent not only when the logger level is above INFO, but also
+    when the parent silenced the terminal with ``configure_logging(stream=False)``.
+    File handlers do not count: workers cannot write to the parent's log file.
+    """
+    if not logger.isEnabledFor(logging.INFO):
+        return False
+    for handler in logger.handlers:
+        if isinstance(handler, logging.FileHandler):
+            continue
+        if not isinstance(handler, logging.StreamHandler):
+            continue
+        if handler.level == logging.NOTSET or handler.level <= logging.INFO:
+            return True
+    return False
 
 
 def _install_default_handler():

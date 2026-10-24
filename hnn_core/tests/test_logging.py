@@ -224,8 +224,29 @@ def test_child_stdout_logging_isolated_and_idempotent():
     assert _hnn_stderr(res.stderr).strip() == "0"
 
 
-def test_mpi_child_command_appends_silence_flag_when_info_disabled():
-    """MPI children get a command-line flag when the parent has silenced INFO."""
+def test_parent_displays_info_matches_stream_and_level(tmp_path):
+    """Workers key off stream handlers, not only the logger level."""
+    from hnn_core._logging import _parent_displays_info
+
+    configure_logging()
+    assert _parent_displays_info() is True
+
+    configure_logging(level="WARNING")
+    assert _parent_displays_info() is False
+
+    configure_logging(stream=False)
+    assert _parent_displays_info() is False
+
+    configure_logging(stream=False, log_file=tmp_path / "hnn.log")
+    assert _parent_displays_info() is False
+
+    buf = io.StringIO()
+    configure_logging(stream=buf)
+    assert _parent_displays_info() is True
+
+
+def test_mpi_child_command_appends_silence_flag_when_parent_would_not_display():
+    """MPI children get a command-line flag when the parent would not show INFO."""
     from hnn_core.parallel_backends import _mpi_child_command
 
     base = ["mpiexec", "-np", "2", "mpi_child.py"]
@@ -233,6 +254,9 @@ def test_mpi_child_command_appends_silence_flag_when_info_disabled():
     assert _mpi_child_command(base) == base
 
     configure_logging(level="WARNING")
+    assert _mpi_child_command(base) == base + [_CHILD_STDOUT_SILENCE_FLAG]
+
+    configure_logging(stream=False)
     assert _mpi_child_command(base) == base + [_CHILD_STDOUT_SILENCE_FLAG]
 
 
@@ -263,28 +287,36 @@ def test_mpi_child_argv_follows_parent_logging_choice():
 # ---------------------------------------------------------------------------
 # Simulation-dependent behavior (requires NEURON)
 # ---------------------------------------------------------------------------
-_JOBLIB_SCRIPT = """
-import sys
-from hnn_core import neymotin_2020_model, simulate_dipole, JoblibBackend
-if {silence}:
-    from hnn_core import configure_logging
+_QUIET_SETUP = """
+from hnn_core import configure_logging
+quiet = {quiet!r}
+if quiet == "level":
     configure_logging(level="WARNING")
+elif quiet == "stream":
+    configure_logging(stream=False)
+"""
+
+_JOBLIB_SCRIPT = (
+    _QUIET_SETUP
+    + """
+from hnn_core import neymotin_2020_model, simulate_dipole, JoblibBackend
 net = neymotin_2020_model(mesh_shape=(3, 3), add_drives_from_params=True)
 with JoblibBackend(n_jobs=2):
     simulate_dipole(net, tstop=10, n_trials=2, dt=0.5, verbose=True)
 """
+)
 
 
-@pytest.mark.parametrize("silence", [False, True])
-def test_joblib_workers_progress_follows_parent_logging(silence):
-    """Worker-process progress appears (on stdout) unless the parent silenced INFO."""
+@pytest.mark.parametrize("quiet", [None, "level", "stream"])
+def test_joblib_workers_progress_follows_parent_logging(quiet):
+    """Worker-process progress appears unless the parent silenced the stream or INFO."""
     res = subprocess.run(
-        [sys.executable, "-c", _JOBLIB_SCRIPT.format(silence=silence)],
+        [sys.executable, "-c", _JOBLIB_SCRIPT.format(quiet=quiet)],
         capture_output=True,
         text=True,
         check=True,
     )
-    if silence:
+    if quiet:
         assert "Trial" not in res.stdout + res.stderr
         assert "Building" not in res.stdout + res.stderr
     else:
@@ -386,30 +418,30 @@ def test_optimize_evoked_maxiter_warning(monkeypatch):
             )
 
 
-_MPI_SCRIPT = """
+_MPI_SCRIPT = (
+    _QUIET_SETUP
+    + """
 from hnn_core import neymotin_2020_model, simulate_dipole, MPIBackend
-if {silence}:
-    from hnn_core import configure_logging
-    configure_logging(level="WARNING")
 net = neymotin_2020_model(mesh_shape=(3, 3), add_drives_from_params=True)
 with MPIBackend(n_procs=2):
     simulate_dipole(net, tstop=10, n_trials=1, dt=0.5, verbose=True)
 """
+)
 
 
 @requires_mpi4py
 @requires_psutil
 @pytest.mark.uses_mpi
-@pytest.mark.parametrize("silence", [False, True])
-def test_mpi_workers_progress_follows_parent_logging(silence):
-    """MPI child progress appears on stdout unless the parent silenced INFO."""
+@pytest.mark.parametrize("quiet", [None, "level", "stream"])
+def test_mpi_workers_progress_follows_parent_logging(quiet):
+    """MPI child progress appears unless the parent silenced the stream or INFO."""
     res = subprocess.run(
-        [sys.executable, "-c", _MPI_SCRIPT.format(silence=silence)],
+        [sys.executable, "-c", _MPI_SCRIPT.format(quiet=quiet)],
         capture_output=True,
         text=True,
         check=True,
     )
-    if silence:
+    if quiet:
         assert "Trial" not in res.stdout + res.stderr
         assert "Building" not in res.stdout + res.stderr
     else:
@@ -505,13 +537,12 @@ def test_optimize_evoked_skips_step_when_maxiter_is_zero(caplog):
     assert "Initial RMSE" in caplog.text and "Final RMSE" in caplog.text
 
 
-_BATCH_SCRIPT = """
-import sys, tempfile
+_BATCH_SCRIPT = (
+    _QUIET_SETUP
+    + """
+import tempfile
 from hnn_core import neymotin_2020_model
 from hnn_core.batch_simulate import BatchSimulate
-if {silence}:
-    from hnn_core import configure_logging
-    configure_logging(level="WARNING")
 
 def set_params(net, p):
     net.add_evoked_drive(
@@ -528,18 +559,19 @@ batch = BatchSimulate(net=net, set_params=set_params, tstop=20,
 batch.run({{"mu": [10, 20]}}, n_jobs=2, backend="loky", verbose=True,
           return_output=False)
 """
+)
 
 
-@pytest.mark.parametrize("silence", [False, True])
-def test_batch_simulate_workers_progress_follows_parent_logging(silence):
-    """BatchSimulate worker progress appears (on stdout) unless INFO was silenced."""
+@pytest.mark.parametrize("quiet", [None, "level", "stream"])
+def test_batch_simulate_workers_progress_follows_parent_logging(quiet):
+    """BatchSimulate worker progress appears unless the parent silenced the stream or INFO."""
     res = subprocess.run(
-        [sys.executable, "-c", _BATCH_SCRIPT.format(silence=silence)],
+        [sys.executable, "-c", _BATCH_SCRIPT.format(quiet=quiet)],
         capture_output=True,
         text=True,
         check=True,
     )
-    if silence:
+    if quiet:
         assert "Building the NEURON model" not in res.stdout + res.stderr
     else:
         assert "Building the NEURON model" in res.stdout
