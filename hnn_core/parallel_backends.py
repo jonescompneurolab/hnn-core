@@ -207,7 +207,7 @@ def run_subprocess(
     pickled_obj = base64.b64encode(raw_pickle)
     if verbose:
         logger.info(
-            f"Network size': {len(raw_pickle)} bytes ({len(raw_pickle) / 1024:.2f} KB)"
+            f"Network size: {len(raw_pickle)} bytes ({len(raw_pickle) / 1024:.2f} KB)"
         )
 
     # non-blocking adapted from https://stackoverflow.com/questions/375427/non-blocking-read-on-a-subprocess-pipe-in-python#4896288  # noqa: E501

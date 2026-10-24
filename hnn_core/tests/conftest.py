@@ -1070,12 +1070,16 @@ def fix_default_params():
 
 
 @pytest.fixture(autouse=True)
-def propagate_hnn_core_logs():
-    """Let pytest's ``caplog`` (a root logger handler) see ``hnn_core`` messages.
+def propagate_hnn_core_logs(request):
+    """Let pytest's ``caplog`` see ``hnn_core`` messages, only in tests that use it.
 
-    ``hnn_core`` does not propagate its messages to the root logger by default, so
-    that they are not printed twice when an application configures the root logger.
+    ``hnn_core`` does not propagate to the root logger by default, so that messages
+    are not printed twice when an application configures the root logger. Tests that
+    do not request ``caplog`` keep that production setting.
     """
+    if "caplog" not in request.fixturenames:
+        yield
+        return
     logger = logging.getLogger("hnn_core")
     propagate = logger.propagate
     logger.propagate = True

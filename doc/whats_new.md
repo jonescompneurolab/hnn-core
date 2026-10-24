@@ -56,7 +56,8 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
   let users choose the log level, silence the output and, optionally, write a log file
   with `configure_logging(log_file="hnn.log")`. Setting the `HNN_CORE_LOG_FILE`
   environment variable before `import hnn_core` also writes that file (no
-  `configure_logging()` call required).
+  `configure_logging()` call required),
+  by [Sourav Rajvi][] in {gh}`1381`.
 
 ### Upcoming Deprecations
 
@@ -84,11 +85,14 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
   `BatchSimulate` worker processes (`n_jobs > 1`) is written to `stdout` as before, and
   follows whether the parent would display INFO on a stream: raising the level
   (`configure_logging(level="WARNING")`) or `configure_logging(stream=False)` keeps
-  those workers quiet too.
+  those workers quiet too,
+  by [Sourav Rajvi][] in {gh}`1381`.
 
 - Warnings that users are expected to act on (`maxiter`
-  being raised to 12, the number of trials being overwritten for `maximize_psd`) are now
-  emitted with `warnings.warn` instead of being printed.
+  being raised to 12, the number of trials being overwritten for `maximize_psd`,
+  non-uniform custom synaptic gains) are now emitted with `warnings.warn` instead of
+  being printed,
+  by [Sourav Rajvi][] in {gh}`1381`.
 
 ### People who contributed to this release:
 
@@ -97,6 +101,7 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 - [Shivansh Bhageria][]
 - [Camilo Diaz][]
 - [William Kang][]
+- [Sourav Rajvi][]
 
 ### Changelog
 
@@ -113,6 +118,9 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 - Improve y-axis labels and ticks of LFP and CSD plotting,
   by [Shivansh Bhageria][] in {gh}`1191`. This was their first PR, thanks Shivansh!
+
+- Unify core-library logging on the standard `logging` library,
+  by [Sourav Rajvi][] in {gh}`1381`.
 
 
 ## 0.6.1 Patch Release Notes
@@ -1527,5 +1535,6 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [Percival Villalva]: https://github.com/pervillalva
 [Anna Cattani]: https://github.com/annacatt
 [Shivansh Bhageria]: https://github.com/Shivansh1205
+[Sourav Rajvi]: https://github.com/Souravrajvi0
 [Arnesh Banerjee]: https://github.com/ArneshBanerjee
 [William Kang]: https://github.com/WilliamK112

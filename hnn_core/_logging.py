@@ -45,11 +45,18 @@ class _StdoutHandler(logging.StreamHandler):
     """
 
     def __init__(self, level=logging.NOTSET):
-        logging.Handler.__init__(self, level)
+        super().__init__(stream=None)
+        self.setLevel(level)
 
     @property
     def stream(self):
         return sys.stdout
+
+    @stream.setter
+    def stream(self, value):
+        # ``StreamHandler.__init__`` assigns ``self.stream``; we always follow
+        # the current ``sys.stdout`` instead of a snapshot taken at init.
+        return
 
 
 def _resolve_level(level):
