@@ -54,8 +54,9 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 - Logging is now unified on Python's standard `logging` library (see {gh}`1133`).
   New functions {func}`hnn_core.configure_logging` and {func}`hnn_core.set_log_level`
   let users choose the log level, silence the output and, optionally, write a log file
-  (`configure_logging(log_file="hnn.log")` or the `HNN_CORE_LOG_FILE` environment
-  variable).
+  with `configure_logging(log_file="hnn.log")`. Setting the `HNN_CORE_LOG_FILE`
+  environment variable before `import hnn_core` also writes that file (no
+  `configure_logging()` call required).
 
 ### Upcoming Deprecations
 
@@ -76,7 +77,8 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
   `Writing file ...`) are now `logging` messages. They are still **shown by default**, on
   `stdout`, and the `verbose` options keep their meaning. Use
   `hnn_core.configure_logging()` to change the level or silence them
-  (`configure_logging(stream=False)`), or to also write them to a log file. When your
+  (`configure_logging(stream=False)`), or to also write them to a log file
+  (`HNN_CORE_LOG_FILE` is read at import as well as by `configure_logging()`). When your
   application configures the root logger and wants to receive the messages there, pass
   `propagate=True`. Output of MPI child processes and of `JoblibBackend` and
   `BatchSimulate` worker processes (`n_jobs > 1`) is written to `stdout` as before, and

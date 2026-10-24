@@ -4,13 +4,16 @@ Library modules obtain loggers with ``logging.getLogger(__name__)`` (all of them
 live under the ``hnn_core`` namespace). Progress messages are shown by default, as
 they were when they were written with ``print``: importing HNN-Core attaches a
 handler to the ``hnn_core`` logger that writes INFO messages to ``sys.stdout``.
-Users change this with :func:`configure_logging`, and the ``verbose`` options of
-the simulation functions decide which messages are emitted at all.
+If ``HNN_CORE_LOG_FILE`` is set at import time, the same messages are also
+appended to that file. Users change this with :func:`configure_logging`, and the
+``verbose`` options of the simulation functions decide which messages are emitted
+at all.
 """
 
 import logging
 import os
 import sys
+import warnings
 
 _LOGGER_NAME = "hnn_core"
 LOG_FILE_ENV_VAR = "HNN_CORE_LOG_FILE"
@@ -72,13 +75,25 @@ def _mark_owned(handler):
     return handler
 
 
+def _env_log_file():
+    return os.environ.get(LOG_FILE_ENV_VAR) or None
+
+
+def _owned_file_handler(log_file):
+    handler = logging.FileHandler(os.fspath(log_file), encoding="utf-8")
+    handler.setFormatter(logging.Formatter(_FILE_FORMAT))
+    return _mark_owned(handler)
+
+
 def configure_logging(level="INFO", log_file=None, stream=True, propagate=False):
     """Configure HNN-Core logging output.
 
     By default (when this function is never called), INFO messages are written to
-    ``sys.stdout``. Calling this function replaces the handlers installed by
-    HNN-Core itself, i.e. the default handler or those of a previous call; handlers
-    added to the ``hnn_core`` logger by other code are left untouched.
+    ``sys.stdout``. If ``HNN_CORE_LOG_FILE`` is set when HNN-Core is imported, they
+    are also appended to that file without calling this function. Calling this
+    function replaces the handlers installed by HNN-Core itself, i.e. the default
+    handler or those of a previous call; handlers added to the ``hnn_core`` logger
+    by other code are left untouched.
 
     Parameters
     ----------
@@ -88,8 +103,9 @@ def configure_logging(level="INFO", log_file=None, stream=True, propagate=False)
     log_file : str | path-like | None
         If given, messages are also appended to this file together with
         timestamps, levels and logger names. If None, the path in the
-        ``HNN_CORE_LOG_FILE`` environment variable is used when it is set.
-        File logging is otherwise disabled.
+        ``HNN_CORE_LOG_FILE`` environment variable is used when it is set
+        (that variable is also read at import). File logging is otherwise
+        disabled.
     stream : bool | file-like, default=True
         Where to write messages (without decoration). True writes to
         ``sys.stdout`` (as by default), False disables terminal output, and a
@@ -109,7 +125,7 @@ def configure_logging(level="INFO", log_file=None, stream=True, propagate=False)
     """
     level = _resolve_level(level)
     if log_file is None:
-        log_file = os.environ.get(LOG_FILE_ENV_VAR) or None
+        log_file = _env_log_file()
 
     # Build new handlers before removing the old ones so that a failure
     # (e.g. unwritable log file) leaves the existing configuration intact.
@@ -121,9 +137,7 @@ def configure_logging(level="INFO", log_file=None, stream=True, propagate=False)
         stream_handler.setFormatter(logging.Formatter(_STREAM_FORMAT))
         new_handlers.append(_mark_owned(stream_handler))
     if log_file is not None:
-        file_handler = logging.FileHandler(os.fspath(log_file), encoding="utf-8")
-        file_handler.setFormatter(logging.Formatter(_FILE_FORMAT))
-        new_handlers.append(_mark_owned(file_handler))
+        new_handlers.append(_owned_file_handler(log_file))
 
     _remove_owned_handlers()
     for handler in new_handlers:
@@ -210,10 +224,21 @@ def _parent_displays_info():
 
 
 def _install_default_handler():
-    """Show INFO messages on stdout until the user configures logging."""
+    """Show INFO on stdout, and to ``HNN_CORE_LOG_FILE`` when that is set."""
     handler = _StdoutHandler()
     handler.setFormatter(logging.Formatter(_STREAM_FORMAT))
     logger.addHandler(_mark_owned(handler))
+    log_file = _env_log_file()
+    if log_file is not None:
+        try:
+            logger.addHandler(_owned_file_handler(log_file))
+        except OSError as err:
+            # Do not fail ``import hnn_core`` if the path is not writable.
+            warnings.warn(
+                f"Could not open {LOG_FILE_ENV_VAR}={log_file!r} for logging: {err}",
+                RuntimeWarning,
+                stacklevel=2,
+            )
     logger.setLevel(logging.INFO)
     logger.propagate = False
 

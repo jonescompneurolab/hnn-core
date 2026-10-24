@@ -4,6 +4,7 @@ import contextlib
 import importlib
 import io
 import logging
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -175,6 +176,44 @@ def test_file_logging_env_var(tmp_path, monkeypatch):
     for handler in _owned():
         handler.flush()
     assert "from env" in log_file.read_text()
+
+
+def test_import_honors_log_file_env_var(tmp_path):
+    """Setting HNN_CORE_LOG_FILE before import writes a log file with no extra call."""
+    log_file = tmp_path / "import.log"
+    env = os.environ.copy()
+    env["HNN_CORE_LOG_FILE"] = str(log_file)
+    code = (
+        "import logging, hnn_core;"
+        "logging.getLogger('hnn_core.x').info('from env at import')"
+    )
+    res = subprocess.run(
+        [sys.executable, "-c", code],
+        capture_output=True,
+        text=True,
+        check=True,
+        env=env,
+    )
+    assert "from env at import" in res.stdout.splitlines()
+    assert "from env at import" in log_file.read_text()
+
+
+def test_import_warns_on_unwritable_log_file_env_var(tmp_path):
+    """A bad HNN_CORE_LOG_FILE path must not prevent importing hnn_core."""
+    missing = tmp_path / "no_such_dir" / "hnn.log"
+    env = os.environ.copy()
+    env["HNN_CORE_LOG_FILE"] = str(missing)
+    code = (
+        "import logging, hnn_core;"
+        "logging.getLogger('hnn_core.x').info('still works')"
+    )
+    res = subprocess.run(
+        [sys.executable, "-c", code], capture_output=True, text=True, env=env
+    )
+    assert res.returncode == 0
+    assert "still works" in res.stdout
+    assert "HNN_CORE_LOG_FILE" in res.stderr
+    assert not missing.exists()
 
 
 def test_reconfigure_drops_file_handler(tmp_path):
