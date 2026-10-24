@@ -5,12 +5,16 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
+import logging
 import numpy as np
 from scipy.signal import periodogram
 
 from hnn_core import simulate_dipole
 from ..dipole import _anticorr, _rmse, _rmse_corr, average_dipoles
 from ..batch_simulate import BatchSimulate
+
+
+logger = logging.getLogger(__name__)
 
 
 def _check_is_batch(predicted_params):
@@ -129,7 +133,7 @@ def _calculate_obj_fun(
     if is_batch:
         # The "batch" case only occurs if the solver is set to "cma"
         predicted_params = np.array(predicted_params).reshape(-1, len(initial_params))
-        print(predicted_params.shape)
+        logger.debug(predicted_params.shape)
         params_batch = {
             name: predicted_params[:, idx]
             for idx, name in enumerate(initial_params.keys())
@@ -183,6 +187,7 @@ def _calculate_obj_fun(
             dt=obj_fun_kwargs.get("dt", 0.025),
             n_trials=obj_fun_kwargs.get("n_trials", 1),
             baseline_correction=obj_fun_kwargs.get("baseline_correction", True),
+            verbose=obj_fun_kwargs.get("verbose", True),
         )
 
         # smooth & scale all dipoles
@@ -197,7 +202,8 @@ def _calculate_obj_fun(
             best["obj"] = obj
             best["params"] = predicted_params.copy()
 
-    print(f"Mean Loss: {np.mean(obj):.2f}; Min Loss: {np.min(obj):.2f}")
+    if obj_fun_kwargs.get("verbose", True):
+        logger.info(f"Mean Loss: {np.mean(obj):.2f}; Min Loss: {np.min(obj):.2f}")
     # Update the store of objective function values via a "side-effect" in-place in the
     # parent scope
     obj_values.append(obj)
@@ -250,7 +256,7 @@ def _rmse_evoked(
         n_trials : int, default=1
             Number of trials to simulate and average.
         verbose : bool, optional
-            If True, print build steps and simulation progress to console. Default: True.
+            If True, log build steps and simulation progress (shown by default, see :func:`~hnn_core.configure_logging`). Default: True.
 
     best : dict, optional
         Dictionary with keys "obj" and "params" to store the best objective value and
@@ -328,7 +334,7 @@ def _maximize_psd(
             Weight for each frequency band in f_bands. If a single float is provided,
             the same weight is applied to all frequency bands.
         verbose : bool, optional
-            If True, print build steps and simulation progress to console. Default: True.
+            If True, log build steps and simulation progress (shown by default, see :func:`~hnn_core.configure_logging`). Default: True.
 
     best : dict, optional
         Dictionary with keys "obj" and "params" to store the best objective value and
@@ -413,7 +419,7 @@ def _anticorr_evoked(
         n_trials : int, default=1
             Number of trials to simulate and average.
         verbose : bool, optional
-            If True, print build steps and simulation progress to console. Default: True.
+            If True, log build steps and simulation progress (shown by default, see :func:`~hnn_core.configure_logging`). Default: True.
 
     best : dict, optional
         Dictionary with keys "obj" and "params" to store the best objective value and
@@ -495,7 +501,7 @@ def _rmse_corr_evoked(
         n_trials : int, default=1
             Number of trials to simulate and average.
         verbose : bool, optional
-            If True, print build steps and simulation progress to console. Default: True.
+            If True, log build steps and simulation progress (shown by default, see :func:`~hnn_core.configure_logging`). Default: True.
 
     best : dict, optional
         Dictionary with keys "obj" and "params" to store the best objective value and

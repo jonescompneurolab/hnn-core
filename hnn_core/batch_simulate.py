@@ -5,6 +5,7 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
+import logging
 from itertools import product
 from pathlib import Path
 import numpy as np
@@ -14,6 +15,8 @@ from .network import Network
 from .externals.mne import _validate_type, _check_option
 from .dipole import simulate_dipole
 from .network_models import neymotin_2020_model
+
+logger = logging.getLogger(__name__)
 
 
 class BatchSimulate(object):
@@ -209,7 +212,7 @@ class BatchSimulate(object):
             completely operationable; all other backends are in
             development. Default is `loky`.
         verbose : bool
-            If True, print build steps and simulation progress to console. Default: True.
+            If True, log build steps and simulation progress (shown by default, see :func:`~hnn_core.configure_logging`). Default: True.
 
         Returns
         -------

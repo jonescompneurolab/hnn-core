@@ -51,6 +51,14 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
       `optimization/objective_functions.py` and run a simulation.
       by [Vaishnavi Baghel][] in {gh}`1271`.
 
+- Logging is now unified on Python's standard `logging` library (see {gh}`1133`).
+  New functions {func}`hnn_core.configure_logging` and {func}`hnn_core.set_log_level`
+  let users choose the log level, silence the output and, optionally, write a log file
+  with `configure_logging(log_file="hnn.log")`. Setting the `HNN_CORE_LOG_FILE`
+  environment variable before `import hnn_core` also writes that file (no
+  `configure_logging()` call required),
+  by [Sourav Rajvi][] in {gh}`1381`.
+
 ### Upcoming Deprecations
 
 ### Bug Fixes
@@ -65,6 +73,24 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ### Public API Changes
 
+- Progress and status messages that were previously written with `print()` (e.g.
+  `Trial 1: ...`, `Building the NEURON model`, optimization progress,
+  `Writing file ...`) are now `logging` messages. They are still **shown by default**, on
+  `stdout`, and the `verbose` options keep their meaning. Use
+  `hnn_core.configure_logging()` to change the level or silence them
+  (`configure_logging(stream=False)`), or to also write them to a log file
+  (`HNN_CORE_LOG_FILE` is read at import as well as by `configure_logging()`). When your
+  application configures the root logger and wants to receive the messages there, pass
+  `propagate=True`. `JoblibBackend`, `BatchSimulate` and MPI child processes import
+  HNN-Core in a fresh process, so they still show default progress on stdout; they do
+  not inherit the parent's `configure_logging()` settings,
+  by [Sourav Rajvi][] in {gh}`1381`.
+
+- Warnings that users are expected to act on (`maxiter`
+  being raised to 12, the number of trials being overwritten for `maximize_psd`) are now
+  emitted with `warnings.warn` instead of being printed,
+  by [Sourav Rajvi][] in {gh}`1381`.
+
 ### People who contributed to this release:
 
 - [Vaishnavi Baghel][]
@@ -72,6 +98,7 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 - [Shivansh Bhageria][]
 - [Camilo Diaz][]
 - [William Kang][]
+- [Sourav Rajvi][]
 
 ### Changelog
 
@@ -88,6 +115,9 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 - Improve y-axis labels and ticks of LFP and CSD plotting,
   by [Shivansh Bhageria][] in {gh}`1191`. This was their first PR, thanks Shivansh!
+
+- Unify core-library logging on the standard `logging` library,
+  by [Sourav Rajvi][] in {gh}`1381`.
 
 
 ## 0.6.1 Patch Release Notes
@@ -1502,5 +1532,6 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [Percival Villalva]: https://github.com/pervillalva
 [Anna Cattani]: https://github.com/annacatt
 [Shivansh Bhageria]: https://github.com/Shivansh1205
+[Sourav Rajvi]: https://github.com/Souravrajvi0
 [Arnesh Banerjee]: https://github.com/ArneshBanerjee
 [William Kang]: https://github.com/WilliamK112

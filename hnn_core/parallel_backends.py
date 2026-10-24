@@ -3,6 +3,7 @@
 # Authors: Blake Caldwell <blake_caldwell@brown.edu>
 #          Mainak Jas <mainakjas@gmail.com>
 
+import logging
 import os
 import sys
 import re
@@ -23,6 +24,9 @@ from .dipole import Dipole
 from .network_builder import _simulate_single_trial
 
 _BACKEND = None
+
+
+logger = logging.getLogger(__name__)
 
 
 def _thread_handler(event, out, queue):
@@ -164,7 +168,7 @@ def run_subprocess(
     timeout : float
         The number of seconds to wait for a process without output.
     verbose : bool, default False
-        If True, prints progress messages and status updates to stdout.
+        If True, logs progress messages and status updates (see :func:`~hnn_core.configure_logging`).
     *args, **kwargs : arguments
         Additional arguments to pass to subprocess.Popen.
     Returns
@@ -182,9 +186,8 @@ def run_subprocess(
     raw_pickle = pickle.dumps(obj)
     pickled_obj = base64.b64encode(raw_pickle)
     if verbose:
-        print(
-            f"Network size': {len(raw_pickle)} bytes ({len(raw_pickle) / 1024:.2f} KB)",
-            flush=True,
+        logger.info(
+            f"Network size: {len(raw_pickle)} bytes ({len(raw_pickle) / 1024:.2f} KB)"
         )
 
     # non-blocking adapted from https://stackoverflow.com/questions/375427/non-blocking-read-on-a-subprocess-pipe-in-python#4896288  # noqa: E501
@@ -260,10 +263,9 @@ def run_subprocess(
                 if child_out:
                     if not first_output_received:
                         if verbose:
-                            print(
+                            logger.info(
                                 f"nrniv startup time: {time.time() - t_start:.2f}s | "
-                                f"first output: {repr(child_out[:200])}",
-                                flush=True,
+                                f"first output: {repr(child_out[:200])}"
                             )
                         first_output_received = True
 
@@ -313,11 +315,10 @@ def run_subprocess(
                     t_now = time.time()
                     if t_now - last_alive_t >= stay_alive_interval:
                         elapsed_time = t_now - t_start
-                        print(
-                            "MPI simulation is still running. This may take several minutes."
-                            f"({elapsed_time:.1f}s elapsed)"
-                            "You may cancel if there is no response for a long time.",
-                            flush=True,
+                        logger.info(
+                            "MPI simulation is still running. This may take several minutes. "
+                            f"({elapsed_time:.1f}s elapsed) "
+                            "You may cancel if there is no response for a long time."
                         )
                         last_alive_t = t_now
                     count_since_last_output = 0
@@ -334,7 +335,9 @@ def run_subprocess(
                 # both exit conditions have been met (also we know that
                 # the network has been sent)
                 if verbose:
-                    print(f"process terminated after {time.time() - t_start:.2f}s")
+                    logger.info(
+                        f"process terminated after {time.time() - t_start:.2f}s"
+                    )
                 break
 
     except KeyboardInterrupt:
@@ -428,8 +431,6 @@ def _process_child_data(path_data_file, data_len):
     return pickle.loads(data_bytes)
 
 
-# This is the input side.
-# sending the network configuration to NEURON
 def _echo_child_output(out_q):
     out = ""
     while True:
@@ -717,7 +718,7 @@ class JoblibBackend(object):
             The Dipole results from each simulation trial
         """
         if net._verbose:
-            print(
+            logger.info(
                 f"Joblib will run {n_trials} trial(s) in parallel by "
                 f"distributing trials over {self.n_jobs} jobs."
             )
@@ -1007,7 +1008,7 @@ class MPIBackend(object):
         There will be a valid process handle present the queue when a MPI
         simulation is running.
     verbose : bool, default False
-        If True, prints progress messages and status updates to stdout.
+        If True, logs progress messages and status updates (see :func:`~hnn_core.configure_logging`).
     """
 
     def __init__(
@@ -1146,10 +1147,11 @@ class MPIBackend(object):
 
         # just use the joblib backend for a single core
         if self.n_procs == 1:
-            print(
-                "MPIBackend is set to use 1 core: transferring the "
-                "simulation to JoblibBackend...."
-            )
+            if net._verbose:
+                logger.info(
+                    "MPIBackend is set to use 1 core: transferring the "
+                    "simulation to JoblibBackend...."
+                )
             return JoblibBackend(n_jobs=1).simulate(
                 net,
                 tstop=tstop,
@@ -1168,10 +1170,11 @@ class MPIBackend(object):
                 f"distribute the {net._n_cells} network neurons."
             )
 
-        print(
-            f"MPI will run {n_trials} trial(s) sequentially by "
-            f"distributing network neurons over {self.n_procs} processes."
-        )
+        if net._verbose:
+            logger.info(
+                f"MPI will run {n_trials} trial(s) sequentially by "
+                f"distributing network neurons over {self.n_procs} processes."
+            )
 
         env = _get_mpi_env()
         self.proc, sim_data = run_subprocess(
