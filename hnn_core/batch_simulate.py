@@ -6,13 +6,12 @@
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
 import logging
-import multiprocessing
 from itertools import product
 from pathlib import Path
 import numpy as np
 from joblib import Parallel, delayed, parallel_config
 
-from ._logging import _configure_child_logging, _parent_displays_info
+from . import _logging  # noqa: F401  # default progress handler in worker processes
 from .network import Network
 from .externals.mne import _validate_type, _check_option
 from .dipole import simulate_dipole
@@ -183,7 +182,6 @@ class BatchSimulate(object):
         self.clear_cache = clear_cache
         self.summary_func = summary_func
         self._verbose = True
-        self._worker_stdout_logging = False
         self.baseline_correction = baseline_correction
 
     def run(
@@ -312,9 +310,6 @@ class BatchSimulate(object):
             "backend", backend, ["loky", "threading", "multiprocessing", "dask"]
         )
 
-        # Worker processes do not share our logging configuration. Let them write
-        # progress to inherited stdout only if this process would display INFO.
-        self._worker_stdout_logging = _parent_displays_info()
         with parallel_config(backend=backend):
             res = Parallel(n_jobs=n_jobs)(
                 delayed(self._run_single_sim)(params) for params in param_combinations
@@ -338,10 +333,6 @@ class BatchSimulate(object):
             - `dpl`: The simulated dipole.
             - `param_values`: The parameter values used for the simulation.
         """
-
-        # Only has an effect in a worker *process*, never in the parent or in threads.
-        if multiprocessing.parent_process() is not None:
-            _configure_child_logging(self._worker_stdout_logging)
 
         net = self.net.copy()
         self.set_params(net, param_values)

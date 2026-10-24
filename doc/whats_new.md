@@ -81,11 +81,9 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
   (`configure_logging(stream=False)`), or to also write them to a log file
   (`HNN_CORE_LOG_FILE` is read at import as well as by `configure_logging()`). When your
   application configures the root logger and wants to receive the messages there, pass
-  `propagate=True`. Output of MPI child processes and of `JoblibBackend` and
-  `BatchSimulate` worker processes (`n_jobs > 1`) is written to `stdout` as before, and
-  follows whether the parent would display INFO on a stream: raising the level
-  (`configure_logging(level="WARNING")`) or `configure_logging(stream=False)` keeps
-  those workers quiet too,
+  `propagate=True`. `JoblibBackend`, `BatchSimulate` and MPI child processes import
+  HNN-Core in a fresh process, so they still show default progress on stdout; they do
+  not inherit the parent's `configure_logging()` settings,
   by [Sourav Rajvi][] in {gh}`1381`.
 
 - Warnings that users are expected to act on (`maxiter`

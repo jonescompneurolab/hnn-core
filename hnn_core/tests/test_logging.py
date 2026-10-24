@@ -12,12 +12,7 @@ from pathlib import Path
 import pytest
 
 import hnn_core
-from hnn_core._logging import (
-    _CHILD_STDOUT_SILENCE_FLAG,
-    _OWNED_ATTR,
-    configure_logging,
-    set_log_level,
-)
+from hnn_core._logging import _OWNED_ATTR, configure_logging, set_log_level
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 
 pkg_logger = logging.getLogger("hnn_core")
@@ -245,152 +240,9 @@ def test_stream_accepts_file_like(capsys):
     assert captured.out == "" and captured.err == ""
 
 
-def test_child_stdout_logging_isolated_and_idempotent():
-    """Child helper writes INFO to stdout, once, without touching the root logger."""
-    code = (
-        "import logging, sys\n"
-        "from hnn_core._logging import _enable_child_stdout_logging\n"
-        "_enable_child_stdout_logging(); _enable_child_stdout_logging()\n"
-        "logging.getLogger('hnn_core.network_builder').info('child progress')\n"
-        "logging.getLogger('hnn_core.network_builder').debug('hidden')\n"
-        "print(len(logging.getLogger().handlers), file=sys.stderr)\n"
-    )
-    res = subprocess.run(
-        [sys.executable, "-c", code], capture_output=True, text=True, check=True
-    )
-    assert res.stdout == "child progress\n"
-    assert _hnn_stderr(res.stderr).strip() == "0"
-
-
-def test_parent_displays_info_matches_stream_and_level(tmp_path):
-    """Workers key off stream handlers, not only the logger level."""
-    from hnn_core._logging import _parent_displays_info
-
-    configure_logging()
-    assert _parent_displays_info() is True
-
-    configure_logging(level="WARNING")
-    assert _parent_displays_info() is False
-
-    configure_logging(stream=False)
-    assert _parent_displays_info() is False
-
-    configure_logging(stream=False, log_file=tmp_path / "hnn.log")
-    assert _parent_displays_info() is False
-
-    buf = io.StringIO()
-    configure_logging(stream=buf)
-    assert _parent_displays_info() is True
-
-
-def test_mpi_child_command_appends_silence_flag_when_parent_would_not_display():
-    """MPI children get a command-line flag when the parent would not show INFO."""
-    from hnn_core.parallel_backends import _mpi_child_command
-
-    base = ["mpiexec", "-np", "2", "mpi_child.py"]
-    configure_logging()
-    assert _mpi_child_command(base) == base
-
-    configure_logging(level="WARNING")
-    assert _mpi_child_command(base) == base + [_CHILD_STDOUT_SILENCE_FLAG]
-
-    configure_logging(stream=False)
-    assert _mpi_child_command(base) == base + [_CHILD_STDOUT_SILENCE_FLAG]
-
-
-def test_mpi_child_argv_follows_parent_logging_choice():
-    """The argv helper used by mpi_child.py shows INFO unless the silence flag is set."""
-    code = (
-        "import logging, sys\n"
-        "from hnn_core._logging import (\n"
-        "    _CHILD_STDOUT_SILENCE_FLAG, _apply_parent_logging_from_argv)\n"
-        "_apply_parent_logging_from_argv(['mpi_child.py'] + sys.argv[1:])\n"
-        "logging.getLogger('hnn_core.x').info('progress')\n"
-    )
-    shown = subprocess.run(
-        [sys.executable, "-c", code], capture_output=True, text=True, check=True
-    )
-    assert shown.stdout == "progress\n"
-
-    silenced = subprocess.run(
-        [sys.executable, "-c", code, _CHILD_STDOUT_SILENCE_FLAG],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    assert silenced.stdout == ""
-    assert _hnn_stderr(silenced.stderr) == ""
-
-
 # ---------------------------------------------------------------------------
 # Simulation-dependent behavior (requires NEURON)
 # ---------------------------------------------------------------------------
-_QUIET_SETUP = """
-from hnn_core import configure_logging
-quiet = {quiet!r}
-if quiet == "level":
-    configure_logging(level="WARNING")
-elif quiet == "stream":
-    configure_logging(stream=False)
-"""
-
-_JOBLIB_SCRIPT = (
-    _QUIET_SETUP
-    + """
-from hnn_core import neymotin_2020_model, simulate_dipole, JoblibBackend
-net = neymotin_2020_model(mesh_shape=(3, 3), add_drives_from_params=True)
-with JoblibBackend(n_jobs=2):
-    simulate_dipole(net, tstop=10, n_trials=2, dt=0.5, verbose=True)
-"""
-)
-
-
-@pytest.mark.parametrize("quiet", [None, "level", "stream"])
-def test_joblib_workers_progress_follows_parent_logging(quiet):
-    """Worker-process progress appears unless the parent silenced the stream or INFO."""
-    res = subprocess.run(
-        [sys.executable, "-c", _JOBLIB_SCRIPT.format(quiet=quiet)],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    if quiet:
-        assert "Trial" not in res.stdout + res.stderr
-        assert "Building" not in res.stdout + res.stderr
-    else:
-        assert "Trial 1" in res.stdout and "Trial 2" in res.stdout
-        assert "Building the NEURON model" in res.stdout
-
-
-def test_joblib_worker_helper_ignored_in_parent_process():
-    """In the parent process (n_jobs=1 / threads) no extra handler is installed."""
-    from hnn_core import neymotin_2020_model
-    from hnn_core.parallel_backends import _simulate_single_trial_in_worker
-
-    net = neymotin_2020_model(mesh_shape=(3, 3), add_drives_from_params=True)
-    net._instantiate_drives(tstop=5, n_trials=1)
-    n_handlers = len(pkg_logger.handlers)
-    propagate = pkg_logger.propagate
-    _simulate_single_trial_in_worker(net, 5, 0.5, 0, True)
-    assert len(pkg_logger.handlers) == n_handlers
-    assert pkg_logger.propagate == propagate
-
-
-def test_joblib_worker_helper_silent_when_parent_logging_is_off(monkeypatch, capsys):
-    """A worker process stays silent if INFO messages are disabled in the parent."""
-    import multiprocessing
-
-    from hnn_core import neymotin_2020_model
-    from hnn_core.parallel_backends import _simulate_single_trial_in_worker
-
-    monkeypatch.setattr(multiprocessing, "parent_process", lambda: object())
-    net = neymotin_2020_model(mesh_shape=(3, 3), add_drives_from_params=True)
-    net._instantiate_drives(tstop=5, n_trials=1)
-    _simulate_single_trial_in_worker(net, 5, 0.5, 0, False)
-    assert "Building the NEURON model" not in capsys.readouterr().out
-    assert not _owned()
-
-
 def test_maximize_psd_trials_warning():
     from hnn_core import neymotin_2020_model
     from hnn_core.optimization import Optimizer
@@ -456,37 +308,6 @@ def test_optimize_evoked_maxiter_warning(monkeypatch):
             )
 
 
-_MPI_SCRIPT = (
-    _QUIET_SETUP
-    + """
-from hnn_core import neymotin_2020_model, simulate_dipole, MPIBackend
-net = neymotin_2020_model(mesh_shape=(3, 3), add_drives_from_params=True)
-with MPIBackend(n_procs=2):
-    simulate_dipole(net, tstop=10, n_trials=1, dt=0.5, verbose=True)
-"""
-)
-
-
-@requires_mpi4py
-@requires_psutil
-@pytest.mark.uses_mpi
-@pytest.mark.parametrize("quiet", [None, "level", "stream"])
-def test_mpi_workers_progress_follows_parent_logging(quiet):
-    """MPI child progress appears unless the parent silenced the stream or INFO."""
-    res = subprocess.run(
-        [sys.executable, "-c", _MPI_SCRIPT.format(quiet=quiet)],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    if quiet:
-        assert "Trial" not in res.stdout + res.stderr
-        assert "Building" not in res.stdout + res.stderr
-    else:
-        assert "Trial 1" in res.stdout
-        assert "Building the NEURON model" in res.stdout
-
-
 @requires_mpi4py
 @requires_psutil
 @pytest.mark.uses_mpi
@@ -497,35 +318,6 @@ def test_mpi_child_silent_without_progress_when_not_verbose(capsys):
     with MPIBackend(n_procs=2):
         simulate_dipole(net, tstop=10, dt=0.5, n_trials=1, verbose=False)
     assert "Trial" not in capsys.readouterr().out
-
-
-def test_child_stdout_logging_in_process(capsys):
-    """In-process twin of the subprocess test (so that coverage measures it)."""
-    from hnn_core._logging import _CHILD_ATTR, _enable_child_stdout_logging
-
-    _enable_child_stdout_logging()
-    _enable_child_stdout_logging()  # idempotent
-    logging.getLogger("hnn_core.network_builder").info("child progress")
-    logging.getLogger("hnn_core.network_builder").debug("hidden")
-    assert capsys.readouterr().out == "child progress\n"
-    assert sum(getattr(h, _CHILD_ATTR, False) for h in pkg_logger.handlers) == 1
-    assert pkg_logger.propagate is False
-
-
-def test_joblib_worker_helper_enables_logging_in_worker_process(monkeypatch, capsys):
-    """In a worker *process* the helper sends INFO progress to the worker's stdout."""
-    import multiprocessing
-
-    from hnn_core import neymotin_2020_model
-    from hnn_core._logging import _CHILD_ATTR
-    from hnn_core.parallel_backends import _simulate_single_trial_in_worker
-
-    monkeypatch.setattr(multiprocessing, "parent_process", lambda: object())
-    net = neymotin_2020_model(mesh_shape=(3, 3), add_drives_from_params=True)
-    net._instantiate_drives(tstop=5, n_trials=1)
-    _simulate_single_trial_in_worker(net, 5, 0.5, 0, True)
-    assert "Building the NEURON model" in capsys.readouterr().out
-    assert sum(getattr(h, _CHILD_ATTR, False) for h in pkg_logger.handlers) == 1
 
 
 @requires_mpi4py
@@ -573,63 +365,3 @@ def test_optimize_evoked_skips_step_when_maxiter_is_zero(caplog):
         )
     assert "Skipping optimization step" in caplog.text
     assert "Initial RMSE" in caplog.text and "Final RMSE" in caplog.text
-
-
-_BATCH_SCRIPT = (
-    _QUIET_SETUP
-    + """
-import tempfile
-from hnn_core import neymotin_2020_model
-from hnn_core.batch_simulate import BatchSimulate
-
-def set_params(net, p):
-    net.add_evoked_drive(
-        "evprox", mu=p["mu"], sigma=2.0, numspikes=1, location="proximal",
-        weights_ampa={{"L2_basket": 1e-3, "L2_pyramidal": 1e-3,
-                      "L5_basket": 1e-3, "L5_pyramidal": 1e-3}},
-        synaptic_delays={{"L2_basket": 0.1, "L2_pyramidal": 0.1,
-                         "L5_basket": 1.0, "L5_pyramidal": 1.0}},
-    )
-
-net = neymotin_2020_model(mesh_shape=(3, 3))
-batch = BatchSimulate(net=net, set_params=set_params, tstop=20,
-                      save_folder=tempfile.mkdtemp(), batch_size=2, n_trials=1)
-batch.run({{"mu": [10, 20]}}, n_jobs=2, backend="loky", verbose=True,
-          return_output=False)
-"""
-)
-
-
-@pytest.mark.parametrize("quiet", [None, "level", "stream"])
-def test_batch_simulate_workers_progress_follows_parent_logging(quiet):
-    """BatchSimulate worker progress appears unless the parent silenced the stream or INFO."""
-    res = subprocess.run(
-        [sys.executable, "-c", _BATCH_SCRIPT.format(quiet=quiet)],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    if quiet:
-        assert "Building the NEURON model" not in res.stdout + res.stderr
-    else:
-        assert "Building the NEURON model" in res.stdout
-
-
-def test_batch_simulate_worker_enables_logging_in_worker_process(monkeypatch, capsys):
-    """In a worker *process*, a batch simulation sends its progress to stdout."""
-    import multiprocessing
-
-    from hnn_core import neymotin_2020_model
-    from hnn_core._logging import _CHILD_ATTR
-    from hnn_core.batch_simulate import BatchSimulate
-
-    def set_params(net, param_values):
-        pass
-
-    net = neymotin_2020_model(mesh_shape=(3, 3), add_drives_from_params=True)
-    batch = BatchSimulate(net=net, set_params=set_params, tstop=5, n_trials=1)
-    batch._worker_stdout_logging = True
-    monkeypatch.setattr(multiprocessing, "parent_process", lambda: object())
-    batch._run_single_sim({})
-    assert "Building the NEURON model" in capsys.readouterr().out
-    assert sum(getattr(h, _CHILD_ATTR, False) for h in pkg_logger.handlers) == 1

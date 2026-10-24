@@ -4,7 +4,6 @@
 #          Mainak Jas <mainakjas@gmail.com>
 
 import logging
-import multiprocessing
 import os
 import sys
 import re
@@ -20,11 +19,7 @@ from pathlib import Path
 
 from typing import Union
 
-from ._logging import (
-    _CHILD_STDOUT_SILENCE_FLAG,
-    _configure_child_logging,
-    _parent_displays_info,
-)
+from . import _logging  # noqa: F401  # default progress handler in worker processes
 from .cell_response import CellResponse
 from .dipole import Dipole
 from .network_builder import _simulate_single_trial
@@ -145,20 +140,6 @@ def _gather_trial_data(sim_data, net, n_trials, postproc, baseline_correction):
         dpls.append(dpl)
 
     return dpls
-
-
-def _mpi_child_command(mpi_cmd):
-    """Copy ``mpi_cmd`` and tell the child whether to write progress to stdout.
-
-    MPI ranks are new processes and do not inherit this process' logging
-    handlers. When this process would not display INFO on a stream, append the
-    silence flag so ``mpi_child`` drops its default stdout handler, matching
-    Joblib workers (including ``configure_logging(stream=False)``).
-    """
-    command = list(mpi_cmd)
-    if not _parent_displays_info():
-        command.append(_CHILD_STDOUT_SILENCE_FLAG)
-    return command
 
 
 def _get_mpi_env():
@@ -449,19 +430,6 @@ def _process_child_data(path_data_file, data_len):
             "got %d" % (data_len, len(data_bytes))
         )
     return pickle.loads(data_bytes)
-
-
-# This is the input side.
-# sending the network configuration to NEURON
-def _simulate_single_trial_in_worker(net, tstop, dt, trial_idx, stdout_logging=False):
-    """Run `_simulate_single_trial`, following the parent's logging choice.
-
-    Only has an effect in a worker *process* (e.g. a loky worker), never in the
-    parent process or in threads, which already share the logging configuration.
-    """
-    if multiprocessing.parent_process() is not None:
-        _configure_child_logging(stdout_logging)
-    return _simulate_single_trial(net, tstop, dt, trial_idx)
 
 
 def _echo_child_output(out_q):
@@ -755,13 +723,9 @@ class JoblibBackend(object):
                 f"Joblib will run {n_trials} trial(s) in parallel by "
                 f"distributing trials over {self.n_jobs} jobs."
             )
-        parallel, myfunc = self._parallel_func(_simulate_single_trial_in_worker)
-        # Worker processes do not share our logging configuration. Let them write
-        # progress to inherited stdout only if this process would display INFO.
-        worker_stdout_logging = _parent_displays_info()
+        parallel, myfunc = self._parallel_func(_simulate_single_trial)
         sim_data = parallel(
-            myfunc(net, tstop, dt, trial_idx, worker_stdout_logging)
-            for trial_idx in range(n_trials)
+            myfunc(net, tstop, dt, trial_idx) for trial_idx in range(n_trials)
         )
 
         dpls = _gather_trial_data(
@@ -1215,7 +1179,7 @@ class MPIBackend(object):
 
         env = _get_mpi_env()
         self.proc, sim_data = run_subprocess(
-            command=_mpi_child_command(self.mpi_cmd),
+            command=self.mpi_cmd,
             obj=[net, tstop, dt, n_trials],
             timeout=10,
             proc_queue=self.proc_queue,
