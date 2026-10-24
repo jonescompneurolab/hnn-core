@@ -8,7 +8,6 @@ import sys
 import pickle
 import base64
 import re
-import hnn_core._logging  # default progress handler in this fresh process
 from hnn_core.parallel_backends import _extract_data, _extract_data_length
 import logging
 

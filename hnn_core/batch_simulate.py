@@ -11,7 +11,6 @@ from pathlib import Path
 import numpy as np
 from joblib import Parallel, delayed, parallel_config
 
-from . import _logging  # noqa: F401  # default progress handler in worker processes
 from .network import Network
 from .externals.mne import _validate_type, _check_option
 from .dipole import simulate_dipole

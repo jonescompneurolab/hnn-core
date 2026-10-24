@@ -19,7 +19,6 @@ from pathlib import Path
 
 from typing import Union
 
-from . import _logging  # noqa: F401  # default progress handler in worker processes
 from .cell_response import CellResponse
 from .dipole import Dipole
 from .network_builder import _simulate_single_trial
