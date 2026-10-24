@@ -11,7 +11,12 @@ from pathlib import Path
 import pytest
 
 import hnn_core
-from hnn_core._logging import _OWNED_ATTR, configure_logging, set_log_level
+from hnn_core._logging import (
+    _CHILD_STDOUT_SILENCE_FLAG,
+    _OWNED_ATTR,
+    configure_logging,
+    set_log_level,
+)
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 
 pkg_logger = logging.getLogger("hnn_core")
@@ -219,6 +224,42 @@ def test_child_stdout_logging_isolated_and_idempotent():
     assert _hnn_stderr(res.stderr).strip() == "0"
 
 
+def test_mpi_child_command_appends_silence_flag_when_info_disabled():
+    """MPI children get a command-line flag when the parent has silenced INFO."""
+    from hnn_core.parallel_backends import _mpi_child_command
+
+    base = ["mpiexec", "-np", "2", "mpi_child.py"]
+    configure_logging()
+    assert _mpi_child_command(base) == base
+
+    configure_logging(level="WARNING")
+    assert _mpi_child_command(base) == base + [_CHILD_STDOUT_SILENCE_FLAG]
+
+
+def test_mpi_child_argv_follows_parent_logging_choice():
+    """The argv helper used by mpi_child.py shows INFO unless the silence flag is set."""
+    code = (
+        "import logging, sys\n"
+        "from hnn_core._logging import (\n"
+        "    _CHILD_STDOUT_SILENCE_FLAG, _apply_parent_logging_from_argv)\n"
+        "_apply_parent_logging_from_argv(['mpi_child.py'] + sys.argv[1:])\n"
+        "logging.getLogger('hnn_core.x').info('progress')\n"
+    )
+    shown = subprocess.run(
+        [sys.executable, "-c", code], capture_output=True, text=True, check=True
+    )
+    assert shown.stdout == "progress\n"
+
+    silenced = subprocess.run(
+        [sys.executable, "-c", code, _CHILD_STDOUT_SILENCE_FLAG],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert silenced.stdout == ""
+    assert _hnn_stderr(silenced.stderr) == ""
+
+
 # ---------------------------------------------------------------------------
 # Simulation-dependent behavior (requires NEURON)
 # ---------------------------------------------------------------------------
@@ -343,6 +384,37 @@ def test_optimize_evoked_maxiter_warning(monkeypatch):
                 maxiter=5,
                 which_drives=["evprox1"],
             )
+
+
+_MPI_SCRIPT = """
+from hnn_core import neymotin_2020_model, simulate_dipole, MPIBackend
+if {silence}:
+    from hnn_core import configure_logging
+    configure_logging(level="WARNING")
+net = neymotin_2020_model(mesh_shape=(3, 3), add_drives_from_params=True)
+with MPIBackend(n_procs=2):
+    simulate_dipole(net, tstop=10, n_trials=1, dt=0.5, verbose=True)
+"""
+
+
+@requires_mpi4py
+@requires_psutil
+@pytest.mark.uses_mpi
+@pytest.mark.parametrize("silence", [False, True])
+def test_mpi_workers_progress_follows_parent_logging(silence):
+    """MPI child progress appears on stdout unless the parent silenced INFO."""
+    res = subprocess.run(
+        [sys.executable, "-c", _MPI_SCRIPT.format(silence=silence)],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    if silence:
+        assert "Trial" not in res.stdout + res.stderr
+        assert "Building" not in res.stdout + res.stderr
+    else:
+        assert "Trial 1" in res.stdout
+        assert "Building the NEURON model" in res.stdout
 
 
 @requires_mpi4py

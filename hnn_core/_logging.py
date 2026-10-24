@@ -23,6 +23,12 @@ _FILE_FORMAT = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
 _OWNED_ATTR = "_hnn_core_owned"
 _CHILD_ATTR = "_hnn_core_child_stdout"
 
+# MPI children cannot inherit the parent's logger. ``MPIBackend.simulate``
+# appends this flag to the ``nrniv`` command when INFO is disabled in the
+# parent, and ``mpi_child`` reads it to stay silent the same way Joblib workers
+# do.
+_CHILD_STDOUT_SILENCE_FLAG = "--silence-hnn-logging"
+
 logger = logging.getLogger(_LOGGER_NAME)
 logger.addHandler(logging.NullHandler())
 
@@ -150,20 +156,34 @@ def _enable_child_stdout_logging():
     logger.propagate = False
 
 
+def _remove_child_handlers():
+    for handler in list(logger.handlers):
+        if getattr(handler, _CHILD_ATTR, False):
+            logger.removeHandler(handler)
+            handler.close()
+
+
 def _configure_child_logging(enabled):
-    """Make a worker process follow the logging choice of its parent process.
+    """Make a worker or MPI child follow the logging choice of its parent process.
 
     Parameters
     ----------
     enabled : bool
-        Whether INFO messages are enabled in the parent. If True, the worker writes
-        its progress to its own stdout; if False, the default handler that the
-        worker created when importing HNN-Core is removed so that it stays silent.
+        Whether INFO messages are enabled in the parent. If True, the process writes
+        its progress to its own stdout; if False, handlers installed by HNN-Core
+        (the default import handler or a previous child handler) are removed so
+        that it stays silent.
     """
     if enabled:
         _enable_child_stdout_logging()
     else:
         _remove_owned_handlers()
+        _remove_child_handlers()
+
+
+def _apply_parent_logging_from_argv(argv):
+    """Configure this MPI child from the flag sent by ``MPIBackend.simulate``."""
+    _configure_child_logging(_CHILD_STDOUT_SILENCE_FLAG not in argv)
 
 
 def _install_default_handler():

@@ -20,7 +20,7 @@ from pathlib import Path
 
 from typing import Union
 
-from ._logging import _configure_child_logging
+from ._logging import _CHILD_STDOUT_SILENCE_FLAG, _configure_child_logging
 from .cell_response import CellResponse
 from .dipole import Dipole
 from .network_builder import _simulate_single_trial
@@ -141,6 +141,19 @@ def _gather_trial_data(sim_data, net, n_trials, postproc, baseline_correction):
         dpls.append(dpl)
 
     return dpls
+
+
+def _mpi_child_command(mpi_cmd):
+    """Copy ``mpi_cmd`` and tell the child whether to write progress to stdout.
+
+    MPI ranks are new processes and do not inherit this process' logging
+    handlers. When INFO is disabled here, append the silence flag so
+    ``mpi_child`` drops its default stdout handler, matching Joblib workers.
+    """
+    command = list(mpi_cmd)
+    if not logger.isEnabledFor(logging.INFO):
+        command.append(_CHILD_STDOUT_SILENCE_FLAG)
+    return command
 
 
 def _get_mpi_env():
@@ -1197,7 +1210,7 @@ class MPIBackend(object):
 
         env = _get_mpi_env()
         self.proc, sim_data = run_subprocess(
-            command=self.mpi_cmd,
+            command=_mpi_child_command(self.mpi_cmd),
             obj=[net, tstop, dt, n_trials],
             timeout=10,
             proc_queue=self.proc_queue,
