@@ -204,8 +204,7 @@ def test_import_warns_on_unwritable_log_file_env_var(tmp_path):
     env = os.environ.copy()
     env["HNN_CORE_LOG_FILE"] = str(missing)
     code = (
-        "import logging, hnn_core;"
-        "logging.getLogger('hnn_core.x').info('still works')"
+        "import logging, hnn_core;logging.getLogger('hnn_core.x').info('still works')"
     )
     res = subprocess.run(
         [sys.executable, "-c", code], capture_output=True, text=True, env=env
