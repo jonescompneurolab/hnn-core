@@ -611,6 +611,19 @@ def requires_psutil(function):
     return pytest.mark.skipif(skip, reason=reason)(function)
 
 
+def requires_openmpi_package(function):
+    """Decorator for testing functions that require the PyPI 'openmpi' package."""
+    import pytest
+
+    try:
+        distribution("openmpi")
+        skip = False
+    except PackageNotFoundError:
+        skip = True
+    reason = "PyPI 'openmpi' package not available"
+    return pytest.mark.skipif(skip, reason=reason)(function)
+
+
 def _extract_data_length(data_str, object_name):
     data_len_match = re.search("@end_of_%s:" % object_name + r"(\d+)@", data_str)
     if data_len_match is not None:

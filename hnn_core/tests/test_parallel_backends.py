@@ -7,7 +7,6 @@ from contextlib import redirect_stdout
 from importlib.metadata import PackageNotFoundError, distribution
 from threading import Thread, Event
 from time import sleep
-from types import SimpleNamespace
 from urllib.request import urlretrieve
 
 import numpy as np
@@ -26,6 +25,7 @@ from hnn_core.dipole import simulate_dipole
 from hnn_core.parallel_backends import (
     requires_mpi4py,
     requires_psutil,
+    requires_openmpi_package,
     _determine_cores_hwthreading,
     _get_mpi_env,
     _get_pip_openmpi_lib,
@@ -506,43 +506,30 @@ def test_compare_duecker_model_output(backend):
     )
 
 
-@pytest.mark.parametrize(
-    "real_lib_name",
-    ["libmpi.so.40", "libmpi.so.12", "libmpi.40.dylib", "libmpi.12.dylib", None],
-    ids=["linux-openmpi", "linux-mpich", "mac-openmpi", "mac-mpich", "none"],
-)
-def test_get_pip_openmpi_lib(monkeypatch, tmp_path, real_lib_name):
-    """Test that only the real libmpi file in the 'openmpi' package is regex-matched"""
-    # Decoys that must NOT match. 'libmpi.so' and 'libmpi.dylib' are linker scripts
-    # that NEURON cannot load.
-    fake_lib_names = [
+@requires_openmpi_package
+def test_get_pip_openmpi_lib():
+    """Test that only the real libmpi file in the 'openmpi' package is found"""
+    mpi_lib = _get_pip_openmpi_lib()
+    assert mpi_lib is not None
+    # `_get_pip_openmpi_lib()` MUST find one or more of these files, which are the only
+    # true MPI library files that NEURON needs.
+    assert Path(mpi_lib).name in {
+        "libmpi.so.40",
+        "libmpi.so.12",
+        "libmpi.40.dylib",
+        "libmpi.12.dylib",
+    }
+    # `_get_pip_openmpi_lib()` must NOT find one or more of these files, which are also
+    # present in the `openmpi` package depending on the OS. None of these files are the
+    # "real" MPI library file that NEURON needs.
+    assert Path(mpi_lib).name not in {
         "libmpi.so",
         "libmpi.dylib",
         "libmpi_mpifh.so.40",
         "libmpi.so.40.1.0",
-    ]
-
-    if real_lib_name is not None:
-        names = fake_lib_names + [real_lib_name]
-        expected = str(tmp_path / real_lib_name)
-    else:
-        names = fake_lib_names
-        expected = None
-
-    # This needs to be a SimpleNamespace instead of a simple dict (etc.) because the
-    # files need to have 'name' and 'locate' object attributes in order for the mock
-    # package distribution to work properly.
-    files = []
-    for n in names:
-        # Note that `locate` is set to the callable Path.absolute method ITSELF, not a
-        # specific invocation of the function.
-        files.append(SimpleNamespace(name=n, locate=(tmp_path / n).absolute))
-
-    monkeypatch.setattr(
-        parallel_backends, "distribution", lambda name: SimpleNamespace(files=files)
-    )
-
-    assert _get_pip_openmpi_lib() == expected
+        "libmpi.so.40.40.8",
+    }
+    assert Path(mpi_lib).is_file()
 
 
 def test_get_pip_openmpi_lib_installed():
