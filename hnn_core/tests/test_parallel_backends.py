@@ -551,7 +551,7 @@ def test_get_pip_openmpi_lib_installed():
 # it. There are four arguments that pytest parametrizes over:
 #
 # - `autoload_flag`: value of `autoload_mpi_library` argument to `_get_mpi_env`
-# - `user_provided_lib`: value of `mpi_lib_path` argument to `_get
+# - `user_provided_lib`: value of `mpi_lib_path` argument to `_get_mpi_env`
 # - `default_openmpi_lib`: value returned by `_get_pip_openmpi_lib` (which is mocked to
 #     return a specific value)
 # - `expected_returned_lib`: the expected value of the `MPI_LIB_NRN_PATH` environment
