@@ -215,7 +215,12 @@ def _get_mpi_env(autoload_mpi_library=True, mpi_lib_path=None):
 def _get_pip_openmpi_lib():
     """Return the path of libmpi from the PyPI 'openmpi' package, if any."""
     try:
-        files = distribution("openmpi").files or []
+        files = distribution("openmpi").files
+        if files is None:
+            raise RuntimeError(
+                "No files found in the PyPI 'openmpi' distribution, "
+                "please re-install the package"
+            )
     except PackageNotFoundError:
         print(
             "PyPI 'openmpi' package not found; attempting to use system MPI if "
