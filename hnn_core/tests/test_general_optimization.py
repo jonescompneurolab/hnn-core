@@ -17,6 +17,7 @@ from hnn_core.optimization.general_optimization import (
 import numpy as np
 import pytest
 
+
 def _evoked_drive_weights(inh_name_suffix="basket"):
     """Weights and delays for proximal evoked drives in optimization tests."""
     weights_ampa = {
