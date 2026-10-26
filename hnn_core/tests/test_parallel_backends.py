@@ -2,7 +2,9 @@ from pathlib import Path
 from os import environ
 import io
 import itertools
+import re
 from contextlib import redirect_stdout
+from importlib.metadata import PackageNotFoundError, distribution
 from threading import Thread, Event
 from time import sleep
 from urllib.request import urlretrieve
@@ -13,6 +15,7 @@ from numpy.testing import assert_array_equal, assert_allclose, assert_raises
 
 import pytest
 
+from hnn_core import parallel_backends
 from hnn_core import (
     MPIBackend,
     neymotin_2020_model,
@@ -22,7 +25,10 @@ from hnn_core.dipole import simulate_dipole
 from hnn_core.parallel_backends import (
     requires_mpi4py,
     requires_psutil,
+    requires_openmpi_package,
     _determine_cores_hwthreading,
+    _get_mpi_env,
+    _get_pip_openmpi_lib,
 )
 from hnn_core.network_builder import NetworkBuilder
 
@@ -498,3 +504,165 @@ def test_compare_duecker_model_output(backend):
         cell_response_new_reloaded.spike_times,
         cell_response_old.spike_times,
     )
+
+
+@requires_openmpi_package
+def test_get_pip_openmpi_lib():
+    """Test that only the real libmpi file in the 'openmpi' package is found"""
+    mpi_lib = _get_pip_openmpi_lib()
+    assert mpi_lib is not None
+    # `_get_pip_openmpi_lib()` MUST find one or more of these files, which are the only
+    # true MPI library files that NEURON needs.
+    assert Path(mpi_lib).name in {
+        "libmpi.so.40",
+        "libmpi.so.12",
+        "libmpi.40.dylib",
+        "libmpi.12.dylib",
+    }
+    # `_get_pip_openmpi_lib()` must NOT find one or more of these files, which are also
+    # present in the `openmpi` package depending on the OS. None of these files are the
+    # "real" MPI library file that NEURON needs.
+    assert Path(mpi_lib).name not in {
+        "libmpi.so",
+        "libmpi.dylib",
+        "libmpi_mpifh.so.40",
+        "libmpi.so.40.1.0",
+        "libmpi.so.40.40.8",
+    }
+    assert Path(mpi_lib).is_file()
+
+
+def test_get_pip_openmpi_lib_installed():
+    """Test _get_pip_openmpi_lib against the actually-installed environment"""
+    try:
+        distribution("openmpi")
+    except PackageNotFoundError:
+        assert _get_pip_openmpi_lib() is None
+    else:
+        # If it's found to be installed, then the returned path of the library must
+        # exist and be a file
+        mpi_lib = _get_pip_openmpi_lib()
+        assert mpi_lib is not None
+        assert Path(mpi_lib).is_file()
+
+
+# This tests that `_get_mpi_env` correctly sets the `MPI_LIB_NRN_PATH` environment
+# variable based the state of the environment and which arguments are passed to
+# it. There are four arguments that pytest parametrizes over:
+#
+# - `autoload_flag`: value of `autoload_mpi_library` argument to `_get_mpi_env`
+# - `user_provided_lib`: value of `mpi_lib_path` argument to `_get_mpi_env`
+# - `default_openmpi_lib`: value returned by `_get_pip_openmpi_lib` (which is mocked to
+#     return a specific value)
+# - `expected_returned_lib`: the expected value of the `MPI_LIB_NRN_PATH` environment
+#     variable after `_get_mpi_env` is called
+#
+# Additionally, the test also sets the CALLER's environment variable `MPI_LIB_NRN_PATH`
+# to a known value ("preexisting.so"). This is to test that `_get_mpi_env` does not
+# modify the caller's environment itself.
+#
+# Think of everything except `expected_returned_lib` as "inputs" to the test, and
+# `expected_returned_lib` as the "output" of the test.
+@pytest.mark.parametrize(
+    "autoload_flag, user_provided_lib, default_openmpi_lib, expected_returned_lib",
+    [
+        # Case when using default arguments if the `openmpi` package is installed:
+        # - autoload_flag = True
+        # - user_provided_lib = None (no custom library path provided)
+        # - default_openmpi_lib = mock value of the installed library file "pip.so"
+        # - expected_returned_lib = _get_mpi_env should automatically set the
+        #     environment variable to `default_openmpi_lib`: "pip.so"
+        pytest.param(True, None, "pip.so", "pip.so", id="default-installed"),
+        # Case when using default arguments if the `openmpi` package is NOT installed:
+        # - autoload_flag = True
+        # - user_provided_lib = None (no custom library path provided)
+        # - default_openmpi_lib = None (not installed)
+        # - expected_returned_lib = the environment variable should remain UNCHANGED
+        #     from its preexisting value "preexisting.so"
+        pytest.param(True, None, None, "preexisting.so", id="default-not-installed"),
+        # Case when autoload is off, and no user provided library path is given:
+        # - autoload_flag = False
+        # - user_provided_lib = None (no custom library path provided)
+        # - default_openmpi_lib = mock value of the installed library file "pip.so"
+        # - expected_returned_lib = the environment variable should remain UNCHANGED
+        #     from its preexisting value "preexisting.so"
+        pytest.param(False, None, "pip.so", "preexisting.so", id="no-autoload"),
+        # Case when autoload is off, and user provided library path has been given:
+        # - autoload_flag = False
+        # - user_provided_lib = "user.so" (custom library path provided)
+        # - default_openmpi_lib = mock value of the installed library file "pip.so"
+        # - expected_returned_lib = _get_mpi_env should automatically set the
+        #     environment variable to `user_provided_lib`: "user.so"
+        pytest.param(False, "user.so", "pip.so", "user.so", id="no-autoload-user"),
+        # Case when autoload is ON, and user provided library path has been given. In
+        # this case, the user-provided library path should take precedence over the
+        # autoloaded library path:
+        # - autoload_flag = True
+        # - user_provided_lib = "user.so" (custom library path provided)
+        # - default_openmpi_lib = mock value of the installed library file "pip.so"
+        # - expected_returned_lib = _get_mpi_env should automatically set the
+        #     environment variable to `user_provided_lib`: "user.so"
+        pytest.param(True, Path("user.so"), "pip.so", "user.so", id="user-wins"),
+    ],
+)
+def test_get_mpi_env_lib_path(
+    monkeypatch,
+    autoload_flag,
+    user_provided_lib,
+    default_openmpi_lib,
+    expected_returned_lib,
+):
+    """Test which MPI library _get_mpi_env points MPI_LIB_NRN_PATH to across arguments"""
+    # Set the caller's environment, in order to make sure that `_get_mpi_env` later does
+    # not modify it
+    monkeypatch.setenv("MPI_LIB_NRN_PATH", "preexisting.so")
+    # Overwrite the `_get_pip_openmpi_lib` function to return a specific library path
+    # for testing purposes.
+    monkeypatch.setattr(
+        parallel_backends, "_get_pip_openmpi_lib", lambda: default_openmpi_lib
+    )
+
+    env = _get_mpi_env(
+        autoload_mpi_library=autoload_flag, mpi_lib_path=user_provided_lib
+    )
+
+    assert env["MPI_LIB_NRN_PATH"] == expected_returned_lib
+    # Check that the caller's own environment was not modified
+    assert environ["MPI_LIB_NRN_PATH"] == "preexisting.so"
+
+
+@requires_mpi4py
+@requires_psutil
+def test_mpibackend_lib_path(monkeypatch, tmp_path):
+    """Test that 'mpi_lib_path' must exist and reaches MPI as an absolute path
+
+    Note that this test does not actually depend on whether the `openmpi` package is
+    installed or not, but does require that the `mpi4py` and `psutil` packages are
+    installed.
+    """
+    # "nonexistent.so" tests a path that does not exist, and `tmp_path` tests a path
+    # that exists but is a directory instead of a file.
+    for bad_path in ["nonexistent.so", tmp_path]:
+        with pytest.raises(FileNotFoundError, match="'mpi_lib_path' not found"):
+            MPIBackend(mpi_lib_path=bad_path)
+
+    # Capture the env that MPI would be launched with, but stop before launching it
+    def _fake_run_subprocess(env, **kwargs):
+        raise RuntimeError(f"MPI_LIB_NRN_PATH={env['MPI_LIB_NRN_PATH']}")
+
+    monkeypatch.setattr(parallel_backends, "run_subprocess", _fake_run_subprocess)
+
+    # Create a fake MPI library file in the temporary directory, in order to make sure
+    # that MPIBackend is accessing the correct path to the library.
+    (tmp_path / "libmpi.so.40").touch()
+
+    # Setup our network and backend, pointing the backend to the fake MPI library file.
+    net = neymotin_2020_model(mesh_shape=(3, 3))
+    backend = MPIBackend(n_procs=2, mpi_lib_path=(tmp_path / "libmpi.so.40"))
+
+    # Test that at simulation time, the MPIBackend can see and is using the correct path
+    # to the MPI library file, based on its internal `env` setting. We do this by
+    # hacking the `run_subprocess` using the monkeypatch above.
+    expected = re.escape(f"MPI_LIB_NRN_PATH={tmp_path / 'libmpi.so.40'}")
+    with pytest.raises(RuntimeError, match=f"^{expected}$"):
+        backend.simulate(net, tstop=1, dt=0.025, n_trials=1)
