@@ -10,12 +10,7 @@ from pathlib import Path
 import numpy as np
 from neuron import h
 
-# # This is due to: https://github.com/neuronsimulator/nrn/pull/746
-# from neuron import __version__
 
-# TODO AES ugh need to check all units?????
-# if int(__version__[0]) >= 8:
-#     h.nrnunit_use_legacy(1)
 
 from .cell import _ArtificialCell
 from .params import _long_name, _short_name
