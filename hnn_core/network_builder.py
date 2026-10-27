@@ -11,7 +11,6 @@ import numpy as np
 from neuron import h
 
 
-
 from .cell import _ArtificialCell
 from .params import _long_name, _short_name
 from .extracellular import _ExtracellularArrayBuilder
