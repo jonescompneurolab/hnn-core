@@ -1036,7 +1036,7 @@ def plot_spikes_raster(
         raster_max = max(max(gid_ranges[cell_type]) for cell_type in cell_types)
     else:
         raster_min = 0
-        raster_max = max_gid
+        raster_max = max(0, max_gid)
 
     # Overlay dipoles on raster plot
     if overlay_dipoles:
@@ -1057,30 +1057,29 @@ def plot_spikes_raster(
         l5_dipole = avgs[0].data["L5"]
         dipole_times = dpl[0].times
 
-        # Scale dipole to fit the spike raster plot
-        if len(cell_type_gids) == 0:
-            raster_max = max(spike_gids)
-        else:
-            raster_max = max(cell_type_gids)
         raster_midpoint = round((raster_max / 2), 0)
         raster_quarterpoint = round((raster_max / 4), 0)
 
-        # Scale down by .95 until the dipoles fit within the appropriate area
-        # separately for L5 and L2
-        while (max(l5_dipole) - min(l5_dipole)) > abs(raster_midpoint):
-            l5_dipole = l5_dipole * 0.95
+        # Exclude if no spikes are detected, or only GID==0 has spikes
+        if raster_max > 0:
+            # Scale down by .95 until the dipoles fit within the appropriate area
+            # separately for L5 and L2
+            while (max(l5_dipole) - min(l5_dipole)) > abs(raster_midpoint):
+                l5_dipole = l5_dipole * 0.95
 
-        while (max(l2_dipole) - min(l2_dipole)) > abs(raster_midpoint):
-            l2_dipole = l2_dipole * 0.95
+            while (max(l2_dipole) - min(l2_dipole)) > abs(raster_midpoint):
+                l2_dipole = l2_dipole * 0.95
 
         # dipoles with a moment << number of cells (270) will present as flat lines
         # scale dipole such that waveform can be inspected properly alongside spiking
         amp_max = max(max(l5_dipole), max(l2_dipole))
         amp_min = min(min(l5_dipole), min(l5_dipole))
-        scale_fact = (10 ** np.floor(np.log10(raster_max))) / (amp_max - amp_min)
 
-        l2_dipole *= scale_fact
-        l5_dipole *= scale_fact
+        # Exclude if no spikes are detected, or only GID==0 has spikes
+        if raster_max > 0 and (amp_max - amp_min) > 0:
+            scale_fact = (10 ** np.floor(np.log10(raster_max))) / (amp_max - amp_min)
+            l2_dipole *= scale_fact
+            l5_dipole *= scale_fact
 
         # Shift the dipole positions to overlay the correct cell types
         l2_dipole = -l2_dipole + abs(raster_quarterpoint)
