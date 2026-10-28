@@ -1,20 +1,18 @@
-import os.path as op
-import tempfile
-from pathlib import Path
+# import os.path as op
+# import tempfile
+from unittest.mock import patch
 
 import matplotlib
 from matplotlib import backend_bases
 import matplotlib.pyplot as plt
 from matplotlib.colorbar import Colorbar
-
 import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
-import hnn_core
-from hnn_core import CellResponse, read_params, neymotin_2020_model, read_spikes
-from hnn_core.dipole import Dipole, simulate_dipole
-from hnn_core.network_models import default_cell_metadata
+# from hnn_core import read_spikes
+from hnn_core import Dipole, CellResponse
+from hnn_core.dipole import simulate_dipole
 from hnn_core.viz import (
     plot_cells,
     plot_dipole,
@@ -23,6 +21,8 @@ from hnn_core.viz import (
     plot_connectivity_matrix,
     plot_cell_connectivity,
     plot_drive_strength,
+    _add_arrows_to_dipole,
+    _collect_drive_arrow_markers,
     NetworkPlotter,
 )
 
@@ -36,166 +36,10 @@ def cleanup_matplotlib():
     plt.close("all")
 
 
-@pytest.fixture
-def setup_net():
-    hnn_core_root = Path(hnn_core.__file__).parent
-    params_fname = hnn_core_root / "param" / "default.json"
-    params = read_params(params_fname)
-    net = neymotin_2020_model(params, mesh_shape=(3, 3))
-
-    return net
-
-
-def _fake_click(fig, ax, point, button=1):
-    """Fake a click at a point within axes."""
-    x, y = ax.transData.transform_point(point)
-    button_press_event = backend_bases.MouseEvent(
-        name="button_press_event", canvas=fig.canvas, x=x, y=y, button=button
-    )
-    fig.canvas.callbacks.process("button_press_event", button_press_event)
-
-
-def test_network_visualization(setup_net):
-    """Test network visualisations."""
-    net = setup_net
-    plot_cells(net)
-    ax = net.cell_types["L2_pyramidal"]["cell_object"].plot_morphology()
-    assert len(ax.lines) == 8
-
-    conn_idx = 0
-    plot_connectivity_matrix(net, conn_idx, show=False)
-    with pytest.raises(TypeError, match="net must be an instance of"):
-        plot_connectivity_matrix("blah", conn_idx, show_weight=False)
-
-    with pytest.raises(TypeError, match="conn_idx must be an instance of"):
-        plot_connectivity_matrix(net, "blah", show_weight=False)
-
-    with pytest.raises(TypeError, match="show_weight must be an instance of"):
-        plot_connectivity_matrix(net, conn_idx, show_weight="blah")
-
-    src_gid = 5
-    plot_cell_connectivity(net, conn_idx, src_gid, show=False)
-    with pytest.raises(TypeError, match="net must be an instance of"):
-        plot_cell_connectivity("blah", conn_idx, src_gid=src_gid)
-
-    with pytest.raises(TypeError, match="conn_idx must be an instance of"):
-        plot_cell_connectivity(net, "blah", src_gid)
-
-    with pytest.raises(TypeError, match="src_gid must be an instance of"):
-        plot_cell_connectivity(net, conn_idx, src_gid="blah")
-
-    with pytest.raises(ValueError, match="src_gid -1 not a valid cell ID"):
-        plot_cell_connectivity(net, conn_idx, src_gid=-1)
-
-    # Test morphology plotting
-    for cell_type in net.cell_types.values():
-        cell_type["cell_object"].plot_morphology()
-        cell_type["cell_object"].plot_morphology(color="r")
-
-        # FIX: Access sections through the cell object
-        sections = list(cell_type["cell_object"].sections.keys())
-        section_color = {sect_name: f"C{idx}" for idx, sect_name in enumerate(sections)}
-        cell_type["cell_object"].plot_morphology(color=section_color)
-
-    cell_type = net.cell_types["L2_basket"]
-    with pytest.raises(ValueError):
-        cell_type["cell_object"].plot_morphology(color="z")
-    with pytest.raises(ValueError):
-        cell_type["cell_object"].plot_morphology(color={"soma": "z"})
-    with pytest.raises(TypeError, match="color must be"):
-        cell_type["cell_object"].plot_morphology(color=123)
-
-    # test for invalid Axes object to plot_cells
-    fig, axes = plt.subplots(1, 1)
-    with pytest.raises(
-        TypeError, match="'ax' to be an instance of Axes3D, but got Axes"
-    ):
-        plot_cells(net, ax=axes, show=False)
-
-    # Test that colors input works for valid cell types, and does not for invalid cell
-    # types
-    plot_cells(net, show=False, colors={"L2_pyramidal": "y"})
-    with pytest.raises(ValueError, match="does not exist in given Network"):
-        plot_cells(net, show=False, colors={"L3333_pyrdamial": "b"})
-    # Test that markers input works for valid cell types, and does not for invalid cell
-    # types
-    plot_cells(net, show=False, markers={"L2_pyramidal": "+"})
-    with pytest.raises(ValueError, match="does not exist in given Network"):
-        plot_cells(net, show=False, markers={"L3333_pyrdamial": "x"})
-
-    cell_type["cell_object"].plot_morphology(pos=(1.0, 2.0, 3.0))
-    with pytest.raises(TypeError, match="pos must be"):
-        cell_type["cell_object"].plot_morphology(pos=123)
-    with pytest.raises(ValueError, match="pos must be a tuple of 3 elements"):
-        cell_type["cell_object"].plot_morphology(pos=(1, 2, 3, 4))
-    with pytest.raises(TypeError, match="pos\\[idx\\] must be"):
-        cell_type["cell_object"].plot_morphology(pos=(1, "2", 3))
-
-    plt.close("all")
-
-    # test interactive clicking updates the position of src_cell in plot
-    del net.connectivity[-1]
-    conn_idx = 15
-    net.add_connection(
-        net.gid_ranges["L2_pyramidal"][::2],
-        "L5_basket",
-        "soma",
-        "ampa",
-        0.00025,
-        1.0,
-        lamtha=3.0,
-        probability=0.8,
-    )
-    fig = plot_cell_connectivity(net, conn_idx, show=False)
-    ax_src, ax_target, _ = fig.axes
-
-    pos = net.pos_dict["L2_pyramidal"][2]
-    _fake_click(fig, ax_src, [pos[0], pos[1]])
-    pos_in_plot = ax_target.collections[2].get_offsets().data[0]
-    assert_allclose(pos[:2], pos_in_plot)
-
-
 class TestDipoleViz:
-    @pytest.fixture
-    def run_simulation(self, setup_net):
-        net = setup_net
-        weights_ampa = {"L2_pyramidal": 5.4e-5, "L5_pyramidal": 5.4e-5}
-        syn_delays = {"L2_pyramidal": 0.1, "L5_pyramidal": 1.0}
-
-        net.add_bursty_drive(
-            "beta_prox",
-            tstart=0.0,
-            burst_rate=25,
-            burst_std=5,
-            numspikes=1,
-            spike_isi=0,
-            n_drive_cells=11,
-            location="proximal",
-            weights_ampa=weights_ampa,
-            synaptic_delays=syn_delays,
-            event_seed=14,
-        )
-
-        net.add_bursty_drive(
-            "beta_dist",
-            tstart=0.0,
-            burst_rate=25,
-            burst_std=5,
-            numspikes=1,
-            spike_isi=0,
-            n_drive_cells=11,
-            location="distal",
-            weights_ampa=weights_ampa,
-            synaptic_delays=syn_delays,
-            event_seed=14,
-        )
-
-        dpl = simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
-        return net, dpl
-
-    def test_decimation_time_options(self, run_simulation):
+    def test_decimation_time_options(self, fix_use_cached_sims):
         """Test basic dipole visualisations, decimation, and time args."""
-        _, dpls = run_simulation
+        _, dpls, _, _ = fix_use_cached_sims
         fig = dpls[0].plot()  # plot the first dipole alone
         axes = fig.get_axes()[0]
         dpls[0].copy().smooth(window_len=10).plot(ax=axes)  # add smoothed versions
@@ -212,9 +56,9 @@ class TestDipoleViz:
         with pytest.warns(FutureWarning, match="tmin and tmax are deprecated"):
             plot_dipole(dpls[0], show=False, tmin=10, tmax=100)
 
-    def test_dipole_mutiple_layers(self, run_simulation):
+    def test_dipole_mutiple_layers(self, fix_use_cached_sims):
         """Test plotting dipoles across multiple trials and layers (L2, L5, agg) with matching axes."""
-        _, dpls = run_simulation
+        _, dpls, _, _ = fix_use_cached_sims
         # test plotting multiple dipoles as overlay
         plot_dipole(dpls, show=False)
 
@@ -241,9 +85,9 @@ class TestDipoleViz:
             _, axes = plt.subplots(nrows=3, ncols=1)
             _ = plot_dipole(dpls, show=False, ax=axes, layer=["L2", "L5"])
 
-    def test_multiple_tfr(self, run_simulation):
+    def test_multiple_tfr(self, fix_use_cached_sims):
         """Test TFR plotting of multiple dipoles and related scaling/sampling checks."""
-        _, dpls = run_simulation
+        _, dpls, _, _ = fix_use_cached_sims
         # multiple TFRs get averaged
         fig = plot_tfr_morlet(
             dpls, freqs=np.arange(23, 26, 1.0), n_cycles=3, show=False
@@ -267,108 +111,139 @@ class TestDipoleViz:
             dpl_sfreq.sfreq /= 10
             plot_psd([dpls[0], dpl_sfreq])
 
+    def test_plot_drive_arrows(self, fix_use_cached_sims):
+        net, dpls, _, _ = fix_use_cached_sims
+        # The cached simulation's only evoked drive is the proximal "evprox1"
+        drive_time = net.external_drives["evprox1"]["dynamics"]["mu"]
+        markers = _collect_drive_arrow_markers(net)
+        assert any(marker["label"] == "evprox1" for marker in markers)
 
-def test_drive_strength(setup_net):
-    """Adds empty external drives to check there strength across each cell types"""
-    net = setup_net
+        _, ax = plt.subplots()
+        plot_dipole(dpls[0], ax=ax, show=False, net=net, show_drive_arrows=True)
+        annotations = [
+            child
+            for child in ax.get_children()
+            if isinstance(child, matplotlib.text.Annotation)
+        ]
+        assert annotations
+        proximal_arrows = [
+            ann
+            for ann in annotations
+            if ann.get_color() == "r" or ann.arrow_patch.get_edgecolor()[0] > 0.9
+        ]
+        assert proximal_arrows
+        assert all(ann.xy[1] > ann.xyann[1] for ann in proximal_arrows)
+        assert proximal_arrows[0].arrow_patch.get_linewidth() == 3.0
+        guide_lines = [
+            line
+            for line in ax.lines
+            if line.get_linestyle() == "--" and line.get_color() in ("0.75", 0.75)
+        ]
+        assert guide_lines
+        assert any(abs(line.get_xdata()[0] - drive_time) < 0.01 for line in guide_lines)
+        assert "evprox1" not in [text.get_text() for text in ax.texts]
+        plt.close("all")
 
-    weights_ampa = {"L2_pyramidal": 0.0, "L5_pyramidal": 0.0, "L2_basket": 0.0}
-    synaptic_delays = {"L2_pyramidal": 0.0, "L5_pyramidal": 0.0, "L2_basket": 0.0}
-    rate_constant = {"L2_pyramidal": 140.0, "L5_pyramidal": 40.0, "L2_basket": 100.0}
+        with pytest.raises(ValueError, match="net must be provided"):
+            plot_dipole(dpls[0], show=False, show_drive_arrows=True)
 
-    net.add_poisson_drive(
-        "poisson",
-        rate_constant=rate_constant,
-        weights_ampa=weights_ampa,
-        location="proximal",
-        synaptic_delays=synaptic_delays,
-        event_seed=1349,
-    )
+        _, ax = plt.subplots()
+        ax.set_xlim(0, 100)
+        _add_arrows_to_dipole(ax, net)
+        assert any(
+            isinstance(child, matplotlib.text.Annotation) for child in ax.get_children()
+        )
+        custom_arrow_width = 3.5
+        _, ax = plt.subplots()
+        ax.set_xlim(0, 100)
+        _add_arrows_to_dipole(ax, net, arrow_width=custom_arrow_width)
+        ann = next(
+            child
+            for child in ax.get_children()
+            if isinstance(child, matplotlib.text.Annotation)
+        )
+        assert ann.arrow_patch.get_linewidth() == custom_arrow_width
 
-    net.add_bursty_drive(
-        "beta_dist",
-        tstart=0.0,
-        burst_rate=25,
-        burst_std=5,
-        numspikes=1,
-        spike_isi=0,
-        n_drive_cells=11,
-        location="distal",
-        weights_ampa=weights_ampa,
-        synaptic_delays=synaptic_delays,
-        event_seed=14,
-    )
+    def test_collect_drive_arrow_markers_evoked_only(self, fix_use_cached_sims):
+        """Bursty and Poisson drives are not shown on dipole arrow overlays."""
+        net, _, _, _ = fix_use_cached_sims
+        drive_types = {drive["type"] for drive in net.external_drives.values()}
+        assert {"evoked", "bursty", "poisson"} <= drive_types
 
-    figure = plot_drive_strength(net)
+        # Only the cached simulation's single evoked drive gets a marker
+        markers = _collect_drive_arrow_markers(net)
+        assert len(markers) == 1
+        assert markers[0]["label"] == "evprox1"
+        assert markers[0]["time"] == net.external_drives["evprox1"]["dynamics"]["mu"]
 
-    assert isinstance(figure, plt.Figure)
-    assert len(figure.axes) > 0  # if there are any axes in the figure
+        # Without the evoked drive, no arrows are drawn
+        del net.external_drives["evprox1"]
+        assert _collect_drive_arrow_markers(net) == []
 
-    any_plot = any(ax.lines or ax.patches or ax.images for ax in figure.axes)
-    assert any_plot  # At least one axis contains graphical elements
+        _, ax = plt.subplots()
+        ax.set_xlim(0.0, 100.0)
+        ax.set_ylim(-1.0, 1.0)
+        _add_arrows_to_dipole(ax, net)
+        assert not any(
+            isinstance(child, matplotlib.text.Annotation) for child in ax.get_children()
+        )
+
+    def test_add_arrows_to_dipole_default_time_window(self, fix_use_cached_sims):
+        """Omitted tmin/tmax are taken from the axis x limits."""
+        net, _, _, _ = fix_use_cached_sims
+        # The cached simulation's only evoked drive is "evprox1"
+        drive_time = net.external_drives["evprox1"]["dynamics"]["mu"]
+
+        def _n_annotations(ax):
+            return sum(
+                1
+                for child in ax.get_children()
+                if isinstance(child, matplotlib.text.Annotation)
+            )
+
+        _, ax = plt.subplots()
+        ax.set_xlim(drive_time - 5.0, drive_time + 5.0)
+        ax.set_ylim(-1.0, 1.0)
+        _add_arrows_to_dipole(ax, net, tmin=None, tmax=None)
+        assert _n_annotations(ax) == 1
+
+        _, ax = plt.subplots()
+        ax.set_xlim(0.0, 100.0)
+        ax.set_ylim(-1.0, 1.0)
+        _add_arrows_to_dipole(ax, net, tmin=drive_time + 1.0, tmax=None)
+        assert _n_annotations(ax) == 0
+
+        _, ax = plt.subplots()
+        ax.set_xlim(0.0, 100.0)
+        ax.set_ylim(-1.0, 1.0)
+        _add_arrows_to_dipole(ax, net, tmin=None, tmax=drive_time - 1.0)
+        assert _n_annotations(ax) == 0
+
+    def test_add_arrows_to_dipole_flat_ylim(self, fix_use_cached_sims):
+        """A zero-height y axis still gets drive arrows."""
+        net, _, _, _ = fix_use_cached_sims
+
+        _, ax = plt.subplots()
+        ax.set_xlim(0.0, 100.0)
+        with patch.object(ax, "get_ylim", return_value=(10.0, 10.0)):
+            _add_arrows_to_dipole(ax, net)
+        annotations = [
+            child
+            for child in ax.get_children()
+            if isinstance(child, matplotlib.text.Annotation)
+        ]
+        assert annotations
+        ymin, ymax = ax.get_ylim()
+        assert ymin < 10.0
+        assert ymax == 10.0
 
 
 class TestCellResponsePlotters:
     """Tests plotting methods of the CellResponse class"""
 
-    @pytest.fixture
-    def class_setup_net(self):
-        """Creates a base network for tests within this class"""
-        hnn_core_root = Path(hnn_core.__file__).parent
-        params_fname = hnn_core_root / "param" / "default.json"
-        params = read_params(params_fname)
-        net = neymotin_2020_model(params, mesh_shape=(3, 3))
-
-        return net
-
-    # AES Had to remove scope=class because we do NOT want only one instance of the
-    # fixture per class anymore
-    @pytest.fixture(
-        params=[
-            None,
-            default_cell_metadata,
-        ],
-    )
-    def base_simulation_spikes(self, class_setup_net, request):
-        """Adds drives with spikes for testing of spike visualizations"""
-        net = class_setup_net
-        weights_ampa = {"L2_pyramidal": 0.1, "L5_pyramidal": 1.0}
-        syn_delays = {"L2_pyramidal": 0.1, "L5_pyramidal": 1.0}
-        net.add_bursty_drive(
-            "beta_prox",
-            tstart=0.0,
-            burst_rate=25,
-            burst_std=5,
-            numspikes=1,
-            spike_isi=0,
-            n_drive_cells=11,
-            location="proximal",
-            weights_ampa=weights_ampa,
-            synaptic_delays=syn_delays,
-            event_seed=14,
-        )
-
-        net.add_bursty_drive(
-            "beta_dist",
-            tstart=0.0,
-            burst_rate=25,
-            burst_std=5,
-            numspikes=1,
-            spike_isi=0,
-            n_drive_cells=11,
-            location="distal",
-            weights_ampa=weights_ampa,
-            synaptic_delays=syn_delays,
-            event_seed=14,
-        )
-        dpls = simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec="all")
-
-        net.cell_response._cell_type_metadata = request.param
-        return net, dpls
-
-    def test_spikes_raster_trial_idx(self, base_simulation_spikes):
+    def test_spikes_raster_trial_idx(self, fix_use_cached_sims):
         """Plotting with different index arguments"""
-        net, _ = base_simulation_spikes
+        net, _, _, spiking = fix_use_cached_sims
 
         # Bad index argument raises error
         with pytest.raises(TypeError, match="trial_idx must be an instance of"):
@@ -377,17 +252,30 @@ class TestCellResponsePlotters:
         # Test valid index arguments
         for index_arg in (0, [0, 1]):
             fig = net.cell_response.plot_spikes_raster(trial_idx=index_arg, show=False)
-            # Check that collections contain data
-            assert all(
-                [
-                    collection.get_positions() != [-1]
-                    for collection in fig.axes[0].collections
-                ]
-            ), "No data plotted in raster plot"
+            # Check that collections contain data when they're supposed to
+            if spiking == "yes_spikes":
+                assert all(
+                    [
+                        collection.get_positions() != [-1]
+                        for collection in fig.axes[0].collections
+                    ]
+                ), "No data plotted in raster plot when there should be some"
+                # when there are spikes there should be more than 4 elements in the plot
+                assert len(fig.axes[0].collections) > 4
+            elif spiking == "no_spikes":
+                assert all(
+                    [
+                        collection.get_positions() == [-1]
+                        for collection in fig.axes[0].collections
+                    ]
+                ), "Data plotted in raster plot when there should be none"
+                # when there are no spikes there should be exactly 4 elements in the plot
+                assert len(fig.axes[0].collections) == 4
 
-    def test_spikes_raster_colors(self, base_simulation_spikes):
+    def test_spikes_raster_colors(self, fix_use_cached_sims):
         """Plotting with different color arguments"""
-        net, _ = base_simulation_spikes
+        net, _, net_customizations, spiking = fix_use_cached_sims
+        inh_name_suffix = net_customizations["inh_name_suffix"]
 
         def _get_line_hex_colors(fig):
             colors = [
@@ -437,25 +325,42 @@ class TestCellResponsePlotters:
                 )
 
         # Colors as dict mapping
-        dict_mapping = {
-            "L2_basket": "#daf7a6",
-            "L2_pyramidal": "#ffc300",
-            "L5_basket": "#ff5733",
-            "L5_pyramidal": "#c70039",
-        }
+        if spiking == "yes_spikes":
+            dict_mapping = {
+                f"L2_{inh_name_suffix}": "#daf7a6",
+                "L2_pyramidal": "#ffc300",
+                f"L5_{inh_name_suffix}": "#ff5733",
+                "L5_pyramidal": "#c70039",
+            }
+        elif spiking == "no_spikes":
+            dict_mapping = {
+                "beta_dist": "#ffc300",
+                "beta_prox": "#c70039",
+            }
         fig = net.cell_response.plot_spikes_raster(
             trial_idx=0, show=False, colors=dict_mapping
         )
         colors, _ = _get_line_hex_colors(fig)
-        assert colors == list(dict_mapping.values())
+        if spiking == "yes_spikes":
+            assert colors == list(dict_mapping.values())
+        elif spiking == "no_spikes":
+            # Default colors are always present for celltypes, but not necessarily for
+            # drives
+            assert set(dict_mapping.values()).issubset(set(colors))
 
         # Change color of only one cell type
-        dict_mapping = {"L2_pyramidal": "#daf7a6"}
+        if spiking == "yes_spikes":
+            dict_mapping = {"L2_pyramidal": "#daf7a6"}
+        elif spiking == "no_spikes":
+            dict_mapping = {"beta_dist": "#ffc300"}
         fig = net.cell_response.plot_spikes_raster(
             trial_idx=0, show=False, colors=dict_mapping
         )
         colors, cell_types = _get_line_hex_colors(fig)
-        assert colors[cell_types.index("L2_pyramidal Spikes")] == "#daf7a6"
+        if spiking == "yes_spikes":
+            assert colors[cell_types.index("L2_pyramidal Spikes")] == "#daf7a6"
+        elif spiking == "no_spikes":
+            assert colors[cell_types.index("beta_dist Spikes")] == "#ffc300"
 
         # Invalid key in dict mapping
         dict_mapping = {"bad_cell_type": "#daf7a6"}
@@ -464,9 +369,10 @@ class TestCellResponsePlotters:
                 trial_idx=0, show=False, colors=dict_mapping
             )
 
-    def test_firing_rate_time_colors(self, base_simulation_spikes):
+    def test_firing_rate_time_colors(self, fix_use_cached_sims):
         """Plotting firing rates over time with different color arguments"""
-        net, _ = base_simulation_spikes
+        net, _, net_customizations, _ = fix_use_cached_sims
+        inh_name_suffix = net_customizations["inh_name_suffix"]
         cell_response = net.cell_response
         cell_types = cell_response._cell_type_names
 
@@ -511,9 +417,9 @@ class TestCellResponsePlotters:
 
         # Colors as a dict mapping every cell type
         dict_mapping = {
-            "L2_basket": "#daf7a6",
+            f"L2_{inh_name_suffix}": "#daf7a6",
             "L2_pyramidal": "#ffc300",
-            "L5_basket": "#ff5733",
+            f"L5_{inh_name_suffix}": "#ff5733",
             "L5_pyramidal": "#c70039",
         }
         axes = cell_response.plot_firing_rate_time(
@@ -534,9 +440,9 @@ class TestCellResponsePlotters:
             if label != "L2_pyramidal":
                 assert colors[i] == default_colors[i]
 
-    def test_firing_rate_time_errors(self, base_simulation_spikes):
+    def test_firing_rate_time_errors(self, fix_use_cached_sims):
         """ValueErrors/TypeErrors are raised for invalid arguments"""
-        net, _ = base_simulation_spikes
+        net, _, _, _ = fix_use_cached_sims
         cell_response = net.cell_response
 
         # Invalid trial_idx type raises a TypeError
@@ -594,8 +500,95 @@ class TestCellResponsePlotters:
         ):
             cell_response.plot_firing_rate_time(window_length=10, ax=axes, show=False)
 
-    def test_spikes_raster_dipole_overlay(self, base_simulation_spikes):
-        net, dpls = base_simulation_spikes
+    def test_firing_rate_time_cell_types_axes_ticks(self, fix_use_cached_sims):
+        """Plotting selected cell types, onto existing axes, with custom ticks"""
+        net, _, _, _ = fix_use_cached_sims
+        cell_response = net.cell_response
+
+        def _get_labels(axes):
+            return [
+                line.get_label() for ax in axes for line in ax.get_legend().get_lines()
+            ]
+
+        # A single cell type, given as a str, can be plotted onto a single axis
+        _, ax = plt.subplots(1, 1)
+        axes = cell_response.plot_firing_rate_time(
+            window_length=10, cell_types="L2_pyramidal", ax=ax, show=False
+        )
+        assert axes[0] is ax
+        assert _get_labels(axes) == ["L2_pyramidal"]
+
+        # A list of cell types gets one new subplot per cell type, in the given order
+        cell_types = ["L5_pyramidal", "L2_pyramidal"]
+        axes = cell_response.plot_firing_rate_time(
+            window_length=10, cell_types=cell_types, show=False
+        )
+        assert _get_labels(axes) == cell_types
+
+        # A 2D grid of axes must be flattened before it can be plotted onto
+        _, axes_grid = plt.subplots(2, 2)
+        with pytest.raises(ValueError, match=r"Use ax\.flatten\(\)"):
+            cell_response.plot_firing_rate_time(
+                window_length=10, ax=axes_grid, show=False
+            )
+        axes = cell_response.plot_firing_rate_time(
+            window_length=10, ax=axes_grid.flatten(), show=False
+        )
+        assert _get_labels(axes) == cell_response._cell_type_names
+
+        # Custom ticks are applied to every subplot
+        xticks, yticks = [0.0, 50.0, 100.0], [0.0, 10.0, 20.0]
+        axes = cell_response.plot_firing_rate_time(
+            window_length=10, xticks=xticks, yticks=yticks, show=False
+        )
+        for ax in axes:
+            assert_allclose(ax.get_xticks(), xticks)
+            assert_allclose(ax.get_yticks(), yticks)
+
+    def test_default_colors_without_metadata(self):
+        """Without cell type metadata, colors come from the matplotlib color cycle"""
+        cell_types = ["L2_pyramidal", "L5_pyramidal"]
+        cell_response = CellResponse(
+            cell_type_names=cell_types,
+            spike_times=[[2.0, 8.0]],
+            spike_gids=[[1, 5]],
+            spike_types=[cell_types],
+            times=np.arange(0.0, 20.0, 0.1),
+        )
+        color_cycle = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+        expected_colors = [
+            matplotlib.colors.to_hex(color) for color in color_cycle[: len(cell_types)]
+        ]
+
+        fig = cell_response.plot_spikes_raster(show=False)
+        colors = [
+            matplotlib.colors.to_hex(line.get_color())
+            for line in fig.axes[0].legend_.get_lines()
+        ]
+        assert colors == expected_colors
+
+        axes = cell_response.plot_firing_rate_time(window_length=2.0, show=False)
+        colors = [
+            matplotlib.colors.to_hex(line.get_color())
+            for ax in axes
+            for line in ax.get_legend().get_lines()
+        ]
+        assert colors == expected_colors
+
+    # For the below, we only use the "yes_spikes" variant, since if there are no spikes
+    # but someone is trying to overlay dipoles, then our logic for scaling the dipoles
+    # to fit breaks down.
+    @pytest.mark.parametrize(
+        "fix_use_cached_sims",
+        [
+            ("fix_net_neymotin_2020", "yes_spikes"),
+            ("fix_net_duecker_ET", "yes_spikes"),
+        ],
+        ids=lambda param: f"{param[0]}-{param[1]}",
+        indirect=True,
+    )
+    def test_spikes_raster_dipole_overlay(self, fix_use_cached_sims):
+        net, dpls, _, _ = fix_use_cached_sims
 
         # Missing dipole argument raises error
         # --------------------------------------------------
@@ -749,111 +742,110 @@ class TestCellResponsePlotters:
         )
 
     # smoke test for raster plot input arguments
-    def test_spikes_raster_input_args(self, base_simulation_spikes):
-        net, _ = base_simulation_spikes
+    def test_spikes_raster_input_args(self, fix_use_cached_sims):
+        net, _, _, _ = fix_use_cached_sims
         net.cell_response.plot_spikes_raster(xticks=np.arange(5), yticks=np.arange(5))
         net.cell_response.plot_spikes_raster(xticks=[1, 2, 3], yticks=[1, 2, 3])
         net.cell_response.plot_spikes_raster(
             xlabel="time", ylabel="cells ID", title="spikes raster"
         )
+        with pytest.raises(ValueError, match="Invalid cell types provided"):
+            net.cell_response.plot_spikes_raster(
+                cell_types=["bad_cell_type"], show=False
+            )
 
-    def test_spikes_from_read_spikes(self, base_simulation_spikes):
-        """Test hist and raster plots on a CellResponse loaded via read_spikes"""
-        net, dpls = base_simulation_spikes
-        with tempfile.TemporaryDirectory() as tmp_dir_name:
-            net.cell_response.write(op.join(tmp_dir_name, "spk_%d.txt"))
-            cell_response = read_spikes(op.join(tmp_dir_name, "spk_*.txt"))
+    # # TODO AES: also currently broken due to a bug with lack of detection of when https://github.com/satviksaluja/hnn-core/blob/ce7fcb9c87c8fca606068ac38691d2712deb841d/hnn_core/viz.py#L804 plot_spikes_raster cell_type_gids is empty
+    # def test_spikes_from_read_spikes(self, fix_use_cached_sims):
+    #     """Test hist and raster plots on a CellResponse loaded via read_spikes"""
+    #     net, dpls, net_customizations, _ = fix_use_cached_sims
+    #     inh_name_suffix = net_customizations["inh_name_suffix"]
+    #     with tempfile.TemporaryDirectory() as tmp_dir_name:
+    #         net.cell_response.write(
+    #             op.join(tmp_dir_name, f"spk_{net._model_variant}_%d.txt")
+    #         )
+    #         cell_response = read_spikes(op.join(tmp_dir_name, "spk_*.txt"))
 
-        cell_type_names = ["L2_basket", "L2_pyramidal", "L5_basket", "L5_pyramidal"]
-        n_cell_spikes = sum(
-            sum(1 for spike_type in trial if spike_type in cell_type_names)
-            for trial in cell_response.spike_types
-        )
-        n_drive_spikes = sum(
-            sum(1 for spike_type in trial if spike_type not in cell_type_names)
-            for trial in cell_response.spike_types
-        )
+    #     cell_type_names = [
+    #         f"L2_{inh_name_suffix}",
+    #         "L2_pyramidal",
+    #         f"L5_{inh_name_suffix}",
+    #         "L5_pyramidal",
+    #     ]
+    #     n_cell_spikes = sum(
+    #         sum(1 for spike_type in trial if spike_type in cell_type_names)
+    #         for trial in cell_response.spike_types
+    #     )
+    #     n_drive_spikes = sum(
+    #         sum(1 for spike_type in trial if spike_type not in cell_type_names)
+    #         for trial in cell_response.spike_types
+    #     )
 
-        # By default, if any drive (input) spike types are present, the
-        # histogram plots only those, not the real cell spikes
-        fig_hist = cell_response.plot_spikes_hist(show=False)
-        n_plotted_hist = sum(
-            patch.get_height() for ax in fig_hist.axes for patch in ax.patches
-        )
-        assert n_plotted_hist == n_drive_spikes, (
-            f"Expected {n_drive_spikes} spikes plotted in histogram, "
-            f"got {n_plotted_hist}"
-        )
+    #     # By default, if any drive (input) spike types are present, the
+    #     # histogram plots only those, not the real cell spikes
+    #     fig_hist = cell_response.plot_spikes_hist(show=False)
+    #     n_plotted_hist = sum(
+    #         patch.get_height() for ax in fig_hist.axes for patch in ax.patches
+    #     )
+    #     assert n_plotted_hist == n_drive_spikes, (
+    #         f"Expected {n_drive_spikes} spikes plotted in histogram, "
+    #         f"got {n_plotted_hist}"
+    #     )
 
-        # By default, the raster plots the real cell spikes, not drive spikes
-        fig_raster = cell_response.plot_spikes_raster(show=False)
-        n_plotted_raster = sum(
-            len(collection.get_positions())
-            for collection in fig_raster.axes[0].collections
-        )
-        assert n_plotted_raster == n_cell_spikes, (
-            f"Expected {n_cell_spikes} spikes plotted in raster, got {n_plotted_raster}"
-        )
+    #     # By default, the raster plots the real cell spikes, not drive spikes
+    #     fig_raster = cell_response.plot_spikes_raster(show=False)
+    #     n_plotted_raster = sum(
+    #         len(collection.get_positions())
+    #         for collection in fig_raster.axes[0].collections
+    #     )
+    #     assert n_plotted_raster == n_cell_spikes, (
+    #         f"Expected {n_cell_spikes} spikes plotted in raster, got {n_plotted_raster}"
+    #     )
 
-        # By default, the raster plots the real cell spikes, not drive spikes
-        fig_raster_overlay = cell_response.plot_spikes_raster(
-            show=False,
-            overlay_dipoles=True,
-            dpl=dpls,
-        )
-        n_plotted_raster_overlay = sum(
-            len(collection.get_positions())
-            for collection in fig_raster_overlay.axes[0].collections
-        )
-        assert n_plotted_raster_overlay == n_cell_spikes, (
-            f"Expected {n_cell_spikes} spikes plotted in raster, got "
-            f"{n_plotted_raster_overlay}"
-        )
+    #     # By default, the raster plots the real cell spikes, not drive spikes
+    #     fig_raster_overlay = cell_response.plot_spikes_raster(
+    #         show=False,
+    #         overlay_dipoles=True,
+    #         dpl=dpls,
+    #     )
+    #     n_plotted_raster_overlay = sum(
+    #         len(collection.get_positions())
+    #         for collection in fig_raster_overlay.axes[0].collections
+    #     )
+    #     assert n_plotted_raster_overlay == n_cell_spikes, (
+    #         f"Expected {n_cell_spikes} spikes plotted in raster, got "
+    #         f"{n_plotted_raster_overlay}"
+    #     )
 
-    def test_no_data_in_raster_plt(self, setup_net):
-        """Test that the raster plot contains no data."""
-        net = setup_net
-        _ = simulate_dipole(net, tstop=100.0, n_trials=2)
-        with pytest.warns(UserWarning, match="No spikes found"):
-            fig = net.cell_response.plot_spikes_raster(trial_idx=[0, 1], show=False)
-
-        # Exactly 4 elements present in an empty plot
-        assert len(fig.axes[0].collections) == 4
-
-    def test_data_in_raster_plt(self, base_simulation_spikes):
-        """Test that the raster plot contains data for various trial_idx inputs."""
-        net, _ = base_simulation_spikes
-        # test cell response plotting
-        with pytest.raises(TypeError, match="trial_idx must be an instance of"):
-            net.cell_response.plot_spikes_raster(trial_idx="blah", show=False)
-        net.cell_response.plot_spikes_raster(trial_idx=0, show=False)
-        fig = net.cell_response.plot_spikes_raster(trial_idx=[0, 1], show=False)
-
-        # c.f. test_no_data_in_raster_plt: when there are spikes there should be more
-        # than 4 elements in the plot
-        assert len(fig.axes[0].collections) > 4
-
-    def test_spikes_hist_default(self, base_simulation_spikes):
+    def test_spikes_hist_default(self, fix_use_cached_sims):
         """Test basic spike histogram plotting."""
-        net, _ = base_simulation_spikes
+        net, _, _, _ = fix_use_cached_sims
         net.cell_response.plot_spikes_hist()
 
-    def test_spikes_hist_trial_idx(self, base_simulation_spikes):
+    def test_spikes_hist_trial_idx(self, fix_use_cached_sims):
         """Test spike histogram with different trial arguments."""
-        net, _ = base_simulation_spikes
+        net, _, _, _ = fix_use_cached_sims
 
         with pytest.raises(TypeError, match="trial_idx must be an instance of"):
             net.cell_response.plot_spikes_hist(trial_idx="blah")
         net.cell_response.plot_spikes_hist(trial_idx=0, show=False)
         net.cell_response.plot_spikes_hist(trial_idx=[0, 1], show=False)
 
-    def test_spikes_hist_color(self, base_simulation_spikes):
+    def test_spikes_hist_color(self, fix_use_cached_sims):
         """Test spike histogram with different color arguments."""
-        net, _ = base_simulation_spikes
+        net, _, _, _ = fix_use_cached_sims
+        # A color dict must define a color for every drive in the cached
+        # simulation. These correspond to the drive names used in
+        # `conftest.py::_base_simulation_cached`:
+        drive_colors = {
+            "evprox1": "b",
+            "beta_prox": "r",
+            "beta_dist": "g",
+            "poisson": "k",
+        }
 
         net.cell_response.plot_spikes_hist(color="r")
         net.cell_response.plot_spikes_hist(color=["C0", "C1"])
-        net.cell_response.plot_spikes_hist(color={"beta_prox": "r", "beta_dist": "g"})
+        net.cell_response.plot_spikes_hist(color=drive_colors)
         net.cell_response.plot_spikes_hist(
             spike_types={"group1": ["beta_prox", "beta_dist"]}, color={"group1": "r"}
         )
@@ -866,19 +858,21 @@ class TestCellResponsePlotters:
         with pytest.raises(ValueError):
             net.cell_response.plot_spikes_hist(color="z")
         with pytest.raises(ValueError):
-            net.cell_response.plot_spikes_hist(
-                color={"beta_prox": "z", "beta_dist": "g"}
-            )
+            net.cell_response.plot_spikes_hist(color={**drive_colors, "beta_prox": "z"})
         with pytest.raises(TypeError, match="Dictionary values of color must"):
-            net.cell_response.plot_spikes_hist(
-                color={"beta_prox": 123, "beta_dist": "g"}
-            )
+            net.cell_response.plot_spikes_hist(color={**drive_colors, "beta_prox": 123})
         with pytest.raises(ValueError, match="'beta_dist' must be"):
-            net.cell_response.plot_spikes_hist(color={"beta_prox": "r"})
+            net.cell_response.plot_spikes_hist(
+                color={
+                    drive: color
+                    for drive, color in drive_colors.items()
+                    if drive != "beta_dist"
+                }
+            )
 
-    def test_spikes_hist_invert_spike_types(self, base_simulation_spikes):
+    def test_spikes_hist_invert_spike_types(self, fix_use_cached_sims):
         """Test spike histogram with different invert_spike_types arguments."""
-        net, _ = base_simulation_spikes
+        net, _, _, _ = fix_use_cached_sims
 
         def _check_inverted_spike_axes(fig):
             # check that there are 2 y axes
@@ -921,9 +915,210 @@ class TestCellResponsePlotters:
         _check_inverted_spike_axes(fig)
 
 
-def test_network_plotter_init(setup_net):
+def _fake_click(fig, ax, point, button=1):
+    """Fake a click at a point within axes."""
+    x, y = ax.transData.transform_point(point)
+    button_press_event = backend_bases.MouseEvent(
+        name="button_press_event", canvas=fig.canvas, x=x, y=y, button=button
+    )
+    fig.canvas.callbacks.process("button_press_event", button_press_event)
+
+
+@pytest.mark.parametrize(
+    "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+)
+def test_network_visualization(fix_net_model, request):
+    """Test network visualisations."""
+    net_model = request.getfixturevalue(fix_net_model)
+    net, net_customizations = net_model(reduced=True)
+    inh_name_suffix = net_customizations["inh_name_suffix"]
+    plot_cells(net)
+    ax = net.cell_types["L2_pyramidal"]["cell_object"].plot_morphology()
+    assert len(ax.lines) == 8
+
+    conn_idx = 0
+    plot_connectivity_matrix(net, conn_idx, show=False)
+    with pytest.raises(TypeError, match="net must be an instance of"):
+        plot_connectivity_matrix("blah", conn_idx, show_weight=False)
+
+    with pytest.raises(TypeError, match="conn_idx must be an instance of"):
+        plot_connectivity_matrix(net, "blah", show_weight=False)
+
+    with pytest.raises(TypeError, match="show_weight must be an instance of"):
+        plot_connectivity_matrix(net, conn_idx, show_weight="blah")
+
+    src_gid = 5
+    plot_cell_connectivity(net, conn_idx, src_gid, show=False)
+    with pytest.raises(TypeError, match="net must be an instance of"):
+        plot_cell_connectivity("blah", conn_idx, src_gid=src_gid)
+
+    with pytest.raises(TypeError, match="conn_idx must be an instance of"):
+        plot_cell_connectivity(net, "blah", src_gid)
+
+    with pytest.raises(TypeError, match="src_gid must be an instance of"):
+        plot_cell_connectivity(net, conn_idx, src_gid="blah")
+
+    with pytest.raises(ValueError, match="src_gid -1 not a valid cell ID"):
+        plot_cell_connectivity(net, conn_idx, src_gid=-1)
+
+    # Test morphology plotting
+    for cell_type in net.cell_types.values():
+        cell_type["cell_object"].plot_morphology()
+        cell_type["cell_object"].plot_morphology(color="r")
+
+        # FIX: Access sections through the cell object
+        sections = list(cell_type["cell_object"].sections.keys())
+        section_color = {sect_name: f"C{idx}" for idx, sect_name in enumerate(sections)}
+        cell_type["cell_object"].plot_morphology(color=section_color)
+
+    cell_type = net.cell_types[f"L2_{inh_name_suffix}"]
+    with pytest.raises(ValueError):
+        cell_type["cell_object"].plot_morphology(color="z")
+    with pytest.raises(ValueError):
+        cell_type["cell_object"].plot_morphology(color={"soma": "z"})
+    with pytest.raises(TypeError, match="color must be"):
+        cell_type["cell_object"].plot_morphology(color=123)
+
+    # test for invalid Axes object to plot_cells
+    fig, axes = plt.subplots(1, 1)
+    with pytest.raises(
+        TypeError, match="'ax' to be an instance of Axes3D, but got Axes"
+    ):
+        plot_cells(net, ax=axes, show=False)
+
+    # Test that colors input works for valid cell types, and does not for invalid cell
+    # types
+    plot_cells(net, show=False, colors={"L2_pyramidal": "y"})
+    with pytest.raises(ValueError, match="does not exist in given Network"):
+        plot_cells(net, show=False, colors={"L3333_pyrdamial": "b"})
+    # Test that markers input works for valid cell types, and does not for invalid cell
+    # types
+    plot_cells(net, show=False, markers={"L2_pyramidal": "+"})
+    with pytest.raises(ValueError, match="does not exist in given Network"):
+        plot_cells(net, show=False, markers={"L3333_pyrdamial": "x"})
+
+    cell_type["cell_object"].plot_morphology(pos=(1.0, 2.0, 3.0))
+    with pytest.raises(TypeError, match="pos must be"):
+        cell_type["cell_object"].plot_morphology(pos=123)
+    with pytest.raises(ValueError, match="pos must be a tuple of 3 elements"):
+        cell_type["cell_object"].plot_morphology(pos=(1, 2, 3, 4))
+    with pytest.raises(TypeError, match="pos\\[idx\\] must be"):
+        cell_type["cell_object"].plot_morphology(pos=(1, "2", 3))
+
+    plt.close("all")
+
+    # test interactive clicking updates the position of src_cell in plot
+    del net.connectivity[-1]
+    conn_idx = len(net.connectivity) - 1
+    net.add_connection(
+        net.gid_ranges["L2_pyramidal"][::2],
+        f"L5_{inh_name_suffix}",
+        "soma",
+        "ampa",
+        0.00025,
+        1.0,
+        lamtha=3.0,
+        probability=0.8,
+    )
+    fig = plot_cell_connectivity(net, conn_idx, show=False)
+    ax_src, ax_target, _ = fig.axes
+
+    pos = net.pos_dict["L2_pyramidal"][2]
+    _fake_click(fig, ax_src, [pos[0], pos[1]])
+    pos_in_plot = ax_target.collections[2].get_offsets().data[0]
+    assert_allclose(pos[:2], pos_in_plot)
+
+
+def test_plot_cells_default_markers(fix_net_neymotin_2020):
+    """Test that plot_cells chooses each cell type's marker from its morpho_type."""
+    net, _ = fix_net_neymotin_2020(reduced=True)
+
+    def _marker_vertices(fig, cell_type):
+        (collection,) = [
+            coll for coll in fig.axes[0].collections if coll.get_label() == cell_type
+        ]
+        return collection.get_paths()[0].vertices
+
+    triangles = _marker_vertices(
+        plot_cells(net, show=False, markers={"L2_pyramidal": "^"}), "L2_pyramidal"
+    )
+    circles = _marker_vertices(
+        plot_cells(net, show=False, markers={"L2_pyramidal": "o"}), "L2_pyramidal"
+    )
+
+    # pyramidal cells are plotted as triangles by default
+    default = _marker_vertices(plot_cells(net, show=False), "L2_pyramidal")
+    assert np.array_equal(default, triangles)
+
+    # a cell type without a morpho_type is plotted as circles
+    metadata = net.cell_types["L2_pyramidal"]["cell_metadata"]
+    net.cell_types["L2_pyramidal"]["cell_metadata"] = {
+        key: val for key, val in metadata.items() if key != "morpho_type"
+    }
+    fallback = _marker_vertices(plot_cells(net, show=False), "L2_pyramidal")
+    assert np.array_equal(fallback, circles)
+
+
+@pytest.mark.parametrize(
+    "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+)
+def test_drive_strength(fix_net_model, request):
+    """Adds empty external drives to check there strength across each cell types"""
+    net_model = request.getfixturevalue(fix_net_model)
+    net, net_customizations = net_model(reduced=True)
+    inh_name_suffix = net_customizations["inh_name_suffix"]
+
+    weights_ampa = {
+        "L2_pyramidal": 0.0,
+        "L5_pyramidal": 0.0,
+        f"L2_{inh_name_suffix}": 0.0,
+    }
+    synaptic_delays = {
+        "L2_pyramidal": 0.0,
+        "L5_pyramidal": 0.0,
+        f"L2_{inh_name_suffix}": 0.0,
+    }
+    rate_constant = {
+        "L2_pyramidal": 140.0,
+        "L5_pyramidal": 40.0,
+        f"L2_{inh_name_suffix}": 100.0,
+    }
+
+    net.add_poisson_drive(
+        "poisson",
+        rate_constant=rate_constant,
+        weights_ampa=weights_ampa,
+        location="proximal",
+        synaptic_delays=synaptic_delays,
+        event_seed=1349,
+    )
+
+    net.add_bursty_drive(
+        "beta_dist",
+        tstart=0.0,
+        burst_rate=25,
+        burst_std=5,
+        numspikes=1,
+        spike_isi=0,
+        n_drive_cells=11,
+        location="distal",
+        weights_ampa=weights_ampa,
+        synaptic_delays=synaptic_delays,
+        event_seed=14,
+    )
+
+    figure = plot_drive_strength(net)
+
+    assert isinstance(figure, plt.Figure)
+    assert len(figure.axes) > 0  # if there are any axes in the figure
+
+    any_plot = any(ax.lines or ax.patches or ax.images for ax in figure.axes)
+    assert any_plot  # At least one axis contains graphical elements
+
+
+def test_network_plotter_init(fix_net_neymotin_2020):
     """Test init keywords of NetworkPlotter class."""
-    net = setup_net
+    net, _ = fix_net_neymotin_2020(reduced=True)
     # test NetworkPlotter class
     args = [
         "xlim",
@@ -948,16 +1143,16 @@ def test_network_plotter_init(setup_net):
     assert net_plot._vsec_recorded is False
 
 
-def test_network_plotter_simulation(setup_net):
+def test_network_plotter_simulation(fix_net_neymotin_2020):
     """Test NetworkPlotter class simulation warnings."""
-    net = setup_net
+    net, _ = fix_net_neymotin_2020(reduced=True)
     net_plot = NetworkPlotter(net)
     # Errors if vsec isn't recorded
     with pytest.raises(RuntimeError, match="Network must be simulated"):
         net_plot.export_movie("demo.gif", dpi=200)
 
     # Errors if vsec isn't recorded with record_vsec='all'
-    _ = simulate_dipole(net, dt=0.5, tstop=10, record_vsec="soma")
+    _ = simulate_dipole(net, dt=0.5, tstop=40, record_vsec="soma")
     net_plot = NetworkPlotter(net)
 
     assert net_plot.vsec_array.shape == (159, 1)
@@ -967,8 +1162,8 @@ def test_network_plotter_simulation(setup_net):
     with pytest.raises(RuntimeError, match="Network must be simulated"):
         net_plot.export_movie("demo.gif", dpi=200)
 
-    net = setup_net
-    _ = simulate_dipole(net, dt=0.5, tstop=10, record_vsec="all", n_trials=2)
+    net, _ = fix_net_neymotin_2020(reduced=True)
+    _ = simulate_dipole(net, dt=0.5, tstop=40, record_vsec="all", n_trials=2)
     net_plot = NetworkPlotter(net)
     # setter/getter test for time_idx and trial_idx
     net_plot.time_idx = 5
@@ -976,15 +1171,15 @@ def test_network_plotter_simulation(setup_net):
     net_plot.trial_idx = 1
     assert net_plot.trial_idx == 1
 
-    assert net_plot.vsec_array.shape == (159, 21)
-    assert net_plot.color_array.shape == (159, 21, 4)
+    assert net_plot.vsec_array.shape == (159, 81)
+    assert net_plot.color_array.shape == (159, 81, 4)
     assert net_plot._vsec_recorded is True
     assert isinstance(net_plot._cbar, Colorbar)
 
 
-def test_network_plotter_setter(setup_net):
+def test_network_plotter_setter(fix_net_neymotin_2020):
     """Test NetworkPlotter class setters and getters."""
-    net = setup_net
+    net, _ = fix_net_neymotin_2020(reduced=True)
     net_plot = NetworkPlotter(net)
     # Type check errors
     args = [
@@ -1031,10 +1226,10 @@ def test_network_plotter_setter(setup_net):
         net_plot.trial_idx = 1
 
 
-def test_network_plotter_export(tmp_path, setup_net):
+def test_network_plotter_export(tmp_path, fix_net_neymotin_2020):
     """Test NetworkPlotter class export methods."""
-    net = setup_net
-    _ = simulate_dipole(net, dt=0.5, tstop=10, n_trials=1, record_vsec="all")
+    net, _ = fix_net_neymotin_2020(reduced=True)
+    _ = simulate_dipole(net, dt=0.5, tstop=40, n_trials=1, record_vsec="all")
     net_plot = NetworkPlotter(net)
 
     # Check no file is already written

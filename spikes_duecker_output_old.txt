@@ -1561,7 +1561,7 @@
 132.150	235	L5_pyramidal
 132.200	241	L5_pyramidal
 132.250	251	L5_pyramidal
-132.400	195	L5_pyramidal
+132.425	195	L5_pyramidal
 132.474	879	prox2
 132.475	209	L5_pyramidal
 132.475	219	L5_pyramidal
@@ -1584,7 +1584,7 @@
 134.325	199	L5_pyramidal
 134.350	100	L2_pyramidal
 134.425	81	L2_pyramidal
-134.450	217	L5_pyramidal
+134.475	217	L5_pyramidal
 134.525	232	L5_pyramidal
 134.525	236	L5_pyramidal
 134.575	68	L2_pyramidal
@@ -1606,7 +1606,7 @@
 135.150	243	L5_pyramidal
 135.175	228	L5_pyramidal
 135.200	207	L5_pyramidal
-135.225	193	L5_pyramidal
+135.250	193	L5_pyramidal
 135.350	50	L2_pyramidal
 135.425	221	L5_pyramidal
 135.475	191	L5_pyramidal
@@ -1637,7 +1637,7 @@
 136.425	264	L5_pyramidal
 136.450	198	L5_pyramidal
 136.500	157	L5_inhibitory
-136.500	161	L5_inhibitory
+136.525	161	L5_inhibitory
 136.525	176	L5_pyramidal
 136.550	151	L5_inhibitory
 136.550	158	L5_inhibitory
@@ -1711,8 +1711,8 @@
 138.000	195	L5_pyramidal
 138.050	22	L2_inhibitory
 138.075	186	L5_pyramidal
-138.075	212	L5_pyramidal
 138.100	189	L5_pyramidal
+138.100	212	L5_pyramidal
 138.125	15	L2_inhibitory
 138.175	86	L2_pyramidal
 138.225	37	L2_pyramidal
@@ -1752,7 +1752,7 @@
 160.175	81	L2_pyramidal
 160.275	71	L2_pyramidal
 160.350	59	L2_pyramidal
-160.400	72	L2_pyramidal
+160.425	72	L2_pyramidal
 160.500	60	L2_pyramidal
 160.600	58	L2_pyramidal
 160.850	87	L2_pyramidal
@@ -1786,7 +1786,7 @@
 163.375	25	L2_inhibitory
 163.375	92	L2_pyramidal
 163.450	76	L2_pyramidal
-163.500	161	L5_inhibitory
+163.525	161	L5_inhibitory
 163.550	153	L5_inhibitory
 163.575	27	L2_inhibitory
 163.575	158	L5_inhibitory

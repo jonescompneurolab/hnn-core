@@ -90,7 +90,7 @@
     -webkit-appearance: none;
     padding-right: 32px !important;
     text-overflow: ellipsis !important;
-    white-space: nowrap !important;
+    white-space: pre !important;
     overflow: hidden !important;
 }
 

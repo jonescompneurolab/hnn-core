@@ -5,7 +5,6 @@
 from pathlib import Path
 from copy import deepcopy
 import warnings
-
 import hnn_core
 from hnn_core import read_params
 from .network import Network, _create_cell_coords
@@ -19,6 +18,7 @@ from .cells_default import (
     human_gen_interneuron,
 )
 from .externals.mne import _validate_type
+from .dipole import _correct_baseline_dueckerET, _correct_baseline_neymotin2020
 
 # Default cell metadata for the standard Jones 2009 network cell types.
 # Defined here at module level so that other code (e.g. JSON
@@ -72,6 +72,20 @@ default_drive_colors = {
     "proximal": "r",
     "distal": "g",
     "default": "#8B4513",
+}
+
+
+# Map of how `Network._model_variant` cases apply to different
+# `Dipole._correct_baseline` functions. This is applied at the time of `Dipole`
+# creation, but contains information about differences between network models, so it is
+# located here.
+MODEL_VARIANT_MAPPING = {
+    None: _correct_baseline_neymotin2020,
+    "neymotin_2020_model": _correct_baseline_neymotin2020,
+    "jones_2009_model": _correct_baseline_neymotin2020,
+    "law_2021_model": _correct_baseline_neymotin2020,
+    "calcium_model": _correct_baseline_neymotin2020,
+    "duecker_ET_model": _correct_baseline_dueckerET,
 }
 
 
@@ -288,7 +302,6 @@ def neymotin_2020_model(
     net._model_variant = _validate_params_for_model(net, params, "neymotin_2020_model")
 
     # source of synapse is always at soma
-
     # layer2 Pyr -> layer2 Pyr
     # layer5 Pyr -> layer5 Pyr
     lamtha = 3.0

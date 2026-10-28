@@ -26,14 +26,15 @@ the ["`pip` Source Installation" section of our Installation Guide][] on our [Te
 website][]. Note that this is **different** from the "`pip` Package Installation" type
 on that webpage!
 
-We are experimenting with having once-monthly HNN Development meetings which are open to
-the public. These take place on the first Monday of every month at 1:00 PM, United
-States Eastern time (the [timezone of Providence, RI, viewable
-here](https://www.timeanddate.com/worldclock/usa/providence)). You can access the Zoom
-room here
-[https://brown.zoom.us/j/99212200748](https://brown.zoom.us/j/99212200748). Note that
-there is a waiting room and you *must raise your hand* before you will be granted
-audio/video privileges. We will kick out anyone causing disruptions during the meeting.
+Once a month, we host our HNN Development meetings publicly, which anyone interested is
+welcome to attend. These take place on the first Monday of every month at 11:00 AM,
+United States Eastern time (the [timezone of Providence, RI, viewable
+here](https://www.timeanddate.com/worldclock/usa/providence)). (Note that in the case of
+that Monday being a holiday according to [this
+calendar](https://hr.brown.edu/benefits-wellness/paid-time/holiday-schedule), then the
+meeting will be rescheduled to the same time on the next available workday). You can
+access the Zoom room here
+[https://brown.zoom.us/j/99212200748](https://brown.zoom.us/j/99212200748).
 
 ## How to contribute code
 
@@ -867,27 +868,20 @@ If you ever need to make scientific or technical changes to the default network
 2. Step 2: Run the following command from the top-level of the repository:
 
     ```
-    make regenerate-networks
+    make regenerate-network
     ```
 
-    This command runs two scripts, each of which rebuild one of the "hierarchical JSON"
-    network files used in HNN-Core. These two files are described below. Note that you do
-    **not** need to make manual changes to these files; running the above command is
-    sufficient. However, you **do** need to commit the new versions of these files. The
-    two files:
+    This command runs a script which rebuilds the "hierarchical JSON" Network file
+    located at `hnn_core/param/neymotin2020_base.json`. This is the base file used for
+    the GUI. This file has been built using the code in
+    `hnn_core/params.py::convert_to_json` by way of
+    `dev_scripts/regenerate_base_network.py`. Note that you do **not** need to make
+    manual changes to this file; running the above command is sufficient. However, you
+    **do** need to commit the updated version of this file.
 
-    A. `hnn_core/param/neymotin2020_base.json`: This is the base file used for the
-       GUI. This file has been built using the code in
-       `hnn_core/params.py::convert_to_json` by way of
-       `dev_scripts/regenerate_base_network.py`.
-
-    B. `hnn_core/test/assets/neymotin2020_3x3_drives.json`: This is the base file used for
-       many tests. This file has been built using the script in
-       `hnn_core/tests/regenerate_test_network.py`.
-
-3. Step 3: Once all the above versions of the network have been updated, make sure to
-   re-run all the tests using `make test`! If the new network files break tests, then
-   that breakage needs to be fixed before we can merge your updates.
+3. Step 3: Once you've updated the network using the command above, make sure to re-run
+   all the tests using `make test`! If the new network file breaks tests, then that
+   breakage needs to be fixed before we can merge your updates.
 
 ## Publishing new releases
 
