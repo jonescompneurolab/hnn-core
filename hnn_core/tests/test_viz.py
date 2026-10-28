@@ -1,5 +1,5 @@
-# import os.path as op
-# import tempfile
+import os.path as op
+import tempfile
 from unittest.mock import patch
 
 import matplotlib
@@ -10,7 +10,7 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
-# from hnn_core import read_spikes
+from hnn_core import read_spikes
 from hnn_core import Dipole, CellResponse
 from hnn_core.dipole import simulate_dipole
 from hnn_core.viz import (
@@ -754,67 +754,74 @@ class TestCellResponsePlotters:
                 cell_types=["bad_cell_type"], show=False
             )
 
-    # # TODO AES: also currently broken due to a bug with lack of detection of when https://github.com/satviksaluja/hnn-core/blob/ce7fcb9c87c8fca606068ac38691d2712deb841d/hnn_core/viz.py#L804 plot_spikes_raster cell_type_gids is empty
-    # def test_spikes_from_read_spikes(self, fix_use_cached_sims):
-    #     """Test hist and raster plots on a CellResponse loaded via read_spikes"""
-    #     net, dpls, net_customizations, _ = fix_use_cached_sims
-    #     inh_name_suffix = net_customizations["inh_name_suffix"]
-    #     with tempfile.TemporaryDirectory() as tmp_dir_name:
-    #         net.cell_response.write(
-    #             op.join(tmp_dir_name, f"spk_{net._model_variant}_%d.txt")
-    #         )
-    #         cell_response = read_spikes(op.join(tmp_dir_name, "spk_*.txt"))
+    # TODO AES: also currently broken due to a bug with lack of detection of when https://github.com/satviksaluja/hnn-core/blob/ce7fcb9c87c8fca606068ac38691d2712deb841d/hnn_core/viz.py#L804 plot_spikes_raster cell_type_gids is empty
+    def test_spikes_from_read_spikes(self, fix_use_cached_sims):
+        """Test hist and raster plots on a CellResponse loaded via read_spikes"""
+        net, dpls, net_customizations, _ = fix_use_cached_sims
+        inh_name_suffix = net_customizations["inh_name_suffix"]
+        cell_type_names = [
+            f"L2_{inh_name_suffix}",
+            "L2_pyramidal",
+            f"L5_{inh_name_suffix}",
+            "L5_pyramidal",
+        ]
+        with tempfile.TemporaryDirectory() as tmp_dir_name:
+            net.cell_response.write(
+                op.join(tmp_dir_name, f"spk_{net._model_variant}_%d.txt")
+            )
+            # This is left using op instead of Path due to the inherent globbing already
+            # present in read_spikes
+            cell_response = read_spikes(op.join(tmp_dir_name, "spk_*.txt"))
 
-    #     cell_type_names = [
-    #         f"L2_{inh_name_suffix}",
-    #         "L2_pyramidal",
-    #         f"L5_{inh_name_suffix}",
-    #         "L5_pyramidal",
-    #     ]
-    #     n_cell_spikes = sum(
-    #         sum(1 for spike_type in trial if spike_type in cell_type_names)
-    #         for trial in cell_response.spike_types
-    #     )
-    #     n_drive_spikes = sum(
-    #         sum(1 for spike_type in trial if spike_type not in cell_type_names)
-    #         for trial in cell_response.spike_types
-    #     )
+        for trial_idx, trial_spike_types in enumerate(cell_response.spike_types):
+            n_cell_spikes = sum(
+                1 for spike_type in trial_spike_types if spike_type in cell_type_names
+            )
+            n_drive_spikes = sum(
+                1
+                for spike_type in trial_spike_types
+                if spike_type not in cell_type_names
+            )
 
-    #     # By default, if any drive (input) spike types are present, the
-    #     # histogram plots only those, not the real cell spikes
-    #     fig_hist = cell_response.plot_spikes_hist(show=False)
-    #     n_plotted_hist = sum(
-    #         patch.get_height() for ax in fig_hist.axes for patch in ax.patches
-    #     )
-    #     assert n_plotted_hist == n_drive_spikes, (
-    #         f"Expected {n_drive_spikes} spikes plotted in histogram, "
-    #         f"got {n_plotted_hist}"
-    #     )
+            # By default, if any drive (input) spike types are present, the
+            # histogram plots only those, not the real cell spikes
+            fig_hist = cell_response.plot_spikes_hist(trial_idx=trial_idx, show=False)
+            n_plotted_hist = sum(
+                patch.get_height() for ax in fig_hist.axes for patch in ax.patches
+            )
+            assert n_plotted_hist == n_drive_spikes, (
+                f"Trial {trial_idx}: expected {n_drive_spikes} spikes plotted in "
+                f"histogram, got {n_plotted_hist}"
+            )
 
-    #     # By default, the raster plots the real cell spikes, not drive spikes
-    #     fig_raster = cell_response.plot_spikes_raster(show=False)
-    #     n_plotted_raster = sum(
-    #         len(collection.get_positions())
-    #         for collection in fig_raster.axes[0].collections
-    #     )
-    #     assert n_plotted_raster == n_cell_spikes, (
-    #         f"Expected {n_cell_spikes} spikes plotted in raster, got {n_plotted_raster}"
-    #     )
+            # By default, the raster plots the real cell spikes, not drive spikes.
+            n_expected_raster = n_cell_spikes
+            fig_raster = cell_response.plot_spikes_raster(
+                trial_idx=trial_idx, show=False
+            )
+            n_plotted_raster = sum(
+                len(collection.get_positions())
+                for collection in fig_raster.axes[0].collections
+            )
+            assert n_plotted_raster == n_expected_raster, (
+                f"Trial {trial_idx}: expected {n_expected_raster} spikes plotted in "
+                f"raster, got {n_plotted_raster}"
+            )
 
-    #     # By default, the raster plots the real cell spikes, not drive spikes
-    #     fig_raster_overlay = cell_response.plot_spikes_raster(
-    #         show=False,
-    #         overlay_dipoles=True,
-    #         dpl=dpls,
-    #     )
-    #     n_plotted_raster_overlay = sum(
-    #         len(collection.get_positions())
-    #         for collection in fig_raster_overlay.axes[0].collections
-    #     )
-    #     assert n_plotted_raster_overlay == n_cell_spikes, (
-    #         f"Expected {n_cell_spikes} spikes plotted in raster, got "
-    #         f"{n_plotted_raster_overlay}"
-    #     )
+            fig_raster_overlay = cell_response.plot_spikes_raster(
+                trial_idx=trial_idx,
+                show=False,
+                overlay_dipoles=True,
+                dpl=dpls[trial_idx],
+            )
+            n_plotted_raster_overlay = sum(
+                len(collection.get_positions())
+                for collection in fig_raster_overlay.axes[0].collections
+            )
+            assert n_plotted_raster_overlay == n_expected_raster, (
+                f"Trial {trial_idx}: expected {n_expected_raster} spikes plotted in "
+                f"raster, got {n_plotted_raster_overlay}"
+            )
 
     def test_spikes_hist_default(self, fix_use_cached_sims):
         """Test basic spike histogram plotting."""
