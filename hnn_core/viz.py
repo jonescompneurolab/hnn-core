@@ -922,11 +922,7 @@ def plot_spikes_raster(
                 f"Got {cell_types}"
             )
     else:
-        cell_types = (
-            cell_response._cell_type_names
-            if cell_response._cell_type_names
-            else unique_spike_types
-        )
+        cell_types = cell_response._cell_type_names
 
     # validate gid_ranges argument
     _validate_type(gid_ranges, (dict, None), "gid_ranges", "dict")
