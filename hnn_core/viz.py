@@ -1029,8 +1029,8 @@ def plot_spikes_raster(
                 "Raster plot will be empty."
             )
 
-    # Extent of y-axis based on maximum gid in gid_ranges if provided, otherwise the range of the cells that
-    # spiked
+    # Extent of y-axis based on maximum gid in gid_ranges if provided, otherwise the
+    # range of the cells that spiked
     if gid_ranges is not None:
         raster_min = min(min(gid_ranges[cell_type]) for cell_type in cell_types)
         raster_max = max(max(gid_ranges[cell_type]) for cell_type in cell_types)
