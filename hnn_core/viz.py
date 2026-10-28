@@ -717,7 +717,7 @@ def plot_spikes_hist(
     if len(cell_response.times) > 0:
         bins = np.linspace(0, cell_response.times[-1], 50)
     else:
-        bins = np.linspace(0, spike_times[-1], 50)
+        bins = np.linspace(0, max(spike_times), 50)
 
     # Create dictionary to aggregate spike times that have the same spike_label
     spike_type_times = {
