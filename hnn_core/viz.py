@@ -573,6 +573,8 @@ def plot_spikes_hist(
 ):
     """Plot the histogram of spiking activity across trials.
 
+    By default, this only plots spikes from drives, and NOT spikes from cells.
+
     Parameters
     ----------
     cell_response : instance of CellResponse
