@@ -728,6 +728,8 @@ class TestCellResponsePlotters:
             assert (min(gids) - float_tol) <= np.mean(y_data) <= (max(gids) + float_tol)
             assert (min(gid_ranges["L2_basket"]) - float_tol) <= y_data.min()
             assert y_data.max() <= (max(gid_ranges["L5_pyramidal"]) + float_tol)
+            assert (min(gids) - float_tol) <= y_data.min()
+            assert y_data.max() <= (max(gids) + float_tol)
 
         # Both dipoles are drawn within the visible y-axis
         ylim_low, ylim_high = sorted(ax.get_ylim())
