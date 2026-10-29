@@ -639,8 +639,8 @@ class TestCellResponsePlotters:
             "L5_pyramidal": range(20, 29),
         }
 
-        times=np.linspace(0, 100, 101)
-        
+        times = np.linspace(0, 100, 101)
+
         # Hard-coded spikes, with the cell type associated with largest gids silent
         spike_times, spike_gids, spike_types = [], [], []
         for cell_type in ["L2_basket", "L2_pyramidal", "L5_basket"]:
