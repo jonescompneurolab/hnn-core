@@ -234,6 +234,30 @@ def test_dipole_simulation(fix_net_neymotin_2020, fix_default_params):
     plt.close("all")
 
 
+def test_tstop_none_drives_resimulation(fix_net_neymotin_2020):
+    """Test that drives and biases with tstop=None last for every simulation."""
+    net, _ = fix_net_neymotin_2020(mesh_shape=(3, 3))
+    net.add_poisson_drive(
+        "poisson",
+        tstart=0.0,
+        tstop=None,
+        rate_constant=50.0,
+        location="proximal",
+        weights_ampa={"L2_pyramidal": 1e-3},
+        event_seed=1,
+    )
+    net.add_tonic_bias(amplitude={"L5_pyramidal": 1.0}, t0=0.0, tstop=None)
+    net_fresh = net.copy()
+
+    simulate_dipole(net, tstop=20.0, n_trials=1)
+    assert net.external_drives["poisson"]["dynamics"]["tstop"] is None
+    assert net.external_biases["tonic"]["L5_pyramidal"]["tstop"] is None
+
+    dpl = simulate_dipole(net, tstop=60.0, n_trials=1)[0]
+    dpl_fresh = simulate_dipole(net_fresh, tstop=60.0, n_trials=1)[0]
+    assert_allclose(dpl.data["agg"], dpl_fresh.data["agg"])
+
+
 @requires_mpi4py
 @requires_psutil
 @pytest.mark.uses_mpi
