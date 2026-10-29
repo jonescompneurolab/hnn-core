@@ -639,6 +639,8 @@ class TestCellResponsePlotters:
             "L5_pyramidal": range(20, 29),
         }
 
+        times=np.linspace(0, 100, 101)
+        
         # Hard-coded spikes, with the cell type associated with largest gids silent
         spike_times, spike_gids, spike_types = [], [], []
         for cell_type in ["L2_basket", "L2_pyramidal", "L5_basket"]:
@@ -653,7 +655,7 @@ class TestCellResponsePlotters:
             spike_times=[spike_times],
             spike_gids=[spike_gids],
             spike_types=[spike_types],
-            times=np.linspace(0, 100, 101),
+            times=times,
         )
 
         marker_size = 1.0
@@ -703,7 +705,6 @@ class TestCellResponsePlotters:
 
         # case 5: test that overlay dipoles works correctly with gid_ranges
         # This test was written by Claude Opus 5.5, but Austin read it and it seems good.
-        times = np.linspace(0, 100, 101)
         l2_data = np.sin(2 * np.pi * times / 50)
         l5_data = 2 * np.cos(2 * np.pi * times / 50)
         dpl = Dipole(times, np.column_stack([l2_data + l5_data, l2_data, l5_data]))
@@ -736,6 +737,8 @@ class TestCellResponsePlotters:
 
         # Without gid_ranges, the raster ends at the largest gid that spiked, so the
         # L5 dipole is placed higher up (at smaller gids) than with gid_ranges
+        # Note that due to y-axis inversion, "higher up" is due to a lower mean y position
+        # hence we test that y position of `l5_line_no_ranges` is *less than* `l5_line`
         _, _, l5_line_no_ranges = plot_dipole_lines()
         assert (np.mean(l5_line_no_ranges.get_ydata()) - float_tol) < np.mean(
             l5_line.get_ydata()
@@ -754,7 +757,6 @@ class TestCellResponsePlotters:
                 cell_types=["bad_cell_type"], show=False
             )
 
-    # TODO AES: also currently broken due to a bug with lack of detection of when https://github.com/satviksaluja/hnn-core/blob/ce7fcb9c87c8fca606068ac38691d2712deb841d/hnn_core/viz.py#L804 plot_spikes_raster cell_type_gids is empty
     def test_spikes_from_read_spikes(self, fix_use_cached_sims):
         """Test hist and raster plots on a CellResponse loaded via read_spikes"""
         net, dpls, net_customizations, _ = fix_use_cached_sims
