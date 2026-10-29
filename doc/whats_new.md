@@ -59,6 +59,10 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
   preserving configured drive and tonic-bias stop times,
   by [William Kang][] in {gh}`1348`.
 
+- The RMSE and Corr comparison text on GUI dipole comparison plots is no longer
+  drawn over the evoked drive arrows, and now stays at the bottom right of the plot,
+  fixing {gh}`1374`.
+
 - [Camilo Diaz][] did considerable work in fixing our long-standing MPI Timeout issues
   and putting in place a permanent solution that uses tempfiles instead of standard
   input/output/error streams. Thanks Camilo!

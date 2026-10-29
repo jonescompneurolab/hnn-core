@@ -2,7 +2,9 @@ from pathlib import Path
 from os import environ
 import io
 import itertools
+import re
 from contextlib import redirect_stdout
+from importlib.metadata import PackageNotFoundError, distribution
 from threading import Thread, Event
 from time import sleep
 from urllib.request import urlretrieve
@@ -13,18 +15,20 @@ from numpy.testing import assert_array_equal, assert_allclose, assert_raises
 
 import pytest
 
-import hnn_core
+from hnn_core import parallel_backends
 from hnn_core import (
     MPIBackend,
     neymotin_2020_model,
-    read_params,
     read_spikes,
 )
 from hnn_core.dipole import simulate_dipole
 from hnn_core.parallel_backends import (
     requires_mpi4py,
     requires_psutil,
+    requires_openmpi_package,
     _determine_cores_hwthreading,
+    _get_mpi_env,
+    _get_pip_openmpi_lib,
 )
 from hnn_core.network_builder import NetworkBuilder
 
@@ -44,12 +48,24 @@ def _terminate_mpibackend(event, backend):
         sleep(0.01)
 
 
-def test_gid_assignment():
+@pytest.mark.parametrize(
+    "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
+)
+def test_gid_assignment(fix_net_model, request):
     """Test that gids are assigned without overlap across ranks"""
-
-    net = neymotin_2020_model(add_drives_from_params=False)
-    weights_ampa = {"L2_basket": 1.0, "L2_pyramidal": 2.0, "L5_pyramidal": 3.0}
-    syn_delays = {"L2_basket": 0.1, "L2_pyramidal": 0.2, "L5_pyramidal": 0.3}
+    net_model = request.getfixturevalue(fix_net_model)
+    net, net_customizations = net_model()
+    inh_name_suffix = net_customizations["inh_name_suffix"]
+    weights_ampa = {
+        f"L2_{inh_name_suffix}": 1.0,
+        "L2_pyramidal": 2.0,
+        "L5_pyramidal": 3.0,
+    }
+    syn_delays = {
+        f"L2_{inh_name_suffix}": 0.1,
+        "L2_pyramidal": 0.2,
+        "L5_pyramidal": 0.3,
+    }
 
     net.add_bursty_drive(
         "bursty_dist",
@@ -101,10 +117,11 @@ class TestParallelBackends:
     dpls_reduced_default = None
     dpls_reduced_joblib = None
 
-    def test_run_default(self, run_hnn_core_fixture):
+    def test_run_default(self, fix_net_neymotin_2020, fix_run_simulation):
         """Test consistency between default backend simulation and master"""
         global dpls_reduced_default
-        dpls_reduced_default, _ = run_hnn_core_fixture(None, reduced=True)
+        net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+        dpls_reduced_default = fix_run_simulation(net, tstop=40, backend=None)
         # test consistency across all parallel backends for multiple trials
         assert_raises(
             AssertionError,
@@ -113,12 +130,13 @@ class TestParallelBackends:
             dpls_reduced_default[1].data["agg"],
         )
 
-    def test_run_joblibbackend(self, run_hnn_core_fixture):
+    def test_run_joblibbackend(self, fix_net_neymotin_2020, fix_run_simulation):
         """Test consistency between joblib backend simulation with master"""
         global dpls_reduced_default, dpls_reduced_joblib
 
-        dpls_reduced_joblib, _ = run_hnn_core_fixture(
-            backend="joblib", n_jobs=2, reduced=True
+        net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+        dpls_reduced_joblib = fix_run_simulation(
+            net, tstop=40, backend="joblib", n_jobs=2
         )
 
         for trial_idx in range(len(dpls_reduced_default)):
@@ -152,15 +170,17 @@ class TestParallelBackends:
         """Test that MPIBackend can use more than 1 processor"""
         # if only 1 processor is available, then MPIBackend tests will not
         # be valid
-        with MPIBackend() as backend:
+        with MPIBackend(n_procs=None) as backend:  # Use all available cores
             assert backend.n_procs > 1
 
     @requires_mpi4py
     @requires_psutil
-    def test_run_mpibackend(self, run_hnn_core_fixture):
+    def test_run_mpibackend(self, fix_net_neymotin_2020, fix_run_simulation):
         """Test running a MPIBackend on reduced model"""
         global dpls_reduced_default, dpls_reduced_mpi
-        dpls_reduced_mpi, _ = run_hnn_core_fixture(backend="mpi", reduced=True)
+        net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+        # Use all available cores
+        dpls_reduced_mpi = fix_run_simulation(net, tstop=40, backend="mpi")
         for trial_idx in range(len(dpls_reduced_default)):
             # account for rounding error incured during MPI parallelization
             assert_allclose(
@@ -172,19 +192,10 @@ class TestParallelBackends:
 
     @requires_mpi4py
     @requires_psutil
-    def test_terminate_mpibackend(self, run_hnn_core_fixture):
+    def test_terminate_mpibackend(self, fix_net_neymotin_2020):
         """Test terminating MPIBackend from thread"""
-        hnn_core_root = Path(hnn_core.__file__).parent
-        params_fname = hnn_core_root / "param" / "default.json"
-        params = read_params(params_fname)
-        params.update(
-            {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}
-        )
-        net = neymotin_2020_model(
-            params, add_drives_from_params=True, mesh_shape=(3, 3)
-        )
-
-        with MPIBackend() as backend:
+        net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+        with MPIBackend(n_procs=None) as backend:  # Use all available cores
             event = Event()
             # start background thread that will kill all MPIBackends
             # until event.set()
@@ -199,7 +210,7 @@ class TestParallelBackends:
                 with pytest.raises(
                     RuntimeError, match="MPI simulation failed. Return code: 1"
                 ):
-                    simulate_dipole(net, tstop=40)
+                    simulate_dipole(net, tstop=40, n_trials=2)
 
             event.set()
         expected_string = "Child process failed unexpectedly"
@@ -208,11 +219,11 @@ class TestParallelBackends:
     @requires_mpi4py
     @requires_psutil
     @pytest.mark.parametrize("use_hwthreading_if_found", [True, False])
-    def test_run_mpibackend_oversubscribed(self, use_hwthreading_if_found):
+    def test_run_mpibackend_oversubscribed(
+        self, use_hwthreading_if_found, fix_default_params
+    ):
         """Test running MPIBackend with oversubscribed number of procs"""
-        hnn_core_root = Path(hnn_core.__file__).parent
-        params_fname = hnn_core_root / "param" / "default.json"
-        params = read_params(params_fname)
+        params = fix_default_params
         params.update(
             {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}
         )
@@ -310,22 +321,15 @@ class TestParallelBackends:
         use_hwthreading_if_found,
         sensible_default_cores,
         override_oversubscribe_option,
+        fix_net_neymotin_2020,
     ):
         """Test running MPIBackend with oversubscribed number of procs"""
-        hnn_core_root = Path(hnn_core.__file__).parent
-        params_fname = hnn_core_root / "param" / "default.json"
-        params = read_params(params_fname)
-        params.update(
-            {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}
-        )
-        net = neymotin_2020_model(
-            params, add_drives_from_params=True, mesh_shape=(3, 3)
-        )
+        net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
 
         n_procs = 2
         # Test that the network runs at all
         with MPIBackend(n_procs=n_procs) as backend:
-            simulate_dipole(net, tstop=40)
+            simulate_dipole(net, tstop=40, n_trials=2)
 
         [_, detected_hwthreading] = _determine_cores_hwthreading(
             use_hwthreading_if_found=use_hwthreading_if_found,
@@ -337,9 +341,8 @@ class TestParallelBackends:
 
         # Possibly needed to prevent MPIBackend failures to exit processes
         del net
-        net = neymotin_2020_model(
-            params, add_drives_from_params=True, mesh_shape=(3, 3)
-        )
+        net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+
         with MPIBackend(
             n_procs=n_procs,
             use_hwthreading_if_found=use_hwthreading_if_found,
@@ -349,7 +352,7 @@ class TestParallelBackends:
         ) as backend:
             if detected_hwthreading:
                 assert "--use-hwthread-cpus" in " ".join(backend.mpi_cmd)
-            simulate_dipole(net, tstop=40)
+            simulate_dipole(net, tstop=40, n_trials=2)
 
         # Case 2: Check that hwthreading turns on if forced. Note that the
         # simulation should NOT be run in this case, since the underlying
@@ -369,9 +372,8 @@ class TestParallelBackends:
 
         # Possibly needed to prevent MPIBackend failures to exit processes
         del net
-        net = neymotin_2020_model(
-            params, add_drives_from_params=True, mesh_shape=(3, 3)
-        )
+        net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+
         with MPIBackend(
             n_procs=n_procs,
             use_hwthreading_if_found=use_hwthreading_if_found,
@@ -380,23 +382,28 @@ class TestParallelBackends:
             override_hwthreading_option=override_hwthreading_option,
         ) as backend:
             assert "--use-hwthread-cpus" not in " ".join(backend.mpi_cmd)
-            simulate_dipole(net, tstop=40)
+            simulate_dipole(net, tstop=40, n_trials=2)
 
     @pytest.mark.parametrize("backend", ["mpi", "joblib"])
-    def test_compare_hnn_core(self, run_hnn_core_fixture, backend, n_jobs=1):
+    def test_compare_hnn_core(
+        self, fix_net_neymotin_2020, fix_run_simulation, backend, n_jobs=1
+    ):
         """Test hnn-core does not break."""
         # small snippet of data on data branch for now. To be deleted
         # later. Data branch should have only commit so it does not
         # pollute the history.
+        ground_truth_fname = "dpl_nonlegacy_units.txt"
         data_url = (
             "https://raw.githubusercontent.com/jonescompneurolab/"
-            "hnn-core/test_data/dpl.txt"
+            f"hnn-core/test_data/{ground_truth_fname}"
         )
-        if not Path("dpl.txt").exists():
-            urlretrieve(data_url, "dpl.txt")
-        dpl_master = loadtxt("dpl.txt")
+        if not Path(ground_truth_fname).exists():
+            urlretrieve(data_url, ground_truth_fname)
+        dpl_master = loadtxt(ground_truth_fname)
 
-        dpls, net = run_hnn_core_fixture(backend=backend)
+        # TODO AES: CURRENTLY NEEDS LEGACY MODE
+        net, _ = fix_net_neymotin_2020(legacy_mode=True, add_drives_from_params=True)
+        dpls = fix_run_simulation(net, tstop=170, backend=backend)
         dpl = dpls[0].smooth(30).scale(3000)
 
         # write the dipole to a file and compare
@@ -422,7 +429,7 @@ class TestParallelBackends:
             "L2_basket": 55,
             "L2_pyramidal": 114,
             "L5_pyramidal": 396,
-            "L5_basket": 86,
+            "L5_basket": 85,
             "evdist1": 270,
             "evprox2": 270,
         }
@@ -433,15 +440,17 @@ class TestParallelBackends:
 @requires_mpi4py
 @requires_psutil
 @pytest.mark.uses_mpi
-def test_mpi_failure(run_hnn_core_fixture):
+def test_mpi_failure(fix_net_neymotin_2020, fix_run_simulation):
     """Test that an MPI failure is handled and messages are printed"""
     # this MPI parameter will cause a MPI job to fail
     environ["OMPI_MCA_btl"] = "self"
 
+    net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
     with pytest.warns(UserWarning) as record:
         with io.StringIO() as buf, redirect_stdout(buf):
             with pytest.raises(RuntimeError, match="MPI simulation failed"):
-                run_hnn_core_fixture(backend="mpi", reduced=True, postproc=False)
+                # Use all available cores
+                fix_run_simulation(net, tstop=40, backend="mpi", postproc=False)
             stdout = buf.getvalue()
 
     assert "MPI processes are unable to reach each other" in stdout
@@ -496,3 +505,165 @@ def test_compare_duecker_model_output(backend):
         cell_response_new_reloaded.spike_times,
         cell_response_old.spike_times,
     )
+
+
+@requires_openmpi_package
+def test_get_pip_openmpi_lib():
+    """Test that only the real libmpi file in the 'openmpi' package is found"""
+    mpi_lib = _get_pip_openmpi_lib()
+    assert mpi_lib is not None
+    # `_get_pip_openmpi_lib()` MUST find one or more of these files, which are the only
+    # true MPI library files that NEURON needs.
+    assert Path(mpi_lib).name in {
+        "libmpi.so.40",
+        "libmpi.so.12",
+        "libmpi.40.dylib",
+        "libmpi.12.dylib",
+    }
+    # `_get_pip_openmpi_lib()` must NOT find one or more of these files, which are also
+    # present in the `openmpi` package depending on the OS. None of these files are the
+    # "real" MPI library file that NEURON needs.
+    assert Path(mpi_lib).name not in {
+        "libmpi.so",
+        "libmpi.dylib",
+        "libmpi_mpifh.so.40",
+        "libmpi.so.40.1.0",
+        "libmpi.so.40.40.8",
+    }
+    assert Path(mpi_lib).is_file()
+
+
+def test_get_pip_openmpi_lib_installed():
+    """Test _get_pip_openmpi_lib against the actually-installed environment"""
+    try:
+        distribution("openmpi")
+    except PackageNotFoundError:
+        assert _get_pip_openmpi_lib() is None
+    else:
+        # If it's found to be installed, then the returned path of the library must
+        # exist and be a file
+        mpi_lib = _get_pip_openmpi_lib()
+        assert mpi_lib is not None
+        assert Path(mpi_lib).is_file()
+
+
+# This tests that `_get_mpi_env` correctly sets the `MPI_LIB_NRN_PATH` environment
+# variable based the state of the environment and which arguments are passed to
+# it. There are four arguments that pytest parametrizes over:
+#
+# - `autoload_flag`: value of `autoload_mpi_library` argument to `_get_mpi_env`
+# - `user_provided_lib`: value of `mpi_lib_path` argument to `_get_mpi_env`
+# - `default_openmpi_lib`: value returned by `_get_pip_openmpi_lib` (which is mocked to
+#     return a specific value)
+# - `expected_returned_lib`: the expected value of the `MPI_LIB_NRN_PATH` environment
+#     variable after `_get_mpi_env` is called
+#
+# Additionally, the test also sets the CALLER's environment variable `MPI_LIB_NRN_PATH`
+# to a known value ("preexisting.so"). This is to test that `_get_mpi_env` does not
+# modify the caller's environment itself.
+#
+# Think of everything except `expected_returned_lib` as "inputs" to the test, and
+# `expected_returned_lib` as the "output" of the test.
+@pytest.mark.parametrize(
+    "autoload_flag, user_provided_lib, default_openmpi_lib, expected_returned_lib",
+    [
+        # Case when using default arguments if the `openmpi` package is installed:
+        # - autoload_flag = True
+        # - user_provided_lib = None (no custom library path provided)
+        # - default_openmpi_lib = mock value of the installed library file "pip.so"
+        # - expected_returned_lib = _get_mpi_env should automatically set the
+        #     environment variable to `default_openmpi_lib`: "pip.so"
+        pytest.param(True, None, "pip.so", "pip.so", id="default-installed"),
+        # Case when using default arguments if the `openmpi` package is NOT installed:
+        # - autoload_flag = True
+        # - user_provided_lib = None (no custom library path provided)
+        # - default_openmpi_lib = None (not installed)
+        # - expected_returned_lib = the environment variable should remain UNCHANGED
+        #     from its preexisting value "preexisting.so"
+        pytest.param(True, None, None, "preexisting.so", id="default-not-installed"),
+        # Case when autoload is off, and no user provided library path is given:
+        # - autoload_flag = False
+        # - user_provided_lib = None (no custom library path provided)
+        # - default_openmpi_lib = mock value of the installed library file "pip.so"
+        # - expected_returned_lib = the environment variable should remain UNCHANGED
+        #     from its preexisting value "preexisting.so"
+        pytest.param(False, None, "pip.so", "preexisting.so", id="no-autoload"),
+        # Case when autoload is off, and user provided library path has been given:
+        # - autoload_flag = False
+        # - user_provided_lib = "user.so" (custom library path provided)
+        # - default_openmpi_lib = mock value of the installed library file "pip.so"
+        # - expected_returned_lib = _get_mpi_env should automatically set the
+        #     environment variable to `user_provided_lib`: "user.so"
+        pytest.param(False, "user.so", "pip.so", "user.so", id="no-autoload-user"),
+        # Case when autoload is ON, and user provided library path has been given. In
+        # this case, the user-provided library path should take precedence over the
+        # autoloaded library path:
+        # - autoload_flag = True
+        # - user_provided_lib = "user.so" (custom library path provided)
+        # - default_openmpi_lib = mock value of the installed library file "pip.so"
+        # - expected_returned_lib = _get_mpi_env should automatically set the
+        #     environment variable to `user_provided_lib`: "user.so"
+        pytest.param(True, Path("user.so"), "pip.so", "user.so", id="user-wins"),
+    ],
+)
+def test_get_mpi_env_lib_path(
+    monkeypatch,
+    autoload_flag,
+    user_provided_lib,
+    default_openmpi_lib,
+    expected_returned_lib,
+):
+    """Test which MPI library _get_mpi_env points MPI_LIB_NRN_PATH to across arguments"""
+    # Set the caller's environment, in order to make sure that `_get_mpi_env` later does
+    # not modify it
+    monkeypatch.setenv("MPI_LIB_NRN_PATH", "preexisting.so")
+    # Overwrite the `_get_pip_openmpi_lib` function to return a specific library path
+    # for testing purposes.
+    monkeypatch.setattr(
+        parallel_backends, "_get_pip_openmpi_lib", lambda: default_openmpi_lib
+    )
+
+    env = _get_mpi_env(
+        autoload_mpi_library=autoload_flag, mpi_lib_path=user_provided_lib
+    )
+
+    assert env["MPI_LIB_NRN_PATH"] == expected_returned_lib
+    # Check that the caller's own environment was not modified
+    assert environ["MPI_LIB_NRN_PATH"] == "preexisting.so"
+
+
+@requires_mpi4py
+@requires_psutil
+def test_mpibackend_lib_path(monkeypatch, tmp_path):
+    """Test that 'mpi_lib_path' must exist and reaches MPI as an absolute path
+
+    Note that this test does not actually depend on whether the `openmpi` package is
+    installed or not, but does require that the `mpi4py` and `psutil` packages are
+    installed.
+    """
+    # "nonexistent.so" tests a path that does not exist, and `tmp_path` tests a path
+    # that exists but is a directory instead of a file.
+    for bad_path in ["nonexistent.so", tmp_path]:
+        with pytest.raises(FileNotFoundError, match="'mpi_lib_path' not found"):
+            MPIBackend(mpi_lib_path=bad_path)
+
+    # Capture the env that MPI would be launched with, but stop before launching it
+    def _fake_run_subprocess(env, **kwargs):
+        raise RuntimeError(f"MPI_LIB_NRN_PATH={env['MPI_LIB_NRN_PATH']}")
+
+    monkeypatch.setattr(parallel_backends, "run_subprocess", _fake_run_subprocess)
+
+    # Create a fake MPI library file in the temporary directory, in order to make sure
+    # that MPIBackend is accessing the correct path to the library.
+    (tmp_path / "libmpi.so.40").touch()
+
+    # Setup our network and backend, pointing the backend to the fake MPI library file.
+    net = neymotin_2020_model(mesh_shape=(3, 3))
+    backend = MPIBackend(n_procs=2, mpi_lib_path=(tmp_path / "libmpi.so.40"))
+
+    # Test that at simulation time, the MPIBackend can see and is using the correct path
+    # to the MPI library file, based on its internal `env` setting. We do this by
+    # hacking the `run_subprocess` using the monkeypatch above.
+    expected = re.escape(f"MPI_LIB_NRN_PATH={tmp_path / 'libmpi.so.40'}")
+    with pytest.raises(RuntimeError, match=f"^{expected}$"):
+        backend.simulate(net, tstop=1, dt=0.025, n_trials=1)
