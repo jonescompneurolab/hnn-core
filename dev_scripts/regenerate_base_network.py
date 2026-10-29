@@ -3,19 +3,18 @@
 from pathlib import Path
 from shutil import copy
 
+import hnn_core
 from hnn_core.params import convert_to_json
 
 
-top_level_dir = Path(__file__).parents[1]
+hnn_core_root = Path(hnn_core.__file__).parent
 
-network_configs_path = Path(top_level_dir, "hnn_core", "param")
+network_configs_path = hnn_core_root / "param"
 # This is the "flat JSON" parameter file which all of our "hierarchical JSON"
 # network files are based off of
-input_flat_base_network_config_path = network_configs_path.joinpath("default.json")
+input_flat_base_network_config_path = network_configs_path / "default.json"
 # This is the "hierarchical JSON" network file which we will build
-output_hier_base_network_config_path = network_configs_path.joinpath(
-    "neymotin2020_base.json"
-)
+output_hier_base_network_config_path = network_configs_path / "neymotin2020_base.json"
 
 backup_path = Path(
     output_hier_base_network_config_path.parent,

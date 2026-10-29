@@ -3,15 +3,17 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
+import os
 from pathlib import Path
 import time
 import pytest
 import numpy as np
 
+import hnn_core
 from hnn_core.batch_simulate import BatchSimulate
-from hnn_core import neymotin_2020_model
+from hnn_core import Network, neymotin_2020_model
 
-hnn_core_root = Path(__file__).parents[1]
+hnn_core_root = Path(hnn_core.__file__).parent
 assets_path = Path(hnn_core_root, "tests", "assets")
 
 
@@ -50,7 +52,7 @@ def batch_simulate_instance(tmp_path, request):
     return BatchSimulate(
         net=net,
         set_params=set_params,
-        tstop=30,
+        tstop=40,
         save_folder=tmp_path,
         batch_size=3,
         n_trials=3,
@@ -288,6 +290,17 @@ def test_load_results(batch_simulate_instance, param_grid, tmp_path):
         batch_simulate_instance._save("invalid_results", start_idx, end_idx)
 
 
+# TODO AES: This randomly fails on CI approximately 5-10% of the time, but always passes
+# locally. The failure on CI is probably due to CPU scheduling on CI servers that are
+# running other jobs besides our own.  We need to find a way to test this more reliably,
+# but ideally WITHOUT forcing many time-consuming simulations and then taking the median
+# or something similar. Until then, we will mark this test as xfail only on GitHub
+# Actions (which sets GITHUB_ACTIONS=true), but it should always truly pass locally.
+@pytest.mark.xfail(
+    os.environ.get("GITHUB_ACTIONS") == "true",
+    strict=False,
+    reason="Parallel execution may not always be faster for CI.",
+)
 def test_parallel_execution(batch_simulate_instance, param_grid):
     """Test parallel execution of simulations and ensure speedup."""
 
@@ -327,3 +340,33 @@ def test_parallel_execution(batch_simulate_instance, param_grid):
     assert serial_time > parallel_time, (
         "Parallel execution is not faster than serial execution!"
     )
+
+
+def test_dask_backend(batch_simulate_instance, param_grid):
+    """Test using the dask backend for parallel execution."""
+    pytest.importorskip("dask.distributed")
+
+    from dask.distributed import Client, LocalCluster
+
+    param_combinations = batch_simulate_instance._generate_param_combinations(
+        param_grid
+    )
+
+    cluster = LocalCluster(processes=True, n_workers=2, threads_per_worker=1)
+    client = Client(cluster)
+
+    results = batch_simulate_instance.simulate_batch(
+        param_combinations, n_jobs=2, backend="dask"
+    )
+
+    # Verify results structure and completeness
+    assert len(results) == len(param_combinations)
+    for result in results:
+        assert "net" in result
+        assert isinstance(result["net"], Network)
+        assert "dpl" in result
+        assert len(result["dpl"][0].times) > 0
+        assert "param_values" in result
+
+    client.close()
+    cluster.close()
