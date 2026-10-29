@@ -932,17 +932,26 @@ def plot_spikes_raster(
     cell_type_metadata = getattr(cell_response, "_cell_type_metadata", None)
     # validate colors argument
     _validate_type(colors, (list, dict, None), "color", "list of str, or dict")
+    default_colors = plt.rcParams["axes.prop_cycle"].by_key()["color"][
+        : len(cell_types)
+    ]
 
     # Set colors
-    if cell_type_metadata is not None and "color" in cell_type_metadata[cell_types[0]]:
-        cell_colors = {
-            cell: cell_type_metadata.get(cell, {}).get("color", "k")
-            for cell in cell_types
-        }
+    if cell_type_metadata is not None:
+        # Validate colors
+        for ct_name, ct_metadata in cell_response._cell_type_metadata.items():
+            if "color" not in ct_metadata:
+                warnings.warn(
+                    f"Color not specified for metadata of cell type {ct_name}. Using "
+                    "default color cycle."
+                )
+                ct_metadata.setdefault(
+                    "color", default_colors[cell_types.index(ct_name)]
+                )
+        cell_colors = {cell: meta["color"] for cell, meta in cell_type_metadata.items()}
     else:
-        default_colors = plt.rcParams["axes.prop_cycle"].by_key()["color"][
-            : len(cell_types)
-        ]
+        # This case probably only corresponds to reading in a CellReponse from either
+        # `read_spikes` or from an old pickled file.
         cell_colors = {cell: color for cell, color in zip(cell_types, default_colors)}
 
     if colors:
