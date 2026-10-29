@@ -24,6 +24,7 @@ import hnn_core
 from hnn_core import Dipole, Network, simulate_dipole
 from hnn_core.gui import HNNGUI
 from hnn_core.gui._viz_manager import (
+    _COMPARISON_TEXT_GID,
     _idx2figname,
     _plot_types,
     _no_overlay_plot_types,
@@ -1138,9 +1139,21 @@ def test_dipole_data_overlay(setup_reduced_gui):
     assert ax.legend_.texts[0]._text == "default: average"
     assert ax.legend_.texts[1]._text == "test_default"
 
-    # Check RMSE and Corr are printed
-    assert "RMSE(default, test_default):" in ax.texts[0]._text
-    assert "Corr(default, test_default):" in ax.texts[0]._text
+    # Check RMSE and Corr are printed in a single dedicated annotation, kept
+    # separate from the drive arrows (which are annotations with empty text)
+    comparison_texts = [t for t in ax.texts if t.get_gid() == _COMPARISON_TEXT_GID]
+    assert len(comparison_texts) == 1
+    comparison_text = comparison_texts[0]
+    assert "RMSE(default, test_default):" in comparison_text.get_text()
+    assert "Corr(default, test_default):" in comparison_text.get_text()
+    # text sits at the bottom right of the axes, not at a drive arrow location
+    assert comparison_text.xycoords == "axes fraction"
+    assert comparison_text.xy == (0.95, 0.05)
+    # no arrow carries the comparison text
+    arrows = [t for t in ax.texts if t is not comparison_text]
+    assert len(arrows) > 0
+    assert all("RMSE" not in t.get_text() for t in arrows)
+    assert all("Corr" not in t.get_text() for t in arrows)
 
     plt.close("all")
 
