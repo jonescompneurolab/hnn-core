@@ -28,7 +28,10 @@ from ipywidgets import (
 from hnn_core.dipole import _anticorr, _rmse, average_dipoles
 from hnn_core.gui._logging import logger
 from hnn_core.network_models import default_drive_colors
-from hnn_core.viz import _add_arrows_to_dipole, plot_dipole, plot_tfr_morlet
+
+# TODO AES: Temporarily removing drive dipole errors until bugs fixed
+# from hnn_core.viz import _add_arrows_to_dipole, plot_dipole, plot_tfr_morlet
+from hnn_core.viz import plot_dipole, plot_tfr_morlet
 from hnn_core.gui._data_store import data_store
 from enum import Enum
 
@@ -449,8 +452,9 @@ def _update_ax(fig, ax, data, data_name, plot_type, plot_config):
                     average=True,
                     show=False,
                 )
-            if plot_config.get("overlay_drive_arrows", False) and net_copied:
-                _add_arrows_to_dipole(ax, net_copied)
+            # TODO AES: Temporarily removing drive dipole errors until bugs fixed
+            # if plot_config.get("overlay_drive_arrows", False) and net_copied:
+            #     _add_arrows_to_dipole(ax, net_copied)
         else:
             print("No dipole data")
 
@@ -527,7 +531,8 @@ def _plot_on_axes(
     spectrogram_colormap_selection,
     hide_spike_legend,
     marker_size,
-    overlay_drive_arrows,
+    # TODO AES: Temporarily removing drive dipole errors until bugs fixed
+    # overlay_drive_arrows,
     min_spectral_frequency,
     max_spectral_frequency,
     dipole_smooth,
@@ -615,7 +620,8 @@ def _plot_on_axes(
         "spectrogram_cm": spectrogram_colormap_selection.value,
         "hide_spike_legend": hide_spike_legend.value,
         "marker_size": marker_size.value,
-        "overlay_drive_arrows": overlay_drive_arrows.value == "True",
+        # TODO AES: Temporarily removing drive dipole errors until bugs fixed
+        # "overlay_drive_arrows": overlay_drive_arrows.value == "True",
     }
 
     dpls_processed = _update_ax(
@@ -647,7 +653,8 @@ def _plot_on_axes(
             "spectrogram_cm": spectrogram_colormap_selection.value,
             "hide_spike_legend": hide_spike_legend.value,
             "marker_size": marker_size.value,
-            "overlay_drive_arrows": overlay_drive_arrows.value == "True",
+            # TODO AES: Temporarily removing drive dipole errors until bugs fixed
+            # "overlay_drive_arrows": overlay_drive_arrows.value == "True",
         }
 
         # plot the "secondary" experimental dipole onto the existing fig/axes object.
@@ -880,14 +887,14 @@ def _build_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax, ui_ac
         layout=layout,
         style=analysis_style,
     )
-
-    overlay_drive_arrows = Dropdown(
-        description="Overlay drive arrows on dipole:",
-        options=["True", "False"],
-        value="True",
-        layout=layout,
-        style=analysis_style,
-    )
+    # TODO AES: Temporarily removing drive dipole errors until bugs fixed
+    # overlay_drive_arrows = Dropdown(
+    #     description="Overlay drive arrows on dipole:",
+    #     options=["True", "False"],
+    #     value="True",
+    #     layout=layout,
+    #     style=analysis_style,
+    # )
 
     existing_plots = VBox([]).add_class("existing-plots")
     plot_context = {}
@@ -936,7 +943,8 @@ def _build_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax, ui_ac
             spectrogram_colormap_selection=spectrogram_colormap_selection,
             hide_spike_legend=hide_spike_legend,
             marker_size=marker_size,
-            overlay_drive_arrows=overlay_drive_arrows,
+            # TODO AES: Temporarily removing drive dipole errors until bugs fixed
+            # overlay_drive_arrows=overlay_drive_arrows,
             min_spectral_frequency=min_spectral_frequency,
             max_spectral_frequency=max_spectral_frequency,
             dipole_smooth=simulation_dipole_smooth,
@@ -967,7 +975,8 @@ def _build_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax, ui_ac
             spectrogram_colormap_selection,
             hide_spike_legend,
             marker_size,
-            overlay_drive_arrows,
+            # TODO AES: Temporarily removing drive dipole errors until bugs fixed
+            # overlay_drive_arrows,
             HBox(
                 [plot_button, clear_button],
                 layout=Layout(justify_content="space-between"),
