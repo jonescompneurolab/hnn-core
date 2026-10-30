@@ -2027,69 +2027,6 @@ class HNNGUI:
         else:
             return screenshot
 
-    def run_notebook_cells(self):
-        """Run all but the last cells sequentially in a Jupyter notebook.
-
-        To properly use this function:
-            1. Put this into the penultimate cell.
-            2. init the HNNGUI in a single cell.
-            3. Hit 'run all' button to run the whole notebook and it will
-               selectively run twice.
-        """
-        js_string = """
-        function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-        }
-        function getRunningStatus(idx){
-            const htmlContent = Jupyter.notebook.get_cell(idx).element[0];
-            return htmlContent.childNodes[0].childNodes[0].textContent;
-        }
-        function cellContainsInitOrMarkdown(idx){
-            const cell = Jupyter.notebook.get_cell(idx);
-            if(cell.cell_type!=='code'){
-                return true;
-            }
-            else{
-                const textVal = cell.element[0].childNodes[0].textContent;
-                return textVal.includes('HNNGUI()') || textVal.includes(
-                    'HNNGUI');
-            }
-        }
-        function cellContainsRunCells(idx){
-            const textVal = Jupyter.notebook.get_cell(
-                idx).element[0].childNodes[0].textContent;
-            return textVal.includes('run_notebook_cells()');
-        }
-        async function runNotebook() {
-            console.log("run notebook cell by cell");
-            const cellHtmlContents = Jupyter.notebook.element[0].children[0];
-            const nCells = cellHtmlContents.childElementCount;
-            console.log(`In total we have ${nCells} cells`);
-
-            for(let i=1; i<nCells-1; i++){
-                if(cellContainsRunCells(i)){
-                    break
-                }
-                else if(cellContainsInitOrMarkdown(i)){
-                    console.log(`Skip init or markdown cell ${i}...`);
-                    continue
-                }
-                else{
-                    console.log(`About to execute cell ${i}..`);
-                    Jupyter.notebook.execute_cells([i]);
-                    while (getRunningStatus(i).includes("*")){
-                        console.log("Still running, wait for another 2 secs");
-                        await sleep(2000);
-                    }
-                    await sleep(1000);
-                }
-            }
-            console.log('Done');
-        }
-        runNotebook();
-        """
-        return js_string
-
     # below are a series of methods that are used to manipulate the GUI in testing only
     def _simulate_upload_experimental_data(self, file_url):
         uploaded_value = _simulate_prepare_upload_file(file_url)
