@@ -501,6 +501,9 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">hnn_core</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_params</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.network</span><span class="w"> </span><span class="kn">import</span> <span class="n">Network</span><span class="p">,</span> <span class="n">_create_cell_coords</span>
@@ -1215,33 +1218,20 @@
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">duecker_ET_model</span><span class="p">(</span>
-    <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">mesh_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
-<span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Initiate the Duecker model (like old calcium model and then replace with new cells)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">duecker_ET_model</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_erp_drives</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mesh_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)):</span>
+<span class="w">    </span><span class="sd">"""Instantiate the Duecker human-derived model (publication pending)</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    params : str | Path | dict | None, default=None</span>
-<span class="sd">        Custom Network parameters to use, if any. If string or Path, it is assumed to be</span>
-<span class="sd">        a path to a legacy "flat" JSON file containing the parameters in the style of</span>
-<span class="sd">        `hnn_core/param/default.json` (NOT a modern "hierarchical" JSON file like</span>
-<span class="sd">        `hnn_core/param/neymotin2020_base.json`). If dict, it is assumed to be a</span>
-<span class="sd">        dictionary of parameters in the "flat" JSON style. If None (the default), the</span>
-<span class="sd">        default parameters are used from `hnn_core/param/default.json`. Note that if you</span>
-<span class="sd">        have drive parameters included, but you ALSO set the deprecated</span>
-<span class="sd">        `add_drives_from_params` to True, the drives will be added twice if the drive</span>
-<span class="sd">        names are the same.</span>
-<span class="sd">    add_drives_from_params : bool, default=False</span>
-<span class="sd">        If True, add drives as defined in the params-dict. NB this is mainly</span>
-<span class="sd">        for backward-compatibility with HNN GUI, and will be deprecated in a</span>
-<span class="sd">        future release. Default: False</span>
-<span class="sd">    legacy_mode : bool, default=False</span>
-<span class="sd">        Set to False by default. Enables matching HNN GUI output when drives</span>
-<span class="sd">        are added suitably. Will be deprecated in a future release.</span>
+<span class="sd">    params : str | dict | None</span>
+<span class="sd">        The path to the parameter file for constructing the network.</span>
+<span class="sd">        If None, parameters loaded from 'default_duecker_ET.json'</span>
+<span class="sd">        Default: None</span>
+<span class="sd">    add_erp_drives : bool, default=False</span>
+<span class="sd">        If True, add evoked drives used to generate Event-Related Potentials (ERPs) in</span>
+<span class="sd">        the upcoming Duecker model publication. Note that these drives are SUBJECT TO</span>
+<span class="sd">        CHANGE until the time of publication! The current values will probably not be</span>
+<span class="sd">        the final values used in the publication.</span>
 <span class="sd">    mesh_shape : tuple of int (default: (10, 10))</span>
 <span class="sd">        Defines the (n_x, n_y) shape of the grid of pyramidal cells.</span>
 
@@ -1251,6 +1241,8 @@
 <span class="sd">        Network object used to store</span>
 <span class="sd">    """</span>
 
+    <span class="c1"># Prepare parameters used to create the initial Network object</span>
+    <span class="c1"># ----------------------------------------------------------------------------------</span>
     <span class="n">hnn_core_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">hnn_core</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
     <span class="n">_validate_type</span><span class="p">(</span>
         <span class="n">params</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)),</span> <span class="s2">"params"</span><span class="p">,</span> <span class="s2">"str | Path | dict | None"</span>
@@ -1337,11 +1329,13 @@
         <span class="s2">"origin"</span><span class="p">:</span> <span class="n">layer_dict</span><span class="p">[</span><span class="s2">"origin"</span><span class="p">],</span>
     <span class="p">}</span>
 
+    <span class="c1"># Created the Network object, and do some housekeeping</span>
+    <span class="c1"># ----------------------------------------------------------------------------------</span>
     <span class="c1"># Create network with cell types and positions</span>
     <span class="n">net</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span>
         <span class="n">params</span><span class="p">,</span>
-        <span class="n">add_drives_from_params</span><span class="o">=</span><span class="n">add_drives_from_params</span><span class="p">,</span>
-        <span class="n">legacy_mode</span><span class="o">=</span><span class="n">legacy_mode</span><span class="p">,</span>
+        <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">mesh_shape</span><span class="o">=</span><span class="n">mesh_shape</span><span class="p">,</span>
         <span class="n">pos_dict</span><span class="o">=</span><span class="n">pos_dict</span><span class="p">,</span>
         <span class="n">cell_types</span><span class="o">=</span><span class="n">cell_types</span><span class="p">,</span>
@@ -1359,6 +1353,8 @@
 
     <span class="n">delay</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">delay</span>
 
+    <span class="c1"># Add recurrent connections</span>
+    <span class="c1"># ----------------------------------------------------------------------------------</span>
     <span class="c1"># layer2 Pyr -&gt; layer2 Pyr</span>
     <span class="n">lamtha</span> <span class="o">=</span> <span class="mf">6.125</span>  <span class="c1"># calculated from human data Campganola et al. 2022</span>
     <span class="n">loc</span> <span class="o">=</span> <span class="s2">"proximal"</span>
@@ -1559,6 +1555,97 @@
     <span class="n">loc</span> <span class="o">=</span> <span class="s2">"soma"</span>
     <span class="n">receptor</span> <span class="o">=</span> <span class="s2">"ampa"</span>
     <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">src_cell</span><span class="p">,</span> <span class="n">target_cell</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">receptor</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">)</span>
+
+    <span class="c1"># Add drives, if requested</span>
+    <span class="c1"># ----------------------------------------------------------------------------------</span>
+    <span class="k">if</span> <span class="n">add_erp_drives</span><span class="p">:</span>
+        <span class="n">weights_ampa_p1</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"L2_inhibitory"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.007588122527131926</span><span class="p">),</span>
+            <span class="s2">"L2_pyramidal"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.018642951414638384</span><span class="p">),</span>
+            <span class="s2">"L5_inhibitory"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">7.6438985456048e-15</span><span class="p">),</span>
+            <span class="s2">"L5_pyramidal"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.013984204478845295</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="n">weights_nmda_p1</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"L2_inhibitory"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.012050887238347885</span><span class="p">),</span>
+            <span class="s2">"L2_pyramidal"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.029485349160794205</span><span class="p">),</span>
+            <span class="s2">"L5_inhibitory"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">1.002171790226989e-15</span><span class="p">),</span>
+            <span class="s2">"L5_pyramidal"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.005379056342376538</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="n">synaptic_delays_p1</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"L2_inhibitory"</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+            <span class="s2">"L2_pyramidal"</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+            <span class="s2">"L5_inhibitory"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="s2">"L5_pyramidal"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">net</span><span class="o">.</span><span class="n">add_evoked_drive</span><span class="p">(</span>
+            <span class="s2">"prox1"</span><span class="p">,</span>
+            <span class="n">location</span><span class="o">=</span><span class="s2">"proximal"</span><span class="p">,</span>
+            <span class="n">cell_specific</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">mu</span><span class="o">=</span><span class="mf">15.59527767691755</span><span class="p">,</span>
+            <span class="n">sigma</span><span class="o">=</span><span class="mf">2.792948035872017</span><span class="p">,</span>
+            <span class="n">numspikes</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">weights_ampa</span><span class="o">=</span><span class="n">weights_ampa_p1</span><span class="p">,</span>
+            <span class="n">weights_nmda</span><span class="o">=</span><span class="n">weights_nmda_p1</span><span class="p">,</span>
+            <span class="n">synaptic_delays</span><span class="o">=</span><span class="n">synaptic_delays_p1</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">weights_ampa_d1</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"L2_inhibitory"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">4.378900714089845e-06</span><span class="p">),</span>
+            <span class="s2">"L2_pyramidal"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">8.300973449010934e-05</span><span class="p">),</span>
+            <span class="s2">"L5_pyramidal"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">1.1808240677861086</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="n">weights_nmda_d1</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"L2_inhibitory"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">2.1176135674160224e-12</span><span class="p">),</span>
+            <span class="s2">"L2_pyramidal"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.00010941280722617688</span><span class="p">),</span>
+            <span class="s2">"L5_pyramidal"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.013519066989944073</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="n">synaptic_delays_d1</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"L2_inhibitory"</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+            <span class="s2">"L2_pyramidal"</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+            <span class="s2">"L5_pyramidal"</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">net</span><span class="o">.</span><span class="n">add_evoked_drive</span><span class="p">(</span>
+            <span class="s2">"dist1"</span><span class="p">,</span>
+            <span class="n">location</span><span class="o">=</span><span class="s2">"distal"</span><span class="p">,</span>
+            <span class="n">cell_specific</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">mu</span><span class="o">=</span><span class="mf">59.187666976120305</span><span class="p">,</span>
+            <span class="n">sigma</span><span class="o">=</span><span class="mf">4.446160189077672</span><span class="p">,</span>
+            <span class="n">numspikes</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+            <span class="n">weights_ampa</span><span class="o">=</span><span class="n">weights_ampa_d1</span><span class="p">,</span>
+            <span class="n">weights_nmda</span><span class="o">=</span><span class="n">weights_nmda_d1</span><span class="p">,</span>
+            <span class="n">synaptic_delays</span><span class="o">=</span><span class="n">synaptic_delays_d1</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">weights_ampa_p2</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"L2_inhibitory"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">1.0000447086287455e-15</span><span class="p">),</span>
+            <span class="s2">"L2_pyramidal"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.015172234470615126</span><span class="p">),</span>
+            <span class="s2">"L5_inhibitory"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">2.247668491134226e-07</span><span class="p">),</span>
+            <span class="s2">"L5_pyramidal"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.2984173605845747</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="n">weights_nmda_p2</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"L2_inhibitory"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">1.495423386739259e-15</span><span class="p">),</span>
+            <span class="s2">"L2_pyramidal"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">1.9874771611430298e-05</span><span class="p">),</span>
+            <span class="s2">"L5_inhibitory"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">7.46394548638012e-08</span><span class="p">),</span>
+            <span class="s2">"L5_pyramidal"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0012506313370813725</span><span class="p">),</span>
+        <span class="p">}</span>
+
+        <span class="n">synaptic_delays_p2</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"L2_inhibitory"</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+            <span class="s2">"L2_pyramidal"</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+            <span class="s2">"L5_inhibitory"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="s2">"L5_pyramidal"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">net</span><span class="o">.</span><span class="n">add_evoked_drive</span><span class="p">(</span>
+            <span class="s2">"prox2"</span><span class="p">,</span>
+            <span class="n">location</span><span class="o">=</span><span class="s2">"proximal"</span><span class="p">,</span>
+            <span class="n">cell_specific</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">mu</span><span class="o">=</span><span class="mf">122.49858703637535</span><span class="p">,</span>
+            <span class="n">sigma</span><span class="o">=</span><span class="mf">14.42431814878363</span><span class="p">,</span>
+            <span class="n">numspikes</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+            <span class="n">weights_ampa</span><span class="o">=</span><span class="n">weights_ampa_p2</span><span class="p">,</span>
+            <span class="n">weights_nmda</span><span class="o">=</span><span class="n">weights_nmda_p2</span><span class="p">,</span>
+            <span class="n">synaptic_delays</span><span class="o">=</span><span class="n">synaptic_delays_p2</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">net</span>
 
