@@ -573,6 +573,8 @@ def plot_spikes_hist(
 ):
     """Plot the histogram of spiking activity across trials.
 
+    By default, this only plots spikes from drives, and NOT spikes from cells.
+
     Parameters
     ----------
     cell_response : instance of CellResponse
@@ -717,7 +719,7 @@ def plot_spikes_hist(
     if len(cell_response.times) > 0:
         bins = np.linspace(0, cell_response.times[-1], 50)
     else:
-        bins = np.linspace(0, spike_times[-1], 50)
+        bins = np.linspace(0, max(spike_times), 50)
 
     # Create dictionary to aggregate spike times that have the same spike_label
     spike_type_times = {
@@ -823,6 +825,7 @@ def plot_spikes_raster(
     ax=None,
     show=True,
     cell_types=None,
+    gid_ranges=None,
     colors=None,
     show_legend=True,
     marker_size=1.0,
@@ -836,41 +839,56 @@ def plot_spikes_raster(
 ):
     """Plot the aggregate spiking activity according to cell type.
 
+    By default, this only plots spikes from cells, and NOT spikes from drives.
+
     Parameters
     ----------
     cell_response : instance of CellResponse
         The CellResponse object from net.cell_response
-    trial_idx : int | list of int | None
-        Index of trials to be plotted. If None, all trials plotted
-    ax : instance of matplotlib axis | None
-        An axis object from matplotlib. If None, a new figure is created.
-    show : bool
-        If True, show the figure.
-    cell_types : list of str
-        List of cell types to plot
-    colors : list of str | None
-        Optional custom colors to plot. Default will use the color cycler.
-    show_legend : bool
-        If True, show the legend with colors for cell types
-    marker_size : float
+    trial_idx : int | list of int | None, default=None
+        Index of trials to be plotted. If None (default), all trials plotted
+    ax : instance of matplotlib axis | None, default=None
+        An axis object from matplotlib. If None (default), a new figure is created.
+    show : bool, default=True
+        If True (default), show the figure.
+    cell_types : list of str | None, default=None
+        List of cell types (or drives) to plot. If None (default), all cell types listed
+        in ``cell_response._cell_type_names`` are plotted.
+    gid_ranges : dict of lists or range objects | None, default=None
+        Dictionary whose keys are cell type names (or drive names) and whose values
+        are lists or range objects of GIDs for that cell type (or drive). If
+        provided, the raster spans the full range of the plotted cell/drive types,
+        so that cells/drives which never spiked still occupy a row, and any overlaid
+        dipoles are scaled to that range. If None (default), the extent of the
+        raster is inferred from the cells (not drives) that spiked. Note that the
+        keys of ``gid_ranges`` must match the cell types (or drives) specified in
+        ``cell_types``; if ``cell_types`` is None (default), the keys of
+        ``gid_ranges`` must match the cell types listed in
+        ``cell_response._cell_type_names``.
+    colors : list of str | None, default=None
+        Optional custom colors to plot. If None (default) will use the default
+        matplotlib color cycler.
+    show_legend : bool, default=True
+        If True (default), show the legend with colors for cell types
+    marker_size : float, default=1.0
         Optional marker size to use when plotting spikes. Uses
         "linelengths" argument of ax.eventplot, which accepts positive
-        numeric values only
-    dpl : instance of Dipole | list
-        The Dipole object containing layer-specific dipole data
-        to overlay on the raster plot
-    overlay_dipoles : bool
+        numeric values only.
+    dpl : instance of Dipole | list of Dipole | None, default=None
+        The Dipole object containing layer-specific dipole data to overlay on the raster
+        plot. Required if ``overlay_dipoles`` is True.
+    overlay_dipoles : bool, default=False
         If True, overlay the layer-specific dipole data on the
-        raster plot
-    xticks : list | np.array | None
-        Ticks on x-axis. If None, ticks are created by matplotlib.
-    yticks : list | np.array | None
-        Ticks on y-axis,  If None, ticks are created by matplotlib.
-    xlabel : str, default: "Time (ms)"
+        raster plot. If True, ``dpl`` must be provided.
+    xticks : list | np.array | None, default=None
+        Ticks on x-axis. If None (default), ticks are created by matplotlib.
+    yticks : list | np.array | None, default=None
+        Ticks on y-axis. If None (default), ticks are created by matplotlib.
+    xlabel : str, default="Time (ms)"
         The matplotlib x-axis label
-    ylabel : str, default: "Neuron index"
+    ylabel : str, default="Neuron index"
         The matplotlib y-axis label
-    title : str | None
+    title : str | None, default=None
         The matplotlib figure title
 
     Returns
@@ -908,17 +926,32 @@ def plot_spikes_raster(
     else:
         cell_types = cell_response._cell_type_names
 
+    # validate gid_ranges argument
+    _validate_type(gid_ranges, (dict, None), "gid_ranges", "dict")
+
     cell_type_metadata = getattr(cell_response, "_cell_type_metadata", None)
     # validate colors argument
     _validate_type(colors, (list, dict, None), "color", "list of str, or dict")
+    default_colors = plt.rcParams["axes.prop_cycle"].by_key()["color"][
+        : len(cell_types)
+    ]
 
     # Set colors
-    if cell_type_metadata is not None and "color" in cell_type_metadata[cell_types[0]]:
+    if cell_type_metadata is not None:
+        # Validate colors
+        for ct_name, ct_metadata in cell_response._cell_type_metadata.items():
+            if "color" not in ct_metadata:
+                warnings.warn(
+                    f"Color not specified for metadata of cell type {ct_name}. Using "
+                    "default color cycle."
+                )
+                ct_metadata.setdefault(
+                    "color", default_colors[cell_types.index(ct_name)]
+                )
         cell_colors = {cell: meta["color"] for cell, meta in cell_type_metadata.items()}
     else:
-        default_colors = plt.rcParams["axes.prop_cycle"].by_key()["color"][
-            : len(cell_types)
-        ]
+        # This case probably only corresponds to reading in a CellReponse from either
+        # `read_spikes` or from an old pickled file.
         cell_colors = {cell: color for cell, color in zip(cell_types, default_colors)}
 
     if colors:
@@ -964,10 +997,18 @@ def plot_spikes_raster(
     if ax is None:
         _, ax = plt.subplots(1, 1, constrained_layout=True)
 
+    # Track the largest gid among the cells that spiked. Used to scale the raster
+    # when gid_ranges is not provided. -1 marks "no cell spiked", as gids are >= 0.
+    max_gid = -1
+
     events = []
+
     for cell_type, color in cell_colors.items():
         cell_type_gids = np.unique(spike_gids[spike_types == cell_type])
         cell_type_times, cell_type_ypos = [], []
+
+        if len(cell_type_gids) > 0:
+            max_gid = max(max_gid, max(cell_type_gids))
 
         for gid in cell_type_gids:
             gid_time = spike_times[spike_gids == gid]
@@ -991,9 +1032,20 @@ def plot_spikes_raster(
                     [-1], lineoffsets=[-1], color=color, label=cell_type, linelengths=1
                 )
             )
+        if len(cell_type_gids) == 0:
+            warnings.warn(
+                f"No spikes found for the spike types {cell_colors.keys()}. "
+                "Raster plot will be empty."
+            )
 
-    # invert y axis
-    ax.invert_yaxis()
+    # Extent of y-axis based on maximum gid in gid_ranges if provided, otherwise the
+    # range of the cells that spiked
+    if gid_ranges is not None:
+        raster_min = min(min(gid_ranges[cell_type]) for cell_type in cell_types)
+        raster_max = max(max(gid_ranges[cell_type]) for cell_type in cell_types)
+    else:
+        raster_min = 0
+        raster_max = max(0, max_gid)
 
     # Overlay dipoles on raster plot
     if overlay_dipoles:
@@ -1014,27 +1066,29 @@ def plot_spikes_raster(
         l5_dipole = avgs[0].data["L5"]
         dipole_times = dpl[0].times
 
-        # Scale dipole to fit the spike raster plot
-        raster_max = max(cell_type_gids)
         raster_midpoint = round((raster_max / 2), 0)
         raster_quarterpoint = round((raster_max / 4), 0)
 
-        # Scale down by .95 until the dipoles fit within the appropriate area
-        # separately for L5 and L2
-        while (max(l5_dipole) - min(l5_dipole)) > abs(raster_midpoint):
-            l5_dipole = l5_dipole * 0.95
+        # Exclude if no spikes are detected, or only GID==0 has spikes
+        if raster_max > 0:
+            # Scale down by .95 until the dipoles fit within the appropriate area
+            # separately for L5 and L2
+            while (max(l5_dipole) - min(l5_dipole)) > abs(raster_midpoint):
+                l5_dipole = l5_dipole * 0.95
 
-        while (max(l2_dipole) - min(l2_dipole)) > abs(raster_midpoint):
-            l2_dipole = l2_dipole * 0.95
+            while (max(l2_dipole) - min(l2_dipole)) > abs(raster_midpoint):
+                l2_dipole = l2_dipole * 0.95
 
         # dipoles with a moment << number of cells (270) will present as flat lines
         # scale dipole such that waveform can be inspected properly alongside spiking
         amp_max = max(max(l5_dipole), max(l2_dipole))
         amp_min = min(min(l5_dipole), min(l5_dipole))
-        scale_fact = (10 ** np.floor(np.log10(raster_max))) / (amp_max - amp_min)
 
-        l2_dipole *= scale_fact
-        l5_dipole *= scale_fact
+        # Exclude if no spikes are detected, or only GID==0 has spikes
+        if raster_max > 0 and (amp_max - amp_min) > 0:
+            scale_fact = (10 ** np.floor(np.log10(raster_max))) / (amp_max - amp_min)
+            l2_dipole *= scale_fact
+            l5_dipole *= scale_fact
 
         # Shift the dipole positions to overlay the correct cell types
         l2_dipole = -l2_dipole + abs(raster_quarterpoint)
@@ -1093,7 +1147,8 @@ def plot_spikes_raster(
 
     ax.set_ylabel(ylabel)
     ax.set_xlabel(xlabel)
-
+    ax.set_ylim([raster_min, raster_max + marker_size])
+    ax.invert_yaxis()
     # add title
     ax.set_title(title)
 
