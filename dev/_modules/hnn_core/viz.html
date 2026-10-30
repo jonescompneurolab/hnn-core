@@ -1077,6 +1077,8 @@
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Plot the histogram of spiking activity across trials.</span>
 
+<span class="sd">    By default, this only plots spikes from drives, and NOT spikes from cells.</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    cell_response : instance of CellResponse</span>
@@ -1221,7 +1223,7 @@
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cell_response</span><span class="o">.</span><span class="n">times</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">cell_response</span><span class="o">.</span><span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">50</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">spike_times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">50</span><span class="p">)</span>
+        <span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">spike_times</span><span class="p">),</span> <span class="mi">50</span><span class="p">)</span>
 
     <span class="c1"># Create dictionary to aggregate spike times that have the same spike_label</span>
     <span class="n">spike_type_times</span> <span class="o">=</span> <span class="p">{</span>
@@ -1330,6 +1332,7 @@
     <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">cell_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">gid_ranges</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">colors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">marker_size</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
@@ -1343,41 +1346,56 @@
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Plot the aggregate spiking activity according to cell type.</span>
 
+<span class="sd">    By default, this only plots spikes from cells, and NOT spikes from drives.</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    cell_response : instance of CellResponse</span>
 <span class="sd">        The CellResponse object from net.cell_response</span>
-<span class="sd">    trial_idx : int | list of int | None</span>
-<span class="sd">        Index of trials to be plotted. If None, all trials plotted</span>
-<span class="sd">    ax : instance of matplotlib axis | None</span>
-<span class="sd">        An axis object from matplotlib. If None, a new figure is created.</span>
-<span class="sd">    show : bool</span>
-<span class="sd">        If True, show the figure.</span>
-<span class="sd">    cell_types : list of str</span>
-<span class="sd">        List of cell types to plot</span>
-<span class="sd">    colors : list of str | None</span>
-<span class="sd">        Optional custom colors to plot. Default will use the color cycler.</span>
-<span class="sd">    show_legend : bool</span>
-<span class="sd">        If True, show the legend with colors for cell types</span>
-<span class="sd">    marker_size : float</span>
+<span class="sd">    trial_idx : int | list of int | None, default=None</span>
+<span class="sd">        Index of trials to be plotted. If None (default), all trials plotted</span>
+<span class="sd">    ax : instance of matplotlib axis | None, default=None</span>
+<span class="sd">        An axis object from matplotlib. If None (default), a new figure is created.</span>
+<span class="sd">    show : bool, default=True</span>
+<span class="sd">        If True (default), show the figure.</span>
+<span class="sd">    cell_types : list of str | None, default=None</span>
+<span class="sd">        List of cell types (or drives) to plot. If None (default), all cell types listed</span>
+<span class="sd">        in ``cell_response._cell_type_names`` are plotted.</span>
+<span class="sd">    gid_ranges : dict of lists or range objects | None, default=None</span>
+<span class="sd">        Dictionary whose keys are cell type names (or drive names) and whose values</span>
+<span class="sd">        are lists or range objects of GIDs for that cell type (or drive). If</span>
+<span class="sd">        provided, the raster spans the full range of the plotted cell/drive types,</span>
+<span class="sd">        so that cells/drives which never spiked still occupy a row, and any overlaid</span>
+<span class="sd">        dipoles are scaled to that range. If None (default), the extent of the</span>
+<span class="sd">        raster is inferred from the cells (not drives) that spiked. Note that the</span>
+<span class="sd">        keys of ``gid_ranges`` must match the cell types (or drives) specified in</span>
+<span class="sd">        ``cell_types``; if ``cell_types`` is None (default), the keys of</span>
+<span class="sd">        ``gid_ranges`` must match the cell types listed in</span>
+<span class="sd">        ``cell_response._cell_type_names``.</span>
+<span class="sd">    colors : list of str | None, default=None</span>
+<span class="sd">        Optional custom colors to plot. If None (default) will use the default</span>
+<span class="sd">        matplotlib color cycler.</span>
+<span class="sd">    show_legend : bool, default=True</span>
+<span class="sd">        If True (default), show the legend with colors for cell types</span>
+<span class="sd">    marker_size : float, default=1.0</span>
 <span class="sd">        Optional marker size to use when plotting spikes. Uses</span>
 <span class="sd">        "linelengths" argument of ax.eventplot, which accepts positive</span>
-<span class="sd">        numeric values only</span>
-<span class="sd">    dpl : instance of Dipole | list</span>
-<span class="sd">        The Dipole object containing layer-specific dipole data</span>
-<span class="sd">        to overlay on the raster plot</span>
-<span class="sd">    overlay_dipoles : bool</span>
+<span class="sd">        numeric values only.</span>
+<span class="sd">    dpl : instance of Dipole | list of Dipole | None, default=None</span>
+<span class="sd">        The Dipole object containing layer-specific dipole data to overlay on the raster</span>
+<span class="sd">        plot. Required if ``overlay_dipoles`` is True.</span>
+<span class="sd">    overlay_dipoles : bool, default=False</span>
 <span class="sd">        If True, overlay the layer-specific dipole data on the</span>
-<span class="sd">        raster plot</span>
-<span class="sd">    xticks : list | np.array | None</span>
-<span class="sd">        Ticks on x-axis. If None, ticks are created by matplotlib.</span>
-<span class="sd">    yticks : list | np.array | None</span>
-<span class="sd">        Ticks on y-axis,  If None, ticks are created by matplotlib.</span>
-<span class="sd">    xlabel : str, default: "Time (ms)"</span>
+<span class="sd">        raster plot. If True, ``dpl`` must be provided.</span>
+<span class="sd">    xticks : list | np.array | None, default=None</span>
+<span class="sd">        Ticks on x-axis. If None (default), ticks are created by matplotlib.</span>
+<span class="sd">    yticks : list | np.array | None, default=None</span>
+<span class="sd">        Ticks on y-axis. If None (default), ticks are created by matplotlib.</span>
+<span class="sd">    xlabel : str, default="Time (ms)"</span>
 <span class="sd">        The matplotlib x-axis label</span>
-<span class="sd">    ylabel : str, default: "Neuron index"</span>
+<span class="sd">    ylabel : str, default="Neuron index"</span>
 <span class="sd">        The matplotlib y-axis label</span>
-<span class="sd">    title : str | None</span>
+<span class="sd">    title : str | None, default=None</span>
 <span class="sd">        The matplotlib figure title</span>
 
 <span class="sd">    Returns</span>
@@ -1415,17 +1433,32 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">cell_types</span> <span class="o">=</span> <span class="n">cell_response</span><span class="o">.</span><span class="n">_cell_type_names</span>
 
+    <span class="c1"># validate gid_ranges argument</span>
+    <span class="n">_validate_type</span><span class="p">(</span><span class="n">gid_ranges</span><span class="p">,</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="s2">"gid_ranges"</span><span class="p">,</span> <span class="s2">"dict"</span><span class="p">)</span>
+
     <span class="n">cell_type_metadata</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">cell_response</span><span class="p">,</span> <span class="s2">"_cell_type_metadata"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="c1"># validate colors argument</span>
     <span class="n">_validate_type</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="s2">"color"</span><span class="p">,</span> <span class="s2">"list of str, or dict"</span><span class="p">)</span>
+    <span class="n">default_colors</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">"axes.prop_cycle"</span><span class="p">]</span><span class="o">.</span><span class="n">by_key</span><span class="p">()[</span><span class="s2">"color"</span><span class="p">][</span>
+        <span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">cell_types</span><span class="p">)</span>
+    <span class="p">]</span>
 
     <span class="c1"># Set colors</span>
-    <span class="k">if</span> <span class="n">cell_type_metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s2">"color"</span> <span class="ow">in</span> <span class="n">cell_type_metadata</span><span class="p">[</span><span class="n">cell_types</span><span class="p">[</span><span class="mi">0</span><span class="p">]]:</span>
+    <span class="k">if</span> <span class="n">cell_type_metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Validate colors</span>
+        <span class="k">for</span> <span class="n">ct_name</span><span class="p">,</span> <span class="n">ct_metadata</span> <span class="ow">in</span> <span class="n">cell_response</span><span class="o">.</span><span class="n">_cell_type_metadata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="s2">"color"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ct_metadata</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"Color not specified for metadata of cell type </span><span class="si">{</span><span class="n">ct_name</span><span class="si">}</span><span class="s2">. Using "</span>
+                    <span class="s2">"default color cycle."</span>
+                <span class="p">)</span>
+                <span class="n">ct_metadata</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span>
+                    <span class="s2">"color"</span><span class="p">,</span> <span class="n">default_colors</span><span class="p">[</span><span class="n">cell_types</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">ct_name</span><span class="p">)]</span>
+                <span class="p">)</span>
         <span class="n">cell_colors</span> <span class="o">=</span> <span class="p">{</span><span class="n">cell</span><span class="p">:</span> <span class="n">meta</span><span class="p">[</span><span class="s2">"color"</span><span class="p">]</span> <span class="k">for</span> <span class="n">cell</span><span class="p">,</span> <span class="n">meta</span> <span class="ow">in</span> <span class="n">cell_type_metadata</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">default_colors</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">"axes.prop_cycle"</span><span class="p">]</span><span class="o">.</span><span class="n">by_key</span><span class="p">()[</span><span class="s2">"color"</span><span class="p">][</span>
-            <span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">cell_types</span><span class="p">)</span>
-        <span class="p">]</span>
+        <span class="c1"># This case probably only corresponds to reading in a CellReponse from either</span>
+        <span class="c1"># `read_spikes` or from an old pickled file.</span>
         <span class="n">cell_colors</span> <span class="o">=</span> <span class="p">{</span><span class="n">cell</span><span class="p">:</span> <span class="n">color</span> <span class="k">for</span> <span class="n">cell</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cell_types</span><span class="p">,</span> <span class="n">default_colors</span><span class="p">)}</span>
 
     <span class="k">if</span> <span class="n">colors</span><span class="p">:</span>
@@ -1471,10 +1504,18 @@
     <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
+    <span class="c1"># Track the largest gid among the cells that spiked. Used to scale the raster</span>
+    <span class="c1"># when gid_ranges is not provided. -1 marks "no cell spiked", as gids are &gt;= 0.</span>
+    <span class="n">max_gid</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
     <span class="n">events</span> <span class="o">=</span> <span class="p">[]</span>
+
     <span class="k">for</span> <span class="n">cell_type</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="n">cell_colors</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">cell_type_gids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">spike_gids</span><span class="p">[</span><span class="n">spike_types</span> <span class="o">==</span> <span class="n">cell_type</span><span class="p">])</span>
         <span class="n">cell_type_times</span><span class="p">,</span> <span class="n">cell_type_ypos</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cell_type_gids</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">max_gid</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_gid</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">cell_type_gids</span><span class="p">))</span>
 
         <span class="k">for</span> <span class="n">gid</span> <span class="ow">in</span> <span class="n">cell_type_gids</span><span class="p">:</span>
             <span class="n">gid_time</span> <span class="o">=</span> <span class="n">spike_times</span><span class="p">[</span><span class="n">spike_gids</span> <span class="o">==</span> <span class="n">gid</span><span class="p">]</span>
@@ -1498,9 +1539,20 @@
                     <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">lineoffsets</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">cell_type</span><span class="p">,</span> <span class="n">linelengths</span><span class="o">=</span><span class="mi">1</span>
                 <span class="p">)</span>
             <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cell_type_gids</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"No spikes found for the spike types </span><span class="si">{</span><span class="n">cell_colors</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">. "</span>
+                <span class="s2">"Raster plot will be empty."</span>
+            <span class="p">)</span>
 
-    <span class="c1"># invert y axis</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>
+    <span class="c1"># Extent of y-axis based on maximum gid in gid_ranges if provided, otherwise the</span>
+    <span class="c1"># range of the cells that spiked</span>
+    <span class="k">if</span> <span class="n">gid_ranges</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">raster_min</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">gid_ranges</span><span class="p">[</span><span class="n">cell_type</span><span class="p">])</span> <span class="k">for</span> <span class="n">cell_type</span> <span class="ow">in</span> <span class="n">cell_types</span><span class="p">)</span>
+        <span class="n">raster_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">gid_ranges</span><span class="p">[</span><span class="n">cell_type</span><span class="p">])</span> <span class="k">for</span> <span class="n">cell_type</span> <span class="ow">in</span> <span class="n">cell_types</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">raster_min</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">raster_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_gid</span><span class="p">)</span>
 
     <span class="c1"># Overlay dipoles on raster plot</span>
     <span class="k">if</span> <span class="n">overlay_dipoles</span><span class="p">:</span>
@@ -1521,27 +1573,29 @@
         <span class="n">l5_dipole</span> <span class="o">=</span> <span class="n">avgs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"L5"</span><span class="p">]</span>
         <span class="n">dipole_times</span> <span class="o">=</span> <span class="n">dpl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">times</span>
 
-        <span class="c1"># Scale dipole to fit the spike raster plot</span>
-        <span class="n">raster_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">cell_type_gids</span><span class="p">)</span>
         <span class="n">raster_midpoint</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">raster_max</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">raster_quarterpoint</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">raster_max</span> <span class="o">/</span> <span class="mi">4</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
 
-        <span class="c1"># Scale down by .95 until the dipoles fit within the appropriate area</span>
-        <span class="c1"># separately for L5 and L2</span>
-        <span class="k">while</span> <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">l5_dipole</span><span class="p">)</span> <span class="o">-</span> <span class="nb">min</span><span class="p">(</span><span class="n">l5_dipole</span><span class="p">))</span> <span class="o">&gt;</span> <span class="nb">abs</span><span class="p">(</span><span class="n">raster_midpoint</span><span class="p">):</span>
-            <span class="n">l5_dipole</span> <span class="o">=</span> <span class="n">l5_dipole</span> <span class="o">*</span> <span class="mf">0.95</span>
+        <span class="c1"># Exclude if no spikes are detected, or only GID==0 has spikes</span>
+        <span class="k">if</span> <span class="n">raster_max</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># Scale down by .95 until the dipoles fit within the appropriate area</span>
+            <span class="c1"># separately for L5 and L2</span>
+            <span class="k">while</span> <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">l5_dipole</span><span class="p">)</span> <span class="o">-</span> <span class="nb">min</span><span class="p">(</span><span class="n">l5_dipole</span><span class="p">))</span> <span class="o">&gt;</span> <span class="nb">abs</span><span class="p">(</span><span class="n">raster_midpoint</span><span class="p">):</span>
+                <span class="n">l5_dipole</span> <span class="o">=</span> <span class="n">l5_dipole</span> <span class="o">*</span> <span class="mf">0.95</span>
 
-        <span class="k">while</span> <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">l2_dipole</span><span class="p">)</span> <span class="o">-</span> <span class="nb">min</span><span class="p">(</span><span class="n">l2_dipole</span><span class="p">))</span> <span class="o">&gt;</span> <span class="nb">abs</span><span class="p">(</span><span class="n">raster_midpoint</span><span class="p">):</span>
-            <span class="n">l2_dipole</span> <span class="o">=</span> <span class="n">l2_dipole</span> <span class="o">*</span> <span class="mf">0.95</span>
+            <span class="k">while</span> <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">l2_dipole</span><span class="p">)</span> <span class="o">-</span> <span class="nb">min</span><span class="p">(</span><span class="n">l2_dipole</span><span class="p">))</span> <span class="o">&gt;</span> <span class="nb">abs</span><span class="p">(</span><span class="n">raster_midpoint</span><span class="p">):</span>
+                <span class="n">l2_dipole</span> <span class="o">=</span> <span class="n">l2_dipole</span> <span class="o">*</span> <span class="mf">0.95</span>
 
         <span class="c1"># dipoles with a moment &lt;&lt; number of cells (270) will present as flat lines</span>
         <span class="c1"># scale dipole such that waveform can be inspected properly alongside spiking</span>
         <span class="n">amp_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">l5_dipole</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">l2_dipole</span><span class="p">))</span>
         <span class="n">amp_min</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">l5_dipole</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">l5_dipole</span><span class="p">))</span>
-        <span class="n">scale_fact</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span> <span class="o">**</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">raster_max</span><span class="p">)))</span> <span class="o">/</span> <span class="p">(</span><span class="n">amp_max</span> <span class="o">-</span> <span class="n">amp_min</span><span class="p">)</span>
 
-        <span class="n">l2_dipole</span> <span class="o">*=</span> <span class="n">scale_fact</span>
-        <span class="n">l5_dipole</span> <span class="o">*=</span> <span class="n">scale_fact</span>
+        <span class="c1"># Exclude if no spikes are detected, or only GID==0 has spikes</span>
+        <span class="k">if</span> <span class="n">raster_max</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="p">(</span><span class="n">amp_max</span> <span class="o">-</span> <span class="n">amp_min</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">scale_fact</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span> <span class="o">**</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">raster_max</span><span class="p">)))</span> <span class="o">/</span> <span class="p">(</span><span class="n">amp_max</span> <span class="o">-</span> <span class="n">amp_min</span><span class="p">)</span>
+            <span class="n">l2_dipole</span> <span class="o">*=</span> <span class="n">scale_fact</span>
+            <span class="n">l5_dipole</span> <span class="o">*=</span> <span class="n">scale_fact</span>
 
         <span class="c1"># Shift the dipole positions to overlay the correct cell types</span>
         <span class="n">l2_dipole</span> <span class="o">=</span> <span class="o">-</span><span class="n">l2_dipole</span> <span class="o">+</span> <span class="nb">abs</span><span class="p">(</span><span class="n">raster_quarterpoint</span><span class="p">)</span>
@@ -1600,7 +1654,8 @@
 
     <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">)</span>
-
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="n">raster_min</span><span class="p">,</span> <span class="n">raster_max</span> <span class="o">+</span> <span class="n">marker_size</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>
     <span class="c1"># add title</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
 

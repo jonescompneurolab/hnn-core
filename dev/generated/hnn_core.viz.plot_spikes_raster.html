@@ -502,44 +502,58 @@
 <h1>hnn_core.viz.plot_spikes_raster<a class="headerlink" href="#hnn-core-viz-plot-spikes-raster" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="hnn_core.viz.plot_spikes_raster">
-<span class="sig-prename descclassname"><span class="pre">hnn_core.viz.</span></span><span class="sig-name descname"><span class="pre">plot_spikes_raster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trial_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlay_dipoles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xticks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yticks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Time</span> <span class="pre">(ms)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Neuron</span> <span class="pre">index'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/viz.html#plot_spikes_raster"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.viz.plot_spikes_raster" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">hnn_core.viz.</span></span><span class="sig-name descname"><span class="pre">plot_spikes_raster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trial_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gid_ranges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlay_dipoles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xticks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yticks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Time</span> <span class="pre">(ms)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Neuron</span> <span class="pre">index'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/viz.html#plot_spikes_raster"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.viz.plot_spikes_raster" title="Link to this definition">#</a></dt>
 <dd><p>Plot the aggregate spiking activity according to cell type.</p>
+<p>By default, this only plots spikes from cells, and NOT spikes from drives.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>cell_response</strong><span class="classifier">instance of CellResponse</span></dt><dd><p>The CellResponse object from net.cell_response</p>
 </dd>
-<dt><strong>trial_idx</strong><span class="classifier">int | list of int | None</span></dt><dd><p>Index of trials to be plotted. If None, all trials plotted</p>
+<dt><strong>trial_idx</strong><span class="classifier">int | list of int | None, default=None</span></dt><dd><p>Index of trials to be plotted. If None (default), all trials plotted</p>
 </dd>
-<dt><strong>ax</strong><span class="classifier">instance of matplotlib axis | None</span></dt><dd><p>An axis object from matplotlib. If None, a new figure is created.</p>
+<dt><strong>ax</strong><span class="classifier">instance of matplotlib axis | None, default=None</span></dt><dd><p>An axis object from matplotlib. If None (default), a new figure is created.</p>
 </dd>
-<dt><strong>show</strong><span class="classifier">bool</span></dt><dd><p>If True, show the figure.</p>
+<dt><strong>show</strong><span class="classifier">bool, default=True</span></dt><dd><p>If True (default), show the figure.</p>
 </dd>
-<dt><strong>cell_types</strong><span class="classifier">list of str</span></dt><dd><p>List of cell types to plot</p>
+<dt><strong>cell_types</strong><span class="classifier">list of str | None, default=None</span></dt><dd><p>List of cell types (or drives) to plot. If None (default), all cell types listed
+in <code class="docutils literal notranslate"><span class="pre">cell_response._cell_type_names</span></code> are plotted.</p>
 </dd>
-<dt><strong>colors</strong><span class="classifier">list of str | None</span></dt><dd><p>Optional custom colors to plot. Default will use the color cycler.</p>
+<dt><strong>gid_ranges</strong><span class="classifier">dict of lists or range objects | None, default=None</span></dt><dd><p>Dictionary whose keys are cell type names (or drive names) and whose values
+are lists or range objects of GIDs for that cell type (or drive). If
+provided, the raster spans the full range of the plotted cell/drive types,
+so that cells/drives which never spiked still occupy a row, and any overlaid
+dipoles are scaled to that range. If None (default), the extent of the
+raster is inferred from the cells (not drives) that spiked. Note that the
+keys of <code class="docutils literal notranslate"><span class="pre">gid_ranges</span></code> must match the cell types (or drives) specified in
+<code class="docutils literal notranslate"><span class="pre">cell_types</span></code>; if <code class="docutils literal notranslate"><span class="pre">cell_types</span></code> is None (default), the keys of
+<code class="docutils literal notranslate"><span class="pre">gid_ranges</span></code> must match the cell types listed in
+<code class="docutils literal notranslate"><span class="pre">cell_response._cell_type_names</span></code>.</p>
 </dd>
-<dt><strong>show_legend</strong><span class="classifier">bool</span></dt><dd><p>If True, show the legend with colors for cell types</p>
+<dt><strong>colors</strong><span class="classifier">list of str | None, default=None</span></dt><dd><p>Optional custom colors to plot. If None (default) will use the default
+matplotlib color cycler.</p>
 </dd>
-<dt><strong>marker_size</strong><span class="classifier">float</span></dt><dd><p>Optional marker size to use when plotting spikes. Uses
+<dt><strong>show_legend</strong><span class="classifier">bool, default=True</span></dt><dd><p>If True (default), show the legend with colors for cell types</p>
+</dd>
+<dt><strong>marker_size</strong><span class="classifier">float, default=1.0</span></dt><dd><p>Optional marker size to use when plotting spikes. Uses
 “linelengths” argument of ax.eventplot, which accepts positive
-numeric values only</p>
+numeric values only.</p>
 </dd>
-<dt><strong>dpl</strong><span class="classifier">instance of Dipole | list</span></dt><dd><p>The Dipole object containing layer-specific dipole data
-to overlay on the raster plot</p>
+<dt><strong>dpl</strong><span class="classifier">instance of Dipole | list of Dipole | None, default=None</span></dt><dd><p>The Dipole object containing layer-specific dipole data to overlay on the raster
+plot. Required if <code class="docutils literal notranslate"><span class="pre">overlay_dipoles</span></code> is True.</p>
 </dd>
-<dt><strong>overlay_dipoles</strong><span class="classifier">bool</span></dt><dd><p>If True, overlay the layer-specific dipole data on the
-raster plot</p>
+<dt><strong>overlay_dipoles</strong><span class="classifier">bool, default=False</span></dt><dd><p>If True, overlay the layer-specific dipole data on the
+raster plot. If True, <code class="docutils literal notranslate"><span class="pre">dpl</span></code> must be provided.</p>
 </dd>
-<dt><strong>xticks</strong><span class="classifier">list | np.array | None</span></dt><dd><p>Ticks on x-axis. If None, ticks are created by matplotlib.</p>
+<dt><strong>xticks</strong><span class="classifier">list | np.array | None, default=None</span></dt><dd><p>Ticks on x-axis. If None (default), ticks are created by matplotlib.</p>
 </dd>
-<dt><strong>yticks</strong><span class="classifier">list | np.array | None</span></dt><dd><p>Ticks on y-axis,  If None, ticks are created by matplotlib.</p>
+<dt><strong>yticks</strong><span class="classifier">list | np.array | None, default=None</span></dt><dd><p>Ticks on y-axis. If None (default), ticks are created by matplotlib.</p>
 </dd>
-<dt><strong>xlabel</strong><span class="classifier">str, default: “Time (ms)”</span></dt><dd><p>The matplotlib x-axis label</p>
+<dt><strong>xlabel</strong><span class="classifier">str, default=”Time (ms)”</span></dt><dd><p>The matplotlib x-axis label</p>
 </dd>
-<dt><strong>ylabel</strong><span class="classifier">str, default: “Neuron index”</span></dt><dd><p>The matplotlib y-axis label</p>
+<dt><strong>ylabel</strong><span class="classifier">str, default=”Neuron index”</span></dt><dd><p>The matplotlib y-axis label</p>
 </dd>
-<dt><strong>title</strong><span class="classifier">str | None</span></dt><dd><p>The matplotlib figure title</p>
+<dt><strong>title</strong><span class="classifier">str | None, default=None</span></dt><dd><p>The matplotlib figure title</p>
 </dd>
 </dl>
 </dd>

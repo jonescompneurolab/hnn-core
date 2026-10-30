@@ -1050,6 +1050,7 @@
         <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">cell_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">gid_ranges</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">colors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">marker_size</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span>
@@ -1073,6 +1074,13 @@
 <span class="sd">            If True, show the figure.</span>
 <span class="sd">        cell_types : list of str</span>
 <span class="sd">            List of cell types to plot</span>
+<span class="sd">        gid_ranges : dict of lists or range objects | None</span>
+<span class="sd">            Dictionary with keys, e.g. net.gid_ranges containing the range of Cell or</span>
+<span class="sd">            input GIDs of different cell or input types. If provided, the raster spans</span>
+<span class="sd">            the full range of the plotted cell types, so that cells which never spiked</span>
+<span class="sd">            still occupy a row, and any overlaid dipoles are scaled to that range. If</span>
+<span class="sd">            None (default), the extent of the raster is inferred from the cells that</span>
+<span class="sd">            spiked.</span>
 <span class="sd">        colors : list of str | None</span>
 <span class="sd">            Optional custom colors to plot. Default will use the colors defined in cell metadata.</span>
 <span class="sd">        show_legend : bool</span>
@@ -1109,6 +1117,7 @@
             <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
             <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">,</span>
             <span class="n">cell_types</span><span class="o">=</span><span class="n">cell_types</span><span class="p">,</span>
+            <span class="n">gid_ranges</span><span class="o">=</span><span class="n">gid_ranges</span><span class="p">,</span>
             <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
             <span class="n">show_legend</span><span class="o">=</span><span class="n">show_legend</span><span class="p">,</span>
             <span class="n">marker_size</span><span class="o">=</span><span class="n">marker_size</span><span class="p">,</span>
