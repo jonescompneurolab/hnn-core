@@ -135,6 +135,17 @@ Input and Output (non-hierarchical JSON):
    read_dipole
    read_spikes
 
+Logging:
+--------
+
+.. currentmodule:: hnn_core
+
+.. autosummary::
+   :toctree: generated/
+
+   configure_logging
+   set_log_level
+
 GUI (:py:mod:`hnn_core.gui`):
 -----------------------------
 

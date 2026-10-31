@@ -4,6 +4,7 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
+import logging
 from glob import glob
 from warnings import warn
 
@@ -11,6 +12,9 @@ import numpy as np
 
 from .viz import plot_spikes_hist, plot_spikes_raster, plot_firing_rate_time
 from .externals.mne import _validate_type
+
+
+logger = logging.getLogger(__name__)
 
 
 class CellResponse(object):
@@ -836,7 +840,7 @@ class CellResponse(object):
                 this_fname = fname % (trial_idx,)
             else:
                 this_fname = fname.format(trial_idx)
-            print(f"Writing file {this_fname}")
+            logger.info(f"Writing file {this_fname}")
             with open(this_fname, "w") as f:
                 for spike_idx in range(len(self._spike_times[trial_idx])):
                     f.write(
