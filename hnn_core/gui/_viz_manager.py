@@ -32,6 +32,10 @@ from hnn_core.viz import _add_arrows_to_dipole, plot_dipole, plot_tfr_morlet
 from hnn_core.gui._data_store import data_store
 from enum import Enum
 
+# matplotlib `gid` that marks the RMSE/Corr text annotation on dipole comparison
+# plots, so it can be told apart from other annotations such as drive arrows
+_COMPARISON_TEXT_GID = "dipole_comparison_text"
+
 #
 _fig_placeholder = HTML(
     value="""
@@ -670,18 +674,24 @@ def _plot_on_axes(
             f"Corr({name_of_data_to_plot}, {name_of_secondary_exp_data_to_plot}): {corr:.4f}"
         )
 
-        # find subplot's annotation
+        # find the subplot's comparison annotation. It is looked up by `gid`
+        # because other annotations (e.g. drive arrows) can exist on the axes.
         annotation = next(
-            (child for child in ax.get_children() if isinstance(child, plt.Annotation)),
+            (
+                child
+                for child in ax.get_children()
+                if isinstance(child, plt.Annotation)
+                and child.get_gid() == _COMPARISON_TEXT_GID
+            ),
             None,
         )
 
-        # if the subplot already has an annotation, update its text.
+        # if the subplot already has a comparison annotation, update its text.
         # Otherwise, create a new one.
         if annotation is not None:
             annotation.set_text(annotation_text)
         else:
-            ax.annotate(
+            annotation = ax.annotate(
                 annotation_text,
                 xy=(0.95, 0.05),
                 xycoords="axes fraction",
@@ -689,6 +699,7 @@ def _plot_on_axes(
                 verticalalignment="bottom",
                 fontsize=12,
             )
+            annotation.set_gid(_COMPARISON_TEXT_GID)
 
         metrics_logger_text = (
             f"RMSE {rmse:.4f} Corr {corr:.4f} ("

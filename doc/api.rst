@@ -22,6 +22,7 @@ Simulation (:py:mod:`hnn_core`):
    simulate_dipole
    Network
    Cell
+   Section
    CellResponse
    pick_connection
 

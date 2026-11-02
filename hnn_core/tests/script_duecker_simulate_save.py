@@ -19,9 +19,8 @@ def rerun_and_save_duecker_model(suffix="new", backend="mpi"):
 
     https://github.com/jonescompneurolab/hnn-tuning/blob/duecker_ET_model/new_model_HNN/ERP/handtune_new_syn.ipynb
 
-    then runs a single 170 ms simulation with the Duecker baseline correction (see
-    ``simulate_dipole(..., baseline_correction=True)``) and then writes the results to
-    the current working directory depending on ``suffix``.
+    then runs a single 170 ms simulation with the ``"duecker"`` baseline correction,
+    then writes the results to the current working directory depending on ``suffix``.
 
     If ``suffix="old"`` then this will OVERWRITE existing output data files that are
     used as the "ground truth" for tests involving whether a recent code change has
@@ -37,7 +36,7 @@ def rerun_and_save_duecker_model(suffix="new", backend="mpi"):
     ----------
     suffix : str, default="new"
         String appended to the spike and dipole output filenames, used to
-        distinguish runs (e.g. ``"old"`` vs. ``"new"``).
+        distinguish runs. Accepted values are ``"old"`` and ``"new"``.
     backend : str, default="mpi"
         Parallel backend to simulate with, either ``"mpi"`` (runs inside an
         :class:`~hnn_core.MPIBackend` context using ``mpiexec``) or
@@ -52,97 +51,10 @@ def rerun_and_save_duecker_model(suffix="new", backend="mpi"):
         - ``spikes_duecker_output_{suffix}.txt`` : spike times of all cells
         - ``dipole_duecker_output_{suffix}.txt`` : dipole waveform of trial 0
     """
-    print("---------------------------------\n")
-    print("-->REMEMBER to recompile the mods\n")
-    print("---------------------------------\n")
+    # Setup network, including drives
+    net = duecker_ET_model(add_erp_drives=True)
 
-    # --------------------------------------------------------------------------------------
-    # Begin network setup and drive config
-    net = duecker_ET_model()
-    net.set_cell_positions(inplane_distance=30.0)
-    weights_ampa_p1 = {
-        "L2_inhibitory": 0.01,
-        "L2_pyramidal": 0.015,
-        "L5_inhibitory": 0.0,
-        "L5_pyramidal": 0.03,
-    }
-    weights_nmda_p1 = {
-        "L2_inhibitory": 0.01,
-        "L2_pyramidal": 0.05,
-        "L5_inhibitory": 0.0,
-        "L5_pyramidal": 0.025,
-    }
-    synaptic_delays_prox = {
-        "L2_inhibitory": 0.1,
-        "L2_pyramidal": 0.1,
-        "L5_inhibitory": 1,
-        "L5_pyramidal": 1,
-    }
-
-    net.add_evoked_drive(
-        "prox1",
-        mu=18,
-        sigma=2.5,
-        numspikes=1,
-        weights_ampa=weights_ampa_p1,
-        weights_nmda=weights_nmda_p1,
-        location="proximal",
-        synaptic_delays=synaptic_delays_prox,
-    )
-
-    weights_ampa_d1 = {
-        "L2_inhibitory": 0.005,
-        "L2_pyramidal": 0.01,
-        "L5_pyramidal": 1.0,
-    }
-    weights_nmda_d1 = {"L2_inhibitory": 0.0, "L2_pyramidal": 0.01, "L5_pyramidal": 1.0}
-    synaptic_delays_dist = {
-        "L2_inhibitory": 0.1,
-        "L2_pyramidal": 0.1,
-        "L5_pyramidal": 0.1,
-    }
-
-    net.add_evoked_drive(
-        "dist1",
-        mu=62,
-        sigma=5,
-        numspikes=2,
-        weights_ampa=weights_ampa_d1,
-        weights_nmda=weights_nmda_d1,
-        location="distal",
-        synaptic_delays=synaptic_delays_dist,
-    )
-
-    weights_ampa_p2 = {
-        "L2_inhibitory": 0.01,
-        "L2_pyramidal": 0.3,
-        "L5_inhibitory": 0.001,
-        "L5_pyramidal": 0.3,
-    }
-    weights_nmda_p2 = {
-        "L2_inhibitory": 0.01,
-        "L2_pyramidal": 0.2,
-        "L5_inhibitory": 0.001,
-        "L5_pyramidal": 0.2,
-    }
-    synaptic_delays_prox = {
-        "L2_inhibitory": 0.1,
-        "L2_pyramidal": 0.1,
-        "L5_inhibitory": 1.0,
-        "L5_pyramidal": 1.0,
-    }
-    net.add_evoked_drive(
-        "prox2",
-        mu=100,
-        sigma=15,
-        numspikes=1,
-        weights_ampa=weights_ampa_p2,
-        weights_nmda=weights_nmda_p2,
-        location="proximal",
-        synaptic_delays=synaptic_delays_prox,
-    )
-    # End of drive config
-    # --------------------------------------------------------------------------------------
+    # Begin simulation
     if backend == "mpi":
         with MPIBackend(mpi_cmd="mpiexec"):
             dpls = simulate_dipole(net, tstop=170.0, baseline_correction=True)
@@ -151,8 +63,8 @@ def rerun_and_save_duecker_model(suffix="new", backend="mpi"):
     else:
         raise ValueError(f"backend must be either 'mpi' or 'joblib', got '{backend}'")
 
+    # Save all output
     write_network_configuration(net, "net_d_duecker.json")
-
     net.cell_response.write(f"spikes_duecker_output_{suffix}.txt")
     dpls[0].write(f"dipole_duecker_output_{suffix}.txt")
 

@@ -86,7 +86,12 @@ class build_py_mod(build_py):
 if __name__ == "__main__":
     extras = {
         "opt": ["cma", "scikit-learn"],
-        "parallel": ["joblib", "psutil"],
+        "parallel": [
+            "joblib",
+            "psutil",
+            "mpi4py ; platform_system != 'Windows'",
+            "openmpi>5.0.0 ; platform_system != 'Windows'",
+        ],
         "test": [
             "codespell",
             "pytest",
@@ -114,12 +119,14 @@ if __name__ == "__main__":
         "voila",
     ]
     extras["all"] = extras["opt"] + extras["parallel"] + extras["gui"]
+    extras['dask'] = (extras['parallel'] + ['dask[distributed]'])
     extras["dev"] = (
-        extras["opt"]
-        + extras["parallel"]
-        + extras["test"]
+        extras["dask"]
         + extras["docs"]
         + extras["gui"]
+        + extras["opt"]
+        + extras["parallel"]
+        + extras["test"]
     )
 
     setup(
@@ -153,13 +160,13 @@ if __name__ == "__main__":
         platforms="any",
         install_requires=[
             "numpy >=1.14",
-            'NEURON >=7.7, <=8.2.7; platform_system != "Windows"',
+            'NEURON >=7.7, <=9.1.0; platform_system != "Windows"',
             "matplotlib>=3.5.3",
             "scipy",
             "h5io",
         ],
         extras_require=extras,
-        python_requires=">=3.9, <3.14",
+        python_requires=">=3.9, <3.15",
         packages=find_packages(),
         package_data={
             "hnn_core": [

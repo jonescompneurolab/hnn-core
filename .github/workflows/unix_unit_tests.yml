@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        python-version: [3.9, 3.11, 3.13]
+        python-version: [3.9, 3.12, 3.14]
         include:
           - os: macos-15-intel
             python-version: 3.9
@@ -106,16 +106,6 @@ jobs:
         shell: bash -el {0}
         run: |
           rm -rf build
-
-      - name: Install MPI dependencies
-        shell: bash -el {0}
-        run: |
-          if [[ "${{ matrix.os }}" == macos* ]]; then
-              echo "DYLD_FALLBACK_LIBRARY_PATH=${CONDA_PREFIX}/lib:$DYLD_FALLBACK_LIBRARY_PATH" >> $GITHUB_ENV
-          elif [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-              echo "LD_LIBRARY_PATH=${CONDA_PREFIX}/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
-          fi
-          conda install --yes --quiet -c conda-forge mpi4py "openmpi >5"
 
       - name: Install HNN-Core with full dependencies
         shell: bash -el {0}
