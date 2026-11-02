@@ -452,8 +452,8 @@ def plot_dipole(
         Network used to overlay drive timing arrows when
         ``show_drive_arrows=True``.
     show_drive_arrows : bool, default=False
-        If True, draw arrows on each axis marking evoked drive onsets.
-        Requires ``net``.
+        If True, draw arrows on each axis marking evoked drive onsets. Requires
+        ``net``. Note this is a "beta", in-development feature that may have bugs.
     arrow_width : float, default=3.0
         Line width of drive timing arrow shafts when ``show_drive_arrows=True``.
     arrow_height : float, default=1.75
