@@ -113,10 +113,10 @@ if __name__ == "__main__":
         ],
     }
     extras["gui"] = extras["opt"] + [
-        "ipywidgets>=8.0.0",
-        "ipykernel",
-        "ipympl",
-        "voila",
+        "ipywidgets>=8.0.0, < 8.2",
+        "ipykernel < 7.5",
+        "ipympl < 0.11",
+        "voila < 0.6",
     ]
     extras["all"] = extras["opt"] + extras["parallel"] + extras["gui"]
     extras['dask'] = (extras['parallel'] + ['dask[distributed]'])
@@ -161,7 +161,7 @@ if __name__ == "__main__":
         install_requires=[
             "h5io",
             "matplotlib>=3.5.3",
-            "notebook",
+            "notebook < 7.7",
             "numpy >=1.14",
             "scipy",
             'NEURON >=7.7, <=9.1.0; platform_system != "Windows"',
