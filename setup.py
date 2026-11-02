@@ -103,16 +103,12 @@ if __name__ == "__main__":
             "ruff<0.16.0",
         ],
         "docs": [
-            "mne",
             "myst-parser",
-            "nibabel",
             "numpydoc",
             "pillow",
-            "pooch<1.9.0",
             "pydata-sphinx-theme",
             "sphinx",
             "sphinx-copybutton",
-            "tdqm",
         ],
     }
     extras["gui"] = extras["opt"] + [
