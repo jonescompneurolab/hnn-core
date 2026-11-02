@@ -388,10 +388,32 @@ class TestParallelBackends:
     def test_compare_hnn_core_legacy(
         self, fix_net_neymotin_2020, fix_run_simulation, backend, n_jobs=1
     ):
-        """Test hnn-core does not break.
+        """Test hnn-core produces similar dipole output to Original HNN.
 
-        AES TODO
+        Prior to NEURON 9.0, HNN-Core (as of v0.6.1) was able to use NEURON's
+        `h.nrnunit_use_legacy(1)` and the following code in order to generate a Dipole
+        that was identical (single-float precision) to the original HNN's "threshold"
+        Dipole simulation (shown in Figure 4-D and 11-A of Neymotin et al., 2020):
 
+        ```
+        from hnn_core import neymotin_2020_model, simulate_dipole
+        net = neymotin_2020_model(add_drives_from_params=True, legacy_mode=True)
+        dpls = simulate_dipole(net, tstop=170.0)
+        dpl = dpls[0].smooth(30).scale(3000)
+        dpl.write("dpl_reran.txt")
+        ```
+
+        With NEURON 9.0 and later, the `h.nrnunit_use_legacy(1)` function is no longer
+        available, and the original HNN's "threshold" Dipole simulation can no longer be
+        reproduced exactly; see
+        https://github.com/jonescompneurolab/hnn-core/pull/1230#issuecomment-5956179244
+        and
+        https://github.com/jonescompneurolab/hnn-core/blob/test_data/README.md
+        for details.
+
+        Therefore, the following test checks that HNN-Core's Dipole output with the code
+        above is still *similar* to the original HNN's Dipole output, but it is expected
+        that there will be small differences due to the lack of legacy unit support.
         """
         # small snippet of data on data branch for now. To be deleted
         # later. Data branch should have only commit so it does not
@@ -442,14 +464,25 @@ class TestParallelBackends:
     def test_compare_hnn_core(
         self, fix_net_neymotin_2020, fix_run_simulation, backend, n_jobs=1
     ):
-        """Test hnn-core does not break.
+        """Test hnn-core dipole output does not change.
 
-        AES TODO
-
+        This tests that the dipole output of the "default ERP" simulation of HNN-Core
+        stays the same after code changes. This dipole is distinct from that of
+        `test_compare_hnn_core_legacy` above in that it does not use `legacy_mode` and,
+        therefore, the random seeds of the drives used are different.
         """
         # small snippet of data on data branch for now. To be deleted
         # later. Data branch should have only commit so it does not
         # pollute the history.
+        #
+        # - "Units" here means we are not using legacy units of NEURON provided by
+        #   `h.nrnunit_use_legacy(1)` anymore, since that function is no longer
+        #   available in NEURON 9.0 and later.
+        # - "Seeds" here means that the random seeds of the drives used in this
+        #   simulation are different from those used in the legacy-mode simulation
+        #   above.
+        # - For details, see
+        #   https://github.com/jonescompneurolab/hnn-core/blob/test_data/README.md
         ground_truth_fname = "dpl_nonlegacy_units_and_seeds.txt"
         data_url = (
             "https://raw.githubusercontent.com/jonescompneurolab/"
