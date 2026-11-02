@@ -1187,6 +1187,37 @@ def test_data_figure_add_simulation(setup_reduced_gui):
     plt.close("all")
 
 
+def test_data_figure_add_simulation_respects_data_scaling(setup_reduced_gui):
+    """Simulation smooth/scale must not alter the existing experimental trace (#1389)."""
+    gui = setup_reduced_gui
+    gui.run_button.click()
+    gui._simulate_upload_experimental_data(assets_path / "test_default.csv")
+
+    viz = gui.viz_manager
+    figid = max(viz.figs)
+    tab_idx = viz.axes_config_tabs.titles.index(f"Figure {figid}")
+    ax_controls = viz.axes_config_tabs.children[tab_idx].children[1].children[0]
+    ax = viz.figs[figid].axes[0]
+    data_y = ax.lines[0].get_ydata().copy()
+    n_lines = len(ax.lines)
+
+    ax_controls.children[3].value = 5.0  # Simulation Dipole Scaling
+    ax_controls.children[5].value = 0.0  # Data Smooth Window
+    ax_controls.children[6].value = 1.0  # Data Dipole Scaling
+    ax_controls.children[1].value = "default"
+    ax_controls.children[-2].children[0].click()
+
+    assert len(ax.lines) > n_lines
+    assert np.allclose(ax.lines[0].get_ydata(), data_y)
+    labels = [t.get_text() for t in ax.legend_.texts]
+    assert any(
+        label.startswith("default") and not label.startswith("test_default")
+        for label in labels
+    )
+
+    plt.close("all")
+
+
 def test_unlink_relink_widget():
     """Tests the unlinking and relinking of widgets decorator."""
 
