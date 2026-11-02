@@ -1148,14 +1148,14 @@ def test_dipole_data_overlay(setup_reduced_gui):
     comparison_text = comparison_texts[0]
     assert "RMSE(default, test_default):" in comparison_text.get_text()
     assert "Corr(default, test_default):" in comparison_text.get_text()
-    # text sits at the bottom right of the axes, not at a drive arrow location
+    # text sits at the bottom right of the axes
     assert comparison_text.xycoords == "axes fraction"
     assert comparison_text.xy == (0.95, 0.05)
-    # no arrow carries the comparison text
-    arrows = [t for t in ax.texts if t is not comparison_text]
-    assert len(arrows) > 0
-    assert all("RMSE" not in t.get_text() for t in arrows)
-    assert all("Corr" not in t.get_text() for t in arrows)
+    # Drive arrows were removed from GUI dipole plots (#1387); remaining texts
+    # must not carry the comparison metrics.
+    other_texts = [t for t in ax.texts if t is not comparison_text]
+    assert all("RMSE" not in t.get_text() for t in other_texts)
+    assert all("Corr" not in t.get_text() for t in other_texts)
 
     plt.close("all")
 
