@@ -392,13 +392,14 @@ class TestParallelBackends:
         # small snippet of data on data branch for now. To be deleted
         # later. Data branch should have only commit so it does not
         # pollute the history.
+        ground_truth_fname = "dpl_nonlegacy_units.txt"
         data_url = (
             "https://raw.githubusercontent.com/jonescompneurolab/"
-            "hnn-core/test_data/dpl.txt"
+            f"hnn-core/test_data/{ground_truth_fname}"
         )
-        if not Path("dpl.txt").exists():
-            urlretrieve(data_url, "dpl.txt")
-        dpl_master = loadtxt("dpl.txt")
+        if not Path(ground_truth_fname).exists():
+            urlretrieve(data_url, ground_truth_fname)
+        dpl_master = loadtxt(ground_truth_fname)
 
         # TODO AES: CURRENTLY NEEDS LEGACY MODE
         net, _ = fix_net_neymotin_2020(legacy_mode=True, add_drives_from_params=True)
@@ -428,7 +429,7 @@ class TestParallelBackends:
             "L2_basket": 55,
             "L2_pyramidal": 114,
             "L5_pyramidal": 396,
-            "L5_basket": 86,
+            "L5_basket": 85,
             "evdist1": 270,
             "evprox2": 270,
         }

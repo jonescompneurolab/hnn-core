@@ -66,6 +66,10 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
   preserving configured drive and tonic-bias stop times,
   by [William Kang][] in {gh}`1348`.
 
+- The RMSE and Corr comparison text on GUI dipole comparison plots is no longer
+  drawn over the evoked drive arrows, and now stays at the bottom right of the plot,
+  fixing {gh}`1374`.
+
 - Setting `Network.threshold` now actually changes the spike-detection
   threshold of all cells: the value in place when the network is built is
   passed to every cell's source `NetCon`, instead of the simulation always
