@@ -1644,5 +1644,10 @@ class _VizManager:
                 buttons.children[0].click()
             elif operation == "clear":
                 buttons.children[1].click()
+
+            # The flag only describes this scripted draw. Reset it so that later
+            # "Add plot" clicks made by the user use the simulation they select
+            # (and the data smoothing/scaling for the data), see #1389.
+            plot_context["is_experimental_data"] = False
         except Exception:
             raise

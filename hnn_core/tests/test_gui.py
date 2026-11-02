@@ -1160,6 +1160,33 @@ def test_dipole_data_overlay(setup_reduced_gui):
     plt.close("all")
 
 
+def test_data_figure_add_simulation(setup_reduced_gui):
+    """Adding a simulation to the experimental data figure plots the simulation (#1389)."""
+    gui = setup_reduced_gui
+    gui.run_button.click()
+    gui._simulate_upload_experimental_data(assets_path / "test_default.csv")
+
+    viz = gui.viz_manager
+    figid = max(viz.figs)
+    tab_idx = viz.axes_config_tabs.titles.index(f"Figure {figid}")
+    ax_controls = viz.axes_config_tabs.children[tab_idx].children[1].children[0]
+    ax = viz.figs[figid].axes[0]
+    n_lines = len(ax.lines)
+
+    # Like a user: select the simulation and click "Add plot"
+    ax_controls.children[1].value = "default"
+    ax_controls.children[-2].children[0].click()
+
+    assert len(ax.lines) > n_lines
+    labels = [t.get_text() for t in ax.legend_.texts]
+    assert any(
+        label.startswith("default") and not label.startswith("test_default")
+        for label in labels
+    )
+
+    plt.close("all")
+
+
 def test_unlink_relink_widget():
     """Tests the unlinking and relinking of widgets decorator."""
 
