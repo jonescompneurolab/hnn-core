@@ -691,7 +691,7 @@ def test_network_cell_positions(fix_net_model, mesh_shape, request):
 
     # Setup our network, default params, and expected post-change params
     # ----------------------------------------------------------------------------------
-    net, _ = net_model(add_drives_from_params=True, mesh_shape=mesh_shape)
+    net, _ = net_model(add_erp_drives=True, mesh_shape=mesh_shape)
     default_inplane_distance = 1.0  # default
     default_layer_separation = 1307.4  # default
     assert np.isclose(net._inplane_distance, default_inplane_distance)  # check default
@@ -797,10 +797,10 @@ def test_network_cell_positions(fix_net_model, mesh_shape, request):
     # reset from the original network, since update_cell_positions always
     # scales relative to the *current* net._inplane_distance
     # ------------------------------------------------------------------------------
-    net_direct, _ = net_model(add_drives_from_params=True, mesh_shape=mesh_shape)
+    net_direct, _ = net_model(add_erp_drives=True, mesh_shape=mesh_shape)
     net_direct.update_cell_positions(inplane_distance=8.0, layer_separation=3000.0)
 
-    net_sequential, _ = net_model(add_drives_from_params=True, mesh_shape=mesh_shape)
+    net_sequential, _ = net_model(add_erp_drives=True, mesh_shape=mesh_shape)
     net_sequential.update_cell_positions(inplane_distance=4.1, layer_separation=1531.0)
     net_sequential.update_cell_positions(inplane_distance=8.0, layer_separation=3000.0)
 

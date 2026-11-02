@@ -112,11 +112,12 @@ class TestDipoleViz:
             plot_psd([dpls[0], dpl_sfreq])
 
     def test_plot_drive_arrows(self, fix_use_cached_sims):
-        net, dpls, _, _ = fix_use_cached_sims
+        net, dpls, net_customizations, _ = fix_use_cached_sims
         # The cached simulation's only evoked drive is the proximal "evprox1"
-        drive_time = net.external_drives["evprox1"]["dynamics"]["mu"]
+        evprox1_name = net_customizations["drive_names_map"]["evprox1"]
+        drive_time = net.external_drives[evprox1_name]["dynamics"]["mu"]
         markers = _collect_drive_arrow_markers(net)
-        assert any(marker["label"] == "evprox1" for marker in markers)
+        assert any(marker["label"] == evprox1_name for marker in markers)
 
         _, ax = plt.subplots()
         plot_dipole(dpls[0], ax=ax, show=False, net=net, show_drive_arrows=True)
@@ -141,7 +142,7 @@ class TestDipoleViz:
         ]
         assert guide_lines
         assert any(abs(line.get_xdata()[0] - drive_time) < 0.01 for line in guide_lines)
-        assert "evprox1" not in [text.get_text() for text in ax.texts]
+        assert evprox1_name not in [text.get_text() for text in ax.texts]
         plt.close("all")
 
         with pytest.raises(ValueError, match="net must be provided"):
@@ -166,18 +167,19 @@ class TestDipoleViz:
 
     def test_collect_drive_arrow_markers_evoked_only(self, fix_use_cached_sims):
         """Bursty and Poisson drives are not shown on dipole arrow overlays."""
-        net, _, _, _ = fix_use_cached_sims
+        net, _, net_customizations, _ = fix_use_cached_sims
+        evprox1_name = net_customizations["drive_names_map"]["evprox1"]
         drive_types = {drive["type"] for drive in net.external_drives.values()}
         assert {"evoked", "bursty", "poisson"} <= drive_types
 
         # Only the cached simulation's single evoked drive gets a marker
         markers = _collect_drive_arrow_markers(net)
         assert len(markers) == 1
-        assert markers[0]["label"] == "evprox1"
-        assert markers[0]["time"] == net.external_drives["evprox1"]["dynamics"]["mu"]
+        assert markers[0]["label"] == evprox1_name
+        assert markers[0]["time"] == net.external_drives[evprox1_name]["dynamics"]["mu"]
 
         # Without the evoked drive, no arrows are drawn
-        del net.external_drives["evprox1"]
+        del net.external_drives[evprox1_name]
         assert _collect_drive_arrow_markers(net) == []
 
         _, ax = plt.subplots()
@@ -190,9 +192,10 @@ class TestDipoleViz:
 
     def test_add_arrows_to_dipole_default_time_window(self, fix_use_cached_sims):
         """Omitted tmin/tmax are taken from the axis x limits."""
-        net, _, _, _ = fix_use_cached_sims
+        net, _, net_customizations, _ = fix_use_cached_sims
         # The cached simulation's only evoked drive is "evprox1"
-        drive_time = net.external_drives["evprox1"]["dynamics"]["mu"]
+        evprox1_name = net_customizations["drive_names_map"]["evprox1"]
+        drive_time = net.external_drives[evprox1_name]["dynamics"]["mu"]
 
         def _n_annotations(ax):
             return sum(
@@ -843,12 +846,12 @@ class TestCellResponsePlotters:
 
     def test_spikes_hist_color(self, fix_use_cached_sims):
         """Test spike histogram with different color arguments."""
-        net, _, _, _ = fix_use_cached_sims
+        net, _, net_customizations, _ = fix_use_cached_sims
         # A color dict must define a color for every drive in the cached
         # simulation. These correspond to the drive names used in
         # `conftest.py::_base_simulation_cached`:
         drive_colors = {
-            "evprox1": "b",
+            net_customizations["drive_names_map"]["evprox1"]: "b",
             "beta_prox": "r",
             "beta_dist": "g",
             "poisson": "k",

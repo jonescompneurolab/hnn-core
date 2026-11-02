@@ -30,7 +30,15 @@ hnn_core_root = Path(hnn_core.__file__).parent
 Description of how to use the network fixtures in this file:
 ------------------------------------------------------------
 
-You can use `fix_net_neymotin_2020` and other network fixtures in one of two ways:
+You can use `fix_net_neymotin_2020` and other network fixtures in one of two ways, described below.
+
+Note that network fixtures do NOT all share the same API:
+- The network models `fix_net_duecker_ET` and `fix_net_neymotin_2020` share the same API
+  due to both having replaced "add_drives_from_params" with "add_erp_drives", and are
+  compatible.
+- fix_net_calcium and fix_net_law_2021 share the same API, which is different from that
+  of the more modern models, since they still use the legacy "add_drives_from_params"
+  argument, and there is no modern equivalent for adding "default" drives to them.
 
 --------------------------------
 
@@ -47,7 +55,7 @@ def test_dipole_simulation(fix_net_neymotin_2020, fix_default_params):
 and then use the fixture similarly to a regular network models function:
 
 ```
-net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+net, _ = fix_net_neymotin_2020(add_erp_drives=True, reduced=True)
 ```
 
 --------------------------------
@@ -91,7 +99,7 @@ separate things:
     described below in each network fixture, e.g.
 
     ```
-    net, net_customizations = net_model(add_drives_from_params=True, reduced=True)
+    net, net_customizations = net_model(add_erp_drives=True, reduced=True)
     ```
 """
 
@@ -105,18 +113,15 @@ def fix_net_duecker_ET():
     so if you are unsure how to use this, see existing tests, or the comment at the top
     of ``conftest.py``.
 
+    This shares the same API as the ``fix_net_neymotin_2020`` network fixture.
+
     Parameters
     ----------
-
-    AES TODO
-
-    add_drives_from_params : bool, default=False
-        If True, add three evoked drives (``evprox1``, ``evdist1``, and ``evprox2``)
-        that mirror the default ERP drives of ``neymotin_2020_model``, except that the
-        cell type names have been updated to match the Duecker model.
-    legacy_mode : bool, default=False
-        Unused. Only present for API equality with other network fixtures, so that all
-        fixtures can be called interchangeably in parametrized tests.
+    add_erp_drives : bool, default=False
+        If True, add the three evoked drives (``prox1``, ``dist1``, and ``prox2``) used
+        to generate ERPs in the upcoming Duecker model publication. Note that the drive
+        names are different than that of `add_erp_drives=True` in the Neymotin 2020
+        model.
     mesh_shape : tuple of int | None, default=None
         Shape of the cell grid. If None (default), a ``mesh_shape`` of ``(10, 10)`` is
         used. Incompatible with ``reduced=True``.
@@ -144,6 +149,11 @@ def fix_net_duecker_ET():
           types (i.e. the suffix of ``"L2Inh"``), as used in parameter and connection
           names. Used to account for cell type naming differences between Duecker and
           non-Duecker model versions.
+        - ``"drive_names_map"``: dict mapping the canonical evoked drive names
+          (``"evprox1"``, ``"evprox2"``, and ``"evdist1"``) to the Duecker model's
+          equivalent drive names (``"prox1"``, ``"prox2"``, and ``"dist1"``). Used to
+          account for drive naming differences between Duecker and non-Duecker model
+          versions.
 
     Raises
     ------
@@ -152,8 +162,7 @@ def fix_net_duecker_ET():
     """
 
     def _fix_net_duecker_ET(
-        add_drives_from_params=False,
-        legacy_mode=False,
+        add_erp_drives=False,
         mesh_shape=None,
         reduced=False,
         electrode_array=None,
@@ -167,114 +176,30 @@ def fix_net_duecker_ET():
         net_customizations = {
             "inh_name_suffix": "inhibitory",
             "short_inh_name_suffix": "Inh",  # codespell:ignore
+            "drive_names_map": {
+                "evprox1": "prox1",
+                "evprox2": "prox2",
+                "evdist1": "dist1",
+            },
         }
 
         if reduced:
             mesh_shape = (3, 3)
-            # Shorten when the drives start, since we usually use a shorter simulation
-            # when using a reduced network.
-            prox1_mu = 5
-            dist1_mu = 10
-            prox2_mu = 20
         else:
             if mesh_shape is not None:
                 pass  # Use the provided mesh_shape
             else:
                 mesh_shape = (10, 10)
-            prox1_mu = 18
-            dist1_mu = 62
-            prox2_mu = 100
 
-        net = duecker_ET_model(
-            mesh_shape=mesh_shape,
-        )
+        net = duecker_ET_model(mesh_shape=mesh_shape, add_erp_drives=add_erp_drives)
 
-        if add_drives_from_params:
-            weights_ampa_p1 = {
-                "L2_inhibitory": 0.01,
-                "L2_pyramidal": 0.015,
-                "L5_inhibitory": 0.0,
-                "L5_pyramidal": 0.03,
-            }
-            weights_nmda_p1 = {
-                "L2_inhibitory": 0.01,
-                "L2_pyramidal": 0.05,
-                "L5_inhibitory": 0.0,
-                "L5_pyramidal": 0.025,
-            }
-            synaptic_delays_prox = {
-                "L2_inhibitory": 0.1,
-                "L2_pyramidal": 0.1,
-                "L5_inhibitory": 1,
-                "L5_pyramidal": 1,
-            }
-
-            net.add_evoked_drive(
-                "evprox1",
-                mu=prox1_mu,
-                sigma=2.5,
-                numspikes=1,
-                weights_ampa=weights_ampa_p1,
-                weights_nmda=weights_nmda_p1,
-                location="proximal",
-                synaptic_delays=synaptic_delays_prox,
-            )
-
-            weights_ampa_d1 = {
-                "L2_inhibitory": 0.005,
-                "L2_pyramidal": 0.01,
-                "L5_pyramidal": 1.0,
-            }
-            weights_nmda_d1 = {
-                "L2_inhibitory": 0.0,
-                "L2_pyramidal": 0.01,
-                "L5_pyramidal": 1.0,
-            }
-            synaptic_delays_dist = {
-                "L2_inhibitory": 0.1,
-                "L2_pyramidal": 0.1,
-                "L5_pyramidal": 0.1,
-            }
-
-            net.add_evoked_drive(
-                "evdist1",
-                mu=dist1_mu,
-                sigma=5,
-                numspikes=2,
-                weights_ampa=weights_ampa_d1,
-                weights_nmda=weights_nmda_d1,
-                location="distal",
-                synaptic_delays=synaptic_delays_dist,
-            )
-
-            weights_ampa_p2 = {
-                "L2_inhibitory": 0.01,
-                "L2_pyramidal": 0.3,
-                "L5_inhibitory": 0.001,
-                "L5_pyramidal": 0.3,
-            }
-            weights_nmda_p2 = {
-                "L2_inhibitory": 0.01,
-                "L2_pyramidal": 0.2,
-                "L5_inhibitory": 0.001,
-                "L5_pyramidal": 0.2,
-            }
-            synaptic_delays_prox = {
-                "L2_inhibitory": 0.1,
-                "L2_pyramidal": 0.1,
-                "L5_inhibitory": 1.0,
-                "L5_pyramidal": 1.0,
-            }
-            net.add_evoked_drive(
-                "evprox2",
-                mu=prox2_mu,
-                sigma=15,
-                numspikes=1,
-                weights_ampa=weights_ampa_p2,
-                weights_nmda=weights_nmda_p2,
-                location="proximal",
-                synaptic_delays=synaptic_delays_prox,
-            )
+        if reduced and add_erp_drives:
+            # Shorten when the drives start, since we usually use a shorter simulation
+            # when using a reduced network.
+            drive_names_map = net_customizations["drive_names_map"]
+            net.external_drives[drive_names_map["evprox1"]]["dynamics"]["mu"] = 5
+            net.external_drives[drive_names_map["evdist1"]]["dynamics"]["mu"] = 10
+            net.external_drives[drive_names_map["evprox2"]]["dynamics"]["mu"] = 20
 
         if electrode_array is not None:
             for name, positions in electrode_array.items():
@@ -294,17 +219,19 @@ def fix_net_neymotin_2020():
     so if you are unsure how to use this, see existing tests, or the comment at the top
     of ``conftest.py``.
 
+    This shares the same API as the ``fix_net_duecker_ET`` network fixture.
+
+    Note that if you need to test any of the deprecated or legacy arguments to
+    ``neymotin_2020_model`` such as ``add_drives_from_params``, ``params``, or
+    ``legacy_mode``, you cannot use this fixture, and you should instead call
+    ``neymotin_2020_model`` directly.
+
     Parameters
     ----------
-    add_drives_from_params : bool, default=False
-        If True, pass ``add_drives_from_params=True`` to the ``neymotin_2020_model``
-        call in order to add the three canonical evoked drives (``evprox1``,
-        ``evdist1``, and ``evprox2``). Incompatible with
-        ``featureful_reduced_network=True``.
-    legacy_mode : bool, default=False
-        If True, pass ``add_drives_from_params=True`` to the ``neymotin_2020_model``
-        call for testing deprecated legacy behavior. Incompatible with
-        ``featureful_reduced_network=True``.
+    add_erp_drives : bool, default=False
+        If True, add the canonical event-related potential (ERP) drives used to
+        reproduce the default ERP simulation behavior. This is the recommended way to
+        add default ERP drives. Incompatible with ``featureful_reduced_network``.
     mesh_shape : tuple of int | None, default=None
         Shape of the cell grid. If None (default), a ``mesh_shape`` of ``(10, 10)`` is
         used. Incompatible with ``reduced=True`` or ``featureful_reduced_network=True``.
@@ -320,12 +247,13 @@ def fix_net_neymotin_2020():
         ``featureful_reduced_network=True``.
     featureful_reduced_network : bool, default=False
         Incompatible with all other arguments. If True, use a ``reduced`` network with a
-        small ``(3, 3)`` mesh, ``add_drives_from_params=True``, a bias, multiple
+        small ``(3, 3)`` mesh, ``add_erp_drives=True``, a bias, multiple
         electrode arrays, and a bursty and Poisson drive. This is called "featureful"
         because it includes all types of Network features, in order to test that all
         features are correctly serialized, written, deserialized, and loaded, including
         via both the API and the GUI. This is identical to the network that was formerly
-        stored at ``hnn_core/tests/assets/neymotin2020_3x3_drives.json``.
+        stored at ``hnn_core/tests/assets/neymotin2020_3x3_drives.json``. Incompatible
+        with ALL other arguments.
 
     Returns
     -------
@@ -339,6 +267,10 @@ def fix_net_neymotin_2020():
         - ``"short_inh_name_suffix"``: ``"Basket"``, the abbreviated name suffix of the
           inhibitory cell types, as used in parameter and connection names (e.g.
           ``"L2Basket"``).
+        - ``"drive_names_map"``: dict mapping the canonical evoked drive names
+          (``"evprox1"``, ``"evprox2"``, and ``"evdist1"``) to themselves. Used to
+          account for drive naming differences between Duecker and non-Duecker model
+          versions.
 
     Raises
     ------
@@ -349,32 +281,31 @@ def fix_net_neymotin_2020():
     """
 
     def _fix_net_neymotin_2020(
-        add_drives_from_params=False,
-        legacy_mode=False,
+        add_erp_drives=False,
         mesh_shape=None,
         reduced=False,
         electrode_array=None,
         featureful_reduced_network=False,
     ):
         if featureful_reduced_network and (
-            add_drives_from_params
-            or legacy_mode
+            add_erp_drives
             or (mesh_shape is not None)
             or reduced
             or (electrode_array is not None)
         ):
             raise ValueError(
-                "featureful_reduced_network cannot be used with legacy_mode, reduced, "
-                "or electrode_array arguments."
+                "featureful_reduced_network cannot be used with any other arguments."
             )
 
-        # default params
-        params_fname = hnn_core_root / "param" / "default.json"
-        params = read_params(params_fname)
         # Account for Duecker name variations
         net_customizations = {
             "inh_name_suffix": "basket",
             "short_inh_name_suffix": "Basket",
+            "drive_names_map": {
+                "evprox1": "evprox1",
+                "evprox2": "evprox2",
+                "evdist1": "evdist1",
+            },
         }
 
         if not featureful_reduced_network:
@@ -388,10 +319,10 @@ def fix_net_neymotin_2020():
                 # - trials to 2 using the `Network` object (instead of at simulation)
                 # - set simulation time to 40 ms, and
                 # - disabled legacy_mode
-                # Trials and simulation time are now only set at simulation time, and legacy
-                # mode is a regular argument.
-                # TODO AES: Use the API for this, NOT params!
-                params.update({"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20})
+                # - set the evoked drive times to 5, 10, and 20 ms (instead of 18, 62,
+                #   and 100 ms) (this is done later in the fixture, after the network is
+                #   created)
+                # Trials and simulation time are now only set at simulation time
             elif mesh_shape is not None:
                 pass  # Use the provided mesh_shape
             else:
@@ -399,11 +330,17 @@ def fix_net_neymotin_2020():
 
             # Legacy mode necessary for exact dipole comparison test
             net = neymotin_2020_model(
-                params,
-                add_drives_from_params=add_drives_from_params,
-                legacy_mode=legacy_mode,
+                add_erp_drives=add_erp_drives,
                 mesh_shape=mesh_shape,
             )
+            if reduced and add_erp_drives:
+                # Shorten when the drives start, since we usually use a shorter
+                # simulation when using a reduced network.
+                drive_names_map = net_customizations["drive_names_map"]
+                net.external_drives[drive_names_map["evprox1"]]["dynamics"]["mu"] = 5
+                net.external_drives[drive_names_map["evdist1"]]["dynamics"]["mu"] = 10
+                net.external_drives[drive_names_map["evprox2"]]["dynamics"]["mu"] = 20
+
             if electrode_array is not None:
                 for name, positions in electrode_array.items():
                     net.add_electrode_array(name, positions)
@@ -413,7 +350,7 @@ def fix_net_neymotin_2020():
         elif featureful_reduced_network:
             net = neymotin_2020_model(
                 params=None,
-                add_drives_from_params=True,
+                add_erp_drives=True,
                 legacy_mode=False,
                 mesh_shape=(3, 3),
             )
@@ -545,6 +482,8 @@ def fix_net_calcium():
     so if you are unsure how to use this, see existing tests, or the comment at the top
     of ``conftest.py``.
 
+    This shares the same API as the ``fix_net_law_2021`` network fixture.
+
     Parameters
     ----------
     add_drives_from_params : bool, default=False
@@ -577,6 +516,10 @@ def fix_net_calcium():
         - ``"short_inh_name_suffix"``: ``"Basket"``, the abbreviated name suffix of the
           inhibitory cell types, as used in parameter and connection names (e.g.
           ``"L2Basket"``).
+        - ``"drive_names_map"``: dict mapping the canonical evoked drive names
+          (``"evprox1"``, ``"evprox2"``, and ``"evdist1"``) to themselves. Used to
+          account for drive naming differences between Duecker and non-Duecker model
+          versions.
 
     Raises
     ------
@@ -599,6 +542,11 @@ def fix_net_calcium():
         net_customizations = {
             "inh_name_suffix": "basket",
             "short_inh_name_suffix": "Basket",
+            "drive_names_map": {
+                "evprox1": "evprox1",
+                "evprox2": "evprox2",
+                "evdist1": "evdist1",
+            },
         }
 
         if reduced:
@@ -632,6 +580,8 @@ def fix_net_law_2021():
     so if you are unsure how to use this, see existing tests, or the comment at the top
     of ``conftest.py``.
 
+    This shares the same API as the ``fix_net_calcium`` network fixture.
+
     Parameters
     ----------
     add_drives_from_params : bool, default=False
@@ -664,6 +614,10 @@ def fix_net_law_2021():
         - ``"short_inh_name_suffix"``: ``"Basket"``, the abbreviated name suffix of the
           inhibitory cell types, as used in parameter and connection names (e.g.
           ``"L2Basket"``).
+        - ``"drive_names_map"``: dict mapping the canonical evoked drive names
+          (``"evprox1"``, ``"evprox2"``, and ``"evdist1"``) to themselves. Used to
+          account for drive naming differences between Duecker and non-Duecker model
+          versions.
 
     Raises
     ------
@@ -687,6 +641,11 @@ def fix_net_law_2021():
         net_customizations = {
             "inh_name_suffix": "basket",
             "short_inh_name_suffix": "Basket",
+            "drive_names_map": {
+                "evprox1": "evprox1",
+                "evprox2": "evprox2",
+                "evdist1": "evdist1",
+            },
         }
         if reduced:
             mesh_shape = (3, 3)
@@ -914,7 +873,7 @@ def _base_simulation_cached():
             # Add single Evoked drive
             # --------------------------------------------------------------------------
             net.add_evoked_drive(
-                "evprox1",
+                net_customizations["drive_names_map"]["evprox1"],
                 mu=5,
                 sigma=2.5,
                 numspikes=1,

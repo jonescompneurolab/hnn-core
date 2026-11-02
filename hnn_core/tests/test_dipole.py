@@ -162,7 +162,7 @@ def test_dipole(
     assert_allclose(dipole_exp.data["agg"], dipole_exp_avg.data["agg"])
 
     # Two different networks to compare `postproc=True/False`
-    net_raw, _ = net_model(add_drives_from_params=True, reduced=True)
+    net_raw, _ = net_model(add_erp_drives=True, reduced=True)
     net_proc = deepcopy(net_raw)
 
     dpls_raw = fix_run_simulation(
@@ -197,7 +197,7 @@ def test_dipole(
 
 def test_dipole_simulation(fix_net_neymotin_2020, fix_default_params):
     """Test data produced from simulate_dipole() call."""
-    net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+    net, _ = fix_net_neymotin_2020(add_erp_drives=True, reduced=True)
     with pytest.raises(ValueError, match="Invalid number of simulations: 0"):
         simulate_dipole(net, tstop=40, n_trials=0)
     with pytest.raises(ValueError, match="Invalid value for the"):
@@ -247,7 +247,7 @@ def test_cell_response_backends(fix_net_model, fix_run_simulation, request):
     trial_idx, n_trials, gid = 0, 2, 7
 
     net_model = request.getfixturevalue(fix_net_model)
-    joblib_net, _ = net_model(add_drives_from_params=True, reduced=True)
+    joblib_net, _ = net_model(add_erp_drives=True, reduced=True)
     mpi_net = deepcopy(joblib_net)
 
     fix_run_simulation(
@@ -469,7 +469,7 @@ def test_dipole_baseline_correction_mpi(
 ):
     """Test that baseline_correction works in simulate_dipole with MPIBackend."""
     net_model = request.getfixturevalue(fix_net_model)
-    net, _ = net_model(reduced=True, add_drives_from_params=True)
+    net, _ = net_model(reduced=True, add_erp_drives=True)
     fix_run_simulation(
         net,
         tstop=40.0,
@@ -486,7 +486,7 @@ def test_dipole_baseline_correction_flags(fix_net_model, request):
     """Test that all variants of baseline_correction work in simulate_dipole"""
     # Test that baseline_correction is flagged as true by default
     net_model = request.getfixturevalue(fix_net_model)
-    net_yes_correct, _ = net_model(add_drives_from_params=True, mesh_shape=(3, 3))
+    net_yes_correct, _ = net_model(add_erp_drives=True, mesh_shape=(3, 3))
 
     assert net_yes_correct._baseline_correction_applied is False
     dpl_yes_correct = simulate_dipole(
@@ -496,7 +496,7 @@ def test_dipole_baseline_correction_flags(fix_net_model, request):
     assert dpl_yes_correct._baseline_correction_applied is True
 
     # Test that baseline_correction, when set to False, is not applied
-    net_no_correct, _ = net_model(add_drives_from_params=True, mesh_shape=(3, 3))
+    net_no_correct, _ = net_model(add_erp_drives=True, mesh_shape=(3, 3))
 
     assert net_no_correct._baseline_correction_applied is False
     with pytest.warns(UserWarning, match="No baseline corr"):
