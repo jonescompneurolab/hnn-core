@@ -523,6 +523,27 @@ def _avg_dipole_check(dpls):
     return dpl
 
 
+def _use_experimental_as_primary(simulations_data_widget, experimental_data_widget):
+    """Whether Add plot should draw experimental data as the primary series.
+
+    Follow the current dropdowns, not a sticky ``plot_context`` flag from an
+    earlier scripted draw. If a simulation is selected, plot that (and overlay
+    experimental data when requested). If Simulation Data is ``None`` and an
+    experimental dataset is selected, plot the experimental data alone.
+    """
+    sim_name = simulations_data_widget.value
+    if sim_name not in (None, "None") and (
+        sim_name in data_store.simulated_data
+        or sim_name in data_store.experimental_data
+    ):
+        return False
+    exp_name = experimental_data_widget.value
+    return (
+        exp_name not in (None, "None")
+        and exp_name in data_store.experimental_data_names
+    )
+
+
 def _plot_on_axes(
     button,
     simulations_data_widget,
@@ -591,9 +612,12 @@ def _plot_on_axes(
     existing_plots : ipywidgets.VBox
         A VBox widget that contains all the existing plots.
     """
+    is_experimental_primary = _use_experimental_as_primary(
+        simulations_data_widget, experimental_data_widget
+    )
     name_of_data_to_plot = (
         experimental_data_widget.value
-        if plot_context.get("is_experimental_data")
+        if is_experimental_primary
         else simulations_data_widget.value
     )
 
@@ -636,7 +660,7 @@ def _plot_on_axes(
     # If experimental_data_widget is not None and we are plotting a simulated dipole,
     # we need to plot the experimental dipole as well.
     if (
-        not plot_context.get("is_experimental_data")
+        not is_experimental_primary
         and experimental_data_widget.value in data_store.experimental_data_names
         and plot_type == "current dipole"
     ):
@@ -1644,10 +1668,5 @@ class _VizManager:
                 buttons.children[0].click()
             elif operation == "clear":
                 buttons.children[1].click()
-
-            # The flag only describes this scripted draw. Reset it so that later
-            # "Add plot" clicks made by the user use the simulation they select
-            # (and the data smoothing/scaling for the data), see #1389.
-            plot_context["is_experimental_data"] = False
         except Exception:
             raise
