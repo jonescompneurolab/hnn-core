@@ -1,5 +1,5 @@
-# import os.path as op
-# import tempfile
+import os.path as op
+import tempfile
 from unittest.mock import patch
 
 import matplotlib
@@ -10,8 +10,8 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
-# from hnn_core import read_spikes
-from hnn_core import CellResponse
+from hnn_core import read_spikes
+from hnn_core import Dipole, CellResponse
 from hnn_core.dipole import simulate_dipole
 from hnn_core.viz import (
     plot_cells,
@@ -628,6 +628,124 @@ class TestCellResponsePlotters:
 
         assert updated_raster_yrange <= initial_raster_yrange
 
+    def test_spikes_raster_ylim(self):
+        """Raster y-axis spans the network gids, or the gids that spiked."""
+
+        # generate some spike times for some example cells
+        gid_ranges = {
+            "L2_basket": range(0, 5),
+            "L2_pyramidal": range(5, 15),
+            "L5_basket": range(15, 20),
+            "L5_pyramidal": range(20, 29),
+        }
+
+        times = np.linspace(0, 100, 101)
+
+        # Hard-coded spikes, with the cell type associated with largest gids silent
+        spike_times, spike_gids, spike_types = [], [], []
+        for cell_type in ["L2_basket", "L2_pyramidal", "L5_basket"]:
+            for gid in gid_ranges[cell_type]:
+                spike_times.append(10.0 + gid)
+                spike_gids.append(gid)
+                spike_types.append(cell_type)
+
+        # create cell_response object
+        cell_response = CellResponse(
+            cell_type_names=list(gid_ranges.keys()),
+            spike_times=[spike_times],
+            spike_gids=[spike_gids],
+            spike_types=[spike_types],
+            times=times,
+        )
+
+        marker_size = 1.0
+
+        # case 1: no defined gid_ranges, y-axis ends at largest gid + marker_size
+        fig = cell_response.plot_spikes_raster(show=False, marker_size=marker_size)
+        assert fig.axes[0].get_ylim() == pytest.approx(
+            (max(spike_gids) + marker_size, 0)
+        )
+
+        # case 2: gid_ranges added as input, y-axis spans largest gid + marker size
+        fig = cell_response.plot_spikes_raster(
+            show=False, marker_size=marker_size, gid_ranges=gid_ranges
+        )
+        assert fig.axes[0].get_ylim() == pytest.approx(
+            (max(gid_ranges["L5_pyramidal"]) + marker_size, 0)
+        )
+
+        # case 3: plotting a subset of cell types spans the gids of those types only
+        fig = cell_response.plot_spikes_raster(
+            show=False,
+            marker_size=marker_size,
+            gid_ranges=gid_ranges,
+            cell_types=["L2_basket", "L2_pyramidal"],
+        )
+        assert fig.axes[0].get_ylim() == pytest.approx(
+            (
+                max(gid_ranges["L2_pyramidal"]) + marker_size,
+                min(gid_ranges["L2_basket"]),
+            )
+        )
+
+        # case 4: same as case 3, except for a cell type that is silent
+        with pytest.warns(UserWarning, match="No spikes found"):
+            fig = cell_response.plot_spikes_raster(
+                show=False,
+                marker_size=marker_size,
+                gid_ranges=gid_ranges,
+                cell_types=["L5_pyramidal"],
+            )
+        assert fig.axes[0].get_ylim() == pytest.approx(
+            (
+                max(gid_ranges["L5_pyramidal"]) + marker_size,
+                min(gid_ranges["L5_pyramidal"]),
+            )
+        )
+
+        # case 5: test that overlay dipoles works correctly with gid_ranges
+        # This test was written by Claude Opus 5.5, but Austin read it and it seems good.
+        l2_data = np.sin(2 * np.pi * times / 50)
+        l5_data = 2 * np.cos(2 * np.pi * times / 50)
+        dpl = Dipole(times, np.column_stack([l2_data + l5_data, l2_data, l5_data]))
+
+        def plot_dipole_lines(**kwargs):
+            fig = cell_response.plot_spikes_raster(
+                show=False, overlay_dipoles=True, dpl=dpl, **kwargs
+            )
+            lines = {line.get_label(): line for line in fig.axes[0].get_lines()}
+            return fig.axes[0], lines["L2 Dipole"], lines["L5 Dipole"]
+
+        ax, l2_line, l5_line = plot_dipole_lines(gid_ranges=gid_ranges)
+        float_tol = 1e-8  # Managing y-data floating point precision
+
+        # Each dipole is overlaid on the rows of its own layer's cells, which for
+        # L5 includes the silent L5 pyramidal cells
+        l2_gids = [*gid_ranges["L2_basket"], *gid_ranges["L2_pyramidal"]]
+        l5_gids = [*gid_ranges["L5_basket"], *gid_ranges["L5_pyramidal"]]
+        for line, gids in [(l2_line, l2_gids), (l5_line, l5_gids)]:
+            y_data = line.get_ydata()
+            assert (min(gids) - float_tol) <= np.mean(y_data) <= (max(gids) + float_tol)
+            assert (min(gid_ranges["L2_basket"]) - float_tol) <= y_data.min()
+            assert y_data.max() <= (max(gid_ranges["L5_pyramidal"]) + float_tol)
+            assert (min(gids) - float_tol) <= y_data.min()
+            assert y_data.max() <= (max(gids) + float_tol)
+
+        # Both dipoles are drawn within the visible y-axis
+        ylim_low, ylim_high = sorted(ax.get_ylim())
+        for line in (l2_line, l5_line):
+            assert (ylim_low - float_tol) <= line.get_ydata().min()
+            assert line.get_ydata().max() <= (ylim_high + float_tol)
+
+        # Without gid_ranges, the raster ends at the largest gid that spiked, so the
+        # L5 dipole is placed higher up (at smaller gids) than with gid_ranges
+        # Note that due to y-axis inversion, "higher up" is due to a lower mean y position
+        # hence we test that y position of `l5_line_no_ranges` is *less than* `l5_line`
+        _, _, l5_line_no_ranges = plot_dipole_lines()
+        assert (np.mean(l5_line_no_ranges.get_ydata()) - float_tol) < np.mean(
+            l5_line.get_ydata()
+        )
+
     # smoke test for raster plot input arguments
     def test_spikes_raster_input_args(self, fix_use_cached_sims):
         net, _, _, _ = fix_use_cached_sims
@@ -641,67 +759,73 @@ class TestCellResponsePlotters:
                 cell_types=["bad_cell_type"], show=False
             )
 
-    # # TODO AES: also currently broken due to a bug with lack of detection of when https://github.com/satviksaluja/hnn-core/blob/ce7fcb9c87c8fca606068ac38691d2712deb841d/hnn_core/viz.py#L804 plot_spikes_raster cell_type_gids is empty
-    # def test_spikes_from_read_spikes(self, fix_use_cached_sims):
-    #     """Test hist and raster plots on a CellResponse loaded via read_spikes"""
-    #     net, dpls, net_customizations, _ = fix_use_cached_sims
-    #     inh_name_suffix = net_customizations["inh_name_suffix"]
-    #     with tempfile.TemporaryDirectory() as tmp_dir_name:
-    #         net.cell_response.write(
-    #             op.join(tmp_dir_name, f"spk_{net._model_variant}_%d.txt")
-    #         )
-    #         cell_response = read_spikes(op.join(tmp_dir_name, "spk_*.txt"))
+    def test_spikes_from_read_spikes(self, fix_use_cached_sims):
+        """Test hist and raster plots on a CellResponse loaded via read_spikes"""
+        net, dpls, net_customizations, _ = fix_use_cached_sims
+        inh_name_suffix = net_customizations["inh_name_suffix"]
+        cell_type_names = [
+            f"L2_{inh_name_suffix}",
+            "L2_pyramidal",
+            f"L5_{inh_name_suffix}",
+            "L5_pyramidal",
+        ]
+        with tempfile.TemporaryDirectory() as tmp_dir_name:
+            net.cell_response.write(
+                op.join(tmp_dir_name, f"spk_{net._model_variant}_%d.txt")
+            )
+            # This is left using op instead of Path due to the inherent globbing already
+            # present in read_spikes
+            cell_response = read_spikes(op.join(tmp_dir_name, "spk_*.txt"))
 
-    #     cell_type_names = [
-    #         f"L2_{inh_name_suffix}",
-    #         "L2_pyramidal",
-    #         f"L5_{inh_name_suffix}",
-    #         "L5_pyramidal",
-    #     ]
-    #     n_cell_spikes = sum(
-    #         sum(1 for spike_type in trial if spike_type in cell_type_names)
-    #         for trial in cell_response.spike_types
-    #     )
-    #     n_drive_spikes = sum(
-    #         sum(1 for spike_type in trial if spike_type not in cell_type_names)
-    #         for trial in cell_response.spike_types
-    #     )
+        for trial_idx, trial_spike_types in enumerate(cell_response.spike_types):
+            n_cell_spikes = sum(
+                1 for spike_type in trial_spike_types if spike_type in cell_type_names
+            )
+            n_drive_spikes = sum(
+                1
+                for spike_type in trial_spike_types
+                if spike_type not in cell_type_names
+            )
 
-    #     # By default, if any drive (input) spike types are present, the
-    #     # histogram plots only those, not the real cell spikes
-    #     fig_hist = cell_response.plot_spikes_hist(show=False)
-    #     n_plotted_hist = sum(
-    #         patch.get_height() for ax in fig_hist.axes for patch in ax.patches
-    #     )
-    #     assert n_plotted_hist == n_drive_spikes, (
-    #         f"Expected {n_drive_spikes} spikes plotted in histogram, "
-    #         f"got {n_plotted_hist}"
-    #     )
+            # By default, if any drive (input) spike types are present, the
+            # histogram plots only those, not the real cell spikes
+            fig_hist = cell_response.plot_spikes_hist(trial_idx=trial_idx, show=False)
+            n_plotted_hist = sum(
+                patch.get_height() for ax in fig_hist.axes for patch in ax.patches
+            )
+            assert n_plotted_hist == n_drive_spikes, (
+                f"Trial {trial_idx}: expected {n_drive_spikes} spikes plotted in "
+                f"histogram, got {n_plotted_hist}"
+            )
 
-    #     # By default, the raster plots the real cell spikes, not drive spikes
-    #     fig_raster = cell_response.plot_spikes_raster(show=False)
-    #     n_plotted_raster = sum(
-    #         len(collection.get_positions())
-    #         for collection in fig_raster.axes[0].collections
-    #     )
-    #     assert n_plotted_raster == n_cell_spikes, (
-    #         f"Expected {n_cell_spikes} spikes plotted in raster, got {n_plotted_raster}"
-    #     )
+            # By default, the raster plots the real cell spikes, not drive spikes.
+            n_expected_raster = n_cell_spikes
+            fig_raster = cell_response.plot_spikes_raster(
+                trial_idx=trial_idx, show=False
+            )
+            n_plotted_raster = sum(
+                len(collection.get_positions())
+                for collection in fig_raster.axes[0].collections
+            )
+            assert n_plotted_raster == n_expected_raster, (
+                f"Trial {trial_idx}: expected {n_expected_raster} spikes plotted in "
+                f"raster, got {n_plotted_raster}"
+            )
 
-    #     # By default, the raster plots the real cell spikes, not drive spikes
-    #     fig_raster_overlay = cell_response.plot_spikes_raster(
-    #         show=False,
-    #         overlay_dipoles=True,
-    #         dpl=dpls,
-    #     )
-    #     n_plotted_raster_overlay = sum(
-    #         len(collection.get_positions())
-    #         for collection in fig_raster_overlay.axes[0].collections
-    #     )
-    #     assert n_plotted_raster_overlay == n_cell_spikes, (
-    #         f"Expected {n_cell_spikes} spikes plotted in raster, got "
-    #         f"{n_plotted_raster_overlay}"
-    #     )
+            fig_raster_overlay = cell_response.plot_spikes_raster(
+                trial_idx=trial_idx,
+                show=False,
+                overlay_dipoles=True,
+                dpl=dpls[trial_idx],
+            )
+            n_plotted_raster_overlay = sum(
+                len(collection.get_positions())
+                for collection in fig_raster_overlay.axes[0].collections
+            )
+            assert n_plotted_raster_overlay == n_expected_raster, (
+                f"Trial {trial_idx}: expected {n_expected_raster} spikes plotted in "
+                f"raster, got {n_plotted_raster_overlay}"
+            )
 
     def test_spikes_hist_default(self, fix_use_cached_sims):
         """Test basic spike histogram plotting."""

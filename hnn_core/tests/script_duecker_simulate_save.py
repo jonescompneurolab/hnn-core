@@ -10,102 +10,6 @@ from hnn_core.hnn_io import (
 )
 
 
-def create_duecker_model_with_drives():
-    """Create a Duecker ET model network model including 3 evoked drives.
-
-    Builds the Duecker ET network in a similar way to the ``handtune_new_syn.ipynb``
-    notebook in the ``duecker_ET_model`` branch of the ``hnn-tuning`` repository at
-    (as of approximately 2026-07-15):
-
-    https://github.com/jonescompneurolab/hnn-tuning/blob/duecker_ET_model/new_model_HNN/ERP/handtune_new_syn.ipynb
-
-    """
-    net = duecker_ET_model()
-    net.set_cell_positions(inplane_distance=30.0)
-    weights_ampa_p1 = {
-        "L2_inhibitory": 0.01,
-        "L2_pyramidal": 0.015,
-        "L5_inhibitory": 0.0,
-        "L5_pyramidal": 0.03,
-    }
-    weights_nmda_p1 = {
-        "L2_inhibitory": 0.01,
-        "L2_pyramidal": 0.05,
-        "L5_inhibitory": 0.0,
-        "L5_pyramidal": 0.025,
-    }
-    synaptic_delays_prox = {
-        "L2_inhibitory": 0.1,
-        "L2_pyramidal": 0.1,
-        "L5_inhibitory": 1,
-        "L5_pyramidal": 1,
-    }
-
-    net.add_evoked_drive(
-        "prox1",
-        mu=18,
-        sigma=2.5,
-        numspikes=1,
-        weights_ampa=weights_ampa_p1,
-        weights_nmda=weights_nmda_p1,
-        location="proximal",
-        synaptic_delays=synaptic_delays_prox,
-    )
-
-    weights_ampa_d1 = {
-        "L2_inhibitory": 0.005,
-        "L2_pyramidal": 0.01,
-        "L5_pyramidal": 1.0,
-    }
-    weights_nmda_d1 = {"L2_inhibitory": 0.0, "L2_pyramidal": 0.01, "L5_pyramidal": 1.0}
-    synaptic_delays_dist = {
-        "L2_inhibitory": 0.1,
-        "L2_pyramidal": 0.1,
-        "L5_pyramidal": 0.1,
-    }
-
-    net.add_evoked_drive(
-        "dist1",
-        mu=62,
-        sigma=5,
-        numspikes=2,
-        weights_ampa=weights_ampa_d1,
-        weights_nmda=weights_nmda_d1,
-        location="distal",
-        synaptic_delays=synaptic_delays_dist,
-    )
-
-    weights_ampa_p2 = {
-        "L2_inhibitory": 0.01,
-        "L2_pyramidal": 0.3,
-        "L5_inhibitory": 0.001,
-        "L5_pyramidal": 0.3,
-    }
-    weights_nmda_p2 = {
-        "L2_inhibitory": 0.01,
-        "L2_pyramidal": 0.2,
-        "L5_inhibitory": 0.001,
-        "L5_pyramidal": 0.2,
-    }
-    synaptic_delays_prox = {
-        "L2_inhibitory": 0.1,
-        "L2_pyramidal": 0.1,
-        "L5_inhibitory": 1.0,
-        "L5_pyramidal": 1.0,
-    }
-    net.add_evoked_drive(
-        "prox2",
-        mu=100,
-        sigma=15,
-        numspikes=1,
-        weights_ampa=weights_ampa_p2,
-        weights_nmda=weights_nmda_p2,
-        location="proximal",
-        synaptic_delays=synaptic_delays_prox,
-    )
-    return net
-
-
 def rerun_and_save_duecker_model(suffix="new", backend="mpi"):
     """Rerun the Duecker ET model and save its network config and output.
 
@@ -148,7 +52,7 @@ def rerun_and_save_duecker_model(suffix="new", backend="mpi"):
         - ``dipole_duecker_output_{suffix}.txt`` : dipole waveform of trial 0
     """
     # Setup network, including drives
-    net = create_duecker_model_with_drives()
+    net = duecker_ET_model(add_erp_drives=True)
 
     # Begin simulation
     if backend == "mpi":
