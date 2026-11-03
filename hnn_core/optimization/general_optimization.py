@@ -501,6 +501,7 @@ def _run_opt_bayesian(
         cons=constraints,
         acquisition=expected_improvement,
         maxfun=max_iter,
+        random_state=obj_fun_kwargs.get("seed", None),
     )
 
     # get optimized params
