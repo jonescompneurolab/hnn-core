@@ -5,6 +5,7 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
+import warnings
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
@@ -232,7 +233,7 @@ class Optimizer:
             data comparison. There is no smoothing applied by default, so you must pass
             a value if you want any smoothing.
         verbose : bool, default=True
-            If True, print build steps and simulation progress to console.
+            If True, log build steps and simulation progress (shown by default, see :func:`~hnn_core.configure_logging`).
 
         Notes
         -----
@@ -260,8 +261,9 @@ class Optimizer:
             ):
                 raise Exception("f_bands and relative_bandpower must be specified")
             elif obj_fun_kwargs["n_trials"] > 1:
-                print(
-                    "WARNING: For the `_maximize_psd` objective function, currently only 1 trial is supported. Overwriting the number of trials to be 1."
+                warnings.warn(
+                    "For the `_maximize_psd` objective function, currently only 1 trial is supported. Overwriting the number of trials to be 1.",
+                    UserWarning,
                 )
                 obj_fun_kwargs["n_trials"] = 1
 

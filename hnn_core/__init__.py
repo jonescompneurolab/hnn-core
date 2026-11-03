@@ -18,6 +18,7 @@ from .cell import Cell, Section
 from .cell_response import CellResponse, read_spikes
 from .cells_default import pyramidal, basket
 from .parallel_backends import MPIBackend, JoblibBackend
+from ._logging import configure_logging, set_log_level
 from .hnn_io import (
     dict_to_network,
     network_to_dict,

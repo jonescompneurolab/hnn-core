@@ -3,6 +3,8 @@
 # Authors: Blake Caldwell <blake_caldwell@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
+import logging
+import warnings
 from math import ceil, floor
 from collections import OrderedDict
 import fnmatch
@@ -14,6 +16,9 @@ from scipy.optimize import fmin_cobyla
 
 from ..dipole import simulate_dipole, _rmse, average_dipoles
 from ..network import pick_connection
+
+
+logger = logging.getLogger(__name__)
 
 
 def _get_range(val, multiplier):
@@ -303,7 +308,7 @@ def _optrun(
     avg_rmse: float
         Weighted RMSE between data in dpl and exp_dpl
     """
-    print(
+    logger.info(
         "Optimization step %d, iteration %d"
         % (opt_params["cur_step"] + 1, opt_params["optiter"] + 1)
     )
@@ -387,7 +392,7 @@ def _optrun(
     opt_params["stepminopterr"] = avg_rmse
     opt_dpls["best_dpl"] = avg_dpl
 
-    print(
+    logger.info(
         "weighted RMSE: %.2e over range [%3.3f-%3.3f] ms"
         % (avg_rmse, opt_params["opt_start"], opt_params["opt_end"])
     )
@@ -605,7 +610,7 @@ def optimize_evoked(
 
     best_rmse = _rmse(initial_dpl, target_dpl, tstop=tstop)
     opt_dpls = dict(best_dpl=initial_dpl, target_dpl=target_dpl)
-    print("Initial RMSE: %.2e" % best_rmse)
+    logger.info("Initial RMSE: %.2e" % best_rmse)
 
     opt_params = dict()
 
@@ -621,11 +626,12 @@ def optimize_evoked(
         opt_params.update(param_chunks[step])
 
         if maxiter == 0:
-            print("Skipping optimization step %d (0 simulations)" % (step + 1))
+            logger.info("Skipping optimization step %d (0 simulations)" % (step + 1))
             continue
         elif maxiter < 12:
-            print(
-                "'maxiter' must be at least 12 for optimization to run. Increasing 'maxiter' to 12."
+            warnings.warn(
+                "'maxiter' must be at least 12 for optimization to run. Increasing 'maxiter' to 12.",
+                UserWarning,
             )
             maxiter = 12
 
@@ -657,7 +663,7 @@ def optimize_evoked(
             # steps was changed by updateoptparams()
             opt_params.update(param_chunks[total_steps - 1])
 
-        print("Starting optimization step %d/%d" % (step + 1, total_steps))
+        logger.info("Starting optimization step %d/%d" % (step + 1, total_steps))
 
         opt_params["optiter"] = 0
         opt_params["stepminopterr"] = _rmse(
@@ -685,7 +691,7 @@ def optimize_evoked(
             return_rmse=return_rmse,
         )
 
-        print(
+        logger.info(
             "Optimizing from [%3.3f-%3.3f] ms"
             % (opt_params["opt_start"], opt_params["opt_end"])
         )
@@ -706,7 +712,7 @@ def optimize_evoked(
 
             net = net_opt
 
-    print("Final RMSE: %.2e" % best_rmse)
+    logger.info("Final RMSE: %.2e" % best_rmse)
 
     if return_rmse is True:
         return net, opt_params["iter_avg_rmse"]

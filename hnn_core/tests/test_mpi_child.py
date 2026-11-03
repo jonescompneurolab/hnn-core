@@ -1,4 +1,5 @@
 import io
+import logging
 from contextlib import redirect_stdout, redirect_stderr
 from queue import Queue
 
@@ -114,7 +115,7 @@ def test_str_to_net(fix_net_neymotin_2020):
 @pytest.mark.parametrize(
     "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
 )
-def test_child_run(fix_net_model, request):
+def test_child_run(fix_net_model, request, caplog):
     """Test running the child process without MPI"""
     net_model = request.getfixturevalue(fix_net_model)
     net_reduced, _ = net_model(add_drives_from_params=True, reduced=True)
@@ -122,12 +123,11 @@ def test_child_run(fix_net_model, request):
     net_reduced._instantiate_drives(tstop=tstop, n_trials=n_trials)
 
     with MPISimulation(skip_mpi_import=True) as mpi_sim:
-        with io.StringIO() as buf, redirect_stdout(buf):
+        with caplog.at_level(logging.INFO, logger="hnn_core"):
             sim_data = mpi_sim.run(
                 net_reduced, tstop=tstop, dt=0.025, n_trials=n_trials
             )
-            stdout = buf.getvalue()
-        assert "Trial 1: 0.03 ms..." in stdout
+        assert "Trial 1: 0.03 ms..." in caplog.text
 
         with io.StringIO() as buf_err, redirect_stderr(buf_err):
             mpi_sim._send_data_to_parent_process(sim_data)
