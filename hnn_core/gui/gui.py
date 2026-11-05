@@ -1508,6 +1508,20 @@ class HNNGUI:
                 "loading_failed"
             ]
             return
+        elif data_filename == "None":
+            logger.error(
+                textwrap.dedent(f"""
+                Cannot load external data named '{data_filename}': the filename is
+                invalid. Please rename the data file to something other than 'None' to
+                avoid naming conflicts.
+                """)
+                .replace("\n", " ")
+                .strip()
+            )
+            self._simulation_status_bar.value = self._simulation_status_contents[
+                "loading_failed"
+            ]
+            return
 
         # Decision from
         # https://github.com/jonescompneurolab/hnn-core/pull/1328#issuecomment-5444471136
@@ -4941,6 +4955,18 @@ def run_button_clicked(
             Cannot run simulation named '{_sim_name}': a experimental data
             with the same name already exists. Please rename the simulation to
             avoid naming conflicts.
+            """)
+            .replace("\n", " ")
+            .strip()
+        )
+
+        simulation_status_bar.value = simulation_status_contents["simulation_failed"]
+        return
+    elif _sim_name == "None":
+        logger.error(
+            textwrap.dedent(f"""
+            Cannot run simulation named '{_sim_name}': the simulation name cannot be
+            'None'. Please rename the simulation to avoid naming conflicts.
             """)
             .replace("\n", " ")
             .strip()
