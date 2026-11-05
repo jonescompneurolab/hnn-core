@@ -837,10 +837,10 @@ def test_gui_spectrogram_trial_averaging(setup_reduced_gui):
     for sim_name, _ in simulations:
         # clear axis first and then plot the spectrogram
         gui._simulate_viz_action(
-            "edit_figure", figname, axname, sim_name, "spectrogram", {}, "clear"
+            "edit_axis", figname, axname, sim_name, "spectrogram", {}, "clear"
         )
         gui._simulate_viz_action(
-            "edit_figure", figname, axname, sim_name, "spectrogram", {}, "plot"
+            "edit_axis", figname, axname, sim_name, "spectrogram", {}, "plot"
         )
 
         fig = gui.viz_manager.figs[figid]
@@ -1023,7 +1023,7 @@ def test_gui_visualization(setup_reduced_gui):
 
     for viz_type in _plot_types:
         gui._simulate_viz_action(
-            "edit_figure", figname, axname, "default", viz_type, {}, "clear"
+            "edit_axis", figname, axname, "default", viz_type, {}, "clear"
         )
         # Check that extra axes have been successfully removed
         assert len(gui.viz_manager.figs[figid].axes) == 1
@@ -1031,7 +1031,7 @@ def test_gui_visualization(setup_reduced_gui):
         assert not gui.viz_manager.figs[figid].axes[0].has_data()
 
         gui._simulate_viz_action(
-            "edit_figure", figname, axname, "default", viz_type, {}, "plot"
+            "edit_axis", figname, axname, "default", viz_type, {}, "plot"
         )
         # Check if data is plotted on the axes
         assert gui.viz_manager.figs[figid].axes[0].has_data()
@@ -1051,7 +1051,7 @@ def test_gui_visualization(setup_reduced_gui):
 
             # make sure the colorbar is safely removed
             gui._simulate_viz_action(
-                "edit_figure", figname, axname, "default", "spectrogram", {}, "clear"
+                "edit_axis", figname, axname, "default", "spectrogram", {}, "clear"
             )
             assert (
                 any(["_cbar-ax-" in attr for attr in dir(gui.viz_manager.figs[figid])])
@@ -1063,7 +1063,7 @@ def test_gui_visualization(setup_reduced_gui):
             # Test that frequency inversion works
             # First, test no inversion
             gui._simulate_viz_action(
-                "edit_figure",
+                "edit_axis",
                 figname,
                 axname,
                 "default",
@@ -1076,12 +1076,12 @@ def test_gui_visualization(setup_reduced_gui):
             )
             assert gui.viz_manager.figs[figid].axes[0].has_data()
             gui._simulate_viz_action(
-                "edit_figure", figname, axname, "default", "spectrogram", {}, "clear"
+                "edit_axis", figname, axname, "default", "spectrogram", {}, "clear"
             )
             assert not gui.viz_manager.figs[figid].axes[0].has_data()
             # Next, test inversion
             gui._simulate_viz_action(
-                "edit_figure",
+                "edit_axis",
                 figname,
                 axname,
                 "default",
@@ -1118,10 +1118,10 @@ def test_dipole_data_overlay(setup_reduced_gui):
     figname = f"Figure {figid}"
     axname = "ax1"
     gui._simulate_viz_action(
-        "edit_figure", figname, axname, "default", "current dipole", {}, "clear"
+        "edit_axis", figname, axname, "default", "current dipole", {}, "clear"
     )
     gui._simulate_viz_action(
-        "edit_figure",
+        "edit_axis",
         figname,
         axname,
         "default",
@@ -1685,11 +1685,11 @@ def test_default_scaling(setup_reduced_gui):
 
     for viz_type in _dipole_plot_types:
         gui._simulate_viz_action(
-            "edit_figure", figname, axname, "no_scaling", viz_type, {}, "clear"
+            "edit_axis", figname, axname, "no_scaling", viz_type, {}, "clear"
         )
 
         gui._simulate_viz_action(
-            "edit_figure", figname, axname, "no_scaling", viz_type, {}, "plot"
+            "edit_axis", figname, axname, "no_scaling", viz_type, {}, "plot"
         )
 
         # Check if data is plotted on the axes
@@ -1741,11 +1741,11 @@ def test_default_smoothing(setup_reduced_gui):
 
     for viz_type in _dipole_plot_types:
         gui._simulate_viz_action(
-            "edit_figure", figname, axname, "no_smoothing", viz_type, {}, "clear"
+            "edit_axis", figname, axname, "no_smoothing", viz_type, {}, "clear"
         )
 
         gui._simulate_viz_action(
-            "edit_figure", figname, axname, "no_smoothing", viz_type, {}, "plot"
+            "edit_axis", figname, axname, "no_smoothing", viz_type, {}, "plot"
         )
 
         # Check if data is plotted on the axes

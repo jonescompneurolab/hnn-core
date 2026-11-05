@@ -1558,10 +1558,10 @@ class HNNGUI:
             self.viz_manager.add_figure()
             fig_name = _idx2figname(self.viz_manager.data["fig_idx"]["idx"] - 1)
             process_configs = {"dipole_smooth": 0, "dipole_scaling": 1}
-            self.viz_manager._simulate_edit_figure(
+            self.viz_manager._simulate_edit_axis(
                 fig_name,
                 ax_name="ax0",
-                simulation_name=data_filename,
+                data_name=data_filename,
                 plot_type="current dipole",
                 preprocessing_config=process_configs,
                 operation="plot",
@@ -5035,7 +5035,7 @@ def run_button_clicked(
             fig_name = _idx2figname(viz_manager.data["fig_idx"]["idx"] - 1)
             ax_plots = [("ax0", "input histogram"), ("ax1", "current dipole")]
             for ax_name, plot_type in ax_plots:
-                viz_manager._simulate_edit_figure(
+                viz_manager._simulate_edit_axis(
                     fig_name, ax_name, _sim_name, plot_type, {}, "plot"
                 )
 
@@ -6306,7 +6306,7 @@ def run_opt_button_clicked(
 
             viz_manager.add_figure()
             fig_name = _idx2figname(viz_manager.data["fig_idx"]["idx"] - 1)
-            viz_manager._simulate_edit_figure(
+            viz_manager._simulate_edit_axis(
                 fig_name,
                 "ax0",
                 new_name,
@@ -6314,7 +6314,7 @@ def run_opt_button_clicked(
                 {},
                 "plot",
             )
-            viz_manager._simulate_edit_figure(
+            viz_manager._simulate_edit_axis(
                 fig_name,
                 "ax1",
                 new_name,
