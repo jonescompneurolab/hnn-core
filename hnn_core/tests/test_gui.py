@@ -1161,24 +1161,64 @@ def test_dipole_data_overlay(setup_reduced_gui):
 
 
 def test_data_figure_add_simulation(setup_reduced_gui):
-    """Adding a simulation to the experimental data figure plots the simulation (#1389)."""
+    """Adding a simulation to existing experimental figure plots the simulation (#1389)."""
     gui = setup_reduced_gui
+
+    # First, run a sim and create the first figure that will plot the sime
+    gui.widget_ntrials.value = 2
     gui.run_button.click()
-    gui._simulate_upload_experimental_data(assets_path / "test_default.csv")
 
-    viz = gui.viz_manager
-    figid = max(viz.figs)
-    tab_idx = viz.axes_config_tabs.titles.index(f"Figure {figid}")
-    ax_controls = viz.axes_config_tabs.children[tab_idx].children[1].children[0]
-    ax = viz.figs[figid].axes[0]
-    n_lines = len(ax.lines)
+    # Secondly, load data, creating a second figure of that data:
+    file_path = assets_path / "test_default.csv"
+    gui._simulate_upload_experimental_data(file_path)
 
-    # Like a user: select the simulation and click "Add plot"
-    ax_controls.children[1].value = "default"
-    ax_controls.children[-2].children[0].click()
+    # On the second figure (experimental data), grab how many lines are present:
+    figid = 2
+    figname = f"Figure {figid}"
+    axname = "ax0"
+    ax0 = gui.viz_manager.figs[figid].axes[0]
+    n_lines_initial = len(ax0.lines)
 
-    assert len(ax.lines) > n_lines
-    labels = [t.get_text() for t in ax.legend_.texts]
+    # Now, add the simulation data to the second figure (experimental data):
+    gui._simulate_viz_action(
+        "edit_axis",
+        figname,
+        axname,
+        "default",
+        "current dipole",
+        {},
+        "clear",
+    )
+    gui._simulate_viz_action(
+        "edit_axis",
+        figname,
+        axname,
+        "default",
+        "current dipole",
+        {
+            "dipole_smooth": gui.widget_default_smoothing.value,
+            "dipole_scaling": gui.widget_default_scaling.value,
+            "data_to_compare": "test_default",
+        },
+        "plot",
+    )
+
+    # There should now be additional datasets / lines
+    assert len(ax0.lines) > n_lines_initial
+
+    # Get the simulation data from the second figure. Note that simulation data is
+    # always plotted first before experimental data, if both are plotted, so it's the
+    # first line:
+    sim_data_overlaid = ax0.lines[0].get_ydata()
+
+    # Check that the simulation data from the second figure matches the simulation data
+    # from the first figure:
+    assert np.allclose(
+        sim_data_overlaid, gui.viz_manager.figs[1].axes[1].lines[0].get_ydata()
+    )
+
+    # Ensure that the legend includes the simulated data in the new second figure:
+    labels = [t.get_text() for t in ax0.legend_.texts]
     assert any(
         label.startswith("default") and not label.startswith("test_default")
         for label in labels
@@ -1190,26 +1230,65 @@ def test_data_figure_add_simulation(setup_reduced_gui):
 def test_data_figure_add_simulation_respects_data_scaling(setup_reduced_gui):
     """Simulation smooth/scale must not alter the existing experimental trace (#1389)."""
     gui = setup_reduced_gui
+
+    # First, run a sim and create the first figure that will plot the sime
+    gui.widget_ntrials.value = 2
     gui.run_button.click()
-    gui._simulate_upload_experimental_data(assets_path / "test_default.csv")
 
-    viz = gui.viz_manager
-    figid = max(viz.figs)
-    tab_idx = viz.axes_config_tabs.titles.index(f"Figure {figid}")
-    ax_controls = viz.axes_config_tabs.children[tab_idx].children[1].children[0]
-    ax = viz.figs[figid].axes[0]
-    data_y = ax.lines[0].get_ydata().copy()
-    n_lines = len(ax.lines)
+    # Secondly, load data, creating a second figure of that data:
+    file_path = assets_path / "test_default.csv"
+    gui._simulate_upload_experimental_data(file_path)
 
-    ax_controls.children[3].value = 5.0  # Simulation Dipole Scaling
-    ax_controls.children[5].value = 0.0  # Data Smooth Window
-    ax_controls.children[6].value = 1.0  # Data Dipole Scaling
-    ax_controls.children[1].value = "default"
-    ax_controls.children[-2].children[0].click()
+    # On the second figure (experimental data), grab lines and data present:
+    figid = 2
+    figname = f"Figure {figid}"
+    axname = "ax0"
+    ax0 = gui.viz_manager.figs[figid].axes[0]
+    n_lines_initial = len(ax0.lines)
+    exp_data_initial = ax0.lines[0].get_ydata().copy()
 
-    assert len(ax.lines) > n_lines
-    assert np.allclose(ax.lines[0].get_ydata(), data_y)
-    labels = [t.get_text() for t in ax.legend_.texts]
+    # Now, add the simulation data to the second figure (experimental data), with
+    # heterogeneous scaling/smoothing:
+    gui._simulate_viz_action(
+        "edit_axis",
+        figname,
+        axname,
+        "default",
+        "current dipole",
+        {},
+        "clear",
+    )
+    gui._simulate_viz_action(
+        "edit_axis",
+        figname,
+        axname,
+        "default",
+        "current dipole",
+        {
+            "dipole_smooth": gui.widget_default_smoothing.value,
+            "dipole_scaling": 0.0,  # Sim scaling is changed from default 3000
+            "data_smooth": 0.0,
+            "data_scaling": 1.0,
+            "data_to_compare": "test_default",
+        },
+        "plot",
+    )
+
+    # There should now be additional datasets / lines
+    assert len(ax0.lines) > n_lines_initial
+
+    # Check that the experimental data has not been altered by the simulation
+    # scaling/smoothing:
+    #
+    # Note that when clearing and adding a new plot, the experimental data is plotted
+    # AFTER the simulated data, so its "line index" will no longer be at 0, so we have
+    # to compare against a different line index. Additionally, the experimental data
+    # appears to be fully contained in BOTH the fourth and fifth of the five lines of
+    # the axis ; I have no idea why, maybe the "clear" button performs weird behavior?
+    assert np.allclose(exp_data_initial, ax0.lines[3].get_ydata())
+
+    # Ensure that the legend includes the simulated data in the new second figure:
+    labels = [t.get_text() for t in ax0.legend_.texts]
     assert any(
         label.startswith("default") and not label.startswith("test_default")
         for label in labels
@@ -1221,24 +1300,58 @@ def test_data_figure_add_simulation_respects_data_scaling(setup_reduced_gui):
 def test_clear_axis_add_experimental_only(setup_reduced_gui):
     """After Clear axis, Add plot with Simulation Data=None still plots experimental data."""
     gui = setup_reduced_gui
+
+    # First, run a sim and create the first figure that will plot the sime
+    gui.widget_ntrials.value = 2
     gui.run_button.click()
-    gui._simulate_upload_experimental_data(assets_path / "test_default.csv")
 
-    viz = gui.viz_manager
-    viz.templates_dropdown.value = "Experimental Data - Dipole"
-    viz.make_fig_button.click()
-    figid = max(viz.figs)
-    tab_idx = viz.axes_config_tabs.titles.index(f"Figure {figid}")
-    ax_controls = viz.axes_config_tabs.children[tab_idx].children[1].children[0]
-    ax = viz.figs[figid].axes[0]
+    # Secondly, load data, creating a second figure of that data:
+    file_path = assets_path / "test_default.csv"
+    gui._simulate_upload_experimental_data(file_path)
 
-    ax_controls.children[-2].children[1].click()  # Clear axis
+    # On the second figure (experimental data), grab lines and data present:
+    figid = 2
+    figname = f"Figure {figid}"
+    axname = "ax0"
+    ax0 = gui.viz_manager.figs[figid].axes[0]
+    n_lines_initial = len(ax0.lines)
+    exp_data_initial = ax0.lines[0].get_ydata().copy()
+
+    # Now, add the simulation data to the second figure (experimental data), with
+    # heterogeneous scaling/smoothing:
+    gui._simulate_viz_action(
+        "edit_axis",
+        figname,
+        axname,
+        "default",
+        "current dipole",
+        {},
+        "clear",
+    )
+
+    # Sourav's clever hack for setting the simulated data set to None
+    # TODO this will be changed after some refactoring of `_simulate_edit_axis` a la
+    # https://github.com/jonescompneurolab/hnn-core/pull/1394#issuecomment-6670606255
+    tab_idx = gui.viz_manager.axes_config_tabs.titles.index(f"Figure {figid}")
+    ax_controls = (
+        gui.viz_manager.axes_config_tabs.children[tab_idx].children[1].children[0]
+    )
     ax_controls.children[1].value = "None"
-    ax_controls.children[4].value = "test_default"
-    ax_controls.children[-2].children[0].click()  # Add plot
 
-    assert ax.has_data()
-    labels = [t.get_text() for t in ax.legend_.texts]
+    gui._simulate_viz_action(
+        "edit_axis",
+        figname,
+        axname,
+        "test_default",  # This is an experimental dataset, not a simulation dataset!
+        "current dipole",
+        {},
+        "plot",
+    )
+
+    assert len(ax0.lines) == n_lines_initial
+    assert np.allclose(exp_data_initial, ax0.lines[-1].get_ydata())
+
+    labels = [t.get_text() for t in ax0.legend_.texts]
     assert any(label.startswith("test_default") for label in labels)
     assert not any(
         label.startswith("default") and not label.startswith("test_default")
