@@ -523,27 +523,6 @@ def _avg_dipole_check(dpls):
     return dpl
 
 
-def _use_experimental_as_primary(simulations_data_widget, experimental_data_widget):
-    """Whether Add plot should draw experimental data as the primary series.
-
-    Follow the current dropdowns, not a sticky ``plot_context`` flag from an
-    earlier scripted draw. If a simulation is selected, plot that (and overlay
-    experimental data when requested). If Simulation Data is ``None`` and an
-    experimental dataset is selected, plot the experimental data alone.
-    """
-    sim_name = simulations_data_widget.value
-    if sim_name not in (None, "None") and (
-        sim_name in data_store.simulated_data
-        or sim_name in data_store.experimental_data
-    ):
-        return False
-    exp_name = experimental_data_widget.value
-    return (
-        exp_name not in (None, "None")
-        and exp_name in data_store.experimental_data_names
-    )
-
-
 def _plot_on_axes(
     button,
     simulations_data_widget,
@@ -568,9 +547,6 @@ def _plot_on_axes(
     existing_plots,
 ):
     """Plotting different types of data on the given axes.
-
-    Now this function is also responsible for comparing multiple simulations,
-    or simulations vs. experimental data.
 
     Parameters
     ----------
@@ -611,9 +587,28 @@ def _plot_on_axes(
     existing_plots : ipywidgets.VBox
         A VBox widget that contains all the existing plots.
     """
-    is_experimental_primary = _use_experimental_as_primary(
-        simulations_data_widget, experimental_data_widget
-    )
+
+    sim_name = simulations_data_widget.value
+    exp_name = experimental_data_widget.value
+
+    # We always plot at least one dataset, called the "primary". We MAY also plot a
+    # "secondary" dataset.
+    #
+    # If both the simulated and experimental data widgets have datasets selected, then
+    # the simulated data is always the "primary" and the experimental is always the
+    # "secondary".
+    if (
+        sim_name in data_store.simulated_data_names
+        and exp_name in data_store.experimental_data_names
+    ):
+        is_experimental_primary = False
+    # Otherwise, the "primary" dataset is whichever data type is indicated.
+    elif exp_name in data_store.experimental_data_names:
+        is_experimental_primary = True
+    else:
+        # This handles both the cases where only simulated is selected or neither.
+        is_experimental_primary = False
+
     name_of_data_to_plot = (
         experimental_data_widget.value
         if is_experimental_primary
@@ -660,7 +655,7 @@ def _plot_on_axes(
     # we need to plot the experimental dipole as well.
     if (
         not is_experimental_primary
-        and experimental_data_widget.value in data_store.experimental_data_names
+        and exp_name in data_store.experimental_data_names
         and plot_type == "current dipole"
     ):
         name_of_secondary_exp_data_to_plot = experimental_data_widget.value
