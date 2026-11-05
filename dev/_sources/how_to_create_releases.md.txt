@@ -44,6 +44,7 @@ Last updated: 2025-10-24
 - Make sure all milestones are achieved or migrated to the next version.
 - Make sure the CI passes on master.
 - Make sure that for both TestPyPI and PyPI, there are NOT already existing releases for the new version that you want to push. You can view [TestPyPI releases here](https://test.pypi.org/project/hnn-core/#history) and [PyPI releases here](https://pypi.org/project/hnn-core/#history).
+- Make sure that you have merged a separate PR to lock in the current max versions for all user-facing dependencies, similar to https://github.com/jonescompneurolab/hnn-core/pull/1385 . In other words, install HNN-core in a completely fresh environment, check that all the tests pass, then write down what are the current `major.minor.patch` versions of all dependencies (excluding `test` and `doc`). Then, apply those values as maximum version caps for dependencies in `setup.py`. This is important so that, for example, a new version update to `ipywidgets` doesn't break the HNN-Core stable's GUI from working.
 
 ## 2. Prepare your local version of the release
 
