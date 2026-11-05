@@ -828,22 +828,22 @@ def test_gui_spectrogram_trial_averaging(setup_reduced_gui):
     gui._simulate_viz_action("switch_fig_template", "[Blank] single figure")
     gui._simulate_viz_action("add_fig")
 
-    figid = gui.viz_manager.fig_idx["idx"] - 1
-    figname = f"Figure {figid}"
-    axname = "ax0"
+    fig_id = gui.viz_manager.fig_idx["idx"] - 1
+    fig_name = f"Figure {fig_id}"
+    ax_name = "ax0"
 
     spectrograms = {}
 
     for sim_name, _ in simulations:
         # clear axis first and then plot the spectrogram
         gui._simulate_viz_action(
-            "edit_axis", figname, axname, sim_name, "spectrogram", {}, "clear"
+            "edit_axis", fig_name, ax_name, sim_name, "spectrogram", {}, "clear"
         )
         gui._simulate_viz_action(
-            "edit_axis", figname, axname, sim_name, "spectrogram", {}, "plot"
+            "edit_axis", fig_name, ax_name, sim_name, "spectrogram", {}, "plot"
         )
 
-        fig = gui.viz_manager.figs[figid]
+        fig = gui.viz_manager.figs[fig_id]
         ax = fig.axes[0]
 
         spectrograms[sim_name] = ax.collections[0].get_array().copy()
@@ -1017,55 +1017,55 @@ def test_gui_visualization(setup_reduced_gui):
 
     gui._simulate_viz_action("switch_fig_template", "[Blank] single figure")
     gui._simulate_viz_action("add_fig")
-    figid = 2
-    figname = f"Figure {figid}"
-    axname = "ax0"
+    fig_id = 2
+    fig_name = f"Figure {fig_id}"
+    ax_name = "ax0"
 
     for viz_type in _plot_types:
         gui._simulate_viz_action(
-            "edit_axis", figname, axname, "default", viz_type, {}, "clear"
+            "edit_axis", fig_name, ax_name, "default", viz_type, {}, "clear"
         )
         # Check that extra axes have been successfully removed
-        assert len(gui.viz_manager.figs[figid].axes) == 1
+        assert len(gui.viz_manager.figs[fig_id].axes) == 1
         # Check if data on the axes has been successfully cleared
-        assert not gui.viz_manager.figs[figid].axes[0].has_data()
+        assert not gui.viz_manager.figs[fig_id].axes[0].has_data()
 
         gui._simulate_viz_action(
-            "edit_axis", figname, axname, "default", viz_type, {}, "plot"
+            "edit_axis", fig_name, ax_name, "default", viz_type, {}, "plot"
         )
         # Check if data is plotted on the axes
-        assert gui.viz_manager.figs[figid].axes[0].has_data()
+        assert gui.viz_manager.figs[fig_id].axes[0].has_data()
 
         if viz_type == "input histogram":
             # Check if the correct number of axes are present
             # "input histogram" is a special case due to "plot_spikes_hist"
             # using 2 axes
-            assert len(gui.viz_manager.figs[figid].axes) == 2
+            assert len(gui.viz_manager.figs[fig_id].axes) == 2
         elif viz_type == "spectrogram":
             # make sure the colorbar is correctly added
             assert (
-                any(["_cbar-ax-" in attr for attr in dir(gui.viz_manager.figs[figid])])
+                any(["_cbar-ax-" in attr for attr in dir(gui.viz_manager.figs[fig_id])])
                 is True
             )
-            assert len(gui.viz_manager.figs[figid].axes) == 2
+            assert len(gui.viz_manager.figs[fig_id].axes) == 2
 
             # make sure the colorbar is safely removed
             gui._simulate_viz_action(
-                "edit_axis", figname, axname, "default", "spectrogram", {}, "clear"
+                "edit_axis", fig_name, ax_name, "default", "spectrogram", {}, "clear"
             )
             assert (
-                any(["_cbar-ax-" in attr for attr in dir(gui.viz_manager.figs[figid])])
+                any(["_cbar-ax-" in attr for attr in dir(gui.viz_manager.figs[fig_id])])
                 is False
             )
-            assert len(gui.viz_manager.figs[figid].axes) == 1
-            assert not gui.viz_manager.figs[figid].axes[0].has_data()
+            assert len(gui.viz_manager.figs[fig_id].axes) == 1
+            assert not gui.viz_manager.figs[fig_id].axes[0].has_data()
 
             # Test that frequency inversion works
             # First, test no inversion
             gui._simulate_viz_action(
                 "edit_axis",
-                figname,
-                axname,
+                fig_name,
+                ax_name,
                 "default",
                 "spectrogram",
                 {
@@ -1074,16 +1074,16 @@ def test_gui_visualization(setup_reduced_gui):
                 },
                 "plot",
             )
-            assert gui.viz_manager.figs[figid].axes[0].has_data()
+            assert gui.viz_manager.figs[fig_id].axes[0].has_data()
             gui._simulate_viz_action(
-                "edit_axis", figname, axname, "default", "spectrogram", {}, "clear"
+                "edit_axis", fig_name, ax_name, "default", "spectrogram", {}, "clear"
             )
-            assert not gui.viz_manager.figs[figid].axes[0].has_data()
+            assert not gui.viz_manager.figs[fig_id].axes[0].has_data()
             # Next, test inversion
             gui._simulate_viz_action(
                 "edit_axis",
-                figname,
-                axname,
+                fig_name,
+                ax_name,
                 "default",
                 "spectrogram",
                 {
@@ -1092,11 +1092,11 @@ def test_gui_visualization(setup_reduced_gui):
                 },
                 "plot",
             )
-            assert gui.viz_manager.figs[figid].axes[0].has_data()
+            assert gui.viz_manager.figs[fig_id].axes[0].has_data()
 
         else:
             # Check if the correct number of axes are present
-            assert len(gui.viz_manager.figs[figid].axes) == 1
+            assert len(gui.viz_manager.figs[fig_id].axes) == 1
 
     plt.close("all")
 
@@ -1114,22 +1114,22 @@ def test_dipole_data_overlay(setup_reduced_gui):
     gui._simulate_upload_experimental_data(file_path)
 
     # Edit the figure with data overlay
-    figid = 1
-    figname = f"Figure {figid}"
-    axname = "ax1"
+    fig_id = 1
+    fig_name = f"Figure {fig_id}"
+    ax_name = "ax1"
     gui._simulate_viz_action(
-        "edit_axis", figname, axname, "default", "current dipole", {}, "clear"
+        "edit_axis", fig_name, ax_name, "default", "current dipole", {}, "clear"
     )
     gui._simulate_viz_action(
         "edit_axis",
-        figname,
-        axname,
+        fig_name,
+        ax_name,
         "default",
         "current dipole",
         {"data_to_compare": "test_default"},
         "plot",
     )
-    ax = gui.viz_manager.figs[figid].axes[1]
+    ax = gui.viz_manager.figs[fig_id].axes[1]
 
     # Check number of lines
     # 2 trials, 1 average, 2 experimental overlays, plus 2 dashed vertical
@@ -1173,17 +1173,17 @@ def test_data_figure_add_simulation(setup_reduced_gui):
     gui._simulate_upload_experimental_data(file_path)
 
     # On the second figure (experimental data), grab how many lines are present:
-    figid = 2
-    figname = f"Figure {figid}"
-    axname = "ax0"
-    ax0 = gui.viz_manager.figs[figid].axes[0]
+    fig_id = 2
+    fig_name = f"Figure {fig_id}"
+    ax_name = "ax0"
+    ax0 = gui.viz_manager.figs[fig_id].axes[0]
     n_lines_initial = len(ax0.lines)
 
     # Now, add the simulation data to the second figure (experimental data):
     gui._simulate_viz_action(
         "edit_axis",
-        figname,
-        axname,
+        fig_name,
+        ax_name,
         "default",
         "current dipole",
         {},
@@ -1191,8 +1191,8 @@ def test_data_figure_add_simulation(setup_reduced_gui):
     )
     gui._simulate_viz_action(
         "edit_axis",
-        figname,
-        axname,
+        fig_name,
+        ax_name,
         "default",
         "current dipole",
         {
@@ -1240,10 +1240,10 @@ def test_data_figure_add_simulation_respects_data_scaling(setup_reduced_gui):
     gui._simulate_upload_experimental_data(file_path)
 
     # On the second figure (experimental data), grab lines and data present:
-    figid = 2
-    figname = f"Figure {figid}"
-    axname = "ax0"
-    ax0 = gui.viz_manager.figs[figid].axes[0]
+    fig_id = 2
+    fig_name = f"Figure {fig_id}"
+    ax_name = "ax0"
+    ax0 = gui.viz_manager.figs[fig_id].axes[0]
     n_lines_initial = len(ax0.lines)
     exp_data_initial = ax0.lines[0].get_ydata().copy()
 
@@ -1251,8 +1251,8 @@ def test_data_figure_add_simulation_respects_data_scaling(setup_reduced_gui):
     # heterogeneous scaling/smoothing:
     gui._simulate_viz_action(
         "edit_axis",
-        figname,
-        axname,
+        fig_name,
+        ax_name,
         "default",
         "current dipole",
         {},
@@ -1260,8 +1260,8 @@ def test_data_figure_add_simulation_respects_data_scaling(setup_reduced_gui):
     )
     gui._simulate_viz_action(
         "edit_axis",
-        figname,
-        axname,
+        fig_name,
+        ax_name,
         "default",
         "current dipole",
         {
@@ -1310,10 +1310,10 @@ def test_clear_axis_add_experimental_only(setup_reduced_gui):
     gui._simulate_upload_experimental_data(file_path)
 
     # On the second figure (experimental data), grab lines and data present:
-    figid = 2
-    figname = f"Figure {figid}"
-    axname = "ax0"
-    ax0 = gui.viz_manager.figs[figid].axes[0]
+    fig_id = 2
+    fig_name = f"Figure {fig_id}"
+    ax_name = "ax0"
+    ax0 = gui.viz_manager.figs[fig_id].axes[0]
     n_lines_initial = len(ax0.lines)
     exp_data_initial = ax0.lines[0].get_ydata().copy()
 
@@ -1321,8 +1321,8 @@ def test_clear_axis_add_experimental_only(setup_reduced_gui):
     # heterogeneous scaling/smoothing:
     gui._simulate_viz_action(
         "edit_axis",
-        figname,
-        axname,
+        fig_name,
+        ax_name,
         "default",
         "current dipole",
         {},
@@ -1332,7 +1332,7 @@ def test_clear_axis_add_experimental_only(setup_reduced_gui):
     # Sourav's clever hack for setting the simulated data set to None
     # TODO this will be changed after some refactoring of `_simulate_edit_axis` a la
     # https://github.com/jonescompneurolab/hnn-core/pull/1394#issuecomment-6670606255
-    tab_idx = gui.viz_manager.axes_config_tabs.titles.index(f"Figure {figid}")
+    tab_idx = gui.viz_manager.axes_config_tabs.titles.index(f"Figure {fig_id}")
     ax_controls = (
         gui.viz_manager.axes_config_tabs.children[tab_idx].children[1].children[0]
     )
@@ -1340,8 +1340,8 @@ def test_clear_axis_add_experimental_only(setup_reduced_gui):
 
     gui._simulate_viz_action(
         "edit_axis",
-        figname,
-        axname,
+        fig_name,
+        ax_name,
         "test_default",  # This is an experimental dataset, not a simulation dataset!
         "current dipole",
         {},
@@ -1786,9 +1786,9 @@ def test_default_scaling(setup_reduced_gui):
     # check that dipole plots have data
     gui._simulate_viz_action("switch_fig_template", "[Blank] single figure")
     gui._simulate_viz_action("add_fig")
-    figid = 2
-    figname = f"Figure {figid}"
-    axname = "ax0"
+    fig_id = 2
+    fig_name = f"Figure {fig_id}"
+    ax_name = "ax0"
 
     _dipole_plot_types = [
         "current dipole",
@@ -1798,15 +1798,15 @@ def test_default_scaling(setup_reduced_gui):
 
     for viz_type in _dipole_plot_types:
         gui._simulate_viz_action(
-            "edit_axis", figname, axname, "no_scaling", viz_type, {}, "clear"
+            "edit_axis", fig_name, ax_name, "no_scaling", viz_type, {}, "clear"
         )
 
         gui._simulate_viz_action(
-            "edit_axis", figname, axname, "no_scaling", viz_type, {}, "plot"
+            "edit_axis", fig_name, ax_name, "no_scaling", viz_type, {}, "plot"
         )
 
         # Check if data is plotted on the axes
-        assert gui.viz_manager.figs[figid].axes[0].has_data()
+        assert gui.viz_manager.figs[fig_id].axes[0].has_data()
 
     plt.close("all")
 
@@ -1842,9 +1842,9 @@ def test_default_smoothing(setup_reduced_gui):
     # check that dipole plots have data
     gui._simulate_viz_action("switch_fig_template", "[Blank] single figure")
     gui._simulate_viz_action("add_fig")
-    figid = 2
-    figname = f"Figure {figid}"
-    axname = "ax0"
+    fig_id = 2
+    fig_name = f"Figure {fig_id}"
+    ax_name = "ax0"
 
     _dipole_plot_types = [
         "current dipole",
@@ -1854,15 +1854,15 @@ def test_default_smoothing(setup_reduced_gui):
 
     for viz_type in _dipole_plot_types:
         gui._simulate_viz_action(
-            "edit_axis", figname, axname, "no_smoothing", viz_type, {}, "clear"
+            "edit_axis", fig_name, ax_name, "no_smoothing", viz_type, {}, "clear"
         )
 
         gui._simulate_viz_action(
-            "edit_axis", figname, axname, "no_smoothing", viz_type, {}, "plot"
+            "edit_axis", fig_name, ax_name, "no_smoothing", viz_type, {}, "plot"
         )
 
         # Check if data is plotted on the axes
-        assert gui.viz_manager.figs[figid].axes[0].has_data()
+        assert gui.viz_manager.figs[fig_id].axes[0].has_data()
 
     plt.close("all")
 
@@ -2722,14 +2722,14 @@ def test_experimental_comparison_change_disables_plot_type(setup_reduced_gui):
     gui._simulate_viz_action("switch_fig_template", "[Blank] single figure")
     gui._simulate_viz_action("add_fig")
 
-    figid = gui.viz_manager.fig_idx["idx"] - 1
-    figname = f"Figure {figid}"
-    axname = "ax0"
+    fig_id = gui.viz_manager.fig_idx["idx"] - 1
+    fig_name = f"Figure {fig_id}"
+    ax_name = "ax0"
 
     tab = gui.viz_manager.axes_config_tabs
-    fig_tab_idx = tab.titles.index(figname)
+    fig_tab_idx = tab.titles.index(fig_name)
     ax_control_tabs = tab.children[fig_tab_idx].children[1]
-    ax_idx = ax_control_tabs.titles.index(axname)
+    ax_idx = ax_control_tabs.titles.index(ax_name)
     ax_control = ax_control_tabs.children[ax_idx]
 
     plot_type_selection = ax_control.children[0]
