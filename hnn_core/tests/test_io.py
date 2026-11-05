@@ -175,7 +175,11 @@ def test_conn_to_dict(fix_net_neymotin_2020):
     """Tests _connectivity_to_list_of_dicts function"""
     net, _ = fix_net_neymotin_2020(featureful_reduced_network=True)
 
-    result = _conn_to_dict(net.connectivity[0])
+    # Previously, when we were using `neymotin_2020_model(add_drives_from_params=True)`,
+    # the drives seem to have been added before the recurrent connections. Now, the
+    # drives are added after the recurrent connections, so the index of the connection
+    # we want to test has changed from connection at index 0 to at index 16.
+    result = _conn_to_dict(net.connectivity[16])
     assert isinstance(result, dict)
     assert result == {
         "target_type": "L2_basket",
