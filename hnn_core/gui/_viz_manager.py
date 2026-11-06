@@ -816,7 +816,7 @@ def _build_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax, ui_ac
         description="Spectrogram Colormap:",
         options=[(cm, cm) for cm in _spectrogram_color_maps],
         value=_spectrogram_color_maps[0],
-        layout=layout,
+        layout=Layout(width="98%", display="none"),
         style=analysis_style,
     )
     simulation_dipole_smooth = FloatText(
@@ -857,7 +857,7 @@ def _build_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax, ui_ac
         max=1000,
         description="Min Spectral Frequency (Hz):",
         disabled=False,
-        layout=layout,
+        layout=Layout(width="98%", display="none"),
         style=analysis_style,
     )
 
@@ -867,7 +867,7 @@ def _build_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax, ui_ac
         max=1000,
         description="Max Spectral Frequency (Hz):",
         disabled=False,
-        layout=layout,
+        layout=Layout(width="98%", display="none"),
         style=analysis_style,
     )
 
@@ -903,22 +903,119 @@ def _build_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax, ui_ac
     plot_button.plot_context = plot_context
     clear_button = Button(description="Clear axis")
 
-    def _on_sim_data_change(new_sim_name):
-        return set_plot_types_options(new_sim_name.new, plot_type_selection)
+    parameter_widgets = [
+        simulation_dipole_smooth,
+        simulation_dipole_scaling,
+        data_dipole_smooth,
+        data_dipole_scaling,
+        min_spectral_frequency,
+        max_spectral_frequency,
+        spectrogram_colormap_selection,
+        hide_spike_legend,
+        marker_size,
+        overlay_drive_arrows,
+    ]
 
-    def _on_experimental_data_comparison_change(new_experimental_data_option):
-        return experimental_data_change(
-            new_experimental_data_option.new, plot_type_selection
-        )
+    parameter_widgets = [
+        simulation_dipole_smooth,
+        simulation_dipole_scaling,
+        data_dipole_smooth,
+        data_dipole_scaling,
+        min_spectral_frequency,
+        max_spectral_frequency,
+        spectrogram_colormap_selection,
+        hide_spike_legend,
+        marker_size,
+        overlay_drive_arrows,
+    ]
 
-    def _on_plot_type_change(new_plot_type):
-        return plot_type_coupled_change(new_plot_type.new, experimental_data_selection)
+    # Ensure all parameter widgets are strictly included in the master reset list
+    parameter_widgets = [
+        simulation_dipole_smooth,
+        simulation_dipole_scaling,
+        data_dipole_smooth,
+        data_dipole_scaling,
+        overlay_drive_arrows,
+        min_spectral_frequency,
+        max_spectral_frequency,
+        spectrogram_colormap_selection,
+        hide_spike_legend,
+        marker_size,
+    ]
 
-    simulation_selection.observe(_on_sim_data_change, "value")
+    # Guard flag to stop infinite feedback loops
+    _sync_lock = False
+
+    def _sync_plot_parameters(plot_type):
+        if not isinstance(plot_type, str):
+            plot_type = getattr(plot_type_selection, "value", "") or ""
+
+        # Reset all parameters to hidden
+        for w in parameter_widgets:
+            w.layout.display = "none"
+
+        if "dipole" in plot_type:
+            simulation_dipole_smooth.layout.display = "block"
+            simulation_dipole_scaling.layout.display = "block"
+            data_dipole_smooth.layout.display = "block"
+            data_dipole_scaling.layout.display = "block"
+            overlay_drive_arrows.layout.display = "block"
+        elif plot_type == "spectrogram":
+            min_spectral_frequency.layout.display = "block"
+            max_spectral_frequency.layout.display = "block"
+            spectrogram_colormap_selection.layout.display = "block"
+        elif "PSD" in plot_type:
+            min_spectral_frequency.layout.display = "block"
+            max_spectral_frequency.layout.display = "block"
+        elif "spikes" in plot_type:
+            hide_spike_legend.layout.display = "block"
+            marker_size.layout.display = "block"
+            if plot_type == "spikes with dipoles":
+                simulation_dipole_smooth.layout.display = "block"
+                simulation_dipole_scaling.layout.display = "block"
+
+    def _on_sim_data_change(change):
+        global _sync_lock
+        if _sync_lock:
+            return
+        new_val = change["new"] if isinstance(change, dict) else getattr(change, "new", change)
+        set_plot_types_options(new_val, plot_type_selection)
+
+    def _on_experimental_data_comparison_change(change):
+        global _sync_lock
+        if _sync_lock:
+            return
+        new_val = change["new"] if isinstance(change, dict) else getattr(change, "new", change)
+        experimental_data_change(new_val, plot_type_selection)
+
+    def _on_plot_type_change(change):
+        global _sync_lock
+        new_val = change["new"] if isinstance(change, dict) else getattr(change, "new", change)
+        if not isinstance(new_val, str):
+            return
+
+        # Lock triggers during coupled updates
+        _sync_lock = True
+        try:
+            plot_type_coupled_change(new_val, experimental_data_selection)
+        finally:
+            _sync_lock = False
+
+        _sync_plot_parameters(new_val)
+
+    # Normal observer registration (registered only once)
+    simulation_selection.observe(_on_sim_data_change, names="value")
     experimental_data_selection.observe(
-        _on_experimental_data_comparison_change, "value"
+        _on_experimental_data_comparison_change, names="value"
     )
-    plot_type_selection.observe(_on_plot_type_change, "value")
+    plot_type_selection.observe(_on_plot_type_change, names="value")
+
+    # Initial layout sync
+    _sync_plot_parameters(plot_type_selection.value)
+
+
+    # Initial layout synchronization
+    _sync_plot_parameters(plot_type_selection.value)
 
     clear_button.on_click(
         partial(
@@ -987,7 +1084,6 @@ def _build_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax, ui_ac
     )
 
     return vbox
-
 
 def _get_dropdowns_initial_values(
     widgets, ui_action, simulation_names, experimental_names, plot_type_selection
@@ -1086,6 +1182,7 @@ def _add_axes_controls(widgets, data, fig_default_params, fig, axd, ui_action):
         )
         for ax in axd.values()
     ]
+
     controls.children = children
     for i in range(len(children)):
         controls.set_title(i, f"ax{i}")
