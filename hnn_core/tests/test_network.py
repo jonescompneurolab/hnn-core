@@ -3094,32 +3094,32 @@ def test_get_global_synaptic_gains(fix_net_neymotin_2020):
     "fix_net_model", ["fix_net_neymotin_2020", "fix_net_duecker_ET"]
 )
 def test_add_connection_threshold_and_gain(fix_net_model, request):
-    """Test adding connections with custom threshold and gain parameters."""
+    """Test adding connections with deprecated threshold and custom gain."""
     net_model = request.getfixturevalue(fix_net_model)
     net, net_customizations = net_model()
     inh_name_suffix = net_customizations["inh_name_suffix"]
 
-    # Add connection with custom threshold
+    # Passing a per-connection threshold warns and is not stored in nc_dict
     custom_threshold = 15.0
-    net.add_connection(
-        src_gids="L2_pyramidal",
-        target_gids=f"L2_{inh_name_suffix}",
-        loc="soma",
-        receptor="ampa",
-        weight=1e-3,
-        delay=1.0,
-        lamtha=3.0,
-        threshold=custom_threshold,
-    )
+    with pytest.warns(FutureWarning, match="`threshold`.*deprecated"):
+        net.add_connection(
+            src_gids="L2_pyramidal",
+            target_gids=f"L2_{inh_name_suffix}",
+            loc="soma",
+            receptor="ampa",
+            weight=1e-3,
+            delay=1.0,
+            lamtha=3.0,
+            threshold=custom_threshold,
+        )
 
-    # Check that the threshold was set correctly
     conn_idx = pick_connection(
         net,
         src_gids="L2_pyramidal",
         target_gids=f"L2_{inh_name_suffix}",
         receptor="ampa",
     )[-1]
-    assert net.connectivity[conn_idx]["nc_dict"]["threshold"] == custom_threshold
+    assert "threshold" not in net.connectivity[conn_idx]["nc_dict"]
 
     # Add connection with custom gain
     custom_gain = 2.5
@@ -3143,41 +3143,20 @@ def test_add_connection_threshold_and_gain(fix_net_model, request):
     )[-1]
     assert net.connectivity[conn_idx]["nc_dict"]["gain"] == custom_gain
 
-    # Add connection with both custom threshold and gain
-    net.add_connection(
-        src_gids=f"L2_{inh_name_suffix}",
-        target_gids="L2_pyramidal",
-        loc="soma",
-        receptor="gabaa",
-        weight=1e-3,
-        delay=1.0,
-        lamtha=3.0,
-        threshold=custom_threshold,
-        gain=custom_gain,
-    )
-
-    # Check that both were set correctly
-    conn_idx = pick_connection(
-        net,
-        src_gids=f"L2_{inh_name_suffix}",
-        target_gids="L2_pyramidal",
-        receptor="gabaa",
-    )[-1]
-    assert net.connectivity[conn_idx]["nc_dict"]["threshold"] == custom_threshold
-    assert net.connectivity[conn_idx]["nc_dict"]["gain"] == custom_gain
-
-    # Test that default threshold is inherited from network when threshold=None
-    net.add_connection(
-        src_gids=f"L5_{inh_name_suffix}",
-        target_gids="L5_pyramidal",
-        loc="soma",
-        receptor="gabaa",
-        weight=1e-3,
-        delay=1.0,
-        lamtha=3.0,
-        threshold=None,  # Should use net.threshold
-        gain=1.5,
-    )
+    # threshold=None (the default) does not warn and is not stored either
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        net.add_connection(
+            src_gids=f"L5_{inh_name_suffix}",
+            target_gids="L5_pyramidal",
+            loc="soma",
+            receptor="gabaa",
+            weight=1e-3,
+            delay=1.0,
+            lamtha=3.0,
+            threshold=None,
+            gain=1.5,
+        )
 
     conn_idx = pick_connection(
         net,
@@ -3185,8 +3164,45 @@ def test_add_connection_threshold_and_gain(fix_net_model, request):
         target_gids="L5_pyramidal",
         receptor="gabaa",
     )[-1]
-    assert net.connectivity[conn_idx]["nc_dict"]["threshold"] == net.threshold
+    assert "threshold" not in net.connectivity[conn_idx]["nc_dict"]
     assert net.connectivity[conn_idx]["nc_dict"]["gain"] == 1.5
+
+
+def test_add_connection_threshold_does_not_change_source_cell():
+    """Test that a connection's deprecated threshold cannot alter the source
+    cell's spike threshold.
+
+    A weight=0 connection should have no effect on the simulation. Passing
+    threshold= before this check clobbered the presynaptic cell's shared
+    NetCon spike detector, silencing its spikes on every connection.
+    """
+    net = neymotin_2020_model()
+
+    with pytest.warns(FutureWarning, match="`threshold`.*deprecated"):
+        net.add_connection(
+            src_gids="L2_basket",
+            target_gids="L2_pyramidal",
+            loc="soma",
+            receptor="gabaa",
+            weight=0.0,
+            delay=1.0,
+            lamtha=3.0,
+            threshold=100.0,
+        )
+
+    network_builder = NetworkBuilder(net)
+    # Every NetCon built from an L2 basket cell, on both the new connection
+    # and the pre-existing ones, keeps the network-level threshold
+    for connection_name in ["L2Basket_L2Pyr_gabaa", "L2Basket_L2Basket_gabaa"]:
+        for nc in network_builder.ncs[connection_name]:
+            assert nc.threshold == net.threshold
+
+    # Setting net.threshold still sets the spike threshold of all cells
+    net2 = neymotin_2020_model()
+    net2.threshold = -50.0
+    network_builder2 = NetworkBuilder(net2)
+    nc = network_builder2.ncs["L2Basket_L2Pyr_gabaa"][0]
+    assert nc.threshold == -50.0
 
 
 def test_get_cell_index_by_synapse_type():

@@ -971,7 +971,6 @@ class Cell:
         nc = _PC.gid_connect(gid_presyn, postsyn)
 
         # set props here.
-        nc.threshold = nc_dict["threshold"]
         nc.weight[0], nc.delay = _get_gaussian_connection(
             nc_dict["pos_src"], self.pos, nc_dict, inplane_distance=inplane_distance
         )
