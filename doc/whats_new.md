@@ -26,7 +26,7 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 <!-- ### Changelog -->
 
-## 0.6.2.dev0 In-progress Notes
+## 0.7.0 Release Notes
 
 ### Deprecations
 
@@ -34,7 +34,46 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
   Python's default warning filters,
   by [William Kang][] in {gh}`1339`. This was their first PR, thanks William!
 
+- Example scripts are no longer included in the `hnn-core` repository or on our API
+  website. All of the former `examples/` scripts have been migrated to polished and
+  updated Jupyter notebooks on our [Textbook
+  website](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/plot_firing_pattern.html),
+  and all references to them in these release notes now link to their corresponding
+  Textbook notebooks. This also removes our use of `sphinx-gallery` and Binder,
+  by [Austin E. Soplata][] in {gh}`1347`.
+
 ### New Features
+
+- [Katharina Duecker][] has added a brand-new model, `duecker_ET_model`, which uses
+  human-derived pyramidal cells and interneurons (`L2_inhibitory` and `L5_inhibitory`),
+  new ion channel and synapse mechanisms (including `NMDA_gao2021` and
+  `gabab_neymotin2016` synapses, and channels from Hay et al. 2011 and Golomb et al.
+  2007), and its own default parameter file `default_duecker_ET.json`. The publication describing this model is
+  pending, and the model (including its optional ERP drives added via
+  `add_erp_drives=True`) is still subject to change until that time. Merged in
+  {gh}`1227`, with additional updates by [Katharina Duecker][] and [Austin E. Soplata][]
+  in {gh}`1345`, {gh}`1358`, and {gh}`1363`.
+
+- Cells can now use synaptic mechanisms other than NEURON's `Exp2Syn`, which can be
+  specified using new, optional parameter keys of the form
+  `<cell_type>_<receptor>_mechname` (e.g. `L2Pyr_nmda_mechname`). This allows custom
+  synaptic mechanisms (such as those used in the new Duecker model) to be used,
+  by [Austin E. Soplata][] in {gh}`1229`.
+
+- HNN-Core now supports NEURON 9 (up to 9.1.0) and Python 3.14. Note that simulations
+  run with NEURON 9 produce very slightly different output than NEURON 8 (on the order
+  of floating-point precision),
+  by [Austin E. Soplata][] in {gh}`1230`.
+
+- MPI can now be installed entirely through `pip`! On MacOS and Linux,
+  `pip install "hnn-core[parallel]"` now installs the `mpi4py` and `openmpi` PyPI
+  packages, and {class}`~hnn_core.MPIBackend` automatically locates and uses the MPI
+  library provided by the `openmpi` package, without the need to set any environment
+  variables yourself. {class}`~hnn_core.MPIBackend` also has two new arguments for
+  advanced users (such as on HPC systems): `autoload_mpi_library` to disable this
+  behavior, and `mpi_lib_path` to explicitly provide the MPI library file NEURON should
+  use,
+  by [Austin E. Soplata][] in {gh}`1377`.
 
 - Users can now specify their own custom objective function in two different ways:
     1. Passing a `obj_fun='custom'` to `Optimizer`. If passing `custom`, then users can
@@ -51,7 +90,24 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
       `optimization/objective_functions.py` and run a simulation.
       by [Vaishnavi Baghel][] in {gh}`1271`.
 
+- {func}`~hnn_core.viz.plot_dipole` can now overlay arrows marking the onset times of
+  evoked drives on dipole plots, similar to Original HNN, via the new arguments `net`,
+  `show_drive_arrows`, `arrow_width`, and `arrow_height`. This feature is in **beta**,
+  may still have bugs, and is currently disabled in the GUI,
+  by [Sourav Rajvi][] in {gh}`1354`, with follow-up by [Austin E. Soplata][] in
+  {gh}`1387` and {gh}`1395`.
+
+- Each cell type's `cell_metadata` now includes a default `color` and `marker`, which
+  are used by our visualization functions (e.g. spike raster and histogram plots)
+  instead of hardcoded values,
+  by [Chetan Kandpal][] in {gh}`1269`.
+
 ### Upcoming Deprecations
+
+- The `postproc` argument of {func}`~hnn_core.simulate_dipole` is now documented as
+  deprecated. Please use the {meth}`~hnn_core.dipole.Dipole.smooth` and
+  {meth}`~hnn_core.dipole.Dipole.scale` methods after your simulation instead, in
+  {gh}`1343`.
 
 ### Bug Fixes
 
@@ -61,26 +117,108 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 - The RMSE and Corr comparison text on GUI dipole comparison plots is no longer
   drawn over the evoked drive arrows, and now stays at the bottom right of the plot,
-  fixing {gh}`1374`.
+  by [Sourav Rajvi][] in {gh}`1378`, fixing {gh}`1374`.
 
 - [Camilo Diaz][] did considerable work in fixing our long-standing MPI Timeout issues
   and putting in place a permanent solution that uses tempfiles instead of standard
-  input/output/error streams. Thanks Camilo!
+  input/output/error streams, in {gh}`1312`. Thanks Camilo!
+
+- Reading in older Network JSON files (created before `v0` was introduced in
+  {gh}`1185`) no longer incorrectly initializes all of their membrane voltages to -65
+  mV, and instead uses each section's correct initial voltage. Thanks to [Anna Cattani][]
+  for finding this bug, which was fixed by [Austin E. Soplata][] in {gh}`1327`.
+
+- Network model functions such as {func}`~hnn_core.neymotin_2020_model` once again
+  accept their `params` argument as a `str` or `Path` filename (which was accidentally
+  removed in {gh}`1227`), and all ways of passing `params` are now tested,
+  by [Austin E. Soplata][] in {gh}`1352`.
+
+- {func}`~hnn_core.viz.plot_spikes_raster` no longer raises an error when one of the
+  cell types does not spike,
+  by [Katharina Duecker][] in {gh}`1356`.
+
+- {class}`~hnn_core.optimization.Optimizer` now ensures that the keys of
+  `initial_params` and `constraints` are in the same order, which previously could
+  cause the CMA-ES solver to raise an error,
+  by [Katharina Duecker][] in {gh}`1359`.
+
+- The documentation of {class}`~hnn_core.optimization.Optimizer`'s arguments now
+  correctly appears on our API website, in {gh}`1344`.
+
+- Interactive plotting buttons in the GUI have been re-enabled by correctly detecting
+  interactive notebook backends,
+  by [Tushar Jamdade][] in {gh}`1273`, fixing {gh}`1125`.
+
+- Errors that occur when running a simulation in the GUI are now printed at the top of
+  the log window (with their tracebacks) instead of the bottom,
+  by [Dev Agarwal][] in {gh}`1264`. This was their first PR, thanks Dev!
+
+- When a user loads a Network file in the GUI that has custom global synaptic gains,
+  the GUI now displays those custom global gains instead of resetting them to their
+  default values,
+  by [Austin E. Soplata][] in {gh}`1183`.
+
+- Fixed a failure to remove spectrogram colorbars in the GUI due to changes in
+  Matplotlib 3.11, in {gh}`1320`.
+
+- Fixed caret coloring and pixel shifting when opening or closing the GUI log window,
+  by [Dylan Daniels][] in {gh}`1318`.
+
+- Fixed stray scrollbars appearing on empty GUI dropdowns in Safari,
+  by [Sourav Rajvi][] in {gh}`1360`, fixing {gh}`1321`. This was their first PR,
+  thanks Sourav!
 
 ### Public API Changes
 
+- {func}`~hnn_core.simulate_dipole` now accepts a `baseline_correction` boolean argument
+  (default `True`), which controls whether the baseline correction appropriate for the
+  `Network`'s model is applied to the dipole after simulation,
+  by [Katharina Duecker][] and [Austin E. Soplata][] in {gh}`1343`.
+
+- `BatchSimulate` now expects the `set_params` callback to accept arguments in the
+  order `(net, param_values)` instead of `(param_values, net)`, aligning it with the
+  `Optimizer` class,
+  by [Rahul Tripathi][] in {gh}`1208`, fixing {gh}`1203`. This was their first PR,
+  thanks Rahul!
+
+- {class}`~hnn_core.Section` is now exposed as part of our public API, in {gh}`1368`.
+
+- `duecker_ET_model` is now available via `from hnn_core import duecker_ET_model` (see
+  "New Features" above).
+
+- All user-facing dependencies now have maximum version caps, in order to prevent
+  future dependency updates from breaking this release. Additionally, `notebook` is now
+  a base dependency, so that users can run our Textbook's Jupyter notebooks using the
+  standard `jupyter notebook` command,
+  in {gh}`1385`, fixing {gh}`1384`.
+
+- The `dask[distributed]` package can now be installed using
+  `pip install "hnn-core[dask]"` for use with `JoblibBackend`'s dask backend,
+  by [M Yaswanth Reddy][] in {gh}`1248`.
+
 ### People who contributed to this release:
 
+- [Dev Agarwal][]
 - [Vaishnavi Baghel][]
 - [Arnesh Banerjee][]
 - [Shivansh Bhageria][]
+- [Dylan Daniels][]
 - [Camilo Diaz][]
+- [Katharina Duecker][]
+- [Tushar Jamdade][]
+- [Chetan Kandpal][]
 - [William Kang][]
+- [Sourav Rajvi][]
+- [M Yaswanth Reddy][]
+- [Satvik Saluja][]
+- [Austin E. Soplata][]
+- [Nick Tolley][]
+- [Rahul Tripathi][]
 
 ### Changelog
 
 - Improvements to some visualization documentation,
-  by [Arnesh Banerjee][] in {gh}`1332`.
+  by [Arnesh Banerjee][] in {gh}`1332`. This was their first PR, thanks Arnesh!
 
 - Easier optimization custom function usage
   by [Vaishnavi Baghel][] in {gh}`1271`.
@@ -92,6 +230,36 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 - Improve y-axis labels and ticks of LFP and CSD plotting,
   by [Shivansh Bhageria][] in {gh}`1191`. This was their first PR, thanks Shivansh!
+
+- The GUI's simulation data is now managed through a single, centralized data store
+  instead of being passed around between many functions, which also fixes a `KeyError`
+  bug,
+  by [Camilo Diaz][] in {gh}`1328`.
+
+- `os.path` usage throughout the codebase has been migrated to `pathlib`,
+  by [Satvik Saluja][] in {gh}`1311`.
+
+- The Network fixtures used in our tests have been expanded and consolidated so that
+  all network models can be tested consistently,
+  by [Satvik Saluja][] in {gh}`1257`.
+
+- `test_viz.py` has been refactored into smaller, more focused tests,
+  by [Camilo Diaz][] in {gh}`1350`.
+
+- Removed unused basal-specific `Ra` and `cm` code from `cells_default.py`,
+  by [Katharina Duecker][] in {gh}`1363`.
+
+- Added progressive installation tests to our CI, which check that the minimal, `[opt]`,
+  and `[gui]` installs each work before running the full test suite, in {gh}`1304`.
+
+- Fixed a random failure of a parallel `BatchSimulate` test, in {gh}`1326`.
+
+- Capped the `ruff` version due to breaking changes, in {gh}`1333`.
+
+- Added coverage reports to local test runs, in {gh}`1342`.
+
+- Miscellaneous CI, documentation, and website maintenance in {gh}`1305`, {gh}`1310`,
+  {gh}`1351`, {gh}`1361`, {gh}`1365`, and {gh}`1372`.
 
 
 ## 0.6.1 Patch Release Notes
@@ -276,10 +444,6 @@ here](https://github.com/jonescompneurolab/hnn-core/releases/tag/v0.6.0).
   by [Tushar Jamdade][] in {gh}`1214`. This was their first PR, thanks Tushar!
 
 ----------------------------------------------------------------------------------------
-
-### Public API Changes
-
-- `BatchSimulate` now expects the `set_params` callback to accept arguments in the order `(net, param_values)` instead of `(param_values, net)`, aligning it with the `Optimizer` class, by [Rahul Tripathi][] in {gh}`1208`.
 
 ## 0.5.0 Release Notes
 
@@ -1508,3 +1672,5 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [Shivansh Bhageria]: https://github.com/Shivansh1205
 [Arnesh Banerjee]: https://github.com/ArneshBanerjee
 [William Kang]: https://github.com/WilliamK112
+[Dev Agarwal]: https://github.com/Dev82545
+[Sourav Rajvi]: https://github.com/Souravrajvi0
