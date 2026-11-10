@@ -28,20 +28,6 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ## 0.7.0 Release Notes
 
-### Deprecations
-
-- User-facing deprecation notices now emit `FutureWarning`, making them visible under
-  Python's default warning filters,
-  by [William Kang][] in {gh}`1339`. This was their first PR, thanks William!
-
-- Example scripts are no longer included in the `hnn-core` repository or on our API
-  website. All of the former `examples/` scripts have been migrated to polished and
-  updated Jupyter notebooks on our [Textbook
-  website](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/plot_firing_pattern.html),
-  and all references to them in these release notes now link to their corresponding
-  Textbook notebooks. This also removes our use of `sphinx-gallery` and Binder,
-  by [Austin E. Soplata][] in {gh}`1347`.
-
 ### New Features
 
 - [Katharina Duecker][] has added a brand-new model, `duecker_ET_model`, which uses
@@ -49,21 +35,28 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
   new ion channel and synapse mechanisms (including `NMDA_gao2021` and
   `gabab_neymotin2016` synapses, and channels from Hay et al. 2011 and Golomb et al.
   2007), and its own default parameter file `default_duecker_ET.json`. The publication describing this model is
-  pending, and the model (including its optional ERP drives added via
+  pending, a preprint is available at https://doi.org/10.64898/2026.10.29.762964 , and the model (including its optional ERP drives added via
   `add_erp_drives=True`) is still subject to change until that time. Merged in
   {gh}`1227`, with additional updates by [Katharina Duecker][] and [Austin E. Soplata][]
   in {gh}`1345`, {gh}`1358`, and {gh}`1363`.
 
-- Cells can now use synaptic mechanisms other than NEURON's `Exp2Syn`, which can be
-  specified using new, optional parameter keys of the form
-  `<cell_type>_<receptor>_mechname` (e.g. `L2Pyr_nmda_mechname`). This allows custom
-  synaptic mechanisms (such as those used in the new Duecker model) to be used,
-  by [Austin E. Soplata][] in {gh}`1229`.
+TODO AES also include links to hnn-tuning
 
-- HNN-Core now supports NEURON 9 (up to 9.1.0) and Python 3.14. Note that simulations
-  run with NEURON 9 produce very slightly different output than NEURON 8 (on the order
-  of floating-point precision),
-  by [Austin E. Soplata][] in {gh}`1230`.
+- HNN-Core now supports NEURON 9 (up to 9.1.0) and Python 3.14. **Please note that due
+  to the removal of legacy units in NEURON 9.0, ALL simulations starting with this
+  HNN-Core version will be quantiatively different!** However, your simulations should
+  still be qualitatively similarly, and the numerical differences will likely be
+  negligble. As an example, this should be equivalent to changing your calcium current
+  reversal potential (`$E_{Ca}$`) from a value of 134.02 to 134.54, or similar
+  magnitude. If your findings are robust to initial conditions and seeds, then you
+  should have nothing to worry about. By [Austin E. Soplata][] in {gh}`1230`.
+
+    - Note: If you want exact bit-perfect reproduction of your simulations from before
+      this change, please install the earlier version using `pip install
+      "hnn-core[all]==0.6.1`. The prior stable version (v0.6.1) will always force usage
+      of NEURON 8 along with the legacy units. If you run into issues with updating your
+      code, simulations, or reproducibility, then please reach out to us on [our Github
+      Discussions page][].
 
 - MPI can now be installed entirely through `pip`! On MacOS and Linux,
   `pip install "hnn-core[parallel]"` now installs the `mpi4py` and `openmpi` PyPI
@@ -72,8 +65,9 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
   variables yourself. {class}`~hnn_core.MPIBackend` also has two new arguments for
   advanced users (such as on HPC systems): `autoload_mpi_library` to disable this
   behavior, and `mpi_lib_path` to explicitly provide the MPI library file NEURON should
-  use,
-  by [Austin E. Soplata][] in {gh}`1377`.
+  use. This means you can use `venv` or `uv` to install `hnn-core` with MPI support
+  without needing any Anaconda packages at all.
+  By [Austin E. Soplata][] in {gh}`1377`.
 
 - Users can now specify their own custom objective function in two different ways:
     1. Passing a `obj_fun='custom'` to `Optimizer`. If passing `custom`, then users can
@@ -102,6 +96,42 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
   instead of hardcoded values,
   by [Chetan Kandpal][] in {gh}`1269`.
 
+- Cells can now use synaptic mechanisms other than NEURON's `Exp2Syn`, which can be
+  specified using new, optional parameter keys of the form
+  `<cell_type>_<receptor>_mechname` (e.g. `L2Pyr_nmda_mechname`). This allows custom
+  synaptic mechanisms (such as those used in the new Duecker model) to be used,
+  by [Austin E. Soplata][] in {gh}`1229`.
+
+### Deprecations
+
+- Example scripts are no longer included in the `hnn-core` repository or on our API
+  website. All of the former `examples/` scripts have been migrated to polished and
+  updated Jupyter notebooks on our [Textbook
+  website](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/plot_firing_pattern.html),
+  and all references to them in these release notes now link to their corresponding
+  Textbook notebooks. This also removes our use of `sphinx-gallery` and Binder,
+  by [Austin E. Soplata][] in {gh}`1347`.
+
+- The `hnn-core-all` Anaconda package has been pulled from distribution. Starting with this version, `pip` and `uv` will be the recommended ways to install `hnn-core`. Users who have previously installed the `conda` package using
+
+```
+conda install hnn-core-all -c jonescompneurolab -c conda-forge
+```
+
+are strongly recommended to remove the `conda` package and instead install the latest `hnn-core` package using pip. If you installed using the instructions in [our Installation Guide][], you can do this upgrade with the following:
+
+```
+conda activate hnn-core-env
+conda remove hnn-core-all
+pip install "hnn-core[all]"
+```
+
+TODO
+
+- Please note that **all simulations** produced from this `hnn_core` version and forward
+  will be slightly numerically different than those of version v0.6.1 and and prior. See
+  note above about NEURON 9.0 support.
+
 ### Upcoming Deprecations
 
 - The `postproc` argument of {func}`~hnn_core.simulate_dipole` is now documented as
@@ -109,7 +139,39 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
   {meth}`~hnn_core.dipole.Dipole.scale` methods after your simulation instead, in
   {gh}`1343`.
 
+### Public API Changes
+
+- {func}`~hnn_core.simulate_dipole` now accepts a `baseline_correction` boolean argument
+  (default `True`), which controls whether the baseline correction appropriate for the
+  `Network`'s model is applied to the dipole after simulation,
+  by [Katharina Duecker][] and [Austin E. Soplata][] in {gh}`1343`.
+
+- `BatchSimulate` now expects the `set_params` callback to accept arguments in the
+  order `(net, param_values)` instead of `(param_values, net)`, aligning it with the
+  `Optimizer` class,
+  by [Rahul Tripathi][] in {gh}`1208`, fixing {gh}`1203`. This was their first PR,
+  thanks Rahul!
+
+- {class}`~hnn_core.Section` is now exposed as part of our public API, in {gh}`1368`.
+
+- `duecker_ET_model` is now available via `from hnn_core import duecker_ET_model` (see
+  "New Features" above).
+
+- All user-facing dependencies now have maximum version caps, in order to prevent
+  future dependency updates from breaking this release. Additionally, `notebook` is now
+  a base dependency, so that users can run our Textbook's Jupyter notebooks using the
+  standard `jupyter notebook` command,
+  in {gh}`1385`, fixing {gh}`1384`.
+
+- The `dask[distributed]` package can now be installed using
+  `pip install "hnn-core[dask]"` for use with `JoblibBackend`'s dask backend,
+  by [M Yaswanth Reddy][] in {gh}`1248`.
+
 ### Bug Fixes
+
+- User-facing deprecation notices now emit `FutureWarning`, making them visible under
+  Python's default warning filters,
+  by [William Kang][] in {gh}`1339`. This was their first PR, thanks William!
 
 - Loading external drives in the GUI now extends the simulation duration when needed,
   preserving configured drive and tonic-bias stop times,
@@ -167,34 +229,6 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 - Fixed stray scrollbars appearing on empty GUI dropdowns in Safari,
   by [Sourav Rajvi][] in {gh}`1360`, fixing {gh}`1321`. This was their first PR,
   thanks Sourav!
-
-### Public API Changes
-
-- {func}`~hnn_core.simulate_dipole` now accepts a `baseline_correction` boolean argument
-  (default `True`), which controls whether the baseline correction appropriate for the
-  `Network`'s model is applied to the dipole after simulation,
-  by [Katharina Duecker][] and [Austin E. Soplata][] in {gh}`1343`.
-
-- `BatchSimulate` now expects the `set_params` callback to accept arguments in the
-  order `(net, param_values)` instead of `(param_values, net)`, aligning it with the
-  `Optimizer` class,
-  by [Rahul Tripathi][] in {gh}`1208`, fixing {gh}`1203`. This was their first PR,
-  thanks Rahul!
-
-- {class}`~hnn_core.Section` is now exposed as part of our public API, in {gh}`1368`.
-
-- `duecker_ET_model` is now available via `from hnn_core import duecker_ET_model` (see
-  "New Features" above).
-
-- All user-facing dependencies now have maximum version caps, in order to prevent
-  future dependency updates from breaking this release. Additionally, `notebook` is now
-  a base dependency, so that users can run our Textbook's Jupyter notebooks using the
-  standard `jupyter notebook` command,
-  in {gh}`1385`, fixing {gh}`1384`.
-
-- The `dask[distributed]` package can now be installed using
-  `pip install "hnn-core[dask]"` for use with `JoblibBackend`'s dask backend,
-  by [M Yaswanth Reddy][] in {gh}`1248`.
 
 ### People who contributed to this release:
 
@@ -1674,3 +1708,4 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [William Kang]: https://github.com/WilliamK112
 [Dev Agarwal]: https://github.com/Dev82545
 [Sourav Rajvi]: https://github.com/Souravrajvi0
+[our Github Discussions page]: https://github.com/jonescompneurolab/hnn-core/discussions
