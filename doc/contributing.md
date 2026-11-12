@@ -853,7 +853,7 @@ MPI parallelization with NEURON requires that the simulation be launched with th
 It is important that `flush()` is used whenever data is written to stdin or stderr to
 ensure that the signal will immediately be available for reading by the other side.
 
-## Making changes to the default network
+## Making changes to the default network (Neymotin 2020)
 
 If you ever need to make scientific or technical changes to the default network
 (i.e. the `neymotin_2020_model` network), you need to do three things:
@@ -882,6 +882,24 @@ If you ever need to make scientific or technical changes to the default network
 3. Step 3: Once you've updated the network using the command above, make sure to re-run
    all the tests using `make test`! If the new network file breaks tests, then that
    breakage needs to be fixed before we can merge your updates.
+
+## Making changes to the new Duecker network
+
+If, over the course of peer-review, the Duecker model `duecker_ET_model` parameters need
+to be updated (either the network itself or the drives of `add_erp_drives=True`), then
+we need to overwrite the locally-stored "ground truth" data that we use for testing the
+Duecker model. This requires two steps:
+
+1. Run the following command from the top-level of the repository:
+
+    ```
+    make regenerate-duecker-test-data
+    ```
+
+2. Once you've updated the ground-truth data using the command above, make sure to
+   re-run all the tests using `make test`! The tests that were previously breaking
+   (probably `test_parallel_backends.py::test_compare_duecker_model_output`) should now
+   pass.
 
 ## Publishing new releases
 
