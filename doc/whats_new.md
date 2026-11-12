@@ -29,11 +29,14 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 ## 1.0.0 Release Notes
 
 Despite this version of `hnn-core` being marked as version `1.0.0`, this software
-package has been stable for several years, and is already actively used by many
+package has been stable for several years and is actively being used by many
 different scientists for ongoing research. We decided to release this as version `1.0.0`
 primarily to communicate that `hnn-core` is, and has been, ready for active use. It
 should not be thought of as "still being built". That said, we will still continue to
 improve it and make it easier for our users than ever before!
+
+To be clear, this means the versions go directly from `0.6.1` tot `1.0.0`, and there is
+no version `0.7.0`, etc. Please enjoy the numerous additions!
 
 ### New Features
 
@@ -50,25 +53,27 @@ improve it and make it easier for our users than ever before!
   updates by [Katharina Duecker][], [Nick Tolley][], and [Austin E. Soplata][] in
   {gh}`1345`, {gh}`1358`, and {gh}`1363`.
 
-- HNN-Core now supports NEURON 9 (up to 9.1.0) and Python up to 3.14
+- HNN-Core now supports NEURON 9 (up to 9.0.2, inclusive) and Python up to 3.14
   (inclusive). **Please note that due to the removal of legacy units in NEURON 9.0, ALL
   simulations starting with this HNN-Core version will be quantiatively different!**
   However, your simulations should still be qualitatively similar, and the numerical
   differences will likely be negligible. As an example, this should be equivalent to
-  changing your calcium current reversal potential (`$E_{Ca}$`) from a value of 134.02
+  changing your calcium current reversal potential (`E_Ca`) from a value of 134.02
   to 134.54, or similar magnitude. If your findings are robust to initial conditions and
   seeds, then you should have nothing to worry about. By [Austin E. Soplata][] and
   Claude in {gh}`1230`.
 
     - Note: If you want exact bit-perfect reproduction of your simulations from before
       this change, please install the earlier stable version using `pip install
-      "hnn-core[all]==0.6.1`. The prior stable version (v0.6.1) will always force usage
+      "hnn-core[all]==0.6.1"`. The prior stable version (v0.6.1) will always force usage
       of NEURON 8 along with the legacy units. If you run into issues with updating your
       code, simulations, or reproducibility, then please reach out to us on [our Github
       Discussions page][].
 
-- MPI can now be installed entirely through `pip`! On MacOS and Linux (including Windows
-  WSL), `pip install "hnn-core[parallel]"` (or, alternatively, `pip install
+- [MPI parallelism in
+  `hnn-core`](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/parallelism_mpi.html)
+  can now be installed entirely through `pip` (or `uv`)! On MacOS and Linux (including
+  Windows WSL), `pip install "hnn-core[parallel]"` (or, alternatively, `pip install
   "hnn-core[all]"`) now installs the `mpi4py` and `openmpi` PyPI packages
   automatically. See [our Installation Guide][] for
   details. {class}`~hnn_core.MPIBackend` can automatically locate and use the MPI
@@ -83,19 +88,21 @@ improve it and make it easier for our users than ever before!
   Jas][] for the tip!)
 
 - For Optimization, users can now specify their own custom objective function in two different ways:
-    1. Passing a `obj_fun='custom'` to `Optimizer`. If passing `custom`, then users can
-      provide a function that simply accepts a single `Dipole` object and accepts
-      `obj_fun_kwargs`. They must then pass this function as `loss_fun` in
-      `Optimizer.fit`. More details are available in the descriptions for
+    1. Passing `obj_fun='custom'` to `Optimizer()`. If passing the string `'custom'`, then
+      users can provide a custom function by passing `loss_fun=my_function` to
+      `Optimizer.fit()`. The only restrictions on this function are that it must accept
+      both a single `Dipole` object and `obj_fun_kwargs`, similar to other objective
+      functions. More details are available in the descriptions for
       {class}`~hnn_core.optimization.Optimizer` and
       {func}`~hnn_core.optimization.Optimizer.fit`.
-    2. Passing their own callable via `obj_fun=<callable>`. If users want to use an
-      objective function that does not use only a single `Dipole`, then they can write
-      their own function similar to the existing code in
+    2. Passing their own function (or callable) directly via `obj_fun=<callable>` to `Optimizer`. If
+      users want to use an objective function without the restrictions of the first way
+      (above), then they can write their own function similar to the existing code in
       `optimization/objective_functions.py` and pass that function to
       `Optimizer(... obj_fun=<callable>)`. Note that this function must accept all the
       same arguments as the other objective functions in
       `optimization/objective_functions.py` and run a simulation.
+
   By [Vaishnavi Baghel][], [Nick Tolley][], and [Austin E. Soplata][] in {gh}`1271`.
 
 - (Beta feature) {func}`~hnn_core.viz.plot_dipole` can now show overlay arrows marking
@@ -125,49 +132,52 @@ improve it and make it easier for our users than ever before!
   forward will be *slightly numerically different* than those of version v0.6.1 and
   prior. See note above about NEURON 9.0 support.
 
-- The `hnn-core-all` *Anaconda* package has been pulled from distribution, and will no
-  longer be developed. (Note: this is *different* from the `pip install hnn-core`
-  package which will always be supported.) Starting with this version, `pip` and `uv`
+- The `hnn-core-all` *Anaconda* (or `conda`) package has been pulled from distribution, and will no
+  longer be developed. (Note: this is *different* from the `pip install "hnn-core[all]"`
+  package which will **always** be supported.) Starting with this version, `pip` and `uv`
   will be the recommended ways to install `hnn-core`. Users who have previously
   installed the `conda` package using
 
-```
-conda install hnn-core-all -c jonescompneurolab -c conda-forge
-```
+    ```bash
+    conda install hnn-core-all -c jonescompneurolab -c conda-forge
+    ```
 
-are strongly recommended to remove the `conda` package and instead update to the latest
-`hnn-core` package using pip. If you installed using the instructions in [our
-Installation Guide][], you can do this upgrade with the following:
+    are strongly recommended to remove the `conda` package and instead update to the latest
+    `hnn-core` package using pip. If you installed using the instructions in [our
+    Installation Guide][], you can do this upgrade with the following commands in your
+    Terminal / Anaconda Prompt:
 
-```
-conda activate hnn-core-env
-conda remove hnn-core-all
-pip install "hnn-core[all]"
-```
+    ```bash
+    conda activate hnn-core-env
+    conda remove hnn-core-all
+    pip install "hnn-core[all]"
+    ```
 
-If you have any questions or concerns about updating from the `conda` package, reach out
-to us on [our Github Discussions page][].
+    If you have any questions or concerns about updating from the discontinued `conda`
+    package, reach out to us on [our Github Discussions page][].
 
 - Example scripts are no longer included in the `hnn-core` repository or on our API
-  website. All of the former `examples/` scripts have been migrated to polished and
-  updated Jupyter notebooks on [our Textbook website][], such as
-  [here](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/plot_firing_pattern.html)
-  and all references to them in these release notes now link to their corresponding
-  Textbook notebooks. This also removes our use of `sphinx-gallery`, Binder, etc. By
-  [Austin E. Soplata][] in {gh}`1347`.
+  website (the website you are reading this on). All of the former `examples/` scripts
+  have been migrated to polished and updated Jupyter notebooks on [our Textbook
+  website][], such as
+  [here](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/plot_firing_pattern.html).
+  All references to them in these release notes now link to their corresponding Textbook
+  notebooks. This also removes our use of `sphinx-gallery`, Binder, etc. By [Austin
+  E. Soplata][] in {gh}`1347`.
 
 ### Upcoming Deprecations
 
 - The `postproc` argument of {func}`~hnn_core.simulate_dipole` is now documented as
   deprecated. Please explicitly use the {meth}`~hnn_core.dipole.Dipole.smooth` and
-  {meth}`~hnn_core.dipole.Dipole.scale` methods after your simulation instead, in
-  {gh}`1343`.
+  {meth}`~hnn_core.dipole.Dipole.scale` methods after your simulation instead,
+  by [Katharina Duecker][] in {gh}`1343`.
 - `Network.set_cell_positions` has been renamed to
   `Network.update_cell_positions`. Now, if you want to change where the cell
   positions are to new values, use `Network.update_cell_positions`, and if you
   instead want to *reset* the cell positions back to where they were before any
   `Network.update_cell_positions` calls, you can use
   `Network._reset_to_original_cell_positions`.
+  By [Katharina Duecker][], [Nick Tolley][], and [Austin E. Soplata][] in {gh}`1227`.
 
 ### Public API Changes
 
@@ -177,8 +187,6 @@ to us on [our Github Discussions page][].
   by [Katharina Duecker][] and [Austin E. Soplata][] in {gh}`1343`. If you have always
   used the default behavior, then you do not need to take any action. The new flag is
   also supported by users of `simulate_dipole` such as `BatchSimulate`.
-
-- {class}`~hnn_core.Section` is now exposed as part of our public API, in {gh}`1368`.
 
 - `duecker_ET_model` is now available via `from hnn_core import duecker_ET_model` (see
   "New Features" above).
@@ -196,22 +204,22 @@ to us on [our Github Discussions page][].
   plotted,
   by [Katharina Duecker][] in {gh}`1356`.
 
-- Various API changes introduced in {gh}`1227`:
+- Many API changes introduced in {gh}`1227`:
 
     - Spike output saved to `*.txt` files should now always be sorted in time, even if
       MPI was used in the simulation.
-    - There is now a new `Makefile` recipe `regenerate-duecker-test-data`. This needs to
-      be run by developers whenever there are any changes to either the network or drive
-      parameters of our "canonical" Duecker model, in order to update the "ground truth"
-      data that is used in testing.
+    - For developers, there is a new `Makefile` recipe
+      `regenerate-duecker-test-data`. This needs to be run by developers whenever there
+      are any changes to either the network or drive parameters of our "canonical"
+      Duecker model, in order to update the "ground truth" data that is used in testing.
     - `Network` objects now have a new `model_variant` attribute that is handled
-      automatically throughout JSON files, etc. This is currently only really used for
+      automatically throughout JSON files, etc. This is currently only used for
       discriminating Duecker-models from non-Duecker models (i.e. Neymotin 2020, etc.),
       but will be a key part of supporting other models in our future repertoire.
     - `Cell.create_tonic_bias` is now demoted to a private function
       `Cell._create_tonic_bias`, since it is what is used to actually create the biases
       in NEURON at simulation. Users who want to introduce a *new* bias to the network
-      should use `Network.add_tonic_bias` as they have been doing.
+      should continue to use `Network.add_tonic_bias`.
     - `CellResponse` now accepts a new argument `cell_type_metadata`, in case you want
       to provide your own custom metadata for your own custom celltypes. This is not
       recommended for general use, and is instead mostly used automatically when
@@ -223,40 +231,42 @@ to us on [our Github Discussions page][].
       {func}`~hnn_core.CellResponse.plot_firing_rate_time`. `rate_over_time` is similar
       to `mean_rates` but with a different API, and allows you to calculate firing rates
       for specific cells (or cell types) but using only a **sliding window** of time
-      instead of only measuring across a distinct time segment. You can visualize its
+      instead of only measuring across a single time segment. You can visualize its
       output with the new associated `plot_firing_rate_time`.
     - The Duecker model has introduced new celltypes in `cells_default.py`, including
       `pyramidal_humanL5ET`, `pyramidal_humanL23`, and `human_gen_interneuron`.
     - `Optimizer` now has a new objective function named `dipole_rmse_corr`, which
       calculates the "correlation-weighted RMSE" between dipoles, penalizing solutions
-      with low correlation. See `dipole.py::_rmse_corr()` for details.
+      with low correlation. See `dipole.py`'s `_rmse_corr()` for details on the
+      calculation.
     - There are now several new MOD files available for use, all of which are used in
-      the new Duecker model, such as `mod/NMDA_gao.mod`, etc. You can thus view the
+      the new Duecker model, such as `mod/NMDA_gao2021.mod`, etc. You can thus view the
       exact source code of the model mechanisms used in the new Duecker model, many of
       which are adapted from (Hay et al., 2011) (see the MOD files for publication
       references).
     - If you are creating raw `Network` objects from scratch (instead of using the
       recommended `neymotin_2020_model` or `duecker_ET_model` functions), then if you
       pass either a custom `pos_dict` or `cell_types` argument, you MUST pass your own
-      version of the other. This is a small part of our plan to gradually reduce the
-      amount of hardcoding of specific celltypes. Relatedly, if you do pass a custom
-      `pos_dict`, then related variables like `inplane_distance` will be recalculated
-      automatically based on your positions, instead of being hardcoded to constant
-      values.
-    - (upcoming deprecation) `Network.set_cell_positions` has been renamed to
+      version of the other argument. This is a small part of our plan to gradually
+      reduce the amount of hardcoding of specific celltypes. Relatedly, if you do pass a
+      custom `pos_dict`, then related variables like `inplane_distance` will be
+      recalculated automatically based on your positions, instead of being hardcoded to
+      constant values.
+    - (Upcoming deprecation) `Network.set_cell_positions` has been renamed to
       `Network.update_cell_positions`. Now, if you want to change where the cell
       positions are to new values, use `Network.update_cell_positions`, and if you
       instead want to *reset* the cell positions back to where they were before any
       `Network.update_cell_positions` calls, you can use
       `Network._reset_to_original_cell_positions`.
     - `Network.add_tonic_bias` now accepts a new argument `gid`, which allows several
-      different ways for you to specify which exact gids you want a particular bias to
-      connect to. See documentation here {func}`~hnn_core.Network.add_tonic_bias`.
+      different ways for you to specify which exact GIDs (or cells) you want a
+      particular bias to connect to. See documentation here
+      {func}`~hnn_core.Network.add_tonic_bias`.
     - `Network.plot_cells` now accepts new arguments `colors` and `markers`, where you
       can map colors/markers to specific cell types.
-    - CMA-ES optimization will now save a `cma_checkpoint.pkl` file every 10th iteration
-      of your optimization, in order to not lose your progress if it crashes. We plan to
-      add this functionality to other algorithms soon.
+    - CMA-ES optimization will now save (or overwrite) a `cma_checkpoint.pkl` file every
+      10th iteration of your optimization, in order to not lose your progress if it
+      crashes. We plan to add this functionality to other optimization algorithms soon.
     - `plot_spikes_raster` now accepts more arguments that correspond to Matplotlib
       variables including `xticks`, `yticks`, `xlabel`, `ylabel`, and
       `title`. Internally, its color handling, sizing, and scaling have all been
@@ -264,8 +274,8 @@ to us on [our Github Discussions page][].
 
 ### Bug Fixes
 
-- User-facing deprecation notices now emit `FutureWarning`, making them visible under
-  Python's default warning filters,
+- User-facing deprecation notices now emit `FutureWarning` instead of
+  `DeprecationWarning`, making them visible under Python's default warning filters,
   by [William Kang][] in {gh}`1339`. This was their first PR, thanks William!
 
 - Loading external drives in the GUI now extends the simulation duration when needed,
@@ -277,15 +287,15 @@ to us on [our Github Discussions page][].
   by [Sourav Rajvi][] in {gh}`1378`, fixing {gh}`1374`.
 
 - [Camilo Diaz][] did considerable work in fixing our long-standing `MPI Timeout` issues
-  and putting in place a permanent solution that uses tempfiles instead of relying on
+  and implementing a permanent solution that uses tempfiles instead of relying on
   standard input/output/error streams in {gh}`1312`. Thanks Camilo!
 
 - Reading in older Network JSON files (created before the `v0` initial voltage value was
   introduced into the `Network` objects in {gh}`1185`) no longer incorrectly initializes
   all of their membrane voltages to -65 mV, and instead uses each section's correct
   initial voltage. Thanks to [Anna Cattani][] for finding this bug, which was fixed by
-  [Austin E. Soplata][] in {gh}`1327`. This means that most simulations run using
-  `hnn-core==0.6.1` end up being slightly different than the plots shown in [our
+  [Austin E. Soplata][] in {gh}`1327`. This means that most simulations that are run
+  using `hnn-core==0.6.1` end up being slightly different than the plots shown in [our
   Textbook website][], but this is now fixed.
 
 - Network model functions such as {func}`~hnn_core.neymotin_2020_model` once again
@@ -301,9 +311,6 @@ to us on [our Github Discussions page][].
   `initial_params` and `constraints` are in the same order, which previously could
   cause the CMA-ES solver to raise an error,
   by [Katharina Duecker][] in {gh}`1359`.
-
-- The documentation of {class}`~hnn_core.optimization.Optimizer`'s arguments now
-  correctly appears on our API website, in {gh}`1344`.
 
 - Interactive plotting buttons in the GUI have been re-enabled by correctly detecting
   interactive notebook backends,
@@ -332,9 +339,9 @@ to us on [our Github Discussions page][].
 
 - For the published stable `1.0.0` stable version, all user-facing dependencies now have
   maximum version caps, in order to prevent future dependency updates from breaking this
-  release. Additionally, `notebook` is now a base dependency, so that users can run our
-  Textbook's Jupyter notebooks using the standard `jupyter notebook <file.ipynb>`
-  command, in {gh}`1385`, fixing {gh}`1384`.
+  release. Additionally, `notebook` is now a base dependency, so that anyone installing
+  `hnn-core` can easily run our Textbook's Jupyter notebooks using the standard `jupyter
+  notebook <file.ipynb>` command, in {gh}`1385`, fixing {gh}`1384`.
 
 - Cell metadata is now used around the codebase much more cleanly. Additionally, each
   cell type's `cell_metadata` now includes a default `color` and `marker`, which are
@@ -371,14 +378,13 @@ to us on [our Github Discussions page][].
 - `test_viz.py` has been refactored into smaller, more focused tests,
   by [Camilo Diaz][] in {gh}`1350`.
 
-- Added "progressive" installation tests to our CI, which check that the minimal, then `[opt]`,
-  then `[gui]` installs each work before running the full test suite, in {gh}`1304`.
-
-- Fixed a random failure of a parallel `BatchSimulate` test, in {gh}`1326`.
+- Added "progressive" installation tests to our CI, which check that the minimal (no
+  `extras`), then `[opt]`, then `[gui]` installations each work before running the full
+  test suite, in {gh}`1304`.
 
 - Miscellaneous CI, documentation, testing/development config, and website maintenance
-  in {gh}`1305`, {gh}`1310`, {gh}`1333`, {gh}`1342`, {gh}`1351`, {gh}`1361`, {gh}`1365`,
-  and {gh}`1372`.
+  in {gh}`1305`, {gh}`1310`, {gh}`1326`, {gh}`1333`, {gh}`1342`, {gh}`1344`, {gh}`1351`,
+  {gh}`1361`, {gh}`1365`, {gh}`1368`, and {gh}`1372`.
 
 ### People who contributed to this release:
 
