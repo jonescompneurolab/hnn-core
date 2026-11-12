@@ -793,15 +793,27 @@ class HNNGUI:
             style={"button_color": self.layout["theme_color"]},
         )
         self.save_config_button = self._init_html_download_button(
-            title="Save Current Network and Drives",
+            title="Save Network and Drives",
             mimetype="application/json",
         )
-        self.save_simulation_button = self._init_html_download_button(
+        self.save_sim_output_button = self._init_html_download_button(
             title="Save Simulation Output",
             mimetype="text/csv",
         )
-        # the list that corresponds to save_simulation_button
-        self.simulation_list_widget = Dropdown(
+        # the list that corresponds to save_config_button
+        self.simulation_netsave_widget = Dropdown(
+            options=["Network Configuration to Save"],
+            value="Network Configuration to Save",
+            description="Network configuration:",
+            disabled=True,
+            layout=Layout(
+                width="50%",
+                flex="0 1 50%",  # prevents growth beyond container limit
+                min_width="0",  # forces text to truncate
+            ),
+        ).add_class("simulation-list-widget")
+        # the list that corresponds to save_sim_output_button
+        self.simulation_outputsave_widget = Dropdown(
             options=["Simulation Output to Save"],
             value="Simulation Output to Save",
             description="Simulation output:",
@@ -812,7 +824,9 @@ class HNNGUI:
                 min_width="0",  # forces text to truncate
             ),
         ).add_class("simulation-list-widget")
-        self.simulation_list_widget.add_class("hide-label")
+        # add hide-label class to both widgets
+        self.simulation_outputsave_widget.add_class("hide-label")
+        self.simulation_netsave_widget.add_class("hide-label")
 
         # ==================================================
         # Network tab
@@ -1321,7 +1335,8 @@ class HNNGUI:
                 self._simulation_status_contents,
                 self.connectivity_widgets,
                 self.viz_manager,
-                self.simulation_list_widget,
+                self.simulation_netsave_widget,
+                self.simulation_outputsave_widget,
                 self.cell_parameters_widgets,
                 self.global_gain_widgets,
             )
@@ -1344,7 +1359,8 @@ class HNNGUI:
                 self._simulation_status_contents,
                 self.connectivity_widgets,
                 self.viz_manager,
-                self.simulation_list_widget,
+                self.simulation_netsave_widget,
+                self.simulation_outputsave_widget,
                 self.cell_parameters_widgets,
                 self.global_gain_widgets,
                 self.widget_opt_solver.value,
@@ -1370,25 +1386,61 @@ class HNNGUI:
                 self._update_opt_history_button()
             return
 
-        def _simulation_list_change_cb(value):
-            # Simulation Data
-            _simulation_data, file_extension = _serialize_simulation(
-                self._log_out, data_store.simulated_data, self.simulation_list_widget
+        def _netsave_button_change_cb(value):
+            """
+            Callback for updating the value of `save_config_button` when there is a
+            change to the selected value of the `simulation_netsave_widget` dropdown
+            """
+            network_config = _serialize_network_config(
+                self._log_out,
+                data_store.simulated_data,
+                self.simulation_netsave_widget,
             )
 
-            self.simulation_list_widget.disabled = False
+            self.simulation_netsave_widget.disabled = False
 
-            result_file = f"{value.new}{file_extension}"
+            result_file = f"{self.simulation_netsave_widget.value}.json"
+
+            b64_net = base64.b64encode(network_config.encode())
+            payload = b64_net.decode()
+
+            # redraw button in the same way after simulation change, but mapped to
+            # the result_file filename
+            self.save_config_button.value = self.html_download_button.format(
+                payload=payload,
+                filename=result_file,
+                is_disabled="",
+                btn_height=self.layout["save_btn"].height,
+                btn_width=self.layout["save_btn"].width,
+                color_theme=self.layout["theme_color"],
+                title="Save Network and Drives",
+                mimetype="application/json",
+            )
+
+        def _outputsave_button_change_cb(value):
+            """
+            Callback for updating the value of `save_sim_output_button` when there is a
+            change to the selected value of the `simulation_outputsave_widget` dropdown
+            """
+            _simulation_data, file_extension = _serialize_simulation_output(
+                self._log_out,
+                data_store.simulated_data,
+                self.simulation_outputsave_widget,
+            )
+
+            self.simulation_outputsave_widget.disabled = False
+
+            result_file = f"{self.simulation_outputsave_widget.value}{file_extension}"
+
             if file_extension == ".csv":
                 b64 = base64.b64encode(_simulation_data.encode())
             else:
                 b64 = base64.b64encode(_simulation_data)
-
             payload = b64.decode()
 
             # redraw button in the same way after simulation change, but mapped to
             # the result_file filename
-            self.save_simulation_button.value = self.html_download_button.format(
+            self.save_sim_output_button.value = self.html_download_button.format(
                 payload=payload,
                 filename=result_file,
                 is_disabled="",
@@ -1397,25 +1449,6 @@ class HNNGUI:
                 color_theme=self.layout["theme_color"],
                 title="Save Simulation Output",
                 mimetype="text/csv",
-            )
-
-            # Network Configuration
-            network_config = _serialize_config(
-                self._log_out, data_store.simulated_data, self.simulation_list_widget
-            )
-            b64_net = base64.b64encode(network_config.encode())
-
-            # redraw button in the same way after simulation change, but mapped to
-            # the value.new filename
-            self.save_config_button.value = self.html_download_button.format(
-                payload=b64_net.decode(),
-                filename=f"{value.new}.json",
-                is_disabled="",
-                btn_height=self.layout["save_btn"].height,
-                btn_width=self.layout["save_btn"].width,
-                color_theme=self.layout["theme_color"],
-                title="Save Current Network and Drives",
-                mimetype="application/json",
             )
 
         def _driver_type_change_cb(value):
@@ -1456,7 +1489,14 @@ class HNNGUI:
         self.load_experimental_data_button.observe(
             _on_upload_experimental_data_cb, names="value"
         )
-        self.simulation_list_widget.observe(_simulation_list_change_cb, "value")
+        self.simulation_netsave_widget.observe(
+            _netsave_button_change_cb,
+            names="value",
+        )
+        self.simulation_outputsave_widget.observe(
+            _outputsave_button_change_cb,
+            names="value",
+        )
         self.widget_drive_type_selection.observe(_driver_type_change_cb, "value")
 
         self.cell_type_radio_buttons.observe(_cell_type_radio_change_cb, "value")
@@ -1665,12 +1705,13 @@ class HNNGUI:
                         HBox(
                             [
                                 self.save_config_button,
+                                self.simulation_netsave_widget,
                             ]
                         ),
                         HBox(
                             [
-                                self.save_simulation_button,
-                                self.simulation_list_widget,
+                                self.save_sim_output_button,
+                                self.simulation_outputsave_widget,
                             ],
                             layout=Layout(align_items="center"),
                         ),
@@ -4863,7 +4904,8 @@ def run_button_clicked(
     simulation_status_contents,
     connectivity_textfields,
     viz_manager,
-    simulations_list_widget,
+    simulation_netsave_widget,
+    simulation_outputsave_widget,
     cell_parameters_widgets,
     global_gain_textfields,
 ):
@@ -4949,8 +4991,26 @@ def run_button_clicked(
                     if simulation_data[sim_name]["net"] is not None
                 ]
 
-                simulations_list_widget.options = sim_names
-                simulations_list_widget.value = sim_names[0]
+                # Update simulation list widgets
+                # ---------------------------------------------------------------------
+                # `simulation_netsave_widget`:
+                #    - list used for saving network configurations
+                # `simulation_outputsave_widget`:
+                #    - list used for saving simulation outputs
+                #
+                # Each widget points to its own selected value, so both values must be
+                # explicitly set after the "options" are updated
+                #
+                # NOTE: assigning "options" resets the selected "value" to
+                # `sim_names[0]`, which can trigger the widget's callback if the
+                # value is updated. The callback may be triggered a second time if
+                # the selected "value" is changed again when it is assigned to
+                # `sim_names[-1]`
+                simulation_netsave_widget.options = sim_names
+                simulation_netsave_widget.value = sim_names[-1]
+
+                simulation_outputsave_widget.options = sim_names
+                simulation_outputsave_widget.value = sim_names[-1]
 
             viz_manager.last_action = UiAction.RUN_SIMULATION
             viz_manager.reset_fig_config_tabs()
@@ -5157,15 +5217,22 @@ def update_common_dendrite_sections(sections, mechs_params):
         sections[section].mechs.update(deepcopy(mechs_params))
 
 
-def _serialize_simulation(log_out, sim_data, simulation_list_widget):
-    # Only download if there is at least one simulation
-    sim_name = simulation_list_widget.value
+def _serialize_simulation_output(
+    log_out,
+    sim_data,
+    simulation_outputsave_widget,
+):
+    """
+    Serialize the currently-selected simulation in `simulation_outputsave_widget`, and
+    route any output or errors to `log_out`.
+    """
+    sim_name = simulation_outputsave_widget.value
 
     with log_out:
-        return serialize_simulation(sim_data, sim_name)
+        return serialize_simulation_output(sim_data, sim_name)
 
 
-def serialize_simulation(all_simulation_data, simulation_name):
+def serialize_simulation_output(all_simulation_data, simulation_name):
     """Serializes simulation data to CSV.
 
     Creates a single CSV file or a ZIP file containing multiple CSVs,
@@ -5203,15 +5270,22 @@ def serialize_simulation(all_simulation_data, simulation_name):
         return _create_zip(csv_trials_output, simulation_name), ".zip"
 
 
-def _serialize_config(log_out, sim_data, simulation_list_widget):
-    # Only download if there is at least one simulation
-    sim_name = simulation_list_widget.value
+def _serialize_network_config(
+    log_out,
+    sim_data,
+    simulation_netsave_widget,
+):
+    """
+    Serialize the network/drives for the currently-selected simulation in the
+    `simulation_netsave_widget`, and route any output or errors to `log_out`
+    """
+    sim_name = simulation_netsave_widget.value
 
     with log_out:
-        return serialize_config(sim_data, sim_name)
+        return serialize_network_config(sim_data, sim_name)
 
 
-def serialize_config(simulations_data, simulation_name):
+def serialize_network_config(simulations_data, simulation_name):
     """Serializes Network configuration data to json."""
 
     # Get network from data dictionary
@@ -5841,7 +5915,8 @@ def run_opt_button_clicked(
     simulation_status_contents,
     connectivity_textfields,
     viz_manager,
-    simulations_list_widget,
+    simulation_netsave_widget,
+    simulation_outputsave_widget,
     cell_parameters_widgets,
     global_gain_textfields,
     opt_solver,
@@ -6154,8 +6229,10 @@ def run_opt_button_clicked(
                     for sim_name in simulation_data
                     if simulation_data[sim_name]["net"] is not None
                 ]
-                simulations_list_widget.options = sim_names
-                simulations_list_widget.value = new_name
+                simulation_netsave_widget.options = sim_names
+                simulation_netsave_widget.value = new_name
+                simulation_outputsave_widget.options = sim_names
+                simulation_outputsave_widget.value = new_name
 
                 # Report back to the user, now that all simulations/output are
                 # completed:
@@ -6274,7 +6351,7 @@ def run_opt_button_clicked(
             # optimization run
 
             # Return both the optimized config and the optimizer results
-            optimized_config = serialize_config(simulation_data, new_name)
+            optimized_config = serialize_network_config(simulation_data, new_name)
             opt_result = {
                 "initial_params": optim.initial_params,
                 "opt_params": optim.opt_params_,
