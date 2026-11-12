@@ -29,26 +29,26 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 ## 1.0.0 Release Notes
 
 Despite this version of `hnn-core` being marked as version `1.0.0`, this software
-package has been stable and is already actively used by many different scientists for
-ongoing research. We decided to release this as version `1.0.0` primarily to communicate
-that `hnn-core` is, and has been, ready for active use; it should not be thought of as
-"still being built". That said, we will still continue to improve it and make it easier
-for our users to use than ever before!
+package has been stable for several years, and is already actively used by many
+different scientists for ongoing research. We decided to release this as version `1.0.0`
+primarily to communicate that `hnn-core` is, and has been, ready for active use. It
+should not be thought of as "still being built". That said, we will still continue to
+improve it and make it easier for our users than ever before!
 
 ### New Features
 
-- [Katharina Duecker][] has added a brand-new model, `duecker_ET_model`, which includes
-  new human-derived pyramidal cell and interneuron models (`L2_inhibitory` and
-  `L5_inhibitory`) along with new ion channel and synapse mechanisms (including
-  `NMDA_gao2021` and `gabab_neymotin2016` synapses, and channels from Hay et al. 2011
-  and Golomb et al.  2007). The publication describing this model is pending, a preprint
-  is [available here](https://doi.org/10.64898/2026.10.29.762964), and the source code
-  for the simulations in the paper is [available
+- [Katharina Duecker][] has added an exciting, brand-new model, `duecker_ET_model`,
+  which includes new human-derived pyramidal cell and interneuron models
+  (`L2_inhibitory` and `L5_inhibitory`) along with new ion channel and synapse
+  mechanisms (including `NMDA_gao2021` and `gabab_neymotin2016` synapses, and channels
+  from Hay et al. 2011 and Golomb et al.  2007). A preprint is [available
+  here](https://doi.org/10.64898/2026.10.29.762964), the final publication is pending,
+  and the source code for the simulations in the paper is [available
   here](https://github.com/jonescompneurolab/hnn-tuning). Importantly, the model is
   **still subject to change** until final publication. You can easily include simulation
-  of its optional ERP drives `add_erp_drives=True`. Merged in {gh}`1227` with
-  additional updates by [Katharina Duecker][], [Nick Tolley][], and [Austin
-  E. Soplata][] in {gh}`1345`, {gh}`1358`, and {gh}`1363`.
+  of its optional ERP drives using the argument `add_erp_drives=True`. Merged in {gh}`1227` with additional
+  updates by [Katharina Duecker][], [Nick Tolley][], and [Austin E. Soplata][] in
+  {gh}`1345`, {gh}`1358`, and {gh}`1363`.
 
 - HNN-Core now supports NEURON 9 (up to 9.1.0) and Python up to 3.14
   (inclusive). **Please note that due to the removal of legacy units in NEURON 9.0, ALL
