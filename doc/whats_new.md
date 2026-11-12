@@ -46,7 +46,7 @@ TODO AES also include links to hnn-tuning
   to the removal of legacy units in NEURON 9.0, ALL simulations starting with this
   HNN-Core version will be quantiatively different!** However, your simulations should
   still be qualitatively similarly, and the numerical differences will likely be
-  negligble. As an example, this should be equivalent to changing your calcium current
+  negligible. As an example, this should be equivalent to changing your calcium current
   reversal potential (`$E_{Ca}$`) from a value of 134.02 to 134.54, or similar
   magnitude. If your findings are robust to initial conditions and seeds, then you
   should have nothing to worry about. By [Austin E. Soplata][] in {gh}`1230`.
