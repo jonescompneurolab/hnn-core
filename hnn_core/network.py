@@ -732,6 +732,14 @@ class Network:
 
         # Must happen after cell types are added
         if add_drives_from_params:
+            warnings.warn(
+                "add_drives_from_params=True is deprecated. In order to add the "
+                "canonical set of drives, please use the appropriate argument to the "
+                "network model you are using, such as 'neymotin_2020_model(..., "
+                "add_erp_drives=True)' to add canonical ERP drives to the Neymotin "
+                "2020 model.",
+                FutureWarning,
+            )
             _add_drives_from_params(self)
 
     def __repr__(self):
