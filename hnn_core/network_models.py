@@ -428,9 +428,12 @@ def neymotin_2020_model(
     net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     if add_erp_drives:
-        # As of HNN-Core v0.6.1 with NEURON 8.2.7, this adds drives that are equivalent
-        # to those added by calling `neymotin_2020_model(add_drives_from_params=True,
-        # legacy_mode=False)`.
+        # Canonical ERP drives and event seeds match
+        # `hnn_core/param/neymotin2020_base.json` (``external_drives``) and the GUI /
+        # textbook defaults; see
+        # https://github.com/jonescompneurolab/hnn-core/blob/master/hnn_core/param/neymotin2020_base.json
+        # and
+        # https://jonescompneurolab.github.io/textbook/content/05_erps/erp_multiscale_interpretation_01.html
 
         # Add distal drive
         weights_ampa_d1 = {
@@ -524,6 +527,7 @@ def neymotin_2020_model(
 def jones_2009_model(
     params=None,
     add_drives_from_params=False,
+    add_erp_drives=False,
     legacy_mode=False,
     mesh_shape=(10, 10),
 ):
@@ -550,6 +554,9 @@ def jones_2009_model(
         If True, add drives as defined in the params-dict. NB this is mainly
         for backward-compatibility with HNN GUI, and will be deprecated in a
         future release. Default: False
+    add_erp_drives : bool, default=False
+        If True, add the canonical ERP drives. Passed through to
+        :func:`neymotin_2020_model`.
     legacy_mode : bool, default=False
         Set to False by default. Enables matching HNN GUI output when drives
         are added suitably. Will be deprecated in a future release.
@@ -598,6 +605,7 @@ def jones_2009_model(
     net = neymotin_2020_model(
         params=params,
         add_drives_from_params=add_drives_from_params,
+        add_erp_drives=add_erp_drives,
         legacy_mode=legacy_mode,
         mesh_shape=mesh_shape,
     )

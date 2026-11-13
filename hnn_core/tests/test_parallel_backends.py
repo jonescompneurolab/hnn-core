@@ -406,7 +406,7 @@ class TestParallelBackends:
         that there will be small differences due to the lack of legacy unit support.
         """
         # small snippet of data on data branch for now. To be deleted
-        # later. Data branch should have only commit so it does not
+        # later. Data branch should have only one commit so it does not
         # pollute the history.
         ground_truth_fname = "dpl_nonlegacy_units.txt"
         data_url = (
@@ -462,7 +462,7 @@ class TestParallelBackends:
         therefore, the random seeds of the drives used are different.
         """
         # small snippet of data on data branch for now. To be deleted
-        # later. Data branch should have only commit so it does not
+        # later. Data branch should have only one commit so it does not
         # pollute the history.
         #
         # - "Units" here means we are not using legacy units of NEURON provided by
@@ -482,7 +482,7 @@ class TestParallelBackends:
             urlretrieve(data_url, ground_truth_fname)
         dpl_master = loadtxt(ground_truth_fname)
 
-        net = neymotin_2020_model(add_erp_drives=True)
+        net = neymotin_2020_model(legacy_mode=False, add_erp_drives=True)
         dpls = fix_run_simulation(net, tstop=170, backend=backend)
         dpl = dpls[0].smooth(30).scale(3000)
 
