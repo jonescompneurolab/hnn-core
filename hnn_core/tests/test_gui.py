@@ -1440,7 +1440,7 @@ def test_gui_download_simulation(setup_reduced_gui):
     # Check no experimental/loaded data is listed in the sims dropdown list to download
     file1_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/S1_SupraT.txt"  # noqa
     gui._simulate_upload_experimental_data(file1_url)
-    download_simulation_list = gui.simulation_netsave_widget.options
+    download_simulation_list = gui.simulation_net_save_widget.options
     assert (
         len(
             [
@@ -2549,7 +2549,7 @@ def test_data_store_shared_singleton_across_modules(setup_reduced_gui):
     gui.widget_simulation_name.value = sim_name
     gui.run_button.click()
 
-    assert sim_name in gui.simulation_netsave_widget.options
+    assert sim_name in gui.simulation_net_save_widget.options
     # data written through gui.py is immediately
     # visible to _VizManager's data_store widget updates
     gui.viz_manager.templates_dropdown.value = "Drive-Dipole (2x1)"
@@ -2808,8 +2808,8 @@ def test_gui_save_dropdowns(setup_reduced_gui):
     # Pre simulation
     # ------------------------------
     # check that both widgets are disabled
-    assert gui.simulation_netsave_widget.disabled
-    assert gui.simulation_outputsave_widget.disabled
+    assert gui.simulation_net_save_widget.disabled
+    assert gui.simulation_output_save_widget.disabled
 
     # Mock first simulation
     # ------------------------------
@@ -2819,8 +2819,8 @@ def test_gui_save_dropdowns(setup_reduced_gui):
     gui.run_button.click()
 
     # check that both widgets are no longer disabled
-    assert not gui.simulation_netsave_widget.disabled
-    assert not gui.simulation_outputsave_widget.disabled
+    assert not gui.simulation_net_save_widget.disabled
+    assert not gui.simulation_output_save_widget.disabled
 
     # Test that the placeholder text for each dropdown is not erroneously
     # added to the data store (this happened in a previous implementation where
@@ -2829,7 +2829,7 @@ def test_gui_save_dropdowns(setup_reduced_gui):
     assert "Network Configuration to Save" not in data_store.simulated_data
 
     # Ensure that `sim_name` is present and selected in both dropdown menus
-    for dropdown in (gui.simulation_netsave_widget, gui.simulation_outputsave_widget):
+    for dropdown in (gui.simulation_net_save_widget, gui.simulation_output_save_widget):
         assert sim_name in dropdown.options
         assert dropdown.value == sim_name
 
@@ -2844,16 +2844,16 @@ def test_gui_save_dropdowns(setup_reduced_gui):
     gui.run_button.click()
 
     # Test that each dropdown updates its value to the most-recent simulation
-    for dropdown in (gui.simulation_netsave_widget, gui.simulation_outputsave_widget):
+    for dropdown in (gui.simulation_net_save_widget, gui.simulation_output_save_widget):
         assert dropdown.value == sim_name2
     assert f'download="{sim_name2}.json"' in gui.save_config_button.value
     assert f'download="{sim_name2}.' in gui.save_sim_output_button.value
 
-    # Manually update `simulation_netsave_widget.value` to be the sim_name
+    # Manually update `simulation_net_save_widget.value` to be the sim_name
     # of the first simulation
     #   - `save_config_button` should reflect the manually-selected `sim_name`
     #   - `save_sim_output_button` should retain `sim_name2`
-    gui.simulation_netsave_widget.value = sim_name
+    gui.simulation_net_save_widget.value = sim_name
     assert f'download="{sim_name}.json"' in gui.save_config_button.value
     assert f'download="{sim_name2}.' in gui.save_sim_output_button.value
 
@@ -2864,11 +2864,11 @@ def test_gui_save_dropdowns(setup_reduced_gui):
     gui.widget_simulation_name.value = sim_name3
     gui.run_button.click()
 
-    # Manually update `simulation_outputsave_widget.value` to be the sim_name
+    # Manually update `simulation_output_save_widget.value` to be the sim_name
     # of the second simulation
     #   - `save_config_button` should retain `sim_name3`
     #   - `save_sim_output_button` should reflect the manually-selected `sim_name2`
-    gui.simulation_outputsave_widget.value = sim_name2
+    gui.simulation_output_save_widget.value = sim_name2
     assert f'download="{sim_name3}.json"' in gui.save_config_button.value
     assert f'download="{sim_name2}.' in gui.save_sim_output_button.value
 
@@ -2961,7 +2961,7 @@ def test_gui_save_button_payloads(setup_reduced_gui):
     # Select the first simulation in the dropdown for the network. The network-saving
     # button should switch to the first simulation's payload, while the output-saving
     # button should keep the second simulation's payload
-    gui.simulation_netsave_widget.value = sim_name
+    gui.simulation_net_save_widget.value = sim_name
     assert _decode_payload(gui.save_config_button) == _expected_netconfig_payload(
         sim_name
     )
@@ -2972,7 +2972,7 @@ def test_gui_save_button_payloads(setup_reduced_gui):
     # Select the first simulation in the dropdown for simulation output. Now the
     # output-saving button should switch to the first simulation's payload, and the
     # network-saving button should still point to the first simulation's payload
-    gui.simulation_outputsave_widget.value = sim_name
+    gui.simulation_output_save_widget.value = sim_name
     assert _decode_payload(gui.save_sim_output_button) == _expected_simoutput_payload(
         sim_name
     )
@@ -2983,7 +2983,7 @@ def test_gui_save_button_payloads(setup_reduced_gui):
     # Select the second simulation in the dropdown for the network. The network-saving
     # button should switch to the second simulation's payload, and the output-saving
     # button should still point to the first simulation's payload
-    gui.simulation_netsave_widget.value = sim_name2
+    gui.simulation_net_save_widget.value = sim_name2
     assert _decode_payload(gui.save_config_button) == _expected_netconfig_payload(
         sim_name2
     )
@@ -2993,12 +2993,12 @@ def test_gui_save_button_payloads(setup_reduced_gui):
 
     # Confirm that updating the payload for `save_sim_output_button` does not change
     # the payload for `save_config_button` to match it
-    # First, set `simulation_outputsave_widget` to `sim_name2`, which forces its
+    # First, set `simulation_output_save_widget` to `sim_name2`, which forces its
     # callback to fire, then change it back to `sim_name`, which forces the callback
     # to fire again. Then confirm that `save_config_button` retains the `sim_name2`
     # payload while `save_sim_output_button` contains the `sim_name` payload
-    gui.simulation_outputsave_widget.value = sim_name2
-    gui.simulation_outputsave_widget.value = sim_name
+    gui.simulation_output_save_widget.value = sim_name2
+    gui.simulation_output_save_widget.value = sim_name
     assert _decode_payload(gui.save_config_button) == _expected_netconfig_payload(
         sim_name2
     )
