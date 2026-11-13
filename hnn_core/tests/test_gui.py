@@ -2837,7 +2837,7 @@ def test_gui_save_dropdowns(setup_reduced_gui):
 
     # Mock second simulation
     # ------------------------------
-    # Set up a secnod mock simulation
+    # Set up a second mock simulation
     sim_name2 = "second_simulation_name"
     gui.widget_simulation_name.value = sim_name2
     gui.run_button.click()
