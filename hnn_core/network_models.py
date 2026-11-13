@@ -428,13 +428,27 @@ def neymotin_2020_model(
     net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     if add_erp_drives:
-        # Canonical ERP drives and event seeds match
-        # `hnn_core/param/neymotin2020_base.json` (``external_drives``) and the GUI /
-        # textbook defaults; see
-        # https://github.com/jonescompneurolab/hnn-core/blob/master/hnn_core/param/neymotin2020_base.json
-        # and
-        # https://jonescompneurolab.github.io/textbook/content/05_erps/erp_multiscale_interpretation_01.html
-
+        # This new flag is an attempt to simplify and canonize the ERP drives in the
+        # default Neymotin model in one place, instead of relying on multiple parameter
+        # files and code that interact with complex logic such as in
+        # `add_drives_from_params`. As of HNN-Core v0.6.1 with NEURON 8.2.7, this adds
+        # drives that are equivalent to those added by calling
+        # `neymotin_2020_model(add_drives_from_params=True, legacy_mode=False)`.
+        #
+        # There is no single parameter file that *inputs* the parameters of these
+        # drives, because the way we traditionally instantiated our "canonical" drives
+        # using `neymotin_2020_model(add_drives_from_params=True, legacy_mode=False)` is
+        # complex and dynamic: it calls `drives.py::_add_drives_from_params` which
+        # relies on both logic and parameters scattered throughout `default.json`,
+        # `params_default.py`, and then the overwriting of certain parameters by
+        # `params.py`.
+        #
+        # If you want to see a parameter file that contains these drive parameters, then
+        # you can see them at `param/neymotin2020_base.json`. However, note that this
+        # file is *created* by using either `add_drives_from_params=True` or
+        # `add_erp_drives=True` -- it is an *output* file from the code of this
+        # function, not an *input* file that determines the drive parameters.
+        #
         # Add distal drive
         weights_ampa_d1 = {
             "L2_basket": 0.006562,
