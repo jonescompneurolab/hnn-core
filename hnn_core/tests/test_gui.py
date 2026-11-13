@@ -1,52 +1,54 @@
 # Authors: Huzi Cheng <hzcheng15@icloud.com>
 #          Camilo Diaz <camilo_diaz@brown.edu>
 #          George Dang <george_dang@brown.edu>
+import base64
 import codecs
 import io
-import os
 import json
 import logging
+import os
+import re
 import sys
 import tempfile
 import time
 from pathlib import Path
 from urllib.request import urlretrieve
 
-from IPython.display import IFrame
-from ipywidgets import Tab, Text, link
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 import traitlets
+from IPython.display import IFrame
+from ipywidgets import Tab, Text, link
 
 import hnn_core
 from hnn_core import Dipole, Network, simulate_dipole
 from hnn_core.gui import HNNGUI
+from hnn_core.gui._data_store import data_store
 from hnn_core.gui._viz_manager import (
     _COMPARISON_TEXT_GID,
-    _idx2figname,
-    _plot_types,
-    _no_overlay_plot_types,
-    unlink_relink,
     _experimental_data_templates,
+    _idx2figname,
+    _no_overlay_plot_types,
+    _plot_types,
+    unlink_relink,
 )
 from hnn_core.gui.gui import (
     _GUI_PrintToLogger,
     _init_network_from_widgets,
     _simulate_prepare_upload_file,
     _update_nested_dict,
-    serialize_simulation,
-    serialize_config,
+    serialize_network_config,
+    serialize_simulation_output,
 )
-from hnn_core.network import pick_connection, _compare_lists
-from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 from hnn_core.hnn_io import (
     dict_to_network,
     read_network_configuration,
     write_network_configuration,
 )
-from hnn_core.gui._data_store import data_store
+from hnn_core.network import _compare_lists, pick_connection
+from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 
 matplotlib.use("agg")
 hnn_core_root = Path(hnn_core.__file__).parent
@@ -1415,7 +1417,7 @@ def test_gui_download_simulation(setup_reduced_gui):
     # Run simulation
     gui.run_button.click()
 
-    _, file_extension = serialize_simulation(data_store.simulated_data, sim_name)
+    _, file_extension = serialize_simulation_output(data_store.simulated_data, sim_name)
     # result is a zip file
     assert file_extension == ".zip"
 
@@ -1428,14 +1430,17 @@ def test_gui_download_simulation(setup_reduced_gui):
 
     # Run simulation
     gui.run_button.click()
-    _, file_extension = serialize_simulation(data_store.simulated_data, sim_name2)
+    _, file_extension = serialize_simulation_output(
+        data_store.simulated_data,
+        sim_name2,
+    )
     # result is a single csv file
     assert file_extension == ".csv"
 
     # Check no experimental/loaded data is listed in the sims dropdown list to download
     file1_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/S1_SupraT.txt"  # noqa
     gui._simulate_upload_experimental_data(file1_url)
-    download_simulation_list = gui.simulation_list_widget.options
+    download_simulation_list = gui.simulation_net_save_widget.options
     assert (
         len(
             [
@@ -1504,7 +1509,7 @@ def test_gui_download_configuration(setup_reduced_gui, fix_load_featureful_tmp_p
     gui.run_button.click()
 
     # serialize configurations of the simulation
-    configs = serialize_config(data_store.simulated_data, sim_name)
+    configs = serialize_network_config(data_store.simulated_data, sim_name)
     net_from_buffer = json.loads(configs)
 
     # Load configuration from file
@@ -2005,7 +2010,7 @@ def test_custom_gains_simulate_and_download(setup_reduced_gui):
     gui.run_button.click()
 
     # Serialize the configuration
-    configs = serialize_config(data_store.simulated_data, sim_name)
+    configs = serialize_network_config(data_store.simulated_data, sim_name)
     net_config = json.loads(configs)
 
     # Check that connectivity includes gain values
@@ -2544,7 +2549,7 @@ def test_data_store_shared_singleton_across_modules(setup_reduced_gui):
     gui.widget_simulation_name.value = sim_name
     gui.run_button.click()
 
-    assert sim_name in gui.simulation_list_widget.options
+    assert sim_name in gui.simulation_net_save_widget.options
     # data written through gui.py is immediately
     # visible to _VizManager's data_store widget updates
     gui.viz_manager.templates_dropdown.value = "Drive-Dipole (2x1)"
@@ -2788,6 +2793,226 @@ def test_gui_upload_data_name_conflicts_with_simulation(setup_reduced_gui):
         f"Cannot run simulation named '{sim_name2}'" in entry["text"]
         and "already exists" in entry["text"]
         for entry in gui._log_out.outputs
+    )
+
+    plt.close("all")
+
+
+def test_gui_save_dropdowns(setup_reduced_gui):
+    """
+    Test the dropdowns and buttons for saving network configurations and
+    simulation outputs update correctly after simulations
+    """
+    gui = setup_reduced_gui
+
+    # Pre simulation
+    # ------------------------------
+    # check that both widgets are disabled
+    assert gui.simulation_net_save_widget.disabled
+    assert gui.simulation_output_save_widget.disabled
+
+    # Mock first simulation
+    # ------------------------------
+    # Set up the first mock simulation
+    sim_name = "first_simulation_name"
+    gui.widget_simulation_name.value = sim_name
+    gui.run_button.click()
+
+    # check that both widgets are no longer disabled
+    assert not gui.simulation_net_save_widget.disabled
+    assert not gui.simulation_output_save_widget.disabled
+
+    # Test that the placeholder text for each dropdown is not erroneously
+    # added to the data store (this happened in a previous implementation where
+    # the two dropdowns relied on a shared callback)
+    assert "Simulation Output to Save" not in data_store.simulated_data
+    assert "Network Configuration to Save" not in data_store.simulated_data
+
+    # Ensure that `sim_name` is present and selected in both dropdown menus
+    for dropdown in (gui.simulation_net_save_widget, gui.simulation_output_save_widget):
+        assert sim_name in dropdown.options
+        assert dropdown.value == sim_name
+
+    assert f'download="{sim_name}.json"' in gui.save_config_button.value
+    assert f'download="{sim_name}.' in gui.save_sim_output_button.value
+
+    # Mock second simulation
+    # ------------------------------
+    # Set up a second mock simulation
+    sim_name2 = "second_simulation_name"
+    gui.widget_simulation_name.value = sim_name2
+    gui.run_button.click()
+
+    # Test that each dropdown updates its value to the most-recent simulation
+    for dropdown in (gui.simulation_net_save_widget, gui.simulation_output_save_widget):
+        assert dropdown.value == sim_name2
+    assert f'download="{sim_name2}.json"' in gui.save_config_button.value
+    assert f'download="{sim_name2}.' in gui.save_sim_output_button.value
+
+    # Manually update `simulation_net_save_widget.value` to be the sim_name
+    # of the first simulation
+    #   - `save_config_button` should reflect the manually-selected `sim_name`
+    #   - `save_sim_output_button` should retain `sim_name2`
+    gui.simulation_net_save_widget.value = sim_name
+    assert f'download="{sim_name}.json"' in gui.save_config_button.value
+    assert f'download="{sim_name2}.' in gui.save_sim_output_button.value
+
+    # Mock third simulation
+    # ------------------------------
+    # Set up a third mock simulation. We expect each value to update to sim_name3
+    sim_name3 = "third_simulation_name"
+    gui.widget_simulation_name.value = sim_name3
+    gui.run_button.click()
+
+    # Manually update `simulation_output_save_widget.value` to be the sim_name
+    # of the second simulation
+    #   - `save_config_button` should retain `sim_name3`
+    #   - `save_sim_output_button` should reflect the manually-selected `sim_name2`
+    gui.simulation_output_save_widget.value = sim_name2
+    assert f'download="{sim_name3}.json"' in gui.save_config_button.value
+    assert f'download="{sim_name2}.' in gui.save_sim_output_button.value
+
+    plt.close("all")
+
+
+def test_gui_save_button_payloads(setup_reduced_gui):
+    """
+    Test that the buttons for saving network configurations and simulation outputs
+    embed the correct, serialized data for the selected simulation in their respective
+    dropdown widgets
+    """
+    gui = setup_reduced_gui
+
+    def _decode_payload(button):
+        """
+        Extract and decode the payload from the button (widget) contents directly
+        """
+        # NOTE: the value of the button is a string built from the template in
+        # `_init_html_download_button`. The file contents are embedded in the
+        # link as a data URI: `href="data:<mimetype>;base64,<payload>"`. The regex
+        # used here captures the payload between "base64," and the closing
+        # quote. If the template in `_init_html_download_button` changes, this
+        # regex will also need to be updated
+
+        # extract the payload using regex
+        match_payload = re.search(
+            r'base64,([^"]*)"',
+            button.value,
+        )
+        # explicitly fail if there is no match; this will help identify if the
+        # template changes and requires a regex update
+        assert match_payload is not None
+
+        # convert payload to raw bytes
+        decoded_payload = base64.b64decode(match_payload.group(1))
+        return decoded_payload
+
+    def _expected_netconfig_payload(sim_name):
+        """
+        Serialize and encode the network configuration for `sim_name` directly from
+        `data_store.simulated_data`
+        """
+        encoded_netconfig = serialize_network_config(
+            data_store.simulated_data,
+            sim_name,
+        ).encode()
+        return encoded_netconfig
+
+    def _expected_simoutput_payload(sim_name):
+        """
+        Serialize and encode the simulation output for `sim_name` directly from
+        `data_store.simulated_data` ***for a single trial simulation only***
+        """
+        # check expected output for *single* trial simulation, which should
+        # *always* have a ".csv" extension
+        #
+        # NOTE: in the case of multiple trials where the payload is a `.zip` file,
+        # the raw bytes can differ across two separate serializations of the same
+        # data (since each file inside the zip is stamped with the write time). This
+        # test only covers the single-trial case where the raw bytes are expected to
+        # match exactly
+        #
+        # TODO: add a test for multiple-trial simulations where the payload is a `.zip`
+        # file. We would need to compare something other than the raw bytes of the
+        # payload; e.g., one option would be to open the `.zip` and compare the
+        # contents of individual files
+        simoutput, extension = serialize_simulation_output(
+            data_store.simulated_data,
+            sim_name,
+        )
+        # sanity check: confirm the serialized output is ".csv"
+        assert extension == ".csv"
+
+        encoded_simoutput = simoutput.encode()
+        return encoded_simoutput
+
+    # Mock run two simulations so that the *selected* simulation is changed to
+    # the second one
+    # NOTE: we need two simulations so we can check that payload associated with the
+    # save button is correctly updated when we change the simulation in the dropdown
+    sim_name = "first_simulation"
+    gui.widget_simulation_name.value = sim_name
+    gui.run_button.click()
+
+    # change tstop so that the payload for the second simulation is different from
+    # the first simulation
+    sim_name2 = "second_simulation"
+    gui.widget_simulation_name.value = sim_name2
+    gui.widget_tstop.value = gui.widget_tstop.value + 1
+    gui.run_button.click()
+
+    # confirm that the two simulation payloads are different; otherwise the payload
+    # comparisons below would be meaningless as they would always be equal
+    assert _expected_simoutput_payload(sim_name) != _expected_simoutput_payload(
+        sim_name2
+    )
+
+    # Select the first simulation in the dropdown for the network. The network-saving
+    # button should switch to the first simulation's payload, while the output-saving
+    # button should keep the second simulation's payload
+    gui.simulation_net_save_widget.value = sim_name
+    assert _decode_payload(gui.save_config_button) == _expected_netconfig_payload(
+        sim_name
+    )
+    assert _decode_payload(gui.save_sim_output_button) == _expected_simoutput_payload(
+        sim_name2
+    )
+
+    # Select the first simulation in the dropdown for simulation output. Now the
+    # output-saving button should switch to the first simulation's payload, and the
+    # network-saving button should still point to the first simulation's payload
+    gui.simulation_output_save_widget.value = sim_name
+    assert _decode_payload(gui.save_sim_output_button) == _expected_simoutput_payload(
+        sim_name
+    )
+    assert _decode_payload(gui.save_config_button) == _expected_netconfig_payload(
+        sim_name
+    )
+
+    # Select the second simulation in the dropdown for the network. The network-saving
+    # button should switch to the second simulation's payload, and the output-saving
+    # button should still point to the first simulation's payload
+    gui.simulation_net_save_widget.value = sim_name2
+    assert _decode_payload(gui.save_config_button) == _expected_netconfig_payload(
+        sim_name2
+    )
+    assert _decode_payload(gui.save_sim_output_button) == _expected_simoutput_payload(
+        sim_name
+    )
+
+    # Confirm that updating the payload for `save_sim_output_button` does not change
+    # the payload for `save_config_button` to match it
+    # First, set `simulation_output_save_widget` to `sim_name2`, which forces its
+    # callback to fire, then change it back to `sim_name`, which forces the callback
+    # to fire again. Then confirm that `save_config_button` retains the `sim_name2`
+    # payload while `save_sim_output_button` contains the `sim_name` payload
+    gui.simulation_output_save_widget.value = sim_name2
+    gui.simulation_output_save_widget.value = sim_name
+    assert _decode_payload(gui.save_config_button) == _expected_netconfig_payload(
+        sim_name2
+    )
+    assert _decode_payload(gui.save_sim_output_button) == _expected_simoutput_payload(
+        sim_name
     )
 
     plt.close("all")
