@@ -405,6 +405,12 @@ class TestParallelBackends:
         above is still *similar* to the original HNN's Dipole output, but it is expected
         that there will be small differences due to the lack of legacy unit support.
         """
+        # - "Units" here means we are not using legacy units of NEURON provided by
+        #   `h.nrnunit_use_legacy(1)` anymore, since that function is no longer
+        #   available in NEURON 9.0 and later.
+        # - For details, see
+        #   https://github.com/jonescompneurolab/hnn-core/blob/test_data/README.md
+        #
         # small snippet of data on data branch for now. To be deleted
         # later. Data branch should have only one commit so it does not
         # pollute the history.
@@ -461,10 +467,6 @@ class TestParallelBackends:
         `test_compare_hnn_core_legacy` above in that it does not use `legacy_mode` and,
         therefore, the random seeds of the drives used are different.
         """
-        # small snippet of data on data branch for now. To be deleted
-        # later. Data branch should have only one commit so it does not
-        # pollute the history.
-        #
         # - "Units" here means we are not using legacy units of NEURON provided by
         #   `h.nrnunit_use_legacy(1)` anymore, since that function is no longer
         #   available in NEURON 9.0 and later.
@@ -473,6 +475,11 @@ class TestParallelBackends:
         #   above.
         # - For details, see
         #   https://github.com/jonescompneurolab/hnn-core/blob/test_data/README.md
+        #
+        # small snippet of data on data branch for now. To be deleted
+        # later. Data branch should have only one commit so it does not
+        # pollute the history.
+        #
         ground_truth_fname = "dpl_nonlegacy_units_and_seeds.txt"
         data_url = (
             "https://raw.githubusercontent.com/jonescompneurolab/"
