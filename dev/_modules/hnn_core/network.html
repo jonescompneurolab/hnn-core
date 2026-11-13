@@ -1233,6 +1233,14 @@
 
         <span class="c1"># Must happen after cell types are added</span>
         <span class="k">if</span> <span class="n">add_drives_from_params</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">"add_drives_from_params=True is deprecated. In order to add the "</span>
+                <span class="s2">"canonical set of drives, please use the appropriate argument to the "</span>
+                <span class="s2">"network model you are using, such as 'neymotin_2020_model(..., "</span>
+                <span class="s2">"add_erp_drives=True)' to add canonical ERP drives to the Neymotin "</span>
+                <span class="s2">"2020 model."</span><span class="p">,</span>
+                <span class="ne">FutureWarning</span><span class="p">,</span>
+            <span class="p">)</span>
             <span class="n">_add_drives_from_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Network.__repr__">

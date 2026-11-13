@@ -502,30 +502,33 @@
 <h1>hnn_core.neymotin_2020_model<a class="headerlink" href="#hnn-core-neymotin-2020-model" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="hnn_core.neymotin_2020_model">
-<span class="sig-prename descclassname"><span class="pre">hnn_core.</span></span><span class="sig-name descname"><span class="pre">neymotin_2020_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_drives_from_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legacy_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mesh_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">10)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network_models.html#neymotin_2020_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.neymotin_2020_model" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">hnn_core.</span></span><span class="sig-name descname"><span class="pre">neymotin_2020_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_drives_from_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legacy_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mesh_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">10)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_erp_drives</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network_models.html#neymotin_2020_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.neymotin_2020_model" title="Link to this definition">#</a></dt>
 <dd><p>Instantiate the network model described in Neymotin et al. 2020</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>params</strong><span class="classifier">str | Path | dict | None, default=None</span></dt><dd><p>Custom Network parameters to use, if any. If string or Path, it is assumed to be
-a path to a legacy “flat” JSON file containing the parameters in the style of
-<em class="xref py py-obj">hnn_core/param/default.json</em> (NOT a modern “hierarchical” JSON file like
-<em class="xref py py-obj">hnn_core/param/neymotin2020_base.json</em>). If dict, it is assumed to be a
-dictionary of parameters in the “flat” JSON style. If None (the default), the
+<dt><strong>add_erp_drives</strong><span class="classifier">bool, default=False</span></dt><dd><p>If True, add the canonical event-related potential (ERP) drives used to
+reproduce the default ERP simulation behavior. This is the recommended way to
+add default ERP drives. Incompatible with arguments <code class="docutils literal notranslate"><span class="pre">add_drives_from_params</span></code>,
+<code class="docutils literal notranslate"><span class="pre">params</span></code>, and <code class="docutils literal notranslate"><span class="pre">legacy_mode</span></code>.</p>
+</dd>
+<dt><strong>mesh_shape</strong><span class="classifier">tuple of int (default: (10, 10))</span></dt><dd><p>Defines the (n_x, n_y) shape of the grid of pyramidal cells.</p>
+</dd>
+<dt><strong>params</strong><span class="classifier">str | Path | dict | None, default=None</span></dt><dd><p>Deprecated. Custom Network parameters to use, if any. If string or Path, it is
+assumed to be a path to a legacy “flat” JSON file containing the parameters in
+the style of <em class="xref py py-obj">hnn_core/param/default.json</em> (NOT a modern “hierarchical” JSON
+file like <em class="xref py py-obj">hnn_core/param/neymotin2020_base.json</em>). If dict, it is assumed to be
+a dictionary of parameters in the “flat” JSON style. If None (the default), the
 default parameters are used from <em class="xref py py-obj">hnn_core/param/default.json</em>. Note that if you
 want to use any drives defined in the params (either your provided custom params
 or the default), then you must also set <em class="xref py py-obj">add_drives_from_params</em> to True. If you
 pass any custom params, then no default params will be used, including for
 drives.</p>
 </dd>
-<dt><strong>add_drives_from_params</strong><span class="classifier">bool, default=False</span></dt><dd><p>If True, add drives as defined in the params-dict. NB this is mainly
-for backward-compatibility with HNN GUI, and will be deprecated in a
-future release. Default: False</p>
+<dt><strong>add_drives_from_params</strong><span class="classifier">bool, default=False</span></dt><dd><p>Deprecated. If True, add drives as defined in the <code class="docutils literal notranslate"><span class="pre">params</span></code> dictionary.</p>
 </dd>
-<dt><strong>legacy_mode</strong><span class="classifier">bool, default=False</span></dt><dd><p>Set to False by default. Enables matching HNN GUI output when drives
-are added suitably. Will be deprecated in a future release.</p>
-</dd>
-<dt><strong>mesh_shape</strong><span class="classifier">tuple of int (default: (10, 10))</span></dt><dd><p>Defines the (n_x, n_y) shape of the grid of pyramidal cells.</p>
+<dt><strong>legacy_mode</strong><span class="classifier">bool, default=False</span></dt><dd><p>Deprecated. Enables matching HNN Original GUI output when drives are added
+suitably.</p>
 </dd>
 </dl>
 </dd>

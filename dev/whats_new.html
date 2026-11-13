@@ -516,11 +516,20 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 <li><p>User-facing deprecation notices now emit <code class="docutils literal notranslate"><span class="pre">FutureWarning</span></code>, making them visible under
 Python’s default warning filters,
 by <a class="reference external" href="https://github.com/WilliamK112">William Kang</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1339">#1339</a>. This was their first PR, thanks William!</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">add_erp_drives_to_jones_model()</span></code> is deprecated in favor of
+<code class="docutils literal notranslate"><span class="pre">neymotin_2020_model(...,</span> <span class="pre">add_erp_drives=True)</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">add_drives_from_params=True</span></code> is deprecated in favor of
+<code class="docutils literal notranslate"><span class="pre">neymotin_2020_model(...,</span> <span class="pre">add_erp_drives=True)</span></code> for adding canonical ERP
+drives.</p></li>
 </ul>
 </section>
 <section id="new-features">
 <h3>New Features<a class="headerlink" href="#new-features" title="Link to this heading">#</a></h3>
 <ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">neymotin_2020_model(...,</span> <span class="pre">add_erp_drives=True)</span></code> is now the recommended way to add the
+canonical ERP drives to your network, instead of using <code class="docutils literal notranslate"><span class="pre">neymotin_2020_model(...,</span> <span class="pre">add_drives_from_params=True)</span></code> or <code class="docutils literal notranslate"><span class="pre">add_erp_drives_to_jones_model()</span></code>. Canonical ERP
+tutorials and tests now use this flag.
+By <a class="reference external" href="https://github.com/Souravrajvi0">Sourav Rajvi</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1340">#1340</a>.</p></li>
 <li><p>Users can now specify their own custom objective function in two different ways:</p>
 <ol class="arabic simple">
 <li><p>Passing a <code class="docutils literal notranslate"><span class="pre">obj_fun='custom'</span></code> to <code class="docutils literal notranslate"><span class="pre">Optimizer</span></code>. If passing <code class="docutils literal notranslate"><span class="pre">custom</span></code>, then users can
@@ -568,6 +577,7 @@ input/output/error streams. Thanks Camilo!</p></li>
 <li><p><a class="reference external" href="https://github.com/Shivansh1205">Shivansh Bhageria</a></p></li>
 <li><p><a class="reference external" href="https://github.com/kmilo9999">Camilo Diaz</a></p></li>
 <li><p><a class="reference external" href="https://github.com/WilliamK112">William Kang</a></p></li>
+<li><p><a class="reference external" href="https://github.com/Souravrajvi0">Sourav Rajvi</a></p></li>
 </ul>
 </section>
 <section id="changelog">
