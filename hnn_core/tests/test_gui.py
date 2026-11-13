@@ -2828,6 +2828,7 @@ def test_gui_save_dropdowns(setup_reduced_gui):
     assert "Simulation Output to Save" not in data_store.simulated_data
     assert "Network Configuration to Save" not in data_store.simulated_data
 
+    # Ensure that `sim_name` is present and selected in both dropdown menus
     for dropdown in (gui.simulation_netsave_widget, gui.simulation_outputsave_widget):
         assert sim_name in dropdown.options
         assert dropdown.value == sim_name
