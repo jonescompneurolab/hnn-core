@@ -685,9 +685,9 @@ def law_2021_model(
         params = read_params(params)
 
     net = neymotin_2020_model(
-        params,
-        add_drives_from_params,
-        legacy_mode,
+        params=params,
+        add_drives_from_params=add_drives_from_params,
+        legacy_mode=legacy_mode,
         mesh_shape=mesh_shape,
     )
     # Ensure model_variant and params' cell types match current model (same cell types
@@ -807,9 +807,9 @@ def calcium_model(
         params = read_params(params)
 
     net = jones_2009_model(
-        params,
-        add_drives_from_params,
-        legacy_mode,
+        params=params,
+        add_drives_from_params=add_drives_from_params,
+        legacy_mode=legacy_mode,
         mesh_shape=mesh_shape,
     )
 
