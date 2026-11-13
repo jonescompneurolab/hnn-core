@@ -2925,8 +2925,17 @@ def test_gui_save_button_payloads(setup_reduced_gui):
         """
         # check expected output for *single* trial simulation, which should
         # *always* have a ".csv" extension
-        # NOTE: zip file decoding (in the case of multiple trials) can be inconsistent,
-        #       so we don't explicitly test for that scenario here
+        #
+        # NOTE: in the case of multiple trials where the payload is a `.zip` file,
+        # the raw bytes can differ across two separate serializations of the same
+        # data (since each file inside the zip is stamped with the write time). This
+        # test only covers the single-trial case where the raw bytes are expected to
+        # match exactly
+        #
+        # TODO: add a test for multiple-trial simulations where the payload is a `.zip`
+        # file. We would need to compare something other than the raw bytes of the
+        # payload; e.g., one option would be to open the `.zip` and compare the
+        # contents of individual files
         simoutput, extension = serialize_simulation_output(
             data_store.simulated_data,
             sim_name,
