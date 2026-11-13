@@ -1432,10 +1432,22 @@ class HNNGUI:
 
             result_file = f"{self.simulation_output_save_widget.value}{file_extension}"
 
+            # in the case of a single trial, the payload will be a ".csv" file, and
+            # the serialized output is a string. The string must be encoded to bytes
+            # before it can be encoded in base64
             if file_extension == ".csv":
                 b64 = base64.b64encode(_simulation_data.encode())
-            else:
+            # in the case of multiple trials, the payload will be a ".zip" file, and
+            # so the serialized output is already in bytes and can be directly encoded
+            # in base64
+            elif file_extension == ".zip":
                 b64 = base64.b64encode(_simulation_data)
+            else:
+                # dev note: using `!r` is the same as calling repr()
+                raise ValueError(
+                    f"Unexpected extension: {file_extension!r}"
+                    "\nThe allowed extension types are '.csv' and '.zip'"
+                )
             payload = b64.decode()
 
             # redraw button in the same way after simulation change, but mapped to
