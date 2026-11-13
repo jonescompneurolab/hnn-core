@@ -1279,12 +1279,6 @@ def test_data_figure_add_simulation_respects_data_scaling(setup_reduced_gui):
 
     # Check that the experimental data has not been altered by the simulation
     # scaling/smoothing:
-    #
-    # Note that when clearing and adding a new plot, the experimental data is plotted
-    # AFTER the simulated data, so its "line index" will no longer be at 0, so we have
-    # to compare against a different line index. Additionally, the experimental data
-    # appears to be fully contained in BOTH the fourth and fifth of the five lines of
-    # the axis ; I have no idea why, maybe the "clear" button performs weird behavior?
     assert np.allclose(exp_data_initial, ax0.lines[3].get_ydata())
 
     # Ensure that the legend includes the simulated data in the new second figure:
@@ -1330,7 +1324,7 @@ def test_clear_axis_add_experimental_only(setup_reduced_gui):
     )
 
     # Sourav's clever hack for setting the simulated data set to None
-    # TODO this will be changed after some refactoring of `_simulate_edit_axis` a la
+    # TODO this will be changed after some refactoring of `_simulate_edit_axis` à la
     # https://github.com/jonescompneurolab/hnn-core/pull/1394#issuecomment-6670606255
     tab_idx = gui.viz_manager.axes_config_tabs.titles.index(f"Figure {fig_id}")
     ax_controls = (
