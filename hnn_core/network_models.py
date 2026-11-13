@@ -714,7 +714,7 @@ def calcium_model(
 
 
 def duecker_ET_model(params=None, add_erp_drives=False, mesh_shape=(10, 10)):
-    """Instantiate the Duecker human-derived model (publication pending)
+    """Instantiate the human-derived model from Duecker et al. 2026 (publication pending)
 
     Parameters
     ----------
@@ -724,9 +724,9 @@ def duecker_ET_model(params=None, add_erp_drives=False, mesh_shape=(10, 10)):
         Default: None
     add_erp_drives : bool, default=False
         If True, add evoked drives used to generate Event-Related Potentials (ERPs) in
-        the upcoming Duecker model publication. Note that these drives are SUBJECT TO
-        CHANGE until the time of publication! The current values will probably not be
-        the final values used in the publication.
+        the upcoming Duecker model publication (pre-print available at [1]_ ). Note that
+        these drives are SUBJECT TO CHANGE until the time of final publication. The
+        current values may not be the final values used in the publication.
     mesh_shape : tuple of int (default: (10, 10))
         Defines the (n_x, n_y) shape of the grid of pyramidal cells.
 
@@ -734,6 +734,13 @@ def duecker_ET_model(params=None, add_erp_drives=False, mesh_shape=(10, 10)):
     -------
     net : Instance of Network object
         Network object used to store
+
+    References
+    ----------
+    .. [1] Duecker, Katharina, et al. "Next generation Human Neocortical Neurosolver
+           model with biophysically realistic somatic, dendritic and synaptic dynamics."
+           bioRxiv (2026) 2026.10.29.762964; doi:
+           https://doi.org/10.64898/2026.10.29.762964
     """
 
     # Prepare parameters used to create the initial Network object
