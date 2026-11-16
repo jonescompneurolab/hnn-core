@@ -120,7 +120,7 @@ class TestParallelBackends:
     def test_run_default(self, fix_net_neymotin_2020, fix_run_simulation):
         """Test consistency between default backend simulation and master"""
         global dpls_reduced_default
-        net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+        net, _ = fix_net_neymotin_2020(add_erp_drives=True, reduced=True)
         dpls_reduced_default = fix_run_simulation(net, tstop=40, backend=None)
         # test consistency across all parallel backends for multiple trials
         assert_raises(
@@ -134,7 +134,7 @@ class TestParallelBackends:
         """Test consistency between joblib backend simulation with master"""
         global dpls_reduced_default, dpls_reduced_joblib
 
-        net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+        net, _ = fix_net_neymotin_2020(add_erp_drives=True, reduced=True)
         dpls_reduced_joblib = fix_run_simulation(
             net, tstop=40, backend="joblib", n_jobs=2
         )
@@ -178,7 +178,7 @@ class TestParallelBackends:
     def test_run_mpibackend(self, fix_net_neymotin_2020, fix_run_simulation):
         """Test running a MPIBackend on reduced model"""
         global dpls_reduced_default, dpls_reduced_mpi
-        net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+        net, _ = fix_net_neymotin_2020(add_erp_drives=True, reduced=True)
         # Use all available cores
         dpls_reduced_mpi = fix_run_simulation(net, tstop=40, backend="mpi")
         for trial_idx in range(len(dpls_reduced_default)):
@@ -194,7 +194,7 @@ class TestParallelBackends:
     @requires_psutil
     def test_terminate_mpibackend(self, fix_net_neymotin_2020):
         """Test terminating MPIBackend from thread"""
-        net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+        net, _ = fix_net_neymotin_2020(add_erp_drives=True, reduced=True)
         with MPIBackend(n_procs=None) as backend:  # Use all available cores
             event = Event()
             # start background thread that will kill all MPIBackends
@@ -220,16 +220,10 @@ class TestParallelBackends:
     @requires_psutil
     @pytest.mark.parametrize("use_hwthreading_if_found", [True, False])
     def test_run_mpibackend_oversubscribed(
-        self, use_hwthreading_if_found, fix_default_params
+        self, use_hwthreading_if_found, fix_net_neymotin_2020
     ):
         """Test running MPIBackend with oversubscribed number of procs"""
-        params = fix_default_params
-        params.update(
-            {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}
-        )
-        net = neymotin_2020_model(
-            params, add_drives_from_params=True, mesh_shape=(3, 3)
-        )
+        net, _ = fix_net_neymotin_2020(add_erp_drives=True, reduced=True)
 
         # Fail state: try running with more procs than cells in the network
         # (will probably oversubscribe too)
@@ -239,7 +233,7 @@ class TestParallelBackends:
             ValueError, match=("More MPI processes were assigned than there are cells")
         ):
             with MPIBackend(n_procs=too_many_procs) as backend:
-                simulate_dipole(net, tstop=40)
+                simulate_dipole(net, tstop=40, n_trials=2)
 
         # Force oversubscription and make sure there are always enough cells in
         # the network
@@ -250,11 +244,9 @@ class TestParallelBackends:
 
         oversubscribed_procs = detected_cores + 1
         n_grid_1d = int(np.ceil(np.sqrt(oversubscribed_procs)))
-        params.update(
-            {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}
-        )
-        net = neymotin_2020_model(
-            params, add_drives_from_params=True, mesh_shape=(n_grid_1d, n_grid_1d)
+        del net
+        net, _ = fix_net_neymotin_2020(
+            add_erp_drives=True, mesh_shape=(n_grid_1d, n_grid_1d)
         )
 
         # Case 1 (default): Check that oversubscription turns on if needed, and
@@ -275,7 +267,7 @@ class TestParallelBackends:
             ) as backend:
                 assert backend.n_procs == oversubscribed_procs
                 assert "--oversubscribe" in " ".join(backend.mpi_cmd)
-                simulate_dipole(net, tstop=40)
+                simulate_dipole(net, tstop=40, n_trials=2)
 
         # Case 2: Check that '--oversubscribe' option is passed if
         # oversubscription is forced on. No simulation is run in this case
@@ -303,7 +295,7 @@ class TestParallelBackends:
             with pytest.raises(
                 RuntimeError, match="MPI simulation failed. Return code: 1"
             ):
-                simulate_dipole(net, tstop=40)
+                simulate_dipole(net, tstop=40, n_trials=2)
 
     @requires_mpi4py
     @requires_psutil
@@ -324,7 +316,7 @@ class TestParallelBackends:
         fix_net_neymotin_2020,
     ):
         """Test running MPIBackend with oversubscribed number of procs"""
-        net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+        net, _ = fix_net_neymotin_2020(add_erp_drives=True, reduced=True)
 
         n_procs = 2
         # Test that the network runs at all
@@ -341,7 +333,7 @@ class TestParallelBackends:
 
         # Possibly needed to prevent MPIBackend failures to exit processes
         del net
-        net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+        net, _ = fix_net_neymotin_2020(add_erp_drives=True, reduced=True)
 
         with MPIBackend(
             n_procs=n_procs,
@@ -372,7 +364,7 @@ class TestParallelBackends:
 
         # Possibly needed to prevent MPIBackend failures to exit processes
         del net
-        net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+        net, _ = fix_net_neymotin_2020(add_erp_drives=True, reduced=True)
 
         with MPIBackend(
             n_procs=n_procs,
@@ -385,12 +377,42 @@ class TestParallelBackends:
             simulate_dipole(net, tstop=40, n_trials=2)
 
     @pytest.mark.parametrize("backend", ["mpi", "joblib"])
-    def test_compare_hnn_core(
-        self, fix_net_neymotin_2020, fix_run_simulation, backend, n_jobs=1
-    ):
-        """Test hnn-core does not break."""
+    def test_compare_hnn_core_legacy(self, fix_run_simulation, backend, n_jobs=1):
+        """Test hnn-core produces similar dipole output to Original HNN.
+
+        Prior to NEURON 9.0, HNN-Core (as of v0.6.1) was able to use NEURON's
+        `h.nrnunit_use_legacy(1)` and the following code in order to generate a Dipole
+        that was identical (single-float precision) to the original HNN's "threshold"
+        Dipole simulation (shown in Figure 4-D and 11-A of Neymotin et al., 2020):
+
+        ```
+        from hnn_core import neymotin_2020_model, simulate_dipole
+        net = neymotin_2020_model(add_drives_from_params=True, legacy_mode=True)
+        dpls = simulate_dipole(net, tstop=170.0)
+        dpl = dpls[0].smooth(30).scale(3000)
+        dpl.write("dpl_reran.txt")
+        ```
+
+        With NEURON 9.0 and later, the `h.nrnunit_use_legacy(1)` function is no longer
+        available, and the original HNN's "threshold" Dipole simulation can no longer be
+        reproduced exactly; see
+        https://github.com/jonescompneurolab/hnn-core/pull/1230#issuecomment-5956179244
+        and
+        https://github.com/jonescompneurolab/hnn-core/blob/test_data/README.md
+        for details.
+
+        Therefore, the following test checks that HNN-Core's Dipole output with the code
+        above is still *similar* to the original HNN's Dipole output, but it is expected
+        that there will be small differences due to the lack of legacy unit support.
+        """
+        # - "Units" here means we are not using legacy units of NEURON provided by
+        #   `h.nrnunit_use_legacy(1)` anymore, since that function is no longer
+        #   available in NEURON 9.0 and later.
+        # - For details, see
+        #   https://github.com/jonescompneurolab/hnn-core/blob/test_data/README.md
+        #
         # small snippet of data on data branch for now. To be deleted
-        # later. Data branch should have only commit so it does not
+        # later. Data branch should have only one commit so it does not
         # pollute the history.
         ground_truth_fname = "dpl_nonlegacy_units.txt"
         data_url = (
@@ -401,8 +423,8 @@ class TestParallelBackends:
             urlretrieve(data_url, ground_truth_fname)
         dpl_master = loadtxt(ground_truth_fname)
 
-        # TODO AES: CURRENTLY NEEDS LEGACY MODE
-        net, _ = fix_net_neymotin_2020(legacy_mode=True, add_drives_from_params=True)
+        # NEEDS LEGACY MODE
+        net = neymotin_2020_model(legacy_mode=True, add_drives_from_params=True)
         dpls = fix_run_simulation(net, tstop=170, backend=backend)
         dpl = dpls[0].smooth(30).scale(3000)
 
@@ -434,6 +456,71 @@ class TestParallelBackends:
             "evprox2": 270,
         }
 
+    @pytest.mark.parametrize("backend", ["mpi", "joblib"])
+    def test_compare_hnn_core(
+        self, fix_net_neymotin_2020, fix_run_simulation, backend, n_jobs=1
+    ):
+        """Test hnn-core dipole output does not change.
+
+        This tests that the dipole output of the "default ERP" simulation of HNN-Core
+        stays the same after code changes. This dipole is distinct from that of
+        `test_compare_hnn_core_legacy` above in that it does not use `legacy_mode` and,
+        therefore, the random seeds of the drives used are different.
+        """
+        # - "Units" here means we are not using legacy units of NEURON provided by
+        #   `h.nrnunit_use_legacy(1)` anymore, since that function is no longer
+        #   available in NEURON 9.0 and later.
+        # - "Seeds" here means that the random seeds of the drives used in this
+        #   simulation are different from those used in the legacy-mode simulation
+        #   above.
+        # - For details, see
+        #   https://github.com/jonescompneurolab/hnn-core/blob/test_data/README.md
+        #
+        # small snippet of data on data branch for now. To be deleted
+        # later. Data branch should have only one commit so it does not
+        # pollute the history.
+        #
+        ground_truth_fname = "dpl_nonlegacy_units_and_seeds.txt"
+        data_url = (
+            "https://raw.githubusercontent.com/jonescompneurolab/"
+            f"hnn-core/test_data/{ground_truth_fname}"
+        )
+        if not Path(ground_truth_fname).exists():
+            urlretrieve(data_url, ground_truth_fname)
+        dpl_master = loadtxt(ground_truth_fname)
+
+        net = neymotin_2020_model(legacy_mode=False, add_erp_drives=True)
+        dpls = fix_run_simulation(net, tstop=170, backend=backend)
+        dpl = dpls[0].smooth(30).scale(3000)
+
+        # write the dipole to a file and compare
+        fname = "./dpl2.txt"
+        dpl.write(fname)
+
+        dpl_pr = loadtxt(fname)
+        assert_array_equal(dpl_pr[:, 2], dpl_master[:, 2])  # L2
+        assert_array_equal(dpl_pr[:, 3], dpl_master[:, 3])  # L5
+
+        # Test spike type counts
+        spike_type_counts = {}
+        for spike_gid in net.cell_response.spike_gids[0]:
+            if net.gid_to_type(spike_gid) not in spike_type_counts:
+                spike_type_counts[net.gid_to_type(spike_gid)] = 1
+            else:
+                spike_type_counts[net.gid_to_type(spike_gid)] += 1
+        assert "common" not in spike_type_counts
+        assert "exgauss" not in spike_type_counts
+        assert "extpois" not in spike_type_counts
+        assert spike_type_counts == {
+            "evprox1": 270,
+            "L2_basket": 58,
+            "L2_pyramidal": 98,
+            "L5_pyramidal": 384,
+            "L5_basket": 89,
+            "evdist1": 235,
+            "evprox2": 270,
+        }
+
 
 # there are no dependencies if this unit tests fails; no need to be in
 # class marked incremental
@@ -445,7 +532,7 @@ def test_mpi_failure(fix_net_neymotin_2020, fix_run_simulation):
     # this MPI parameter will cause a MPI job to fail
     environ["OMPI_MCA_btl"] = "self"
 
-    net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+    net, _ = fix_net_neymotin_2020(add_erp_drives=True, reduced=True)
     with pytest.warns(UserWarning) as record:
         with io.StringIO() as buf, redirect_stdout(buf):
             with pytest.raises(RuntimeError, match="MPI simulation failed"):

@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 def test_extracellular_api(fix_net_model, request):
     """Test extracellular recording API."""
     net_model = request.getfixturevalue(fix_net_model)
-    net, _ = net_model(add_drives_from_params=True)
+    net, _ = net_model(add_erp_drives=True)
 
     # Test LFP electrodes
     electrode_pos = (1, 2, 3)
@@ -132,7 +132,7 @@ def test_extracellular_api(fix_net_model, request):
 def test_transmembrane_currents(fix_net_model, request):
     """Test that net transmembrane current is zero at all times."""
     net_model = request.getfixturevalue(fix_net_model)
-    net, _ = net_model(add_drives_from_params=True, reduced=True)
+    net, _ = net_model(add_erp_drives=True, reduced=True)
     electrode_pos = (0, 0, 0)  # irrelevant where electrode is
     # all transfer resistances set to unity
     net.add_electrode_array("net_Im", electrode_pos, method=None)
@@ -205,7 +205,7 @@ def test_extracellular_backends(fix_net_model, fix_run_simulation, request):
     electrode_array = {"arr1": [(2, 2, 400), (2, 2, 600), (2, 2, 800), (2, 2, 1000)]}
     net_model = request.getfixturevalue(fix_net_model)
     joblib_net, _ = net_model(
-        add_drives_from_params=True, reduced=True, electrode_array=electrode_array
+        add_erp_drives=True, reduced=True, electrode_array=electrode_array
     )
     mpi_net = deepcopy(joblib_net)
 
@@ -269,9 +269,10 @@ def test_extracellular_backends(fix_net_model, fix_run_simulation, request):
 def test_rec_array_calculation(fix_net_model, request):
     """Test LFP/CSD calculation."""
     net_model = request.getfixturevalue(fix_net_model)
-    net, _ = net_model(add_drives_from_params=True, reduced=True)
-    net.external_drives["evprox1"]["dynamics"]["mu"] = 7
-    net.external_drives["evdist1"]["dynamics"]["mu"] = 17
+    net, net_customizations = net_model(add_erp_drives=True, reduced=True)
+    drive_names_map = net_customizations["drive_names_map"]
+    net.external_drives[drive_names_map["evprox1"]]["dynamics"]["mu"] = 7
+    net.external_drives[drive_names_map["evdist1"]]["dynamics"]["mu"] = 17
 
     # one electrode inside, one above the active elements of the network,
     # and two more to allow calculation of CSD (2nd spatial derivative)
@@ -332,11 +333,12 @@ def test_extracellular_viz(fix_net_model, request):
     electrode_array = {"arr1": [(1, 2, 1000), (2, 3, 3000), (3, 4, 5000), (4, 5, 7000)]}
 
     net_model = request.getfixturevalue(fix_net_model)
-    net, _ = net_model(
-        add_drives_from_params=True, reduced=True, electrode_array=electrode_array
+    net, net_customizations = net_model(
+        add_erp_drives=True, reduced=True, electrode_array=electrode_array
     )
-    net.external_drives["evprox1"]["dynamics"]["mu"] = 7
-    net.external_drives["evdist1"]["dynamics"]["mu"] = 17
+    drive_names_map = net_customizations["drive_names_map"]
+    net.external_drives[drive_names_map["evprox1"]]["dynamics"]["mu"] = 7
+    net.external_drives[drive_names_map["evdist1"]]["dynamics"]["mu"] = 17
 
     _ = simulate_dipole(net, tstop=5, n_trials=1)
 
