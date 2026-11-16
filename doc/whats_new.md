@@ -33,8 +33,19 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 - User-facing deprecation notices now emit `FutureWarning`, making them visible under
   Python's default warning filters,
   by [William Kang][] in {gh}`1339`. This was their first PR, thanks William!
+- `add_erp_drives_to_jones_model()` is deprecated in favor of
+  `neymotin_2020_model(..., add_erp_drives=True)`.
+- `add_drives_from_params=True` is deprecated in favor of
+  `neymotin_2020_model(..., add_erp_drives=True)` for adding canonical ERP
+  drives.
 
 ### New Features
+
+- `neymotin_2020_model(..., add_erp_drives=True)` is now the recommended way to add the
+  canonical ERP drives to your network, instead of using `neymotin_2020_model(...,
+  add_drives_from_params=True)` or `add_erp_drives_to_jones_model()`. Canonical ERP
+  tutorials and tests now use this flag.
+  By [Sourav Rajvi][] in {gh}`1340`.
 
 - Users can now specify their own custom objective function in two different ways:
     1. Passing a `obj_fun='custom'` to `Optimizer`. If passing `custom`, then users can
@@ -66,6 +77,10 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 - Loading external drives in the GUI now extends the simulation duration when needed,
   preserving configured drive and tonic-bias stop times,
   by [William Kang][] in {gh}`1348`.
+
+- The RMSE and Corr comparison text on GUI dipole comparison plots is no longer
+  drawn over the evoked drive arrows, and now stays at the bottom right of the plot,
+  fixing {gh}`1374`.
 
 - [Camilo Diaz][] did considerable work in fixing our long-standing MPI Timeout issues
   and putting in place a permanent solution that uses tempfiles instead of standard
@@ -1535,3 +1550,4 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [Sourav Rajvi]: https://github.com/Souravrajvi0
 [Arnesh Banerjee]: https://github.com/ArneshBanerjee
 [William Kang]: https://github.com/WilliamK112
+[Sourav Rajvi]: https://github.com/Souravrajvi0

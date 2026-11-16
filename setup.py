@@ -85,8 +85,16 @@ class build_py_mod(build_py):
 # `scikit-learn` dependency, not via the `[parallel]` extras.
 if __name__ == "__main__":
     extras = {
-        "opt": ["cma", "scikit-learn"],
-        "parallel": ["joblib", "psutil"],
+        "opt": [
+            "cma <= 4.5.0",
+            "scikit-learn <= 1.9.1",
+        ],
+        "parallel": [
+            "joblib <= 1.6.0",
+            "psutil <= 7.2.2",
+            "mpi4py <= 4.1.2; platform_system != 'Windows'",
+            "openmpi > 5.0.0, <= 5.0.11 ; platform_system != 'Windows'",
+        ],
         "test": [
             "codespell",
             "pytest",
@@ -95,26 +103,22 @@ if __name__ == "__main__":
             "ruff<0.16.0",
         ],
         "docs": [
-            "mne",
             "myst-parser",
-            "nibabel",
             "numpydoc",
             "pillow",
-            "pooch<1.9.0",
             "pydata-sphinx-theme",
             "sphinx",
             "sphinx-copybutton",
-            "tdqm",
         ],
     }
     extras["gui"] = extras["opt"] + [
-        "ipywidgets>=8.0.0",
-        "ipykernel",
-        "ipympl",
-        "voila",
+        "ipywidgets >= 8.0.0, <= 8.1.9",
+        "ipykernel <= 7.4.0",
+        "ipympl <= 0.10.0",
+        "voila <= 0.5.13",
     ]
     extras["all"] = extras["opt"] + extras["parallel"] + extras["gui"]
-    extras['dask'] = (extras['parallel'] + ['dask[distributed]'])
+    extras['dask'] = (extras['parallel'] + ['dask[distributed] <= 2026.8.0'])
     extras["dev"] = (
         extras["dask"]
         + extras["docs"]
@@ -154,14 +158,15 @@ if __name__ == "__main__":
         ],
         platforms="any",
         install_requires=[
-            "numpy >=1.14",
-            'NEURON >=7.7, <=8.2.7; platform_system != "Windows"',
-            "matplotlib>=3.5.3",
-            "scipy",
-            "h5io",
+            "h5io <= 0.2.5",
+            "matplotlib >= 3.5.3, <=3.11.2",
+            "notebook <= 7.6.4",
+            "numpy >=1.14, <= 2.4.6",
+            "scipy <= 1.17.1",
+            'NEURON >=7.7, <=9.1.0; platform_system != "Windows"',
         ],
         extras_require=extras,
-        python_requires=">=3.9, <3.14",
+        python_requires=">=3.9, <3.15",
         packages=find_packages(),
         package_data={
             "hnn_core": [

@@ -3,6 +3,7 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
+import os
 from pathlib import Path
 import time
 import pytest
@@ -289,6 +290,17 @@ def test_load_results(batch_simulate_instance, param_grid, tmp_path):
         batch_simulate_instance._save("invalid_results", start_idx, end_idx)
 
 
+# TODO AES: This randomly fails on CI approximately 5-10% of the time, but always passes
+# locally. The failure on CI is probably due to CPU scheduling on CI servers that are
+# running other jobs besides our own.  We need to find a way to test this more reliably,
+# but ideally WITHOUT forcing many time-consuming simulations and then taking the median
+# or something similar. Until then, we will mark this test as xfail only on GitHub
+# Actions (which sets GITHUB_ACTIONS=true), but it should always truly pass locally.
+@pytest.mark.xfail(
+    os.environ.get("GITHUB_ACTIONS") == "true",
+    strict=False,
+    reason="Parallel execution may not always be faster for CI.",
+)
 def test_parallel_execution(batch_simulate_instance, param_grid):
     """Test parallel execution of simulations and ensure speedup."""
 

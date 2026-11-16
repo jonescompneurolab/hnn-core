@@ -1508,6 +1508,20 @@ class HNNGUI:
                 "loading_failed"
             ]
             return
+        elif data_filename == "None":
+            logger.error(
+                textwrap.dedent(f"""
+                Cannot load external data named '{data_filename}': the filename is
+                invalid. Please rename the data file to something other than 'None' to
+                avoid naming conflicts.
+                """)
+                .replace("\n", " ")
+                .strip()
+            )
+            self._simulation_status_bar.value = self._simulation_status_contents[
+                "loading_failed"
+            ]
+            return
 
         # Decision from
         # https://github.com/jonescompneurolab/hnn-core/pull/1328#issuecomment-5444471136
@@ -1558,10 +1572,10 @@ class HNNGUI:
             self.viz_manager.add_figure()
             fig_name = _idx2figname(self.viz_manager.data["fig_idx"]["idx"] - 1)
             process_configs = {"dipole_smooth": 0, "dipole_scaling": 1}
-            self.viz_manager._simulate_edit_figure(
+            self.viz_manager._simulate_edit_axis(
                 fig_name,
                 ax_name="ax0",
-                simulation_name=data_filename,
+                data_name=data_filename,
                 plot_type="current dipole",
                 preprocessing_config=process_configs,
                 operation="plot",
@@ -2026,69 +2040,6 @@ class HNNGUI:
             display(screenshot)
         else:
             return screenshot
-
-    def run_notebook_cells(self):
-        """Run all but the last cells sequentially in a Jupyter notebook.
-
-        To properly use this function:
-            1. Put this into the penultimate cell.
-            2. init the HNNGUI in a single cell.
-            3. Hit 'run all' button to run the whole notebook and it will
-               selectively run twice.
-        """
-        js_string = """
-        function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-        }
-        function getRunningStatus(idx){
-            const htmlContent = Jupyter.notebook.get_cell(idx).element[0];
-            return htmlContent.childNodes[0].childNodes[0].textContent;
-        }
-        function cellContainsInitOrMarkdown(idx){
-            const cell = Jupyter.notebook.get_cell(idx);
-            if(cell.cell_type!=='code'){
-                return true;
-            }
-            else{
-                const textVal = cell.element[0].childNodes[0].textContent;
-                return textVal.includes('HNNGUI()') || textVal.includes(
-                    'HNNGUI');
-            }
-        }
-        function cellContainsRunCells(idx){
-            const textVal = Jupyter.notebook.get_cell(
-                idx).element[0].childNodes[0].textContent;
-            return textVal.includes('run_notebook_cells()');
-        }
-        async function runNotebook() {
-            console.log("run notebook cell by cell");
-            const cellHtmlContents = Jupyter.notebook.element[0].children[0];
-            const nCells = cellHtmlContents.childElementCount;
-            console.log(`In total we have ${nCells} cells`);
-
-            for(let i=1; i<nCells-1; i++){
-                if(cellContainsRunCells(i)){
-                    break
-                }
-                else if(cellContainsInitOrMarkdown(i)){
-                    console.log(`Skip init or markdown cell ${i}...`);
-                    continue
-                }
-                else{
-                    console.log(`About to execute cell ${i}..`);
-                    Jupyter.notebook.execute_cells([i]);
-                    while (getRunningStatus(i).includes("*")){
-                        console.log("Still running, wait for another 2 secs");
-                        await sleep(2000);
-                    }
-                    await sleep(1000);
-                }
-            }
-            console.log('Done');
-        }
-        runNotebook();
-        """
-        return js_string
 
     # below are a series of methods that are used to manipulate the GUI in testing only
     def _simulate_upload_experimental_data(self, file_url):
@@ -4948,6 +4899,18 @@ def run_button_clicked(
 
         simulation_status_bar.value = simulation_status_contents["simulation_failed"]
         return
+    elif _sim_name == "None":
+        logger.error(
+            textwrap.dedent(f"""
+            Cannot run simulation named '{_sim_name}': the simulation name cannot be
+            'None'. Please rename the simulation to avoid naming conflicts.
+            """)
+            .replace("\n", " ")
+            .strip()
+        )
+
+        simulation_status_bar.value = simulation_status_contents["simulation_failed"]
+        return
 
     with log_out:
         try:
@@ -5035,7 +4998,7 @@ def run_button_clicked(
             fig_name = _idx2figname(viz_manager.data["fig_idx"]["idx"] - 1)
             ax_plots = [("ax0", "input histogram"), ("ax1", "current dipole")]
             for ax_name, plot_type in ax_plots:
-                viz_manager._simulate_edit_figure(
+                viz_manager._simulate_edit_axis(
                     fig_name, ax_name, _sim_name, plot_type, {}, "plot"
                 )
 
@@ -6306,7 +6269,7 @@ def run_opt_button_clicked(
 
             viz_manager.add_figure()
             fig_name = _idx2figname(viz_manager.data["fig_idx"]["idx"] - 1)
-            viz_manager._simulate_edit_figure(
+            viz_manager._simulate_edit_axis(
                 fig_name,
                 "ax0",
                 new_name,
@@ -6314,7 +6277,7 @@ def run_opt_button_clicked(
                 {},
                 "plot",
             )
-            viz_manager._simulate_edit_figure(
+            viz_manager._simulate_edit_axis(
                 fig_name,
                 "ax1",
                 new_name,

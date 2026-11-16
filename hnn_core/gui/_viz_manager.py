@@ -28,9 +28,16 @@ from ipywidgets import (
 from hnn_core.dipole import _anticorr, _rmse, average_dipoles
 from hnn_core.gui._logging import logger
 from hnn_core.network_models import default_drive_colors
-from hnn_core.viz import _add_arrows_to_dipole, plot_dipole, plot_tfr_morlet
+
+# TODO AES: Temporarily removing drive dipole errors until bugs fixed
+# from hnn_core.viz import _add_arrows_to_dipole, plot_dipole, plot_tfr_morlet
+from hnn_core.viz import plot_dipole, plot_tfr_morlet
 from hnn_core.gui._data_store import data_store
 from enum import Enum
+
+# matplotlib `gid` that marks the RMSE/Corr text annotation on dipole comparison
+# plots, so it can be told apart from other annotations such as drive arrows
+_COMPARISON_TEXT_GID = "dipole_comparison_text"
 
 #
 _fig_placeholder = HTML(
@@ -445,8 +452,9 @@ def _update_ax(fig, ax, data, data_name, plot_type, plot_config):
                     average=True,
                     show=False,
                 )
-            if plot_config.get("overlay_drive_arrows", False) and net_copied:
-                _add_arrows_to_dipole(ax, net_copied)
+            # TODO AES: Temporarily removing drive dipole errors until bugs fixed
+            # if plot_config.get("overlay_drive_arrows", False) and net_copied:
+            #     _add_arrows_to_dipole(ax, net_copied)
         else:
             print("No dipole data")
 
@@ -523,7 +531,8 @@ def _plot_on_axes(
     spectrogram_colormap_selection,
     hide_spike_legend,
     marker_size,
-    overlay_drive_arrows,
+    # TODO AES: Temporarily removing drive dipole errors until bugs fixed
+    # overlay_drive_arrows,
     min_spectral_frequency,
     max_spectral_frequency,
     dipole_smooth,
@@ -536,12 +545,8 @@ def _plot_on_axes(
     fig,
     ax,
     existing_plots,
-    plot_context,
 ):
     """Plotting different types of data on the given axes.
-
-    Now this function is also responsible for comparing multiple simulations,
-    or simulations vs. experimental data.
 
     Parameters
     ----------
@@ -582,9 +587,31 @@ def _plot_on_axes(
     existing_plots : ipywidgets.VBox
         A VBox widget that contains all the existing plots.
     """
+
+    sim_name = simulations_data_widget.value
+    exp_name = experimental_data_widget.value
+
+    # We always plot at least one dataset, called the "primary". We MAY also plot a
+    # "secondary" dataset.
+    #
+    # If both the simulated and experimental data widgets have datasets selected, then
+    # the simulated data is always the "primary" and the experimental is always the
+    # "secondary".
+    if (
+        sim_name in data_store.simulated_data_names
+        and exp_name in data_store.experimental_data_names
+    ):
+        is_experimental_primary = False
+    # Otherwise, the "primary" dataset is whichever data type is indicated.
+    elif exp_name in data_store.experimental_data_names:
+        is_experimental_primary = True
+    else:
+        # This handles both the cases where only simulated is selected or neither.
+        is_experimental_primary = False
+
     name_of_data_to_plot = (
         experimental_data_widget.value
-        if plot_context.get("is_experimental_data")
+        if is_experimental_primary
         else simulations_data_widget.value
     )
 
@@ -611,7 +638,8 @@ def _plot_on_axes(
         "spectrogram_cm": spectrogram_colormap_selection.value,
         "hide_spike_legend": hide_spike_legend.value,
         "marker_size": marker_size.value,
-        "overlay_drive_arrows": overlay_drive_arrows.value == "True",
+        # TODO AES: Temporarily removing drive dipole errors until bugs fixed
+        # "overlay_drive_arrows": overlay_drive_arrows.value == "True",
     }
 
     dpls_processed = _update_ax(
@@ -626,8 +654,8 @@ def _plot_on_axes(
     # If experimental_data_widget is not None and we are plotting a simulated dipole,
     # we need to plot the experimental dipole as well.
     if (
-        not plot_context.get("is_experimental_data")
-        and experimental_data_widget.value in data_store.experimental_data_names
+        not is_experimental_primary
+        and exp_name in data_store.experimental_data_names
         and plot_type == "current dipole"
     ):
         name_of_secondary_exp_data_to_plot = experimental_data_widget.value
@@ -643,7 +671,8 @@ def _plot_on_axes(
             "spectrogram_cm": spectrogram_colormap_selection.value,
             "hide_spike_legend": hide_spike_legend.value,
             "marker_size": marker_size.value,
-            "overlay_drive_arrows": overlay_drive_arrows.value == "True",
+            # TODO AES: Temporarily removing drive dipole errors until bugs fixed
+            # "overlay_drive_arrows": overlay_drive_arrows.value == "True",
         }
 
         # plot the "secondary" experimental dipole onto the existing fig/axes object.
@@ -670,18 +699,24 @@ def _plot_on_axes(
             f"Corr({name_of_data_to_plot}, {name_of_secondary_exp_data_to_plot}): {corr:.4f}"
         )
 
-        # find subplot's annotation
+        # find the subplot's comparison annotation. It is looked up by `gid`
+        # because other annotations (e.g. drive arrows) can exist on the axes.
         annotation = next(
-            (child for child in ax.get_children() if isinstance(child, plt.Annotation)),
+            (
+                child
+                for child in ax.get_children()
+                if isinstance(child, plt.Annotation)
+                and child.get_gid() == _COMPARISON_TEXT_GID
+            ),
             None,
         )
 
-        # if the subplot already has an annotation, update its text.
+        # if the subplot already has a comparison annotation, update its text.
         # Otherwise, create a new one.
         if annotation is not None:
             annotation.set_text(annotation_text)
         else:
-            ax.annotate(
+            annotation = ax.annotate(
                 annotation_text,
                 xy=(0.95, 0.05),
                 xycoords="axes fraction",
@@ -689,6 +724,7 @@ def _plot_on_axes(
                 verticalalignment="bottom",
                 fontsize=12,
             )
+            annotation.set_gid(_COMPARISON_TEXT_GID)
 
         metrics_logger_text = (
             f"RMSE {rmse:.4f} Corr {corr:.4f} ("
@@ -869,20 +905,17 @@ def _build_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax, ui_ac
         layout=layout,
         style=analysis_style,
     )
-
-    overlay_drive_arrows = Dropdown(
-        description="Overlay drive arrows on dipole:",
-        options=["True", "False"],
-        value="True",
-        layout=layout,
-        style=analysis_style,
-    )
+    # TODO AES: Temporarily removing drive dipole errors until bugs fixed
+    # overlay_drive_arrows = Dropdown(
+    #     description="Overlay drive arrows on dipole:",
+    #     options=["True", "False"],
+    #     value="True",
+    #     layout=layout,
+    #     style=analysis_style,
+    # )
 
     existing_plots = VBox([]).add_class("existing-plots")
-    plot_context = {}
-
     plot_button = Button(description="Add plot")
-    plot_button.plot_context = plot_context
     clear_button = Button(description="Clear axis")
 
     def _on_sim_data_change(new_sim_name):
@@ -925,7 +958,8 @@ def _build_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax, ui_ac
             spectrogram_colormap_selection=spectrogram_colormap_selection,
             hide_spike_legend=hide_spike_legend,
             marker_size=marker_size,
-            overlay_drive_arrows=overlay_drive_arrows,
+            # TODO AES: Temporarily removing drive dipole errors until bugs fixed
+            # overlay_drive_arrows=overlay_drive_arrows,
             min_spectral_frequency=min_spectral_frequency,
             max_spectral_frequency=max_spectral_frequency,
             dipole_smooth=simulation_dipole_smooth,
@@ -938,7 +972,6 @@ def _build_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax, ui_ac
             fig=fig,
             ax=ax,
             existing_plots=existing_plots,
-            plot_context=plot_context,
         )
     )
 
@@ -956,7 +989,8 @@ def _build_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax, ui_ac
             spectrogram_colormap_selection,
             hide_spike_legend,
             marker_size,
-            overlay_drive_arrows,
+            # TODO AES: Temporarily removing drive dipole errors until bugs fixed
+            # overlay_drive_arrows,
             HBox(
                 [plot_button, clear_button],
                 layout=Layout(justify_content="space-between"),
@@ -1487,7 +1521,7 @@ class _VizManager:
         preprocessing_config = preprocessing_config or {}
         # get figs per axis
         for ax_name, plot_type in ax_plots:
-            self._simulate_edit_figure(
+            self._simulate_edit_axis(
                 fig_name, ax_name, data_name, plot_type, preprocessing_config, "plot"
             )
         # template post-processing
@@ -1522,41 +1556,48 @@ class _VizManager:
         close_button = self.axes_config_tabs.children[tab_idx].children[0]
         close_button.click()
 
-    def _simulate_edit_figure(
+    def _simulate_edit_axis(
         self,
         fig_name,
         ax_name,
-        simulation_name,
+        data_name,
         plot_type,
         preprocessing_config,
         operation,
     ):
-        """Manipulate a certain figure.
+        """Manipulate a certain axis object, then either plot or clear the axis.
+
+        Despite the "simulate" prefix, this is not just for testing and is used in
+        production code. This is regularly used by the GUI to easily setup your axes
+        objects and then, upon simulating a "click", plotting data with the actual
+        plotting function ``_plot_on_axes`` (or clearing the axis depending on
+        ``operation``). This is used by the "Make figure" button, the "Run simulation"
+        button, et al.
 
         Parameters
         ----------
-            fig_name : str
-                The figure name shown in the GUI, e.g., 'Figure 1'.
-            ax_name : str
-                Axis name shown in the left side of GUI, like, 'ax0'.
-            simulation_name : str
-                The name of simulation you want to visualize
-            plot_type : str
-                Type of visualization.
-            preprocessing_config : dict
-                A dict of visualization preprocessing parameters. Allowed keys:
-                `dipole_smooth`, `dipole_scaling`,
-                `data_to_compare`, `data_smooth`, `data_scaling`
-                `min_spectral_frequency`, `max_spectral_frequency`,
-                `spectrogram_colormap_selection`, `hide_spike_legend,
-                `marker_size`.
-                config could be empty: `{}`.
-            operation : str
-                `"plot"` if you want to plot and `"clear"` if you want to
-                remove previously plotted visualizations.
+        fig_name : str
+            The figure name shown in the GUI, e.g., 'Figure 1'.
+        ax_name : str
+            The axis name shown in the left side of GUI, like, 'ax0'.
+        data_name : str
+            The name of simulation or experimental data you want to visualize
+        plot_type : str
+            Type of visualization.
+        preprocessing_config : dict
+            A dict of visualization preprocessing parameters. Allowed keys:
+            `dipole_smooth`, `dipole_scaling`,
+            `data_to_compare`, `data_smooth`, `data_scaling`
+            `min_spectral_frequency`, `max_spectral_frequency`,
+            `spectrogram_colormap_selection`, `hide_spike_legend,
+            `marker_size`.
+            config could be empty: `{}`.
+        operation : str
+            `"plot"` if you want to plot and `"clear"` if you want to
+            remove previously plotted visualizations.
         """
 
-        assert simulation_name in data_store.all_data_names
+        assert data_name in data_store.all_data_names
 
         assert plot_type in _plot_types
         assert operation in ("plot", "clear")
@@ -1577,25 +1618,22 @@ class _VizManager:
             ax_control_tabs.selected_index = ax_idx
 
             buttons = ax_control_tabs.children[ax_idx].children[-2]
-            plot_context = buttons.children[0].plot_context
 
-            if self.last_action == UiAction.UPLOAD_EXPERIMENTAL_DATA:
-                is_experimental_data = True
-            elif self.last_action == UiAction.RUN_SIMULATION:
-                is_experimental_data = False
-            else:
-                is_experimental_data = (
-                    simulation_name in data_store.experimental_data_names
-                )
-
-            plot_context["is_experimental_data"] = is_experimental_data
+            # Change the appropriate data selection dropdown value to be what data_name
+            # has been passed in.
+            #
+            # We know that data_name is in data_store, and that names are mutually
+            # exclusive between simulated and experimental data, so we can just check if
+            # it's in experimental data to determine which dropdown to change:
+            is_experimental_data = data_name in data_store.experimental_data_names
+            # Since the simulation data dropdown is the 2nd widget in the ax control tab
+            # and the experimental data dropdown is the 5th widget, we need to be sure
+            # of which widget we want to change before we change its value.
             widget_index = 4 if is_experimental_data else 1
-
-            # Select the simulation
-            simulation_selector = ax_control_tabs.children[ax_idx].children[
+            data_selector_widget = ax_control_tabs.children[ax_idx].children[
                 widget_index
             ]
-            simulation_selector.value = simulation_name
+            data_selector_widget.value = data_name
 
             # Select the plot type
             plot_type_selector = ax_control_tabs.children[ax_idx].children[0]

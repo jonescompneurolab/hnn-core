@@ -2,7 +2,9 @@ from pathlib import Path
 from os import environ
 import io
 import itertools
+import re
 from contextlib import redirect_stdout
+from importlib.metadata import PackageNotFoundError, distribution
 from threading import Thread, Event
 from time import sleep
 from urllib.request import urlretrieve
@@ -13,6 +15,7 @@ from numpy.testing import assert_array_equal, assert_allclose, assert_raises
 
 import pytest
 
+from hnn_core import parallel_backends
 from hnn_core import (
     MPIBackend,
     neymotin_2020_model,
@@ -22,7 +25,10 @@ from hnn_core.dipole import simulate_dipole
 from hnn_core.parallel_backends import (
     requires_mpi4py,
     requires_psutil,
+    requires_openmpi_package,
     _determine_cores_hwthreading,
+    _get_mpi_env,
+    _get_pip_openmpi_lib,
 )
 from hnn_core.network_builder import NetworkBuilder
 
@@ -114,7 +120,7 @@ class TestParallelBackends:
     def test_run_default(self, fix_net_neymotin_2020, fix_run_simulation):
         """Test consistency between default backend simulation and master"""
         global dpls_reduced_default
-        net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+        net, _ = fix_net_neymotin_2020(add_erp_drives=True, reduced=True)
         dpls_reduced_default = fix_run_simulation(net, tstop=40, backend=None)
         # test consistency across all parallel backends for multiple trials
         assert_raises(
@@ -128,7 +134,7 @@ class TestParallelBackends:
         """Test consistency between joblib backend simulation with master"""
         global dpls_reduced_default, dpls_reduced_joblib
 
-        net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+        net, _ = fix_net_neymotin_2020(add_erp_drives=True, reduced=True)
         dpls_reduced_joblib = fix_run_simulation(
             net, tstop=40, backend="joblib", n_jobs=2
         )
@@ -172,7 +178,7 @@ class TestParallelBackends:
     def test_run_mpibackend(self, fix_net_neymotin_2020, fix_run_simulation):
         """Test running a MPIBackend on reduced model"""
         global dpls_reduced_default, dpls_reduced_mpi
-        net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+        net, _ = fix_net_neymotin_2020(add_erp_drives=True, reduced=True)
         # Use all available cores
         dpls_reduced_mpi = fix_run_simulation(net, tstop=40, backend="mpi")
         for trial_idx in range(len(dpls_reduced_default)):
@@ -188,7 +194,7 @@ class TestParallelBackends:
     @requires_psutil
     def test_terminate_mpibackend(self, fix_net_neymotin_2020):
         """Test terminating MPIBackend from thread"""
-        net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+        net, _ = fix_net_neymotin_2020(add_erp_drives=True, reduced=True)
         with MPIBackend(n_procs=None) as backend:  # Use all available cores
             event = Event()
             # start background thread that will kill all MPIBackends
@@ -214,16 +220,10 @@ class TestParallelBackends:
     @requires_psutil
     @pytest.mark.parametrize("use_hwthreading_if_found", [True, False])
     def test_run_mpibackend_oversubscribed(
-        self, use_hwthreading_if_found, fix_default_params
+        self, use_hwthreading_if_found, fix_net_neymotin_2020
     ):
         """Test running MPIBackend with oversubscribed number of procs"""
-        params = fix_default_params
-        params.update(
-            {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}
-        )
-        net = neymotin_2020_model(
-            params, add_drives_from_params=True, mesh_shape=(3, 3)
-        )
+        net, _ = fix_net_neymotin_2020(add_erp_drives=True, reduced=True)
 
         # Fail state: try running with more procs than cells in the network
         # (will probably oversubscribe too)
@@ -233,7 +233,7 @@ class TestParallelBackends:
             ValueError, match=("More MPI processes were assigned than there are cells")
         ):
             with MPIBackend(n_procs=too_many_procs) as backend:
-                simulate_dipole(net, tstop=40)
+                simulate_dipole(net, tstop=40, n_trials=2)
 
         # Force oversubscription and make sure there are always enough cells in
         # the network
@@ -244,11 +244,9 @@ class TestParallelBackends:
 
         oversubscribed_procs = detected_cores + 1
         n_grid_1d = int(np.ceil(np.sqrt(oversubscribed_procs)))
-        params.update(
-            {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}
-        )
-        net = neymotin_2020_model(
-            params, add_drives_from_params=True, mesh_shape=(n_grid_1d, n_grid_1d)
+        del net
+        net, _ = fix_net_neymotin_2020(
+            add_erp_drives=True, mesh_shape=(n_grid_1d, n_grid_1d)
         )
 
         # Case 1 (default): Check that oversubscription turns on if needed, and
@@ -269,7 +267,7 @@ class TestParallelBackends:
             ) as backend:
                 assert backend.n_procs == oversubscribed_procs
                 assert "--oversubscribe" in " ".join(backend.mpi_cmd)
-                simulate_dipole(net, tstop=40)
+                simulate_dipole(net, tstop=40, n_trials=2)
 
         # Case 2: Check that '--oversubscribe' option is passed if
         # oversubscription is forced on. No simulation is run in this case
@@ -297,7 +295,7 @@ class TestParallelBackends:
             with pytest.raises(
                 RuntimeError, match="MPI simulation failed. Return code: 1"
             ):
-                simulate_dipole(net, tstop=40)
+                simulate_dipole(net, tstop=40, n_trials=2)
 
     @requires_mpi4py
     @requires_psutil
@@ -318,7 +316,7 @@ class TestParallelBackends:
         fix_net_neymotin_2020,
     ):
         """Test running MPIBackend with oversubscribed number of procs"""
-        net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+        net, _ = fix_net_neymotin_2020(add_erp_drives=True, reduced=True)
 
         n_procs = 2
         # Test that the network runs at all
@@ -335,7 +333,7 @@ class TestParallelBackends:
 
         # Possibly needed to prevent MPIBackend failures to exit processes
         del net
-        net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+        net, _ = fix_net_neymotin_2020(add_erp_drives=True, reduced=True)
 
         with MPIBackend(
             n_procs=n_procs,
@@ -366,7 +364,7 @@ class TestParallelBackends:
 
         # Possibly needed to prevent MPIBackend failures to exit processes
         del net
-        net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+        net, _ = fix_net_neymotin_2020(add_erp_drives=True, reduced=True)
 
         with MPIBackend(
             n_procs=n_procs,
@@ -379,23 +377,54 @@ class TestParallelBackends:
             simulate_dipole(net, tstop=40, n_trials=2)
 
     @pytest.mark.parametrize("backend", ["mpi", "joblib"])
-    def test_compare_hnn_core(
-        self, fix_net_neymotin_2020, fix_run_simulation, backend, n_jobs=1
-    ):
-        """Test hnn-core does not break."""
+    def test_compare_hnn_core_legacy(self, fix_run_simulation, backend, n_jobs=1):
+        """Test hnn-core produces similar dipole output to Original HNN.
+
+        Prior to NEURON 9.0, HNN-Core (as of v0.6.1) was able to use NEURON's
+        `h.nrnunit_use_legacy(1)` and the following code in order to generate a Dipole
+        that was identical (single-float precision) to the original HNN's "threshold"
+        Dipole simulation (shown in Figure 4-D and 11-A of Neymotin et al., 2020):
+
+        ```
+        from hnn_core import neymotin_2020_model, simulate_dipole
+        net = neymotin_2020_model(add_drives_from_params=True, legacy_mode=True)
+        dpls = simulate_dipole(net, tstop=170.0)
+        dpl = dpls[0].smooth(30).scale(3000)
+        dpl.write("dpl_reran.txt")
+        ```
+
+        With NEURON 9.0 and later, the `h.nrnunit_use_legacy(1)` function is no longer
+        available, and the original HNN's "threshold" Dipole simulation can no longer be
+        reproduced exactly; see
+        https://github.com/jonescompneurolab/hnn-core/pull/1230#issuecomment-5956179244
+        and
+        https://github.com/jonescompneurolab/hnn-core/blob/test_data/README.md
+        for details.
+
+        Therefore, the following test checks that HNN-Core's Dipole output with the code
+        above is still *similar* to the original HNN's Dipole output, but it is expected
+        that there will be small differences due to the lack of legacy unit support.
+        """
+        # - "Units" here means we are not using legacy units of NEURON provided by
+        #   `h.nrnunit_use_legacy(1)` anymore, since that function is no longer
+        #   available in NEURON 9.0 and later.
+        # - For details, see
+        #   https://github.com/jonescompneurolab/hnn-core/blob/test_data/README.md
+        #
         # small snippet of data on data branch for now. To be deleted
-        # later. Data branch should have only commit so it does not
+        # later. Data branch should have only one commit so it does not
         # pollute the history.
+        ground_truth_fname = "dpl_nonlegacy_units.txt"
         data_url = (
             "https://raw.githubusercontent.com/jonescompneurolab/"
-            "hnn-core/test_data/dpl.txt"
+            f"hnn-core/test_data/{ground_truth_fname}"
         )
-        if not Path("dpl.txt").exists():
-            urlretrieve(data_url, "dpl.txt")
-        dpl_master = loadtxt("dpl.txt")
+        if not Path(ground_truth_fname).exists():
+            urlretrieve(data_url, ground_truth_fname)
+        dpl_master = loadtxt(ground_truth_fname)
 
-        # TODO AES: CURRENTLY NEEDS LEGACY MODE
-        net, _ = fix_net_neymotin_2020(legacy_mode=True, add_drives_from_params=True)
+        # NEEDS LEGACY MODE
+        net = neymotin_2020_model(legacy_mode=True, add_drives_from_params=True)
         dpls = fix_run_simulation(net, tstop=170, backend=backend)
         dpl = dpls[0].smooth(30).scale(3000)
 
@@ -422,8 +451,73 @@ class TestParallelBackends:
             "L2_basket": 55,
             "L2_pyramidal": 114,
             "L5_pyramidal": 396,
-            "L5_basket": 86,
+            "L5_basket": 85,
             "evdist1": 270,
+            "evprox2": 270,
+        }
+
+    @pytest.mark.parametrize("backend", ["mpi", "joblib"])
+    def test_compare_hnn_core(
+        self, fix_net_neymotin_2020, fix_run_simulation, backend, n_jobs=1
+    ):
+        """Test hnn-core dipole output does not change.
+
+        This tests that the dipole output of the "default ERP" simulation of HNN-Core
+        stays the same after code changes. This dipole is distinct from that of
+        `test_compare_hnn_core_legacy` above in that it does not use `legacy_mode` and,
+        therefore, the random seeds of the drives used are different.
+        """
+        # - "Units" here means we are not using legacy units of NEURON provided by
+        #   `h.nrnunit_use_legacy(1)` anymore, since that function is no longer
+        #   available in NEURON 9.0 and later.
+        # - "Seeds" here means that the random seeds of the drives used in this
+        #   simulation are different from those used in the legacy-mode simulation
+        #   above.
+        # - For details, see
+        #   https://github.com/jonescompneurolab/hnn-core/blob/test_data/README.md
+        #
+        # small snippet of data on data branch for now. To be deleted
+        # later. Data branch should have only one commit so it does not
+        # pollute the history.
+        #
+        ground_truth_fname = "dpl_nonlegacy_units_and_seeds.txt"
+        data_url = (
+            "https://raw.githubusercontent.com/jonescompneurolab/"
+            f"hnn-core/test_data/{ground_truth_fname}"
+        )
+        if not Path(ground_truth_fname).exists():
+            urlretrieve(data_url, ground_truth_fname)
+        dpl_master = loadtxt(ground_truth_fname)
+
+        net = neymotin_2020_model(legacy_mode=False, add_erp_drives=True)
+        dpls = fix_run_simulation(net, tstop=170, backend=backend)
+        dpl = dpls[0].smooth(30).scale(3000)
+
+        # write the dipole to a file and compare
+        fname = "./dpl2.txt"
+        dpl.write(fname)
+
+        dpl_pr = loadtxt(fname)
+        assert_array_equal(dpl_pr[:, 2], dpl_master[:, 2])  # L2
+        assert_array_equal(dpl_pr[:, 3], dpl_master[:, 3])  # L5
+
+        # Test spike type counts
+        spike_type_counts = {}
+        for spike_gid in net.cell_response.spike_gids[0]:
+            if net.gid_to_type(spike_gid) not in spike_type_counts:
+                spike_type_counts[net.gid_to_type(spike_gid)] = 1
+            else:
+                spike_type_counts[net.gid_to_type(spike_gid)] += 1
+        assert "common" not in spike_type_counts
+        assert "exgauss" not in spike_type_counts
+        assert "extpois" not in spike_type_counts
+        assert spike_type_counts == {
+            "evprox1": 270,
+            "L2_basket": 58,
+            "L2_pyramidal": 98,
+            "L5_pyramidal": 384,
+            "L5_basket": 89,
+            "evdist1": 235,
             "evprox2": 270,
         }
 
@@ -438,7 +532,7 @@ def test_mpi_failure(fix_net_neymotin_2020, fix_run_simulation):
     # this MPI parameter will cause a MPI job to fail
     environ["OMPI_MCA_btl"] = "self"
 
-    net, _ = fix_net_neymotin_2020(add_drives_from_params=True, reduced=True)
+    net, _ = fix_net_neymotin_2020(add_erp_drives=True, reduced=True)
     with pytest.warns(UserWarning) as record:
         with io.StringIO() as buf, redirect_stdout(buf):
             with pytest.raises(RuntimeError, match="MPI simulation failed"):
@@ -498,3 +592,165 @@ def test_compare_duecker_model_output(backend):
         cell_response_new_reloaded.spike_times,
         cell_response_old.spike_times,
     )
+
+
+@requires_openmpi_package
+def test_get_pip_openmpi_lib():
+    """Test that only the real libmpi file in the 'openmpi' package is found"""
+    mpi_lib = _get_pip_openmpi_lib()
+    assert mpi_lib is not None
+    # `_get_pip_openmpi_lib()` MUST find one or more of these files, which are the only
+    # true MPI library files that NEURON needs.
+    assert Path(mpi_lib).name in {
+        "libmpi.so.40",
+        "libmpi.so.12",
+        "libmpi.40.dylib",
+        "libmpi.12.dylib",
+    }
+    # `_get_pip_openmpi_lib()` must NOT find one or more of these files, which are also
+    # present in the `openmpi` package depending on the OS. None of these files are the
+    # "real" MPI library file that NEURON needs.
+    assert Path(mpi_lib).name not in {
+        "libmpi.so",
+        "libmpi.dylib",
+        "libmpi_mpifh.so.40",
+        "libmpi.so.40.1.0",
+        "libmpi.so.40.40.8",
+    }
+    assert Path(mpi_lib).is_file()
+
+
+def test_get_pip_openmpi_lib_installed():
+    """Test _get_pip_openmpi_lib against the actually-installed environment"""
+    try:
+        distribution("openmpi")
+    except PackageNotFoundError:
+        assert _get_pip_openmpi_lib() is None
+    else:
+        # If it's found to be installed, then the returned path of the library must
+        # exist and be a file
+        mpi_lib = _get_pip_openmpi_lib()
+        assert mpi_lib is not None
+        assert Path(mpi_lib).is_file()
+
+
+# This tests that `_get_mpi_env` correctly sets the `MPI_LIB_NRN_PATH` environment
+# variable based the state of the environment and which arguments are passed to
+# it. There are four arguments that pytest parametrizes over:
+#
+# - `autoload_flag`: value of `autoload_mpi_library` argument to `_get_mpi_env`
+# - `user_provided_lib`: value of `mpi_lib_path` argument to `_get_mpi_env`
+# - `default_openmpi_lib`: value returned by `_get_pip_openmpi_lib` (which is mocked to
+#     return a specific value)
+# - `expected_returned_lib`: the expected value of the `MPI_LIB_NRN_PATH` environment
+#     variable after `_get_mpi_env` is called
+#
+# Additionally, the test also sets the CALLER's environment variable `MPI_LIB_NRN_PATH`
+# to a known value ("preexisting.so"). This is to test that `_get_mpi_env` does not
+# modify the caller's environment itself.
+#
+# Think of everything except `expected_returned_lib` as "inputs" to the test, and
+# `expected_returned_lib` as the "output" of the test.
+@pytest.mark.parametrize(
+    "autoload_flag, user_provided_lib, default_openmpi_lib, expected_returned_lib",
+    [
+        # Case when using default arguments if the `openmpi` package is installed:
+        # - autoload_flag = True
+        # - user_provided_lib = None (no custom library path provided)
+        # - default_openmpi_lib = mock value of the installed library file "pip.so"
+        # - expected_returned_lib = _get_mpi_env should automatically set the
+        #     environment variable to `default_openmpi_lib`: "pip.so"
+        pytest.param(True, None, "pip.so", "pip.so", id="default-installed"),
+        # Case when using default arguments if the `openmpi` package is NOT installed:
+        # - autoload_flag = True
+        # - user_provided_lib = None (no custom library path provided)
+        # - default_openmpi_lib = None (not installed)
+        # - expected_returned_lib = the environment variable should remain UNCHANGED
+        #     from its preexisting value "preexisting.so"
+        pytest.param(True, None, None, "preexisting.so", id="default-not-installed"),
+        # Case when autoload is off, and no user provided library path is given:
+        # - autoload_flag = False
+        # - user_provided_lib = None (no custom library path provided)
+        # - default_openmpi_lib = mock value of the installed library file "pip.so"
+        # - expected_returned_lib = the environment variable should remain UNCHANGED
+        #     from its preexisting value "preexisting.so"
+        pytest.param(False, None, "pip.so", "preexisting.so", id="no-autoload"),
+        # Case when autoload is off, and user provided library path has been given:
+        # - autoload_flag = False
+        # - user_provided_lib = "user.so" (custom library path provided)
+        # - default_openmpi_lib = mock value of the installed library file "pip.so"
+        # - expected_returned_lib = _get_mpi_env should automatically set the
+        #     environment variable to `user_provided_lib`: "user.so"
+        pytest.param(False, "user.so", "pip.so", "user.so", id="no-autoload-user"),
+        # Case when autoload is ON, and user provided library path has been given. In
+        # this case, the user-provided library path should take precedence over the
+        # autoloaded library path:
+        # - autoload_flag = True
+        # - user_provided_lib = "user.so" (custom library path provided)
+        # - default_openmpi_lib = mock value of the installed library file "pip.so"
+        # - expected_returned_lib = _get_mpi_env should automatically set the
+        #     environment variable to `user_provided_lib`: "user.so"
+        pytest.param(True, Path("user.so"), "pip.so", "user.so", id="user-wins"),
+    ],
+)
+def test_get_mpi_env_lib_path(
+    monkeypatch,
+    autoload_flag,
+    user_provided_lib,
+    default_openmpi_lib,
+    expected_returned_lib,
+):
+    """Test which MPI library _get_mpi_env points MPI_LIB_NRN_PATH to across arguments"""
+    # Set the caller's environment, in order to make sure that `_get_mpi_env` later does
+    # not modify it
+    monkeypatch.setenv("MPI_LIB_NRN_PATH", "preexisting.so")
+    # Overwrite the `_get_pip_openmpi_lib` function to return a specific library path
+    # for testing purposes.
+    monkeypatch.setattr(
+        parallel_backends, "_get_pip_openmpi_lib", lambda: default_openmpi_lib
+    )
+
+    env = _get_mpi_env(
+        autoload_mpi_library=autoload_flag, mpi_lib_path=user_provided_lib
+    )
+
+    assert env["MPI_LIB_NRN_PATH"] == expected_returned_lib
+    # Check that the caller's own environment was not modified
+    assert environ["MPI_LIB_NRN_PATH"] == "preexisting.so"
+
+
+@requires_mpi4py
+@requires_psutil
+def test_mpibackend_lib_path(monkeypatch, tmp_path):
+    """Test that 'mpi_lib_path' must exist and reaches MPI as an absolute path
+
+    Note that this test does not actually depend on whether the `openmpi` package is
+    installed or not, but does require that the `mpi4py` and `psutil` packages are
+    installed.
+    """
+    # "nonexistent.so" tests a path that does not exist, and `tmp_path` tests a path
+    # that exists but is a directory instead of a file.
+    for bad_path in ["nonexistent.so", tmp_path]:
+        with pytest.raises(FileNotFoundError, match="'mpi_lib_path' not found"):
+            MPIBackend(mpi_lib_path=bad_path)
+
+    # Capture the env that MPI would be launched with, but stop before launching it
+    def _fake_run_subprocess(env, **kwargs):
+        raise RuntimeError(f"MPI_LIB_NRN_PATH={env['MPI_LIB_NRN_PATH']}")
+
+    monkeypatch.setattr(parallel_backends, "run_subprocess", _fake_run_subprocess)
+
+    # Create a fake MPI library file in the temporary directory, in order to make sure
+    # that MPIBackend is accessing the correct path to the library.
+    (tmp_path / "libmpi.so.40").touch()
+
+    # Setup our network and backend, pointing the backend to the fake MPI library file.
+    net = neymotin_2020_model(mesh_shape=(3, 3))
+    backend = MPIBackend(n_procs=2, mpi_lib_path=(tmp_path / "libmpi.so.40"))
+
+    # Test that at simulation time, the MPIBackend can see and is using the correct path
+    # to the MPI library file, based on its internal `env` setting. We do this by
+    # hacking the `run_subprocess` using the monkeypatch above.
+    expected = re.escape(f"MPI_LIB_NRN_PATH={tmp_path / 'libmpi.so.40'}")
+    with pytest.raises(RuntimeError, match=f"^{expected}$"):
+        backend.simulate(net, tstop=1, dt=0.025, n_trials=1)
