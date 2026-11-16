@@ -1437,20 +1437,15 @@ def test_gui_download_simulation(setup_reduced_gui):
     # result is a single csv file
     assert file_extension == ".csv"
 
-    # Check no experimental/loaded data is listed in the sims dropdown list to download
+    # Check that no experimental/loaded data are listed in either the network or
+    # simulation output dropdown
     file1_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/S1_SupraT.txt"  # noqa
     gui._simulate_upload_experimental_data(file1_url)
-    download_simulation_list = gui.simulation_net_save_widget.options
-    assert (
-        len(
-            [
-                sim_name
-                for sim_name in download_simulation_list
-                if sim_name == "S1_SupraT"
-            ]
-        )
-        == 0
-    )
+    simulation_net_save_list = gui.simulation_net_save_widget.options
+    simulation_output_save_list = gui.simulation_output_save_widget.options
+
+    assert "S1_SupraT" not in simulation_net_save_list
+    assert "S1_SupraT" not in simulation_output_save_list
 
 
 def test_gui_upload_csv_simulation(setup_reduced_gui):
