@@ -335,6 +335,10 @@ no version `0.7.0`, etc. Please enjoy the numerous additions!
   by [Sourav Rajvi][] in {gh}`1360`, fixing {gh}`1321`. This was their first PR,
   thanks Sourav!
 
+- Fixed broken behavior with "simulation data" / "experimental data" visualization
+  dropdown bug, and refactor some related code,
+  by [Sourav Rajvi][] in {gh}`1394`, fixing {gh}`1389`.
+
 ### Miscellaneous Changelog
 
 - For the published stable `1.0.0` stable version, all user-facing dependencies now have
