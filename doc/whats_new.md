@@ -32,8 +32,8 @@ Despite this version of `hnn-core` being marked as version `1.0.0`, this softwar
 package has been stable for several years and is actively being used by many
 different scientists for ongoing research. We decided to release this as version `1.0.0`
 primarily to communicate that `hnn-core` is, and has been, ready for active use. It
-should not be thought of as "still being built". That said, we will still continue to
-improve it and make it easier for our users than ever before!
+should not be thought of as "still being built". That said, we will still continue by
+adding new features and making it easier to use than ever before!
 
 To be clear, this means the versions go directly from `0.6.1` to `1.0.0`, and there is
 no version `0.7.0`, etc. Please enjoy the numerous additions!
@@ -44,7 +44,7 @@ no version `0.7.0`, etc. Please enjoy the numerous additions!
   which includes new human-derived pyramidal cell and interneuron models
   (`L2_inhibitory` and `L5_inhibitory`) along with new ion channel and synapse
   mechanisms (including `NMDA_gao2021` and `gabab_neymotin2016` synapses, and channels
-  from Hay et al. 2011 and Golomb et al.  2007). A preprint is [available
+  from Hay et al. 2011 and Golomb et al. 2007). A preprint is [available
   here](https://doi.org/10.64898/2026.10.29.762964), the final publication is pending,
   and the source code for the simulations in the paper is [available
   here](https://github.com/jonescompneurolab/hnn-tuning). Importantly, the model is
@@ -55,7 +55,7 @@ no version `0.7.0`, etc. Please enjoy the numerous additions!
 
 - HNN-Core now supports NEURON 9 (up to 9.0.2, inclusive) and Python up to 3.14
   (inclusive). **Please note that due to the removal of legacy units in NEURON 9.0, ALL
-  simulations starting with this HNN-Core version will be quantiatively different!**
+  simulations starting with this HNN-Core version will be quantitatively different!**
   However, your simulations should still be qualitatively similar, and the numerical
   differences will likely be negligible. As an example, this should be equivalent to
   changing your calcium current reversal potential (`E_Ca`) from a value of 134.02
@@ -296,7 +296,7 @@ no version `0.7.0`, etc. Please enjoy the numerous additions!
       which are adapted from (Hay et al., 2011) (see the MOD files for publication
       references).
     - If you are creating raw `Network` objects from scratch (instead of using the
-      recommended `neymotin_2020_model` or `duecker_ET_model` functions), then if you
+      recommended `neymotin_2020_model` or `duecker_ET_model` functions), and if you
       pass either a custom `pos_dict` or `cell_types` argument, you MUST pass your own
       version of the other argument. This is a small part of our plan to gradually
       reduce the amount of hardcoding of specific celltypes. Relatedly, if you do pass a
@@ -392,7 +392,7 @@ no version `0.7.0`, etc. Please enjoy the numerous additions!
 
 ### Miscellaneous Changelog
 
-- For the published stable `1.0.0` stable version, all user-facing dependencies now have
+- For the published stable `1.0.0` version, all user-facing dependencies now have
   maximum version caps, in order to prevent future dependency updates from breaking this
   release. Additionally, `notebook` is now a base dependency, so that anyone installing
   `hnn-core` can easily run our Textbook's Jupyter notebooks using the standard `jupyter
@@ -487,7 +487,7 @@ here](https://github.com/jonescompneurolab/hnn-core/releases/tag/v0.6.0).
 - `jones_2009_model` has been renamed to `neymotin_2020_model` to better reflect its
   provenance. From now on, `neymotin_2020_model` is the recommended "default" model we
   will be documenting and using going forward. However, for backwards compatibility,
-  `jonegs_2009_model` will still be retained as a simple "wrapper function" around
+  `jones_2009_model` will still be retained as a simple "wrapper function" around
   `neymotin_2020_model`, the latter being otherwise identical to the old
   `jones_2009_model` behavior. We recommend you update your scripts to use
   `neymotin_2020_model`, but `jones_2009_model` will still continue to work.
@@ -1299,7 +1299,7 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 
 - GUI load confirmation message, by [George Dang][] in {gh}`846`
 
-- Differentiate L5/L2 Pyr geomtetry options in GUI, by [Nick Tolley][] in {gh}`848`
+- Differentiate L5/L2 Pyr geometry options in GUI, by [Nick Tolley][] in {gh}`848`
 
 - Updated the GUI load drive widget to be able to load tonic biases from a network
   configuration file. [George Dang][] in {gh}`852`
@@ -1754,7 +1754,7 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
   time-frequency representations ({func}`~hnn_core.viz.plot_tfr_morlet`), by [Christopher Bailey][]
   in {gh}`264`
 
-- Add y-label units (nAm) to all visualisation functions involving dipole moments, by [Christopher
+- Add y-label units (nAm) to all visualization functions involving dipole moments, by [Christopher
   Bailey][] in {gh}`264`
 
 - Add Savitzky-Golay filtering method {meth}`~hnn_core.dipole.Dipole.savgol_filter` to ``Dipole``;
@@ -1800,7 +1800,7 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 
 - New API for defining external drives and biases to network. By default, a
   {class}`~hnn_core.Network` is created without drives, which are added using class methods. The
-  argument ``add_drives_from_params`` controls this behaviour, by [Christopher Bailey][] in
+  argument ``add_drives_from_params`` controls this behavior, by [Christopher Bailey][] in
   {gh}`221`
 
 - Examples apply random state seeds that reproduce the output of HNN GUI documentation, by
