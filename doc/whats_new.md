@@ -390,6 +390,9 @@ no version `0.7.0`, etc. Please enjoy the numerous additions!
   dropdown bug, and refactor some related code,
   by [Sourav Rajvi][] in {gh}`1394`, fixing {gh}`1389`.
 
+- Fixed crash from when `add_spike_train_drive` uses spikes that are not sorted,
+  by [Austin E. Soplata][] in {gh}`1400`, identified by [Sourav Rajvi][].
+
 ### Miscellaneous Changelog
 
 - For the published stable `1.0.0` version, all user-facing dependencies now have
