@@ -331,6 +331,9 @@ no version `0.7.0`, etc. Please enjoy the numerous additions!
 
 ### Bug Fixes
 
+- The GUI input histogram now aggregates all drives by their proximal or distal
+  location, with only location names in the legend, fixing {gh}`1123`.
+
 - The notorious `MPITimeout` errors should now be a thing of the past and no longer
   happen! Document and remove problematic MPI Timeouts (while keeping code intact), and
   implement a new tempfile-based mechanism for transmitting MPI data from child
