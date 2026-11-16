@@ -1508,6 +1508,20 @@ class HNNGUI:
                 "loading_failed"
             ]
             return
+        elif data_filename == "None":
+            logger.error(
+                textwrap.dedent(f"""
+                Cannot load external data named '{data_filename}': the filename is
+                invalid. Please rename the data file to something other than 'None' to
+                avoid naming conflicts.
+                """)
+                .replace("\n", " ")
+                .strip()
+            )
+            self._simulation_status_bar.value = self._simulation_status_contents[
+                "loading_failed"
+            ]
+            return
 
         # Decision from
         # https://github.com/jonescompneurolab/hnn-core/pull/1328#issuecomment-5444471136
@@ -1558,10 +1572,10 @@ class HNNGUI:
             self.viz_manager.add_figure()
             fig_name = _idx2figname(self.viz_manager.data["fig_idx"]["idx"] - 1)
             process_configs = {"dipole_smooth": 0, "dipole_scaling": 1}
-            self.viz_manager._simulate_edit_figure(
+            self.viz_manager._simulate_edit_axis(
                 fig_name,
                 ax_name="ax0",
-                simulation_name=data_filename,
+                data_name=data_filename,
                 plot_type="current dipole",
                 preprocessing_config=process_configs,
                 operation="plot",
@@ -4885,6 +4899,18 @@ def run_button_clicked(
 
         simulation_status_bar.value = simulation_status_contents["simulation_failed"]
         return
+    elif _sim_name == "None":
+        logger.error(
+            textwrap.dedent(f"""
+            Cannot run simulation named '{_sim_name}': the simulation name cannot be
+            'None'. Please rename the simulation to avoid naming conflicts.
+            """)
+            .replace("\n", " ")
+            .strip()
+        )
+
+        simulation_status_bar.value = simulation_status_contents["simulation_failed"]
+        return
 
     with log_out:
         try:
@@ -4972,7 +4998,7 @@ def run_button_clicked(
             fig_name = _idx2figname(viz_manager.data["fig_idx"]["idx"] - 1)
             ax_plots = [("ax0", "input histogram"), ("ax1", "current dipole")]
             for ax_name, plot_type in ax_plots:
-                viz_manager._simulate_edit_figure(
+                viz_manager._simulate_edit_axis(
                     fig_name, ax_name, _sim_name, plot_type, {}, "plot"
                 )
 
@@ -6243,7 +6269,7 @@ def run_opt_button_clicked(
 
             viz_manager.add_figure()
             fig_name = _idx2figname(viz_manager.data["fig_idx"]["idx"] - 1)
-            viz_manager._simulate_edit_figure(
+            viz_manager._simulate_edit_axis(
                 fig_name,
                 "ax0",
                 new_name,
@@ -6251,7 +6277,7 @@ def run_opt_button_clicked(
                 {},
                 "plot",
             )
-            viz_manager._simulate_edit_figure(
+            viz_manager._simulate_edit_axis(
                 fig_name,
                 "ax1",
                 new_name,
