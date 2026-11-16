@@ -317,13 +317,12 @@ def _update_ax(fig, ax, data, data_name, plot_type, plot_config):
                         active_locations.add(location)
 
             if active_locations:
+                inverted_locations = ["distal"] if "distal" in active_locations else []
                 net_copied.cell_response.plot_spikes_hist(
                     ax=ax,
                     show=False,
                     spike_types=sorted(active_locations),
-                    invert_spike_types=["distal"]
-                    if "distal" in active_locations
-                    else [],
+                    invert_spike_types=inverted_locations,
                     color=default_drive_colors,
                 )
             else:
