@@ -1291,15 +1291,27 @@
             <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">"button_color"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s2">"theme_color"</span><span class="p">]},</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">save_config_button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_html_download_button</span><span class="p">(</span>
-            <span class="n">title</span><span class="o">=</span><span class="s2">"Save Current Network and Drives"</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="s2">"Save Network and Drives"</span><span class="p">,</span>
             <span class="n">mimetype</span><span class="o">=</span><span class="s2">"application/json"</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">save_simulation_button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_html_download_button</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_sim_output_button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_html_download_button</span><span class="p">(</span>
             <span class="n">title</span><span class="o">=</span><span class="s2">"Save Simulation Output"</span><span class="p">,</span>
             <span class="n">mimetype</span><span class="o">=</span><span class="s2">"text/csv"</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="c1"># the list that corresponds to save_simulation_button</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_list_widget</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span>
+        <span class="c1"># the list that corresponds to save_config_button</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_net_save_widget</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span>
+            <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">"Network Configuration to Save"</span><span class="p">],</span>
+            <span class="n">value</span><span class="o">=</span><span class="s2">"Network Configuration to Save"</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">"Network configuration:"</span><span class="p">,</span>
+            <span class="n">disabled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span>
+                <span class="n">width</span><span class="o">=</span><span class="s2">"50%"</span><span class="p">,</span>
+                <span class="n">flex</span><span class="o">=</span><span class="s2">"0 1 50%"</span><span class="p">,</span>  <span class="c1"># prevents growth beyond container limit</span>
+                <span class="n">min_width</span><span class="o">=</span><span class="s2">"0"</span><span class="p">,</span>  <span class="c1"># forces text to truncate</span>
+            <span class="p">),</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">"simulation-list-widget"</span><span class="p">)</span>
+        <span class="c1"># the list that corresponds to save_sim_output_button</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_output_save_widget</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span>
             <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">"Simulation Output to Save"</span><span class="p">],</span>
             <span class="n">value</span><span class="o">=</span><span class="s2">"Simulation Output to Save"</span><span class="p">,</span>
             <span class="n">description</span><span class="o">=</span><span class="s2">"Simulation output:"</span><span class="p">,</span>
@@ -1310,7 +1322,9 @@
                 <span class="n">min_width</span><span class="o">=</span><span class="s2">"0"</span><span class="p">,</span>  <span class="c1"># forces text to truncate</span>
             <span class="p">),</span>
         <span class="p">)</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">"simulation-list-widget"</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_list_widget</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">"hide-label"</span><span class="p">)</span>
+        <span class="c1"># add hide-label class to both widgets</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_output_save_widget</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">"hide-label"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_net_save_widget</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">"hide-label"</span><span class="p">)</span>
 
         <span class="c1"># ==================================================</span>
         <span class="c1"># Network tab</span>
@@ -1825,7 +1839,8 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_contents</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">viz_manager</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">simulation_list_widget</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">simulation_net_save_widget</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">simulation_output_save_widget</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">cell_parameters_widgets</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">global_gain_widgets</span><span class="p">,</span>
             <span class="p">)</span>
@@ -1848,7 +1863,8 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_contents</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">viz_manager</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">simulation_list_widget</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">simulation_net_save_widget</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">simulation_output_save_widget</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">cell_parameters_widgets</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">global_gain_widgets</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">widget_opt_solver</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
@@ -1874,25 +1890,73 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_update_opt_history_button</span><span class="p">()</span>
             <span class="k">return</span>
 
-        <span class="k">def</span><span class="w"> </span><span class="nf">_simulation_list_change_cb</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-            <span class="c1"># Simulation Data</span>
-            <span class="n">_simulation_data</span><span class="p">,</span> <span class="n">file_extension</span> <span class="o">=</span> <span class="n">_serialize_simulation</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">,</span> <span class="n">data_store</span><span class="o">.</span><span class="n">simulated_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation_list_widget</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_netsave_button_change_cb</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">"""</span>
+<span class="sd">            Callback for updating the value of `save_config_button` when there is a</span>
+<span class="sd">            change to the selected value of the `simulation_net_save_widget` dropdown</span>
+<span class="sd">            """</span>
+            <span class="n">network_config</span> <span class="o">=</span> <span class="n">_serialize_network_config</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">,</span>
+                <span class="n">data_store</span><span class="o">.</span><span class="n">simulated_data</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">simulation_net_save_widget</span><span class="p">,</span>
             <span class="p">)</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">simulation_list_widget</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">simulation_net_save_widget</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">False</span>
 
-            <span class="n">result_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">value</span><span class="o">.</span><span class="n">new</span><span class="si">}{</span><span class="n">file_extension</span><span class="si">}</span><span class="s2">"</span>
+            <span class="n">result_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">simulation_net_save_widget</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">.json"</span>
+
+            <span class="n">b64_net</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">network_config</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+            <span class="n">payload</span> <span class="o">=</span> <span class="n">b64_net</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+
+            <span class="c1"># redraw button in the same way after simulation change, but mapped to</span>
+            <span class="c1"># the result_file filename</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">save_config_button</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">html_download_button</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">payload</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span>
+                <span class="n">filename</span><span class="o">=</span><span class="n">result_file</span><span class="p">,</span>
+                <span class="n">is_disabled</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span>
+                <span class="n">btn_height</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s2">"save_btn"</span><span class="p">]</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
+                <span class="n">btn_width</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s2">"save_btn"</span><span class="p">]</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
+                <span class="n">color_theme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s2">"theme_color"</span><span class="p">],</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">"Save Network and Drives"</span><span class="p">,</span>
+                <span class="n">mimetype</span><span class="o">=</span><span class="s2">"application/json"</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_outputsave_button_change_cb</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">"""</span>
+<span class="sd">            Callback for updating the value of `save_sim_output_button` when there is a</span>
+<span class="sd">            change to the selected value of the `simulation_output_save_widget` dropdown</span>
+<span class="sd">            """</span>
+            <span class="n">_simulation_data</span><span class="p">,</span> <span class="n">file_extension</span> <span class="o">=</span> <span class="n">_serialize_simulation_output</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">,</span>
+                <span class="n">data_store</span><span class="o">.</span><span class="n">simulated_data</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">simulation_output_save_widget</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">simulation_output_save_widget</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="n">result_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">simulation_output_save_widget</span><span class="o">.</span><span class="n">value</span><span class="si">}{</span><span class="n">file_extension</span><span class="si">}</span><span class="s2">"</span>
+
+            <span class="c1"># in the case of a single trial, the payload will be a ".csv" file, and</span>
+            <span class="c1"># the serialized output is a string. The string must be encoded to bytes</span>
+            <span class="c1"># before it can be encoded in base64</span>
             <span class="k">if</span> <span class="n">file_extension</span> <span class="o">==</span> <span class="s2">".csv"</span><span class="p">:</span>
                 <span class="n">b64</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">_simulation_data</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
-            <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># in the case of multiple trials, the payload will be a ".zip" file, and</span>
+            <span class="c1"># so the serialized output is already in bytes and can be directly encoded</span>
+            <span class="c1"># in base64</span>
+            <span class="k">elif</span> <span class="n">file_extension</span> <span class="o">==</span> <span class="s2">".zip"</span><span class="p">:</span>
                 <span class="n">b64</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">_simulation_data</span><span class="p">)</span>
-
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># dev note: using `!r` is the same as calling repr()</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"Unexpected extension: </span><span class="si">{</span><span class="n">file_extension</span><span class="si">!r}</span><span class="s2">"</span>
+                    <span class="s2">"</span><span class="se">\n</span><span class="s2">The allowed extension types are '.csv' and '.zip'"</span>
+                <span class="p">)</span>
             <span class="n">payload</span> <span class="o">=</span> <span class="n">b64</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
 
             <span class="c1"># redraw button in the same way after simulation change, but mapped to</span>
             <span class="c1"># the result_file filename</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">save_simulation_button</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">html_download_button</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">save_sim_output_button</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">html_download_button</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">payload</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span>
                 <span class="n">filename</span><span class="o">=</span><span class="n">result_file</span><span class="p">,</span>
                 <span class="n">is_disabled</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span>
@@ -1901,25 +1965,6 @@
                 <span class="n">color_theme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s2">"theme_color"</span><span class="p">],</span>
                 <span class="n">title</span><span class="o">=</span><span class="s2">"Save Simulation Output"</span><span class="p">,</span>
                 <span class="n">mimetype</span><span class="o">=</span><span class="s2">"text/csv"</span><span class="p">,</span>
-            <span class="p">)</span>
-
-            <span class="c1"># Network Configuration</span>
-            <span class="n">network_config</span> <span class="o">=</span> <span class="n">_serialize_config</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">,</span> <span class="n">data_store</span><span class="o">.</span><span class="n">simulated_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation_list_widget</span>
-            <span class="p">)</span>
-            <span class="n">b64_net</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">network_config</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
-
-            <span class="c1"># redraw button in the same way after simulation change, but mapped to</span>
-            <span class="c1"># the value.new filename</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">save_config_button</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">html_download_button</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">payload</span><span class="o">=</span><span class="n">b64_net</span><span class="o">.</span><span class="n">decode</span><span class="p">(),</span>
-                <span class="n">filename</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">value</span><span class="o">.</span><span class="n">new</span><span class="si">}</span><span class="s2">.json"</span><span class="p">,</span>
-                <span class="n">is_disabled</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span>
-                <span class="n">btn_height</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s2">"save_btn"</span><span class="p">]</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
-                <span class="n">btn_width</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s2">"save_btn"</span><span class="p">]</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
-                <span class="n">color_theme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s2">"theme_color"</span><span class="p">],</span>
-                <span class="n">title</span><span class="o">=</span><span class="s2">"Save Current Network and Drives"</span><span class="p">,</span>
-                <span class="n">mimetype</span><span class="o">=</span><span class="s2">"application/json"</span><span class="p">,</span>
             <span class="p">)</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">_driver_type_change_cb</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
@@ -1960,7 +2005,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">load_experimental_data_button</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span>
             <span class="n">_on_upload_experimental_data_cb</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="s2">"value"</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_list_widget</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">_simulation_list_change_cb</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_net_save_widget</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span>
+            <span class="n">_netsave_button_change_cb</span><span class="p">,</span>
+            <span class="n">names</span><span class="o">=</span><span class="s2">"value"</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_output_save_widget</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span>
+            <span class="n">_outputsave_button_change_cb</span><span class="p">,</span>
+            <span class="n">names</span><span class="o">=</span><span class="s2">"value"</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">widget_drive_type_selection</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">_driver_type_change_cb</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">cell_type_radio_buttons</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">_cell_type_radio_change_cb</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
@@ -2185,12 +2237,13 @@
                         <span class="n">HBox</span><span class="p">(</span>
                             <span class="p">[</span>
                                 <span class="bp">self</span><span class="o">.</span><span class="n">save_config_button</span><span class="p">,</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">simulation_net_save_widget</span><span class="p">,</span>
                             <span class="p">]</span>
                         <span class="p">),</span>
                         <span class="n">HBox</span><span class="p">(</span>
                             <span class="p">[</span>
-                                <span class="bp">self</span><span class="o">.</span><span class="n">save_simulation_button</span><span class="p">,</span>
-                                <span class="bp">self</span><span class="o">.</span><span class="n">simulation_list_widget</span><span class="p">,</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">save_sim_output_button</span><span class="p">,</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">simulation_output_save_widget</span><span class="p">,</span>
                             <span class="p">],</span>
                             <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">align_items</span><span class="o">=</span><span class="s2">"center"</span><span class="p">),</span>
                         <span class="p">),</span>
@@ -5418,7 +5471,8 @@
     <span class="n">simulation_status_contents</span><span class="p">,</span>
     <span class="n">connectivity_textfields</span><span class="p">,</span>
     <span class="n">viz_manager</span><span class="p">,</span>
-    <span class="n">simulations_list_widget</span><span class="p">,</span>
+    <span class="n">simulation_net_save_widget</span><span class="p">,</span>
+    <span class="n">simulation_output_save_widget</span><span class="p">,</span>
     <span class="n">cell_parameters_widgets</span><span class="p">,</span>
     <span class="n">global_gain_textfields</span><span class="p">,</span>
 <span class="p">):</span>
@@ -5516,8 +5570,26 @@
                     <span class="k">if</span> <span class="n">simulation_data</span><span class="p">[</span><span class="n">sim_name</span><span class="p">][</span><span class="s2">"net"</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
                 <span class="p">]</span>
 
-                <span class="n">simulations_list_widget</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">sim_names</span>
-                <span class="n">simulations_list_widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">sim_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="c1"># Update simulation list widgets</span>
+                <span class="c1"># ---------------------------------------------------------------------</span>
+                <span class="c1"># `simulation_net_save_widget`:</span>
+                <span class="c1">#    - list used for saving network configurations</span>
+                <span class="c1"># `simulation_output_save_widget`:</span>
+                <span class="c1">#    - list used for saving simulation outputs</span>
+                <span class="c1">#</span>
+                <span class="c1"># Each widget points to its own selected value, so both values must be</span>
+                <span class="c1"># explicitly set after the "options" are updated</span>
+                <span class="c1">#</span>
+                <span class="c1"># NOTE: assigning "options" resets the selected "value" to</span>
+                <span class="c1"># `sim_names[0]`, which can trigger the widget's callback if the</span>
+                <span class="c1"># value is updated. The callback may be triggered a second time if</span>
+                <span class="c1"># the selected "value" is changed again when it is assigned to</span>
+                <span class="c1"># `sim_names[-1]`</span>
+                <span class="n">simulation_net_save_widget</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">sim_names</span>
+                <span class="n">simulation_net_save_widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">sim_names</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+                <span class="n">simulation_output_save_widget</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">sim_names</span>
+                <span class="n">simulation_output_save_widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">sim_names</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
             <span class="n">viz_manager</span><span class="o">.</span><span class="n">last_action</span> <span class="o">=</span> <span class="n">UiAction</span><span class="o">.</span><span class="n">RUN_SIMULATION</span>
             <span class="n">viz_manager</span><span class="o">.</span><span class="n">reset_fig_config_tabs</span><span class="p">()</span>
@@ -5724,15 +5796,22 @@
         <span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span><span class="o">.</span><span class="n">mechs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">mechs_params</span><span class="p">))</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_serialize_simulation</span><span class="p">(</span><span class="n">log_out</span><span class="p">,</span> <span class="n">sim_data</span><span class="p">,</span> <span class="n">simulation_list_widget</span><span class="p">):</span>
-    <span class="c1"># Only download if there is at least one simulation</span>
-    <span class="n">sim_name</span> <span class="o">=</span> <span class="n">simulation_list_widget</span><span class="o">.</span><span class="n">value</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_serialize_simulation_output</span><span class="p">(</span>
+    <span class="n">log_out</span><span class="p">,</span>
+    <span class="n">sim_data</span><span class="p">,</span>
+    <span class="n">simulation_output_save_widget</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Serialize the currently-selected simulation in `simulation_output_save_widget`, and</span>
+<span class="sd">    route any output or errors to `log_out`.</span>
+<span class="sd">    """</span>
+    <span class="n">sim_name</span> <span class="o">=</span> <span class="n">simulation_output_save_widget</span><span class="o">.</span><span class="n">value</span>
 
     <span class="k">with</span> <span class="n">log_out</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">serialize_simulation</span><span class="p">(</span><span class="n">sim_data</span><span class="p">,</span> <span class="n">sim_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">serialize_simulation_output</span><span class="p">(</span><span class="n">sim_data</span><span class="p">,</span> <span class="n">sim_name</span><span class="p">)</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">serialize_simulation</span><span class="p">(</span><span class="n">all_simulation_data</span><span class="p">,</span> <span class="n">simulation_name</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">serialize_simulation_output</span><span class="p">(</span><span class="n">all_simulation_data</span><span class="p">,</span> <span class="n">simulation_name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Serializes simulation data to CSV.</span>
 
 <span class="sd">    Creates a single CSV file or a ZIP file containing multiple CSVs,</span>
@@ -5770,15 +5849,22 @@
         <span class="k">return</span> <span class="n">_create_zip</span><span class="p">(</span><span class="n">csv_trials_output</span><span class="p">,</span> <span class="n">simulation_name</span><span class="p">),</span> <span class="s2">".zip"</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_serialize_config</span><span class="p">(</span><span class="n">log_out</span><span class="p">,</span> <span class="n">sim_data</span><span class="p">,</span> <span class="n">simulation_list_widget</span><span class="p">):</span>
-    <span class="c1"># Only download if there is at least one simulation</span>
-    <span class="n">sim_name</span> <span class="o">=</span> <span class="n">simulation_list_widget</span><span class="o">.</span><span class="n">value</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_serialize_network_config</span><span class="p">(</span>
+    <span class="n">log_out</span><span class="p">,</span>
+    <span class="n">sim_data</span><span class="p">,</span>
+    <span class="n">simulation_net_save_widget</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Serialize the network/drives for the currently-selected simulation in the</span>
+<span class="sd">    `simulation_net_save_widget`, and route any output or errors to `log_out`</span>
+<span class="sd">    """</span>
+    <span class="n">sim_name</span> <span class="o">=</span> <span class="n">simulation_net_save_widget</span><span class="o">.</span><span class="n">value</span>
 
     <span class="k">with</span> <span class="n">log_out</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">serialize_config</span><span class="p">(</span><span class="n">sim_data</span><span class="p">,</span> <span class="n">sim_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">serialize_network_config</span><span class="p">(</span><span class="n">sim_data</span><span class="p">,</span> <span class="n">sim_name</span><span class="p">)</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">serialize_config</span><span class="p">(</span><span class="n">simulations_data</span><span class="p">,</span> <span class="n">simulation_name</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">serialize_network_config</span><span class="p">(</span><span class="n">simulations_data</span><span class="p">,</span> <span class="n">simulation_name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Serializes Network configuration data to json."""</span>
 
     <span class="c1"># Get network from data dictionary</span>
@@ -6408,7 +6494,8 @@
     <span class="n">simulation_status_contents</span><span class="p">,</span>
     <span class="n">connectivity_textfields</span><span class="p">,</span>
     <span class="n">viz_manager</span><span class="p">,</span>
-    <span class="n">simulations_list_widget</span><span class="p">,</span>
+    <span class="n">simulation_net_save_widget</span><span class="p">,</span>
+    <span class="n">simulation_output_save_widget</span><span class="p">,</span>
     <span class="n">cell_parameters_widgets</span><span class="p">,</span>
     <span class="n">global_gain_textfields</span><span class="p">,</span>
     <span class="n">opt_solver</span><span class="p">,</span>
@@ -6721,8 +6808,10 @@
                     <span class="k">for</span> <span class="n">sim_name</span> <span class="ow">in</span> <span class="n">simulation_data</span>
                     <span class="k">if</span> <span class="n">simulation_data</span><span class="p">[</span><span class="n">sim_name</span><span class="p">][</span><span class="s2">"net"</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
                 <span class="p">]</span>
-                <span class="n">simulations_list_widget</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">sim_names</span>
-                <span class="n">simulations_list_widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">new_name</span>
+                <span class="n">simulation_net_save_widget</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">sim_names</span>
+                <span class="n">simulation_net_save_widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">new_name</span>
+                <span class="n">simulation_output_save_widget</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">sim_names</span>
+                <span class="n">simulation_output_save_widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">new_name</span>
 
                 <span class="c1"># Report back to the user, now that all simulations/output are</span>
                 <span class="c1"># completed:</span>
@@ -6841,7 +6930,7 @@
             <span class="c1"># optimization run</span>
 
             <span class="c1"># Return both the optimized config and the optimizer results</span>
-            <span class="n">optimized_config</span> <span class="o">=</span> <span class="n">serialize_config</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">new_name</span><span class="p">)</span>
+            <span class="n">optimized_config</span> <span class="o">=</span> <span class="n">serialize_network_config</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">new_name</span><span class="p">)</span>
             <span class="n">opt_result</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s2">"initial_params"</span><span class="p">:</span> <span class="n">optim</span><span class="o">.</span><span class="n">initial_params</span><span class="p">,</span>
                 <span class="s2">"opt_params"</span><span class="p">:</span> <span class="n">optim</span><span class="o">.</span><span class="n">opt_params_</span><span class="p">,</span>
