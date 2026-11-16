@@ -2823,7 +2823,7 @@ def test_spike_train_drive_formats_and_simulation(fix_net_model, request):
     with tempfile.TemporaryDirectory() as tmp_dir:
         # Create dictionary format (Format 1)
         dict_format = {
-            "L2_pyramidal": [10.0, 20.0, 30.0],
+            "L2_pyramidal": [10.0, 30.0, 20.0],  # test unsorted spikes too
             "L5_pyramidal": [15.0, 25.0, 35.0],
         }
 
