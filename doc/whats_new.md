@@ -35,7 +35,7 @@ primarily to communicate that `hnn-core` is, and has been, ready for active use.
 should not be thought of as "still being built". That said, we will still continue to
 improve it and make it easier for our users than ever before!
 
-To be clear, this means the versions go directly from `0.6.1` tot `1.0.0`, and there is
+To be clear, this means the versions go directly from `0.6.1` to `1.0.0`, and there is
 no version `0.7.0`, etc. Please enjoy the numerous additions!
 
 ### New Features
@@ -167,10 +167,56 @@ no version `0.7.0`, etc. Please enjoy the numerous additions!
 
 ### Upcoming Deprecations
 
-- The `postproc` argument of {func}`~hnn_core.simulate_dipole` is now documented as
-  deprecated. Please explicitly use the {meth}`~hnn_core.dipole.Dipole.smooth` and
-  {meth}`~hnn_core.dipole.Dipole.scale` methods after your simulation instead,
-  by [Katharina Duecker][] in {gh}`1343`.
+- **There is now a new, preferred way for you to add the "canonical" ERP drives to your
+  Neymotin 2020 network**: Users are strongly advised to begin using the new argument:
+
+    ```python
+    # use this new argument `add_erp_drives`
+    neymotin_2020_model(add_erp_drives=True)
+    ```
+
+    INSTEAD OF either
+
+    ```python
+    # deprecated
+    neymotin_2020_model(add_drives_from_params=True)
+    ```
+
+    or
+
+    ```python
+    # deprecated
+    net = neymotin_2020_model()
+    add_erp_drives_to_jones_model(net)
+    ```
+
+    Both the argument `neymotin_2020_model(add_drives_from_params=True)` and the
+    function `add_erp_drives_to_jones_model()` will eventually be deprecated and have
+    been marked as such.
+
+    The reasoning for this was that the two deprecated ways to add these drives were
+    slightly different (seed values were different), and that `add_drives_from_params`'s
+    final values required reading a lot of code. You can see all [parameters for the
+    canonical drives easily
+    here](https://github.com/jonescompneurolab/hnn-core/blob/dbf7f94274a01961f3e11cc58c193cc4777861b5/hnn_core/network_models.py#L430).
+
+    The only exception to using the new `neymotin_2020_model(add_erp_drives=True)`
+    argument is if you are still using `legacy_mode=True`. If you still need
+    `legacy_mode`, then you must continue using `add_drives_from_params`, though
+    `legacy_mode` is planned to be deprecated as well in the future.
+
+    This same argument has been added to `jones_2009_model(add_erp_drives=True)` for
+    backwards compatibility, though we recommend users switch from `jones_2009_model()`
+    to `neymotin_2020_model()`.
+
+    Relatedly, the new `duecker_ET_model` also has an argument of the same name
+    (`duecker_ET_model(add_erp_drives=True)`) for adding its canonical ERP drives,
+    however be advised that its ERP drives are very different than that of
+    `neymotin_2020_model`, and you can read about them at [the Duecker preprint
+    here](https://doi.org/10.64898/2026.10.29.762964).
+    By [Austin E. Soplata][] and [Sourav Rajvi][] in {gh}`1340`.
+
+
 - `Network.set_cell_positions` has been renamed to
   `Network.update_cell_positions`. Now, if you want to change where the cell
   positions are to new values, use `Network.update_cell_positions`, and if you
@@ -178,6 +224,11 @@ no version `0.7.0`, etc. Please enjoy the numerous additions!
   `Network.update_cell_positions` calls, you can use
   `Network._reset_to_original_cell_positions`.
   By [Katharina Duecker][], [Nick Tolley][], and [Austin E. Soplata][] in {gh}`1227`.
+
+- The `postproc` argument of {func}`~hnn_core.simulate_dipole` is now documented as
+  deprecated. Please explicitly use the {meth}`~hnn_core.dipole.Dipole.smooth` and
+  {meth}`~hnn_core.dipole.Dipole.scale` methods after your simulation instead,
+  by [Katharina Duecker][] in {gh}`1343`.
 
 ### Public API Changes
 
