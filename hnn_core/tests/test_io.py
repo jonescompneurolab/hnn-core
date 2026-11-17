@@ -417,6 +417,30 @@ def test_network_serialization_metadata(fix_net_neymotin_2020, tmp_path):
     assert net_loaded.cell_types["L2_pyramidal"]["cell_metadata"]["layer"] == "2"
 
 
+def test_read_spike_train_drive_configuration(tmp_path):
+    """Spike-train drives written to JSON reload without KeyError."""
+    net = hnn_core.jones_2009_model(mesh_shape=(3, 3))
+    spike_data = {"cell_a": [10.0, 20.0], "cell_b": [15.0, 25.0]}
+    net.add_spike_train_drive(
+        "spk_drive",
+        spike_data=spike_data,
+        location="proximal",
+        weights_ampa={"L2_pyramidal": 0.05},
+        conn_seed=7,
+    )
+    json_path = tmp_path / "net_spike_train.json"
+    write_network_configuration(net, json_path)
+    net_loaded = read_network_configuration(json_path)
+
+    assert "spk_drive" in net_loaded.external_drives
+    loaded = net_loaded.external_drives["spk_drive"]
+    saved = net.external_drives["spk_drive"]
+    assert loaded["type"] == "spike_train"
+    assert loaded["dynamics"]["times"] == saved["dynamics"]["times"]
+    assert loaded["dynamics"]["gids"] == saved["dynamics"]["gids"]
+    assert loaded["n_drive_cells"] == saved["n_drive_cells"]
+
+
 def test_read_run_tutorial_json():
     """Test that the first tutorial Network for ERP can be loaded and ran without error."""
     net_url = (

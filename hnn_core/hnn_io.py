@@ -242,6 +242,19 @@ def _set_from_cell_specific(drive_data):
     return drive_data["n_drive_cells"]
 
 
+def _spike_data_from_saved_dynamics(drive_data):
+    """Build spike_data for add_spike_train_drive from serialized dynamics."""
+    dynamics = drive_data["dynamics"]
+    source_map = drive_data.get("source_to_gid_map")
+    if source_map:
+        gid_to_source = {gid: src for src, gid in source_map.items()}
+        spike_data = {src: [] for src in source_map}
+        for spike_time, gid in zip(dynamics["times"], dynamics["gids"]):
+            spike_data[gid_to_source[gid]].append(spike_time)
+        return spike_data
+    return list(zip(dynamics["times"], dynamics["gids"]))
+
+
 def _read_external_drive(net, drive_data, read_output):
     """Adds drives encoded in json data to a Network"""
 
@@ -296,6 +309,17 @@ def _read_external_drive(net, drive_data, read_output):
             synaptic_delays=drive_data["synaptic_delays"],
             probability=drive_data["probability"],
             event_seed=drive_data["event_seed"],
+            conn_seed=drive_data["conn_seed"],
+        )
+    elif drive_data["type"] == "spike_train":
+        net.add_spike_train_drive(
+            name=drive_data["name"],
+            spike_data=_spike_data_from_saved_dynamics(drive_data),
+            location=drive_data["location"],
+            weights_ampa=drive_data["weights_ampa"],
+            weights_nmda=drive_data["weights_nmda"],
+            synaptic_delays=drive_data["synaptic_delays"],
+            probability=drive_data["probability"],
             conn_seed=drive_data["conn_seed"],
         )
 
