@@ -6,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>hnn_core.dipole &#8212; hnn-core 0.6.2.dev0 documentation</title>
+    <title>hnn_core.dipole &#8212; hnn-core 1.0.0 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../_static/documentation_options.js?v=debdd0a9"></script>
+    <script src="../../_static/documentation_options.js?v=8d563738"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -47,7 +47,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.24.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '1.0.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -58,7 +58,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.6.2.dev0" />
+  <meta name="docsearch:version" content="1.0.0" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -141,8 +141,8 @@
       
     
     
-    <img src="../../_static/hnn-medium.png" class="logo__image only-light" alt="hnn-core 0.6.2.dev0 documentation - Home"/>
-    <img src="../../_static/hnn-medium.png" class="logo__image only-dark pst-js-only" alt="hnn-core 0.6.2.dev0 documentation - Home"/>
+    <img src="../../_static/hnn-medium.png" class="logo__image only-light" alt="hnn-core 1.0.0 documentation - Home"/>
+    <img src="../../_static/hnn-medium.png" class="logo__image only-dark pst-js-only" alt="hnn-core 1.0.0 documentation - Home"/>
   
   
 </a></div>
@@ -997,6 +997,9 @@
 <span class="sd">    independently. `Dipole` will use the correct version of the function based on</span>
 <span class="sd">    `Network._model_variant`.</span>
 
+<span class="sd">    Details of this baseline correction can be found in Duecker et al. (preprint at [1]_</span>
+<span class="sd">    , publication pending).</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    dpl : Dipole</span>
@@ -1005,6 +1008,13 @@
 <span class="sd">        Number of cells in the network along the x-axis (assuming a grid)</span>
 <span class="sd">    N_pyr_y : int</span>
 <span class="sd">        Number of cells in the network along the y-axis (assuming a grid)</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Duecker, Katharina, et al. "Next generation Human Neocortical Neurosolver</span>
+<span class="sd">           model with biophysically realistic somatic, dendritic and synaptic dynamics."</span>
+<span class="sd">           bioRxiv (2026) 2026.10.29.762964; doi:</span>
+<span class="sd">           https://doi.org/10.64898/2026.10.29.762964</span>
 <span class="sd">    """</span>
 
     <span class="c1"># exponential decay function</span>

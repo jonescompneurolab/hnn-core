@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Contributing Guide &#8212; hnn-core 0.6.2.dev0 documentation</title>
+    <title>Contributing Guide &#8212; hnn-core 1.0.0 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="_static/documentation_options.js?v=debdd0a9"></script>
+    <script src="_static/documentation_options.js?v=8d563738"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,7 +48,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.24.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '1.0.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -60,7 +60,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.6.2.dev0" />
+  <meta name="docsearch:version" content="1.0.0" />
   
     
     <script src="_static/searchtools.js"></script>
@@ -143,8 +143,8 @@
       
     
     
-    <img src="_static/hnn-medium.png" class="logo__image only-light" alt="hnn-core 0.6.2.dev0 documentation - Home"/>
-    <img src="_static/hnn-medium.png" class="logo__image only-dark pst-js-only" alt="hnn-core 0.6.2.dev0 documentation - Home"/>
+    <img src="_static/hnn-medium.png" class="logo__image only-light" alt="hnn-core 1.0.0 documentation - Home"/>
+    <img src="_static/hnn-medium.png" class="logo__image only-dark pst-js-only" alt="hnn-core 1.0.0 documentation - Home"/>
   
   
 </a></div>
@@ -1292,8 +1292,8 @@ network’s <a class="reference internal" href="generated/hnn_core.CellResponse.
 <p>It is important that <code class="docutils literal notranslate"><span class="pre">flush()</span></code> is used whenever data is written to stdin or stderr to
 ensure that the signal will immediately be available for reading by the other side.</p>
 </section>
-<section id="making-changes-to-the-default-network">
-<h2>Making changes to the default network<a class="headerlink" href="#making-changes-to-the-default-network" title="Link to this heading">#</a></h2>
+<section id="making-changes-to-the-default-network-neymotin-2020">
+<h2>Making changes to the default network (Neymotin 2020)<a class="headerlink" href="#making-changes-to-the-default-network-neymotin-2020" title="Link to this heading">#</a></h2>
 <p>If you ever need to make scientific or technical changes to the default network
 (i.e. the <code class="docutils literal notranslate"><span class="pre">neymotin_2020_model</span></code> network), you need to do three things:</p>
 <ol class="arabic">
@@ -1318,6 +1318,24 @@ manual changes to this file; running the above command is sufficient. However, y
 <li><p>Step 3: Once you’ve updated the network using the command above, make sure to re-run
 all the tests using <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">test</span></code>! If the new network file breaks tests, then that
 breakage needs to be fixed before we can merge your updates.</p></li>
+</ol>
+</section>
+<section id="making-changes-to-the-new-duecker-network">
+<h2>Making changes to the new Duecker network<a class="headerlink" href="#making-changes-to-the-new-duecker-network" title="Link to this heading">#</a></h2>
+<p>If, over the course of peer-review, the Duecker model <code class="docutils literal notranslate"><span class="pre">duecker_ET_model</span></code> parameters need
+to be updated (either the network itself or the drives of <code class="docutils literal notranslate"><span class="pre">add_erp_drives=True</span></code>), then
+we need to overwrite the locally-stored “ground truth” data that we use for testing the
+Duecker model. This requires two steps:</p>
+<ol class="arabic">
+<li><p>Run the following command from the top-level of the repository:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">regenerate</span><span class="o">-</span><span class="n">duecker</span><span class="o">-</span><span class="n">test</span><span class="o">-</span><span class="n">data</span>
+</pre></div>
+</div>
+</li>
+<li><p>Once you’ve updated the ground-truth data using the command above, make sure to
+re-run all the tests using <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">test</span></code>! The tests that were previously breaking
+(probably <code class="docutils literal notranslate"><span class="pre">test_parallel_backends.py::test_compare_duecker_model_output</span></code>) should now
+pass.</p></li>
 </ol>
 </section>
 <section id="publishing-new-releases">
@@ -1402,7 +1420,8 @@ the tests are first failing.</p></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notes-on-mpi-for-contributors">Notes on MPI for contributors</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#making-changes-to-the-default-network">Making changes to the default network</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#making-changes-to-the-default-network-neymotin-2020">Making changes to the default network (Neymotin 2020)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#making-changes-to-the-new-duecker-network">Making changes to the new Duecker network</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#publishing-new-releases">Publishing new releases</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tips-tricks">Tips &amp; Tricks</a></li>
 </ul>
