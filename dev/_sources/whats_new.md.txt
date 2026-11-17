@@ -28,7 +28,7 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ## 1.0.0 Release Notes
 
-Despite this version of `hnn-core` being marked as version `1.0.0`, this software
+Despite this version of `hnn-core` being marked as version `1.0.0`, this software 
 package has been stable for several years and is actively being used by many
 different scientists for ongoing research. We decided to release this as version `1.0.0`
 primarily to communicate that `hnn-core` is, and has been, ready for active use. It
