@@ -163,7 +163,7 @@ if __name__ == "__main__":
             "notebook <= 7.6.4",
             "numpy >=1.14, <= 2.4.6",
             "scipy <= 1.17.1",
-            'NEURON >=7.7, <=9.1.0; platform_system != "Windows"',
+            'NEURON >=7.7, <=9.0.2; platform_system != "Windows"',
         ],
         extras_require=extras,
         python_requires=">=3.9, <3.15",
