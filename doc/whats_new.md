@@ -121,6 +121,13 @@ no version `0.7.0`, etc. Please enjoy the numerous additions!
   by NEURON. This still relies on the old "legacy params" interface, so if you are
   interested in using this, please reach out to us on [our Github Discussions page][].
 
+- GUI buttons for saving simulated Networks or simulated dipole output data have been
+  overhauled. In the GUI Simulation tab, each of the "Save Network and Drives" and "Save
+  Simulation Output" buttons now have their own respective dropdowns for which
+  simulation you want to save. This also adds the functionality to save PRIOR simulated
+  networks from the GUI, which was not possible before!
+  By [Dylan Daniels][] in {gh}`1399`.
+
 ### Deprecations
 
 - (Breaking change) `BatchSimulate` now expects the `set_params` callback to accept
@@ -215,7 +222,6 @@ no version `0.7.0`, etc. Please enjoy the numerous additions!
     `neymotin_2020_model`, and you can read about them at [the Duecker preprint
     here](https://doi.org/10.64898/2026.10.29.762964).
     By [Austin E. Soplata][] and [Sourav Rajvi][] in {gh}`1340`.
-
 
 - `Network.set_cell_positions` has been renamed to
   `Network.update_cell_positions`. Now, if you want to change where the cell
@@ -325,6 +331,12 @@ no version `0.7.0`, etc. Please enjoy the numerous additions!
 
 ### Bug Fixes
 
+- The notorious `MPITimeout` errors should now be a thing of the past and no longer
+  happen! Document and remove problematic MPI Timeouts (while keeping code intact), and
+  implement a new tempfile-based mechanism for transmitting MPI data from child
+  processes back to rank 0 child process then parent process, by [Camilo Diaz][] in
+  {gh}`1312` and {gh}`1315`.
+
 - User-facing deprecation notices now emit `FutureWarning` instead of
   `DeprecationWarning`, making them visible under Python's default warning filters,
   by [William Kang][] in {gh}`1339`. This was their first PR, thanks William!
@@ -412,11 +424,6 @@ no version `0.7.0`, etc. Please enjoy the numerous additions!
 
 - Easier optimization custom function usage
   by [Vaishnavi Baghel][] in {gh}`1271`.
-
-- Document and remove problematic MPI Timeouts (while keeping code intact), and
-  implement a new tempfile-based mechanism for transmitting MPI data from child
-  processes back to rank 0 child process then parent process,
-  by [Camilo Diaz][] in {gh}`1312` and {gh}`1315`.
 
 - Improve y-axis labels (depth units) and ticks of LFP and CSD plotting,
   by [Shivansh Bhageria][] in {gh}`1191`. This was their first PR, thanks Shivansh!
