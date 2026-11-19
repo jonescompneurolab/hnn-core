@@ -492,6 +492,9 @@ def _correct_baseline_dueckerET(dpl, N_pyr_x, N_pyr_y):
     independently. `Dipole` will use the correct version of the function based on
     `Network._model_variant`.
 
+    Details of this baseline correction can be found in Duecker et al. (preprint at [1]_
+    , publication pending).
+
     Parameters
     ----------
     dpl : Dipole
@@ -500,6 +503,13 @@ def _correct_baseline_dueckerET(dpl, N_pyr_x, N_pyr_y):
         Number of cells in the network along the x-axis (assuming a grid)
     N_pyr_y : int
         Number of cells in the network along the y-axis (assuming a grid)
+
+    References
+    ----------
+    .. [1] Duecker, Katharina, et al. "Next generation Human Neocortical Neurosolver
+           model with biophysically realistic somatic, dendritic and synaptic dynamics."
+           bioRxiv (2026) 2026.10.29.762964; doi:
+           https://doi.org/10.64898/2026.10.29.762964
     """
 
     # exponential decay function

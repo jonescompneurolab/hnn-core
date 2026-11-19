@@ -548,8 +548,19 @@ def _get_basket_soma(v_init=NEYMOTIN_V_INIT["L2_basket"]["soma"]):
 def _get_interneuron_soma(cell_name, v_init=-69):
     """Create Duecker-only interneuron soma Sections.
 
-    These values were taken from (Chamberland et al., 2023)
-    https://doi.org/10.1016/j.neuron.2023.01.017
+    These values were taken from Chamberland et al [1]_ and used in Duecker et
+    al. (preprint available at [2]_ , publication forthcoming).
+
+    References
+    ----------
+    .. [1] Chamberland, Siman et al. "Brief synaptic inhibition persistently interrupts
+           firing of fast-spiking interneurons." Neuron (2023) Volume 111, Issue 8,
+           pages 1264-1281. doi: https://doi.org/10.1016/j.neuron.2023.01.017
+
+    .. [2] Duecker, Katharina, et al. "Next generation Human Neocortical Neurosolver
+           model with biophysically realistic somatic, dendritic and synaptic dynamics."
+           bioRxiv (2026) 2026.10.29.762964; doi:
+           https://doi.org/10.64898/2026.10.29.762964
     """
     end_pts = [[0, 0, 0], [0, 0, 20.0]]
     return Section(L=20.0, diam=20.0, cm=1, Ra=200.0, end_pts=end_pts, v0=v_init)
@@ -566,7 +577,7 @@ def _get_syn_props(p_all, cell_type, syn_types=["ampa", "nmda", "gabaa", "gabab"
     the value being the name of the custom mechanism.
 
     This was formerly called `_get_pyr_syn_props`, but `_pyr` was dropped from name due
-    to this function's future usage by interneurons in the upcoming Duecker model.
+    to this function's future usage by interneurons in the upcoming Duecker model [1]_ .
 
     Parameters
     ----------
@@ -589,6 +600,13 @@ def _get_syn_props(p_all, cell_type, syn_types=["ampa", "nmda", "gabaa", "gabab"
         e.g., 'Exp2Syn'). For `Exp2Syn` synapses, includes 'e' (reversal potential),
         'tau1' (rise time constant), and 'tau2' (decay time constant). Custom synapse
         mechanisms may include additional parameters specific to that mechanism.
+
+    References
+    ----------
+    .. [1] Duecker, Katharina, et al. "Next generation Human Neocortical Neurosolver
+           model with biophysically realistic somatic, dendritic and synaptic dynamics."
+           bioRxiv (2026) 2026.10.29.762964; doi:
+           https://doi.org/10.64898/2026.10.29.762964
     """
     syn_props = dict()
     for syn in syn_types:
@@ -858,6 +876,9 @@ def pyramidal_ca(cell_name, pos, override_params=None, gid=None):
 def pyramidal_humanL5ET(cell_name, pos=(0, 0, 0), gid=None):
     """Create a Cell object of a human extra-telencephalic-projecting L5Pyr pyramidal neuron (developed for duecker_ET_model).
 
+    Details of this cell can be found in Duecker et al. (preprint at [1]_ , publication
+    pending).
+
     Parameters
     ----------
     cell_name : str
@@ -866,6 +887,13 @@ def pyramidal_humanL5ET(cell_name, pos=(0, 0, 0), gid=None):
         Coordinates of cell soma in xyz-space
     gid : int or None (optional)
         The unique, "global ID" (GID) of the cell.
+
+    References
+    ----------
+    .. [1] Duecker, Katharina, et al. "Next generation Human Neocortical Neurosolver
+           model with biophysically realistic somatic, dendritic and synaptic dynamics."
+           bioRxiv (2026) 2026.10.29.762964; doi:
+           https://doi.org/10.64898/2026.10.29.762964
     """
 
     p_all = get_L5PyrET_params()
@@ -1080,6 +1108,9 @@ def pyramidal_humanL5ET(cell_name, pos=(0, 0, 0), gid=None):
 def pyramidal_humanL23(cell_name, pos=(0, 0, 0), gid=None):
     """Create a Cell object of a human L2/3 pyramidal neuron (developed for duecker_ET_model).
 
+    Details of this cell can be found in Duecker et al. (preprint at [1]_ , publication
+    pending).
+
     Parameters
     ----------
     cell_name : str
@@ -1088,6 +1119,13 @@ def pyramidal_humanL23(cell_name, pos=(0, 0, 0), gid=None):
         Coordinates of cell soma in xyz-space
     gid : int or None (optional)
         The unique, "global ID" (GID) of the cell.
+
+    References
+    ----------
+    .. [1] Duecker, Katharina, et al. "Next generation Human Neocortical Neurosolver
+           model with biophysically realistic somatic, dendritic and synaptic dynamics."
+           bioRxiv (2026) 2026.10.29.762964; doi:
+           https://doi.org/10.64898/2026.10.29.762964
     """
 
     p_all = get_L2Pyrhuman_params()
@@ -1275,7 +1313,9 @@ def pyramidal_humanL23(cell_name, pos=(0, 0, 0), gid=None):
 def human_gen_interneuron(cell_name, pos=(0, 0, 0), layer=2, gid=None):
     """Create a Cell object of a "human generic interneuron" tuned to dynamics of aspiny human cells.
 
-    Stands in for both Parvalbumin+ and Somatostatin+ cells in duecker_ET_model.
+    Stands in for both Parvalbumin+ and Somatostatin+ cells in duecker_ET_model. Details
+    of this cell can be found in Duecker et al. (preprint at [1]_ , publication
+    pending).
 
     Parameters
     ----------
@@ -1285,6 +1325,13 @@ def human_gen_interneuron(cell_name, pos=(0, 0, 0), layer=2, gid=None):
         Coordinates of cell soma in xyz-space
     gid : int or None (optional)
         The unique, "global ID" (GID) of the cell.
+
+    References
+    ----------
+    .. [1] Duecker, Katharina, et al. "Next generation Human Neocortical Neurosolver
+           model with biophysically realistic somatic, dendritic and synaptic dynamics."
+           bioRxiv (2026) 2026.10.29.762964; doi:
+           https://doi.org/10.64898/2026.10.29.762964
     """
 
     p_all = get_Int_params()

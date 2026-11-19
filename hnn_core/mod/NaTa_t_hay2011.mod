@@ -1,5 +1,5 @@
 :Reference :Colbert and Pan 2002, from Hay et al., 2011 PLOS Comp Bio, https://doi.org/10.1371/journal.pcbi.1002107
-:Comment : corrected rates using q10 = 2.3, target temperature 37 (K. Duecker for duecker_ET_model, fast L5 ET pyr APs), orginal 21
+:Comment : corrected rates using q10 = 2.3, target temperature 37 (K. Duecker for duecker_ET_model, fast L5 ET pyr APs), orginal 21 (Duecker et al., 2026 biorxiv https://doi.org/10.64898/2026.10.29.762964 )
 NEURON	{
 	SUFFIX NaTa_t_hay2011
 	USEION na READ ena WRITE ina

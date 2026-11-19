@@ -367,11 +367,9 @@ def _drive_cell_event_times(
         # Extract only spikes from this drive cell GID
         if times and gids:
             mask = np.array(gids) == drive_cell_gid
-            cell_event_times = np.array(times)[mask].tolist()
+            event_times = np.array(times)[mask]
         else:
-            cell_event_times = []
-
-        return cell_event_times
+            event_times = np.array([])
 
     # brute force remove non-zero times. Might result in fewer vals
     # than desired

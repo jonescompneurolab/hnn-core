@@ -1,52 +1,54 @@
 # Authors: Huzi Cheng <hzcheng15@icloud.com>
 #          Camilo Diaz <camilo_diaz@brown.edu>
 #          George Dang <george_dang@brown.edu>
+import base64
 import codecs
 import io
-import os
 import json
 import logging
+import os
+import re
 import sys
 import tempfile
 import time
 from pathlib import Path
 from urllib.request import urlretrieve
 
-from IPython.display import IFrame
-from ipywidgets import Tab, Text, link
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 import traitlets
+from IPython.display import IFrame
+from ipywidgets import Tab, Text, link
 
 import hnn_core
 from hnn_core import Dipole, Network, simulate_dipole
 from hnn_core.gui import HNNGUI
+from hnn_core.gui._data_store import data_store
 from hnn_core.gui._viz_manager import (
     _COMPARISON_TEXT_GID,
-    _idx2figname,
-    _plot_types,
-    _no_overlay_plot_types,
-    unlink_relink,
     _experimental_data_templates,
+    _idx2figname,
+    _no_overlay_plot_types,
+    _plot_types,
+    unlink_relink,
 )
 from hnn_core.gui.gui import (
     _GUI_PrintToLogger,
     _init_network_from_widgets,
     _simulate_prepare_upload_file,
     _update_nested_dict,
-    serialize_simulation,
-    serialize_config,
+    serialize_network_config,
+    serialize_simulation_output,
 )
-from hnn_core.network import pick_connection, _compare_lists
-from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 from hnn_core.hnn_io import (
     dict_to_network,
     read_network_configuration,
     write_network_configuration,
 )
-from hnn_core.gui._data_store import data_store
+from hnn_core.network import _compare_lists, pick_connection
+from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 
 matplotlib.use("agg")
 hnn_core_root = Path(hnn_core.__file__).parent
@@ -828,22 +830,22 @@ def test_gui_spectrogram_trial_averaging(setup_reduced_gui):
     gui._simulate_viz_action("switch_fig_template", "[Blank] single figure")
     gui._simulate_viz_action("add_fig")
 
-    figid = gui.viz_manager.fig_idx["idx"] - 1
-    figname = f"Figure {figid}"
-    axname = "ax0"
+    fig_id = gui.viz_manager.fig_idx["idx"] - 1
+    fig_name = f"Figure {fig_id}"
+    ax_name = "ax0"
 
     spectrograms = {}
 
     for sim_name, _ in simulations:
         # clear axis first and then plot the spectrogram
         gui._simulate_viz_action(
-            "edit_figure", figname, axname, sim_name, "spectrogram", {}, "clear"
+            "edit_axis", fig_name, ax_name, sim_name, "spectrogram", {}, "clear"
         )
         gui._simulate_viz_action(
-            "edit_figure", figname, axname, sim_name, "spectrogram", {}, "plot"
+            "edit_axis", fig_name, ax_name, sim_name, "spectrogram", {}, "plot"
         )
 
-        fig = gui.viz_manager.figs[figid]
+        fig = gui.viz_manager.figs[fig_id]
         ax = fig.axes[0]
 
         spectrograms[sim_name] = ax.collections[0].get_array().copy()
@@ -1017,55 +1019,55 @@ def test_gui_visualization(setup_reduced_gui):
 
     gui._simulate_viz_action("switch_fig_template", "[Blank] single figure")
     gui._simulate_viz_action("add_fig")
-    figid = 2
-    figname = f"Figure {figid}"
-    axname = "ax0"
+    fig_id = 2
+    fig_name = f"Figure {fig_id}"
+    ax_name = "ax0"
 
     for viz_type in _plot_types:
         gui._simulate_viz_action(
-            "edit_figure", figname, axname, "default", viz_type, {}, "clear"
+            "edit_axis", fig_name, ax_name, "default", viz_type, {}, "clear"
         )
         # Check that extra axes have been successfully removed
-        assert len(gui.viz_manager.figs[figid].axes) == 1
+        assert len(gui.viz_manager.figs[fig_id].axes) == 1
         # Check if data on the axes has been successfully cleared
-        assert not gui.viz_manager.figs[figid].axes[0].has_data()
+        assert not gui.viz_manager.figs[fig_id].axes[0].has_data()
 
         gui._simulate_viz_action(
-            "edit_figure", figname, axname, "default", viz_type, {}, "plot"
+            "edit_axis", fig_name, ax_name, "default", viz_type, {}, "plot"
         )
         # Check if data is plotted on the axes
-        assert gui.viz_manager.figs[figid].axes[0].has_data()
+        assert gui.viz_manager.figs[fig_id].axes[0].has_data()
 
         if viz_type == "input histogram":
             # Check if the correct number of axes are present
             # "input histogram" is a special case due to "plot_spikes_hist"
             # using 2 axes
-            assert len(gui.viz_manager.figs[figid].axes) == 2
+            assert len(gui.viz_manager.figs[fig_id].axes) == 2
         elif viz_type == "spectrogram":
             # make sure the colorbar is correctly added
             assert (
-                any(["_cbar-ax-" in attr for attr in dir(gui.viz_manager.figs[figid])])
+                any(["_cbar-ax-" in attr for attr in dir(gui.viz_manager.figs[fig_id])])
                 is True
             )
-            assert len(gui.viz_manager.figs[figid].axes) == 2
+            assert len(gui.viz_manager.figs[fig_id].axes) == 2
 
             # make sure the colorbar is safely removed
             gui._simulate_viz_action(
-                "edit_figure", figname, axname, "default", "spectrogram", {}, "clear"
+                "edit_axis", fig_name, ax_name, "default", "spectrogram", {}, "clear"
             )
             assert (
-                any(["_cbar-ax-" in attr for attr in dir(gui.viz_manager.figs[figid])])
+                any(["_cbar-ax-" in attr for attr in dir(gui.viz_manager.figs[fig_id])])
                 is False
             )
-            assert len(gui.viz_manager.figs[figid].axes) == 1
-            assert not gui.viz_manager.figs[figid].axes[0].has_data()
+            assert len(gui.viz_manager.figs[fig_id].axes) == 1
+            assert not gui.viz_manager.figs[fig_id].axes[0].has_data()
 
             # Test that frequency inversion works
             # First, test no inversion
             gui._simulate_viz_action(
-                "edit_figure",
-                figname,
-                axname,
+                "edit_axis",
+                fig_name,
+                ax_name,
                 "default",
                 "spectrogram",
                 {
@@ -1074,16 +1076,16 @@ def test_gui_visualization(setup_reduced_gui):
                 },
                 "plot",
             )
-            assert gui.viz_manager.figs[figid].axes[0].has_data()
+            assert gui.viz_manager.figs[fig_id].axes[0].has_data()
             gui._simulate_viz_action(
-                "edit_figure", figname, axname, "default", "spectrogram", {}, "clear"
+                "edit_axis", fig_name, ax_name, "default", "spectrogram", {}, "clear"
             )
-            assert not gui.viz_manager.figs[figid].axes[0].has_data()
+            assert not gui.viz_manager.figs[fig_id].axes[0].has_data()
             # Next, test inversion
             gui._simulate_viz_action(
-                "edit_figure",
-                figname,
-                axname,
+                "edit_axis",
+                fig_name,
+                ax_name,
                 "default",
                 "spectrogram",
                 {
@@ -1092,11 +1094,11 @@ def test_gui_visualization(setup_reduced_gui):
                 },
                 "plot",
             )
-            assert gui.viz_manager.figs[figid].axes[0].has_data()
+            assert gui.viz_manager.figs[fig_id].axes[0].has_data()
 
         else:
             # Check if the correct number of axes are present
-            assert len(gui.viz_manager.figs[figid].axes) == 1
+            assert len(gui.viz_manager.figs[fig_id].axes) == 1
 
     plt.close("all")
 
@@ -1114,22 +1116,22 @@ def test_dipole_data_overlay(setup_reduced_gui):
     gui._simulate_upload_experimental_data(file_path)
 
     # Edit the figure with data overlay
-    figid = 1
-    figname = f"Figure {figid}"
-    axname = "ax1"
+    fig_id = 1
+    fig_name = f"Figure {fig_id}"
+    ax_name = "ax1"
     gui._simulate_viz_action(
-        "edit_figure", figname, axname, "default", "current dipole", {}, "clear"
+        "edit_axis", fig_name, ax_name, "default", "current dipole", {}, "clear"
     )
     gui._simulate_viz_action(
-        "edit_figure",
-        figname,
-        axname,
+        "edit_axis",
+        fig_name,
+        ax_name,
         "default",
         "current dipole",
         {"data_to_compare": "test_default"},
         "plot",
     )
-    ax = gui.viz_manager.figs[figid].axes[1]
+    ax = gui.viz_manager.figs[fig_id].axes[1]
 
     # Check number of lines
     # 2 trials, 1 average, 2 experimental overlays, plus 2 dashed vertical
@@ -1148,15 +1150,209 @@ def test_dipole_data_overlay(setup_reduced_gui):
     comparison_text = comparison_texts[0]
     assert "RMSE(default, test_default):" in comparison_text.get_text()
     assert "Corr(default, test_default):" in comparison_text.get_text()
-    # text sits at the bottom right of the axes, not at a drive arrow location
+    # text sits at the bottom right of the axes
     assert comparison_text.xycoords == "axes fraction"
     assert comparison_text.xy == (0.95, 0.05)
-    # TODO AES: Temporarily removing dipole arrows tests until bugs fixed
-    # # no arrow carries the comparison text
-    # arrows = [t for t in ax.texts if t is not comparison_text]
-    # assert len(arrows) > 0
-    # assert all("RMSE" not in t.get_text() for t in arrows)
-    # assert all("Corr" not in t.get_text() for t in arrows)
+    # Drive arrows were removed from GUI dipole plots (#1387); remaining texts
+    # must not carry the comparison metrics.
+    other_texts = [t for t in ax.texts if t is not comparison_text]
+    assert all("RMSE" not in t.get_text() for t in other_texts)
+    assert all("Corr" not in t.get_text() for t in other_texts)
+
+    plt.close("all")
+
+
+def test_data_figure_add_simulation(setup_reduced_gui):
+    """Adding a simulation to existing experimental figure plots the simulation (#1389)."""
+    gui = setup_reduced_gui
+
+    # First, run a sim and create the first figure that will plot the sime
+    gui.widget_ntrials.value = 2
+    gui.run_button.click()
+
+    # Secondly, load data, creating a second figure of that data:
+    file_path = assets_path / "test_default.csv"
+    gui._simulate_upload_experimental_data(file_path)
+
+    # On the second figure (experimental data), grab how many lines are present:
+    fig_id = 2
+    fig_name = f"Figure {fig_id}"
+    ax_name = "ax0"
+    ax0 = gui.viz_manager.figs[fig_id].axes[0]
+    n_lines_initial = len(ax0.lines)
+
+    # Now, add the simulation data to the second figure (experimental data):
+    gui._simulate_viz_action(
+        "edit_axis",
+        fig_name,
+        ax_name,
+        "default",
+        "current dipole",
+        {},
+        "clear",
+    )
+    gui._simulate_viz_action(
+        "edit_axis",
+        fig_name,
+        ax_name,
+        "default",
+        "current dipole",
+        {
+            "dipole_smooth": gui.widget_default_smoothing.value,
+            "dipole_scaling": gui.widget_default_scaling.value,
+            "data_to_compare": "test_default",
+        },
+        "plot",
+    )
+
+    # There should now be additional datasets / lines
+    assert len(ax0.lines) > n_lines_initial
+
+    # Get the simulation data from the second figure. Note that simulation data is
+    # always plotted first before experimental data, if both are plotted, so it's the
+    # first line:
+    sim_data_overlaid = ax0.lines[0].get_ydata()
+
+    # Check that the simulation data from the second figure matches the simulation data
+    # from the first figure:
+    assert np.allclose(
+        sim_data_overlaid, gui.viz_manager.figs[1].axes[1].lines[0].get_ydata()
+    )
+
+    # Ensure that the legend includes the simulated data in the new second figure:
+    labels = [t.get_text() for t in ax0.legend_.texts]
+    assert any(
+        label.startswith("default") and not label.startswith("test_default")
+        for label in labels
+    )
+
+    plt.close("all")
+
+
+def test_data_figure_add_simulation_respects_data_scaling(setup_reduced_gui):
+    """Simulation smooth/scale must not alter the existing experimental trace (#1389)."""
+    gui = setup_reduced_gui
+
+    # First, run a sim and create the first figure that will plot the sime
+    gui.widget_ntrials.value = 2
+    gui.run_button.click()
+
+    # Secondly, load data, creating a second figure of that data:
+    file_path = assets_path / "test_default.csv"
+    gui._simulate_upload_experimental_data(file_path)
+
+    # On the second figure (experimental data), grab lines and data present:
+    fig_id = 2
+    fig_name = f"Figure {fig_id}"
+    ax_name = "ax0"
+    ax0 = gui.viz_manager.figs[fig_id].axes[0]
+    n_lines_initial = len(ax0.lines)
+    exp_data_initial = ax0.lines[0].get_ydata().copy()
+
+    # Now, add the simulation data to the second figure (experimental data), with
+    # heterogeneous scaling/smoothing:
+    gui._simulate_viz_action(
+        "edit_axis",
+        fig_name,
+        ax_name,
+        "default",
+        "current dipole",
+        {},
+        "clear",
+    )
+    gui._simulate_viz_action(
+        "edit_axis",
+        fig_name,
+        ax_name,
+        "default",
+        "current dipole",
+        {
+            "dipole_smooth": gui.widget_default_smoothing.value,
+            "dipole_scaling": 0.0,  # Sim scaling is changed from default 3000
+            "data_smooth": 0.0,
+            "data_scaling": 1.0,
+            "data_to_compare": "test_default",
+        },
+        "plot",
+    )
+
+    # There should now be additional datasets / lines
+    assert len(ax0.lines) > n_lines_initial
+
+    # Check that the experimental data has not been altered by the simulation
+    # scaling/smoothing:
+    assert np.allclose(exp_data_initial, ax0.lines[3].get_ydata())
+
+    # Ensure that the legend includes the simulated data in the new second figure:
+    labels = [t.get_text() for t in ax0.legend_.texts]
+    assert any(
+        label.startswith("default") and not label.startswith("test_default")
+        for label in labels
+    )
+
+    plt.close("all")
+
+
+def test_clear_axis_add_experimental_only(setup_reduced_gui):
+    """After Clear axis, Add plot with Simulation Data=None still plots experimental data."""
+    gui = setup_reduced_gui
+
+    # First, run a sim and create the first figure that will plot the sime
+    gui.widget_ntrials.value = 2
+    gui.run_button.click()
+
+    # Secondly, load data, creating a second figure of that data:
+    file_path = assets_path / "test_default.csv"
+    gui._simulate_upload_experimental_data(file_path)
+
+    # On the second figure (experimental data), grab lines and data present:
+    fig_id = 2
+    fig_name = f"Figure {fig_id}"
+    ax_name = "ax0"
+    ax0 = gui.viz_manager.figs[fig_id].axes[0]
+    n_lines_initial = len(ax0.lines)
+    exp_data_initial = ax0.lines[0].get_ydata().copy()
+
+    # Now, add the simulation data to the second figure (experimental data), with
+    # heterogeneous scaling/smoothing:
+    gui._simulate_viz_action(
+        "edit_axis",
+        fig_name,
+        ax_name,
+        "default",
+        "current dipole",
+        {},
+        "clear",
+    )
+
+    # Sourav's clever hack for setting the simulated data set to None
+    # TODO this will be changed after some refactoring of `_simulate_edit_axis` à la
+    # https://github.com/jonescompneurolab/hnn-core/pull/1394#issuecomment-6670606255
+    tab_idx = gui.viz_manager.axes_config_tabs.titles.index(f"Figure {fig_id}")
+    ax_controls = (
+        gui.viz_manager.axes_config_tabs.children[tab_idx].children[1].children[0]
+    )
+    ax_controls.children[1].value = "None"
+
+    gui._simulate_viz_action(
+        "edit_axis",
+        fig_name,
+        ax_name,
+        "test_default",  # This is an experimental dataset, not a simulation dataset!
+        "current dipole",
+        {},
+        "plot",
+    )
+
+    assert len(ax0.lines) == n_lines_initial
+    assert np.allclose(exp_data_initial, ax0.lines[-1].get_ydata())
+
+    labels = [t.get_text() for t in ax0.legend_.texts]
+    assert any(label.startswith("test_default") for label in labels)
+    assert not any(
+        label.startswith("default") and not label.startswith("test_default")
+        for label in labels
+    )
 
     plt.close("all")
 
@@ -1221,7 +1417,7 @@ def test_gui_download_simulation(setup_reduced_gui):
     # Run simulation
     gui.run_button.click()
 
-    _, file_extension = serialize_simulation(data_store.simulated_data, sim_name)
+    _, file_extension = serialize_simulation_output(data_store.simulated_data, sim_name)
     # result is a zip file
     assert file_extension == ".zip"
 
@@ -1234,24 +1430,22 @@ def test_gui_download_simulation(setup_reduced_gui):
 
     # Run simulation
     gui.run_button.click()
-    _, file_extension = serialize_simulation(data_store.simulated_data, sim_name2)
+    _, file_extension = serialize_simulation_output(
+        data_store.simulated_data,
+        sim_name2,
+    )
     # result is a single csv file
     assert file_extension == ".csv"
 
-    # Check no experimental/loaded data is listed in the sims dropdown list to download
+    # Check that no experimental/loaded data are listed in either the network or
+    # simulation output dropdown
     file1_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/S1_SupraT.txt"  # noqa
     gui._simulate_upload_experimental_data(file1_url)
-    download_simulation_list = gui.simulation_list_widget.options
-    assert (
-        len(
-            [
-                sim_name
-                for sim_name in download_simulation_list
-                if sim_name == "S1_SupraT"
-            ]
-        )
-        == 0
-    )
+    simulation_net_save_list = gui.simulation_net_save_widget.options
+    simulation_output_save_list = gui.simulation_output_save_widget.options
+
+    assert "S1_SupraT" not in simulation_net_save_list
+    assert "S1_SupraT" not in simulation_output_save_list
 
 
 def test_gui_upload_csv_simulation(setup_reduced_gui):
@@ -1310,7 +1504,7 @@ def test_gui_download_configuration(setup_reduced_gui, fix_load_featureful_tmp_p
     gui.run_button.click()
 
     # serialize configurations of the simulation
-    configs = serialize_config(data_store.simulated_data, sim_name)
+    configs = serialize_network_config(data_store.simulated_data, sim_name)
     net_from_buffer = json.loads(configs)
 
     # Load configuration from file
@@ -1586,9 +1780,9 @@ def test_default_scaling(setup_reduced_gui):
     # check that dipole plots have data
     gui._simulate_viz_action("switch_fig_template", "[Blank] single figure")
     gui._simulate_viz_action("add_fig")
-    figid = 2
-    figname = f"Figure {figid}"
-    axname = "ax0"
+    fig_id = 2
+    fig_name = f"Figure {fig_id}"
+    ax_name = "ax0"
 
     _dipole_plot_types = [
         "current dipole",
@@ -1598,15 +1792,15 @@ def test_default_scaling(setup_reduced_gui):
 
     for viz_type in _dipole_plot_types:
         gui._simulate_viz_action(
-            "edit_figure", figname, axname, "no_scaling", viz_type, {}, "clear"
+            "edit_axis", fig_name, ax_name, "no_scaling", viz_type, {}, "clear"
         )
 
         gui._simulate_viz_action(
-            "edit_figure", figname, axname, "no_scaling", viz_type, {}, "plot"
+            "edit_axis", fig_name, ax_name, "no_scaling", viz_type, {}, "plot"
         )
 
         # Check if data is plotted on the axes
-        assert gui.viz_manager.figs[figid].axes[0].has_data()
+        assert gui.viz_manager.figs[fig_id].axes[0].has_data()
 
     plt.close("all")
 
@@ -1642,9 +1836,9 @@ def test_default_smoothing(setup_reduced_gui):
     # check that dipole plots have data
     gui._simulate_viz_action("switch_fig_template", "[Blank] single figure")
     gui._simulate_viz_action("add_fig")
-    figid = 2
-    figname = f"Figure {figid}"
-    axname = "ax0"
+    fig_id = 2
+    fig_name = f"Figure {fig_id}"
+    ax_name = "ax0"
 
     _dipole_plot_types = [
         "current dipole",
@@ -1654,15 +1848,15 @@ def test_default_smoothing(setup_reduced_gui):
 
     for viz_type in _dipole_plot_types:
         gui._simulate_viz_action(
-            "edit_figure", figname, axname, "no_smoothing", viz_type, {}, "clear"
+            "edit_axis", fig_name, ax_name, "no_smoothing", viz_type, {}, "clear"
         )
 
         gui._simulate_viz_action(
-            "edit_figure", figname, axname, "no_smoothing", viz_type, {}, "plot"
+            "edit_axis", fig_name, ax_name, "no_smoothing", viz_type, {}, "plot"
         )
 
         # Check if data is plotted on the axes
-        assert gui.viz_manager.figs[figid].axes[0].has_data()
+        assert gui.viz_manager.figs[fig_id].axes[0].has_data()
 
     plt.close("all")
 
@@ -1811,7 +2005,7 @@ def test_custom_gains_simulate_and_download(setup_reduced_gui):
     gui.run_button.click()
 
     # Serialize the configuration
-    configs = serialize_config(data_store.simulated_data, sim_name)
+    configs = serialize_network_config(data_store.simulated_data, sim_name)
     net_config = json.loads(configs)
 
     # Check that connectivity includes gain values
@@ -2350,7 +2544,7 @@ def test_data_store_shared_singleton_across_modules(setup_reduced_gui):
     gui.widget_simulation_name.value = sim_name
     gui.run_button.click()
 
-    assert sim_name in gui.simulation_list_widget.options
+    assert sim_name in gui.simulation_net_save_widget.options
     # data written through gui.py is immediately
     # visible to _VizManager's data_store widget updates
     gui.viz_manager.templates_dropdown.value = "Drive-Dipole (2x1)"
@@ -2522,14 +2716,14 @@ def test_experimental_comparison_change_disables_plot_type(setup_reduced_gui):
     gui._simulate_viz_action("switch_fig_template", "[Blank] single figure")
     gui._simulate_viz_action("add_fig")
 
-    figid = gui.viz_manager.fig_idx["idx"] - 1
-    figname = f"Figure {figid}"
-    axname = "ax0"
+    fig_id = gui.viz_manager.fig_idx["idx"] - 1
+    fig_name = f"Figure {fig_id}"
+    ax_name = "ax0"
 
     tab = gui.viz_manager.axes_config_tabs
-    fig_tab_idx = tab.titles.index(figname)
+    fig_tab_idx = tab.titles.index(fig_name)
     ax_control_tabs = tab.children[fig_tab_idx].children[1]
-    ax_idx = ax_control_tabs.titles.index(axname)
+    ax_idx = ax_control_tabs.titles.index(ax_name)
     ax_control = ax_control_tabs.children[ax_idx]
 
     plot_type_selection = ax_control.children[0]
@@ -2594,6 +2788,226 @@ def test_gui_upload_data_name_conflicts_with_simulation(setup_reduced_gui):
         f"Cannot run simulation named '{sim_name2}'" in entry["text"]
         and "already exists" in entry["text"]
         for entry in gui._log_out.outputs
+    )
+
+    plt.close("all")
+
+
+def test_gui_save_dropdowns(setup_reduced_gui):
+    """
+    Test the dropdowns and buttons for saving network configurations and
+    simulation outputs update correctly after simulations
+    """
+    gui = setup_reduced_gui
+
+    # Pre simulation
+    # ------------------------------
+    # check that both widgets are disabled
+    assert gui.simulation_net_save_widget.disabled
+    assert gui.simulation_output_save_widget.disabled
+
+    # Mock first simulation
+    # ------------------------------
+    # Set up the first mock simulation
+    sim_name = "first_simulation_name"
+    gui.widget_simulation_name.value = sim_name
+    gui.run_button.click()
+
+    # check that both widgets are no longer disabled
+    assert not gui.simulation_net_save_widget.disabled
+    assert not gui.simulation_output_save_widget.disabled
+
+    # Test that the placeholder text for each dropdown is not erroneously
+    # added to the data store (this happened in a previous implementation where
+    # the two dropdowns relied on a shared callback)
+    assert "Simulation Output to Save" not in data_store.simulated_data
+    assert "Network Configuration to Save" not in data_store.simulated_data
+
+    # Ensure that `sim_name` is present and selected in both dropdown menus
+    for dropdown in (gui.simulation_net_save_widget, gui.simulation_output_save_widget):
+        assert sim_name in dropdown.options
+        assert dropdown.value == sim_name
+
+    assert f'download="{sim_name}.json"' in gui.save_config_button.value
+    assert f'download="{sim_name}.' in gui.save_sim_output_button.value
+
+    # Mock second simulation
+    # ------------------------------
+    # Set up a second mock simulation
+    sim_name2 = "second_simulation_name"
+    gui.widget_simulation_name.value = sim_name2
+    gui.run_button.click()
+
+    # Test that each dropdown updates its value to the most-recent simulation
+    for dropdown in (gui.simulation_net_save_widget, gui.simulation_output_save_widget):
+        assert dropdown.value == sim_name2
+    assert f'download="{sim_name2}.json"' in gui.save_config_button.value
+    assert f'download="{sim_name2}.' in gui.save_sim_output_button.value
+
+    # Manually update `simulation_net_save_widget.value` to be the sim_name
+    # of the first simulation
+    #   - `save_config_button` should reflect the manually-selected `sim_name`
+    #   - `save_sim_output_button` should retain `sim_name2`
+    gui.simulation_net_save_widget.value = sim_name
+    assert f'download="{sim_name}.json"' in gui.save_config_button.value
+    assert f'download="{sim_name2}.' in gui.save_sim_output_button.value
+
+    # Mock third simulation
+    # ------------------------------
+    # Set up a third mock simulation. We expect each value to update to sim_name3
+    sim_name3 = "third_simulation_name"
+    gui.widget_simulation_name.value = sim_name3
+    gui.run_button.click()
+
+    # Manually update `simulation_output_save_widget.value` to be the sim_name
+    # of the second simulation
+    #   - `save_config_button` should retain `sim_name3`
+    #   - `save_sim_output_button` should reflect the manually-selected `sim_name2`
+    gui.simulation_output_save_widget.value = sim_name2
+    assert f'download="{sim_name3}.json"' in gui.save_config_button.value
+    assert f'download="{sim_name2}.' in gui.save_sim_output_button.value
+
+    plt.close("all")
+
+
+def test_gui_save_button_payloads(setup_reduced_gui):
+    """
+    Test that the buttons for saving network configurations and simulation outputs
+    embed the correct, serialized data for the selected simulation in their respective
+    dropdown widgets
+    """
+    gui = setup_reduced_gui
+
+    def _decode_payload(button):
+        """
+        Extract and decode the payload from the button (widget) contents directly
+        """
+        # NOTE: the value of the button is a string built from the template in
+        # `_init_html_download_button`. The file contents are embedded in the
+        # link as a data URI: `href="data:<mimetype>;base64,<payload>"`. The regex
+        # used here captures the payload between "base64," and the closing
+        # quote. If the template in `_init_html_download_button` changes, this
+        # regex will also need to be updated
+
+        # extract the payload using regex
+        match_payload = re.search(
+            r'base64,([^"]*)"',
+            button.value,
+        )
+        # explicitly fail if there is no match; this will help identify if the
+        # template changes and requires a regex update
+        assert match_payload is not None
+
+        # convert payload to raw bytes
+        decoded_payload = base64.b64decode(match_payload.group(1))
+        return decoded_payload
+
+    def _expected_netconfig_payload(sim_name):
+        """
+        Serialize and encode the network configuration for `sim_name` directly from
+        `data_store.simulated_data`
+        """
+        encoded_netconfig = serialize_network_config(
+            data_store.simulated_data,
+            sim_name,
+        ).encode()
+        return encoded_netconfig
+
+    def _expected_simoutput_payload(sim_name):
+        """
+        Serialize and encode the simulation output for `sim_name` directly from
+        `data_store.simulated_data` ***for a single trial simulation only***
+        """
+        # check expected output for *single* trial simulation, which should
+        # *always* have a ".csv" extension
+        #
+        # NOTE: in the case of multiple trials where the payload is a `.zip` file,
+        # the raw bytes can differ across two separate serializations of the same
+        # data (since each file inside the zip is stamped with the write time). This
+        # test only covers the single-trial case where the raw bytes are expected to
+        # match exactly
+        #
+        # TODO: add a test for multiple-trial simulations where the payload is a `.zip`
+        # file. We would need to compare something other than the raw bytes of the
+        # payload; e.g., one option would be to open the `.zip` and compare the
+        # contents of individual files
+        simoutput, extension = serialize_simulation_output(
+            data_store.simulated_data,
+            sim_name,
+        )
+        # sanity check: confirm the serialized output is ".csv"
+        assert extension == ".csv"
+
+        encoded_simoutput = simoutput.encode()
+        return encoded_simoutput
+
+    # Mock run two simulations so that the *selected* simulation is changed to
+    # the second one
+    # NOTE: we need two simulations so we can check that payload associated with the
+    # save button is correctly updated when we change the simulation in the dropdown
+    sim_name = "first_simulation"
+    gui.widget_simulation_name.value = sim_name
+    gui.run_button.click()
+
+    # change tstop so that the payload for the second simulation is different from
+    # the first simulation
+    sim_name2 = "second_simulation"
+    gui.widget_simulation_name.value = sim_name2
+    gui.widget_tstop.value = gui.widget_tstop.value + 1
+    gui.run_button.click()
+
+    # confirm that the two simulation payloads are different; otherwise the payload
+    # comparisons below would be meaningless as they would always be equal
+    assert _expected_simoutput_payload(sim_name) != _expected_simoutput_payload(
+        sim_name2
+    )
+
+    # Select the first simulation in the dropdown for the network. The network-saving
+    # button should switch to the first simulation's payload, while the output-saving
+    # button should keep the second simulation's payload
+    gui.simulation_net_save_widget.value = sim_name
+    assert _decode_payload(gui.save_config_button) == _expected_netconfig_payload(
+        sim_name
+    )
+    assert _decode_payload(gui.save_sim_output_button) == _expected_simoutput_payload(
+        sim_name2
+    )
+
+    # Select the first simulation in the dropdown for simulation output. Now the
+    # output-saving button should switch to the first simulation's payload, and the
+    # network-saving button should still point to the first simulation's payload
+    gui.simulation_output_save_widget.value = sim_name
+    assert _decode_payload(gui.save_sim_output_button) == _expected_simoutput_payload(
+        sim_name
+    )
+    assert _decode_payload(gui.save_config_button) == _expected_netconfig_payload(
+        sim_name
+    )
+
+    # Select the second simulation in the dropdown for the network. The network-saving
+    # button should switch to the second simulation's payload, and the output-saving
+    # button should still point to the first simulation's payload
+    gui.simulation_net_save_widget.value = sim_name2
+    assert _decode_payload(gui.save_config_button) == _expected_netconfig_payload(
+        sim_name2
+    )
+    assert _decode_payload(gui.save_sim_output_button) == _expected_simoutput_payload(
+        sim_name
+    )
+
+    # Confirm that updating the payload for `save_sim_output_button` does not change
+    # the payload for `save_config_button` to match it
+    # First, set `simulation_output_save_widget` to `sim_name2`, which forces its
+    # callback to fire, then change it back to `sim_name`, which forces the callback
+    # to fire again. Then confirm that `save_config_button` retains the `sim_name2`
+    # payload while `save_sim_output_button` contains the `sim_name` payload
+    gui.simulation_output_save_widget.value = sim_name2
+    gui.simulation_output_save_widget.value = sim_name
+    assert _decode_payload(gui.save_config_button) == _expected_netconfig_payload(
+        sim_name2
+    )
+    assert _decode_payload(gui.save_sim_output_button) == _expected_simoutput_payload(
+        sim_name
     )
 
     plt.close("all")

@@ -1,7 +1,7 @@
 :Comment : The persistent component of the K current
 :Reference : :		Voltage-gated K+ channels in layer 5 neocortical pyramidal neurones from young rats:subtypes and gradients,Korngreen and Sakmann, J. Physiology, 2000, from Hay et al., 2011 PLOS Comp Bio, https://doi.org/10.1371/journal.pcbi.1002107
 :Comment : shifted -10 mv to correct for junction potential
-:Comment: corrected rates using q10 = 2.3, target temperature 37 (K. Duecker for duecker_ET_model), orginal 21
+:Comment: corrected rates using q10 = 2.3, target temperature 37 (K. Duecker for duecker_ET_model), orginal 21 (Duecker et al., 2026 biorxiv https://doi.org/10.64898/2026.10.29.762964 )
 
 
 NEURON	{
