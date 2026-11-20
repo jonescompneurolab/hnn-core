@@ -3174,6 +3174,7 @@ def test_add_connection_threshold_and_gain(fix_net_model, request):
     assert net.connectivity[conn_idx]["nc_dict"]["gain"] == 1.5
 
 
+@pytest.mark.filterwarnings(r"error:Invalid net\.threshold")
 def test_add_connection_threshold_does_not_change_source_cell():
     """Test that a connection's deprecated threshold cannot alter the source
     cell's spike threshold.
@@ -3203,24 +3204,26 @@ def test_add_connection_threshold_does_not_change_source_cell():
     assert net.cell_response.spike_gids == original.cell_response.spike_gids
     assert net.cell_response.spike_times == original.cell_response.spike_times
 
-    for threshold in (-50.0, "-50"):
+    for threshold, expected in ((-50.0, -50.0), ("-50", -50.0), (0.0, 0.0)):
         net.threshold = threshold
         builder = NetworkBuilder(net)
         for connection_name in ("L2Basket_L2Pyr_gabaa", "L2Basket_L2Basket_gabaa"):
             assert builder.ncs[connection_name]
-            assert all(nc.threshold == -50.0 for nc in builder.ncs[connection_name])
-        assert builder._drive_cells[0].nrn_netcon.threshold == -50.0
+            assert all(nc.threshold == expected for nc in builder.ncs[connection_name])
+        assert builder._drive_cells[0].nrn_netcon.threshold == expected
 
 
 @pytest.mark.parametrize(
     "value", [None, "invalid", np.nan, np.inf, 1 << 1024, np.complex128(-50 + 1j)]
 )
 def test_invalid_network_threshold(value):
-    net = neymotin_2020_model(mesh_shape=(3, 3))
+    net = neymotin_2020_model(mesh_shape=(3, 3), add_erp_drives=True)
+    net._instantiate_drives(tstop=170.0)
     net.threshold = value
     with pytest.warns(UserWarning, match=r"Invalid net\.threshold\. Using 0\.0 mV\."):
         builder = NetworkBuilder(net)
     assert builder.ncs["L2Basket_L2Pyr_gabaa"][0].threshold == 0.0
+    assert builder._drive_cells[0].nrn_netcon.threshold == 0.0
 
 
 def test_get_cell_index_by_synapse_type():
