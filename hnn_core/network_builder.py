@@ -12,6 +12,7 @@ from neuron import h
 
 
 from .cell import _ArtificialCell
+from .externals.mne import _validate_type
 from .params import _long_name, _short_name
 from .extracellular import _ExtracellularArrayBuilder
 from .network import pick_connection
@@ -366,8 +367,12 @@ class NetworkBuilder(object):
         record_vsec = self.net._params["record_vsec"]
         record_isec = self.net._params["record_isec"]
         record_ca = self.net._params["record_ca"]
+        threshold = self.net.threshold
+        _validate_type(threshold, "numeric", "net.threshold")
+        if not np.isfinite(threshold):
+            raise ValueError(f"net.threshold must be finite, got {threshold}")
         self._create_cells_and_drives(
-            threshold=self.net.threshold,
+            threshold=threshold,
             record_vsec=record_vsec,
             record_isec=record_isec,
             record_ca=record_ca,

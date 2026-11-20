@@ -3106,7 +3106,7 @@ def test_add_connection_threshold_and_gain(fix_net_model, request):
     inh_name_suffix = net_customizations["inh_name_suffix"]
 
     # Passing a per-connection threshold warns and is not stored in nc_dict
-    custom_threshold = 15.0
+    custom_threshold = 0.0
     with pytest.warns(FutureWarning, match="`threshold`.*deprecated"):
         net.add_connection(
             src_gids="L2_pyramidal",
@@ -3209,6 +3209,18 @@ def test_add_connection_threshold_does_not_change_source_cell():
     network_builder2 = NetworkBuilder(net2)
     nc = network_builder2.ncs["L2Basket_L2Pyr_gabaa"][0]
     assert nc.threshold == -50.0
+
+
+@pytest.mark.parametrize(
+    "value, error",
+    [(None, TypeError), ("-50", TypeError), (np.nan, ValueError), (np.inf, ValueError)],
+)
+def test_invalid_network_threshold(value, error):
+    """Test that an invalid net.threshold is refused when building."""
+    net = neymotin_2020_model(mesh_shape=(3, 3))
+    net.threshold = value
+    with pytest.raises(error, match="threshold"):
+        NetworkBuilder(net)
 
 
 def test_get_cell_index_by_synapse_type():

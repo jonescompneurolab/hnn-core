@@ -2445,7 +2445,7 @@ class Network:
         lamtha : float
             Space constant.
         threshold : float, default=None
-            .. deprecated:: 0.6.2
+            .. deprecated:: Unreleased
                 Firing threshold of cells for connection. This argument is
                 deprecated and has no effect: the spike threshold is a property
                 of the source cell, not of an individual connection. Set

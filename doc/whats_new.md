@@ -31,18 +31,14 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 ### Upcoming Deprecations
 
 - The `threshold` argument of {meth}`~hnn_core.Network.add_connection` is
-  deprecated and has no effect. A connection's threshold was silently applied
-  to the shared spike detector of the presynaptic cell, changing spike
-  detection and outgoing events on all of its other connections. Set
-  `net.threshold` instead; it is now the single value used for every cell's
-  spike detector when the network is built for simulation.
+  deprecated and has no effect. Set `net.threshold` to change the network-wide
+  spike threshold.
 
 ### Bug Fixes
 
-- Setting `Network.threshold` now actually changes the spike-detection
-  threshold of all cells: the value in place when the network is built is
-  passed to every cell's source `NetCon`, instead of the simulation always
-  using the `threshold` stored in `net._params`.
+- The network builder now uses `Network.threshold` for each source
+  `NetCon`. Previously, a connection on the same rank could overwrite the
+  source threshold for spike detection and all outgoing events.
 
 ## 1.0.0 Release Notes
 
