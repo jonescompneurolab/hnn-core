@@ -26,6 +26,20 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 <!-- ### Changelog -->
 
+## Current
+
+### Upcoming Deprecations
+
+- The `threshold` argument of {meth}`~hnn_core.Network.add_connection` is
+  deprecated and has no effect. Set `net.threshold` to change the network-wide
+  spike threshold.
+
+### Bug Fixes
+
+- The network builder now uses `Network.threshold` for each source
+  `NetCon`. Previously, a connection on the same rank could overwrite the
+  source threshold for spike detection and all outgoing events.
+
 ## 1.0.0 Release Notes
 
 Despite this version of `hnn-core` being marked as version `1.0.0`, this software 

@@ -5,6 +5,7 @@
 #          Blake Caldwell <blake_caldwell@brown.edu>
 
 import os
+import warnings
 from copy import deepcopy
 from pathlib import Path
 import numpy as np
@@ -12,6 +13,7 @@ from neuron import h
 
 
 from .cell import _ArtificialCell
+from .externals.mne import _validate_type
 from .params import _long_name, _short_name
 from .extracellular import _ExtracellularArrayBuilder
 from .network import pick_connection
@@ -366,8 +368,17 @@ class NetworkBuilder(object):
         record_vsec = self.net._params["record_vsec"]
         record_isec = self.net._params["record_isec"]
         record_ca = self.net._params["record_ca"]
+        threshold = self.net.threshold
+        try:
+            _validate_type(threshold, ("numeric", str), "net.threshold")
+            threshold = float(threshold)
+        except (TypeError, ValueError, OverflowError):
+            threshold = np.nan
+        if not np.isfinite(threshold):
+            warnings.warn("Invalid net.threshold. Using 0.0 mV.")
+            threshold = 0.0
         self._create_cells_and_drives(
-            threshold=self.net._params["threshold"],
+            threshold=threshold,
             record_vsec=record_vsec,
             record_isec=record_isec,
             record_ca=record_ca,
