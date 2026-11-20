@@ -3182,7 +3182,8 @@ def test_add_connection_threshold_does_not_change_source_cell():
     threshold= before this check clobbered the presynaptic cell's shared
     NetCon spike detector, silencing its spikes on every connection.
     """
-    net = neymotin_2020_model()
+    original = neymotin_2020_model(mesh_shape=(3, 3), add_erp_drives=True)
+    net = original.copy()
 
     with pytest.warns(FutureWarning, match="`threshold`.*deprecated"):
         net.add_connection(
@@ -3196,31 +3197,30 @@ def test_add_connection_threshold_does_not_change_source_cell():
             threshold=100.0,
         )
 
-    network_builder = NetworkBuilder(net)
-    # Every NetCon built from an L2 basket cell, on both the new connection
-    # and the pre-existing ones, keeps the network-level threshold
-    for connection_name in ["L2Basket_L2Pyr_gabaa", "L2Basket_L2Basket_gabaa"]:
-        for nc in network_builder.ncs[connection_name]:
-            assert nc.threshold == net.threshold
+    simulate_dipole(original, tstop=170.0, n_trials=1)
+    simulate_dipole(net, tstop=170.0, n_trials=1)
+    assert "L2_basket" in original.cell_response.spike_types[0]
+    assert net.cell_response.spike_gids == original.cell_response.spike_gids
+    assert net.cell_response.spike_times == original.cell_response.spike_times
 
-    # Setting net.threshold still sets the spike threshold of all cells
-    net2 = neymotin_2020_model()
-    net2.threshold = -50.0
-    network_builder2 = NetworkBuilder(net2)
-    nc = network_builder2.ncs["L2Basket_L2Pyr_gabaa"][0]
-    assert nc.threshold == -50.0
+    for threshold in (-50.0, "-50"):
+        net.threshold = threshold
+        builder = NetworkBuilder(net)
+        for connection_name in ("L2Basket_L2Pyr_gabaa", "L2Basket_L2Basket_gabaa"):
+            assert builder.ncs[connection_name]
+            assert all(nc.threshold == -50.0 for nc in builder.ncs[connection_name])
+        assert builder._drive_cells[0].nrn_netcon.threshold == -50.0
 
 
 @pytest.mark.parametrize(
-    "value, error",
-    [(None, TypeError), ("-50", TypeError), (np.nan, ValueError), (np.inf, ValueError)],
+    "value", [None, "invalid", np.nan, np.inf, 1 << 1024, np.complex128(-50 + 1j)]
 )
-def test_invalid_network_threshold(value, error):
-    """Test that an invalid net.threshold is refused when building."""
+def test_invalid_network_threshold(value):
     net = neymotin_2020_model(mesh_shape=(3, 3))
     net.threshold = value
-    with pytest.raises(error, match="threshold"):
-        NetworkBuilder(net)
+    with pytest.warns(UserWarning, match=r"Invalid net\.threshold\. Using 0\.0 mV\."):
+        builder = NetworkBuilder(net)
+    assert builder.ncs["L2Basket_L2Pyr_gabaa"][0].threshold == 0.0
 
 
 def test_get_cell_index_by_synapse_type():

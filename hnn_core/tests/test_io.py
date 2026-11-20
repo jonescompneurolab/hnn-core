@@ -302,6 +302,22 @@ def test_read_configuration_json(fix_net_neymotin_2020, fix_load_featureful_tmp_
     assert len(net_no_bias.external_drives) > 0
 
 
+@pytest.mark.filterwarnings("error:.*threshold.*deprecated:FutureWarning")
+def test_read_legacy_connection_threshold(fix_load_featureful_tmp_path, tmp_path):
+    data = json.loads(fix_load_featureful_tmp_path.read_text())
+    data["threshold"] = -50.0
+    connections = data["connectivity"]
+    connections[0]["nc_dict"]["threshold"] = 0.0
+    connections[1]["nc_dict"]["threshold"] = 100.0
+    connections[2]["nc_dict"].pop("threshold", None)
+    path = tmp_path / "legacy.json"
+    path.write_text(json.dumps(data))
+
+    net = read_network_configuration(path)
+    assert net.threshold == -50.0
+    assert all("threshold" not in conn["nc_dict"] for conn in net.connectivity)
+
+
 def test_read_incorrect_format(tmp_path):
     """Test that error raise when the json do not have a Network label."""
 
