@@ -12,6 +12,7 @@ import sys
 import tempfile
 import time
 from pathlib import Path
+from types import SimpleNamespace
 from urllib.request import urlretrieve
 
 import matplotlib
@@ -23,7 +24,7 @@ from IPython.display import IFrame
 from ipywidgets import Tab, Text, link
 
 import hnn_core
-from hnn_core import Dipole, Network, simulate_dipole
+from hnn_core import CellResponse, Dipole, Network, simulate_dipole
 from hnn_core.gui import HNNGUI
 from hnn_core.gui._data_store import data_store
 from hnn_core.gui._viz_manager import (
@@ -32,6 +33,7 @@ from hnn_core.gui._viz_manager import (
     _idx2figname,
     _no_overlay_plot_types,
     _plot_types,
+    _update_ax,
     unlink_relink,
 )
 from hnn_core.gui.gui import (
@@ -1007,6 +1009,79 @@ def test_gui_figure_overlay(setup_reduced_gui):
                 clear_ax_button.click()
                 assert add_plot_button.disabled is False
     plt.close("all")
+
+
+@pytest.mark.parametrize(
+    "locations", [("proximal", "distal"), ("proximal",), ("distal",), ()]
+)
+@pytest.mark.parametrize("n_trials", [1, 2])
+def test_input_histogram_groups_drives_by_location(locations, n_trials):
+    """Aggregate named drives by location without changing stored spike data."""
+    drives = {}
+    spike_types = []
+    spike_times = []
+    for location in locations:
+        for name in (
+            f"ev{location[:4]}1",
+            f"ev{location[:4]}2",
+            "poisson" if location == "proximal" else "poisson_distal",
+        ):
+            drives[name] = {"location": location}
+            spike_types.extend([name, name])
+            spike_times.extend([10.0, 20.0])
+    # A configured drive may have no spikes within this time window.
+    drives["silent_drive"] = {"location": "distal"}
+    # Cell spikes must not be counted as input spikes.
+    spike_types.append("L2_pyramidal")
+    spike_times.append(25.0)
+    response = CellResponse(
+        cell_type_names=["L2_pyramidal"],
+        spike_times=[spike_times.copy() for _ in range(n_trials)],
+        spike_gids=[list(range(len(spike_types))) for _ in range(n_trials)],
+        spike_types=[spike_types.copy() for _ in range(n_trials)],
+        times=np.arange(31.0),
+    )
+    expected_drives = {name: drive.copy() for name, drive in drives.items()}
+    net = SimpleNamespace(external_drives=drives, cell_response=response)
+    fig, ax = plt.subplots()
+    try:
+        _update_ax(
+            fig,
+            ax,
+            {"net": net, "dpls": [Dipole(np.arange(31.0), np.zeros((31, 3)))]},
+            "test",
+            "input histogram",
+            {"dipole_smooth": 0, "dipole_scaling": 1},
+        )
+        legend = fig.axes[-1].get_legend()
+        assert {text.get_text() for text in legend.get_texts()} == {
+            "proximal",
+            "distal",
+        }
+        assert len(legend.get_texts()) == 2
+        for handle, location in zip(legend.get_patches(), ("proximal", "distal")):
+            expected_color = "r" if location == "proximal" else "g"
+            assert handle.get_facecolor() == matplotlib.colors.to_rgba(expected_color)
+        for hist_ax in fig.axes:
+            for container in hist_ax.containers:
+                location = container.patches[0].get_label()
+                expected_color = "r" if location == "proximal" else "g"
+                actual_color = container.patches[0].get_facecolor()
+                assert actual_color == matplotlib.colors.to_rgba(expected_color)
+                assert (
+                    sum(patch.get_height() for patch in container.patches)
+                    == 6 * n_trials
+                )
+            if hist_ax.containers:
+                assert hist_ax.yaxis_inverted() == (
+                    hist_ax.containers[0].patches[0].get_label() == "distal"
+                )
+        assert response.spike_times == [spike_times] * n_trials
+        assert response.spike_gids == [list(range(len(spike_types)))] * n_trials
+        assert response.spike_types == [spike_types] * n_trials
+        assert net.external_drives == expected_drives
+    finally:
+        plt.close(fig)
 
 
 def test_gui_visualization(setup_reduced_gui):

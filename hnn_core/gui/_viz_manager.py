@@ -8,6 +8,7 @@ from functools import partial, wraps
 
 import matplotlib
 import matplotlib.pyplot as plt
+from matplotlib.patches import Patch
 import numpy as np
 from IPython.display import display
 from ipywidgets import (
@@ -302,47 +303,39 @@ def _update_ax(fig, ax, data, data_name, plot_type, plot_config):
 
     elif plot_type == "input histogram":
         if net_copied.cell_response:
-            net_copied.external_drives.keys()
+            # Relabel only the copied response, using locations rather than names.
+            drive_locations = {
+                name: drive["location"]
+                for name, drive in net_copied.external_drives.items()
+            }
+            active_locations = set()
+            for trial_types in net_copied.cell_response.spike_types:
+                for idx, name in enumerate(trial_types):
+                    if name in drive_locations:
+                        location = drive_locations[name]
+                        trial_types[idx] = location
+                        active_locations.add(location)
 
-            # initialize dictionary for drives, locations
-            drive_locations = dict()
-            drive_colors = dict()
+            if active_locations:
+                inverted_locations = ["distal"] if "distal" in active_locations else []
+                net_copied.cell_response.plot_spikes_hist(
+                    ax=ax,
+                    show=False,
+                    spike_types=sorted(active_locations),
+                    invert_spike_types=inverted_locations,
+                    color=default_drive_colors,
+                )
+            else:
+                ax.set_ylabel("Counts")
 
-            for name, drive in net_copied.external_drives.items():
-                # remove all increments of default 'evdist' inputs
-                if "evdist" in name:
-                    if "evdist" not in drive_locations.keys():
-                        drive_locations["evdist"] = drive["location"]
-                        drive_colors["evdist"] = default_drive_colors["distal"]
-                # remove all increments of default 'evprox' inputs
-                elif "evprox" in name:
-                    if "evprox" not in drive_locations.keys():
-                        drive_locations["evprox"] = drive["location"]
-                        drive_colors["evprox"] = default_drive_colors["proximal"]
-
-                else:
-                    drive_locations[name] = drive["location"]
-                    if drive["location"] == "proximal":
-                        drive_colors[name] = default_drive_colors["proximal"]
-                    elif drive["location"] == "distal":
-                        drive_colors[name] = default_drive_colors["distal"]
-
-            # all drives to plot, excluding 'evdist' and 'evprox' increments
-            all_drives = list(drive_locations.keys())
-
-            # initialize list for distal drives
-            distal_drives = list()
-
-            for name, location in drive_locations.items():
-                if location == "distal":
-                    distal_drives.append(name)
-
-            net_copied.cell_response.plot_spikes_hist(
-                ax=ax,
-                show=False,
-                spike_types=all_drives,
-                invert_spike_types=distal_drives,
-                color=drive_colors,
+            # Keep the location key stable, including when one location is silent.
+            legend_ax = fig.axes[-1] if "distal" in active_locations else ax
+            legend_ax.legend(
+                handles=[
+                    Patch(color=default_drive_colors[location], label=location)
+                    for location in ("proximal", "distal")
+                ],
+                loc="upper left",
             )
 
     elif plot_type == "PSD":
