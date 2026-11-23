@@ -27,6 +27,15 @@
     justify-content: safe center !important;
 }
 
+/* Let the mouse wheel scroll the panel while a numeric field has focus. */
+.hnn-gui input[type="number"] {
+    appearance: textfield;
+}
+
+.hnn-gui input[type="number"]::-webkit-inner-spin-button {
+    display: none;
+}
+
 /*  adjust header and footer margins  */
 .title-bar {
     margin: 2px 0px 2px 0px !important;
