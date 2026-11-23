@@ -1,0 +1,71 @@
+name: Post-merge CI
+
+# GitHub skips `push` workflows when the head commit message contains a skip
+# token such as `[no ci]`. Squash merges copy every PR commit message into the
+# merge commit, so one `[no ci]` on an intermediate PR commit can skip CI on
+# master (see #1404). Skip tokens do not apply to `pull_request_target`, so
+# this workflow checks each merge commit and, only if push CI was skipped,
+# runs the regular workflows against it.
+#
+# Security note: `pull_request_target` runs with the base repository's token.
+# This is safe here because we only ever check out `merge_commit_sha`, which is
+# code already merged into master, never the PR head.
+
+on:
+  pull_request_target:
+    types: [closed]
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    if: github.event.pull_request.merged
+    runs-on: ubuntu-latest
+    outputs:
+      skipped: ${{ steps.check.outputs.skipped }}
+    steps:
+      - id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.pull_request.merge_commit_sha }}
+        run: |
+          set -euo pipefail
+          msg="$(gh api "repos/$REPO/commits/$SHA" --jq .commit.message)"
+          if printf '%s\n' "$msg" | grep -Eiq '\[(skip ci|ci skip|no ci|skip actions|actions skip)\]|skip-checks:[[:space:]]*true'; then
+            echo "Merge commit $SHA contains a skip token; running CI."
+            echo "skipped=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Merge commit $SHA has no skip token; push CI already ran."
+            echo "skipped=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  unix:
+    needs: gate
+    if: needs.gate.outputs.skipped == 'true'
+    uses: ./.github/workflows/unix_unit_tests.yml
+    with:
+      ref: ${{ github.event.pull_request.merge_commit_sha }}
+
+  windows:
+    needs: gate
+    if: needs.gate.outputs.skipped == 'true'
+    uses: ./.github/workflows/windows_unit_tests.yml
+    with:
+      ref: ${{ github.event.pull_request.merge_commit_sha }}
+
+  linkcheck:
+    needs: gate
+    if: needs.gate.outputs.skipped == 'true'
+    uses: ./.github/workflows/linkcheck.yml
+    with:
+      ref: ${{ github.event.pull_request.merge_commit_sha }}
+
+  codespell:
+    needs: gate
+    if: needs.gate.outputs.skipped == 'true'
+    uses: ./.github/workflows/codespell.yml
+    with:
+      ref: ${{ github.event.pull_request.merge_commit_sha }}

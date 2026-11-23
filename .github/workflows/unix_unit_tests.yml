@@ -1,13 +1,19 @@
 name: Unix Unit Tests
 
 on:
+  workflow_call:
+    inputs:
+      ref:
+        description: Commit to test (used by post_merge_ci.yml)
+        type: string
+        default: ''
   push:
     branches: ['**']
   pull_request:
     branches: ['**']
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: Unix Unit Tests-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -23,6 +29,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
 
       - name: Create and activate conda environment
         uses: conda-incubator/setup-miniconda@v3
