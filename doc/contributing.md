@@ -811,6 +811,14 @@ The repository is tested via continuous integration with GitHub Actions and
 CircleCI. All the above checks and tests run on GitHub Actions, while the Developer
 Portal website is built on CircleCI.
 
+You can add `[no ci]` (or `[skip ci]`) to a commit message to skip GitHub
+Actions for intermediate commits in a pull request. Because pull requests are
+squash-merged, these tokens can end up in the final commit on `master`, which
+would also skip CI there. To prevent this, the `Post-merge CI` workflow checks
+every merge commit on `master` and, if it contains a skip token, runs the full
+GitHub Actions checks on it anyway. When squash-merging, maintainers can also
+remove skip tokens from the commit message to get the normal `push` CI run.
+
 To speed up the website-building process on CircleCI, we enabled versioned
 [caching](https://circleci.com/docs/caching/).
 

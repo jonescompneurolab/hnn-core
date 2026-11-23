@@ -1,6 +1,12 @@
 name: Windows Unit Tests
 
 on:
+  workflow_call:
+    inputs:
+      ref:
+        description: Commit to test (used by post_merge_ci.yml)
+        type: string
+        default: ''
   push:
     branches: ['**']
   pull_request:
@@ -11,7 +17,7 @@ env:
     NEURONHOME: C:\nrn_test
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: Windows Unit Tests-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -25,6 +31,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
 
       - uses: conda-incubator/setup-miniconda@v3
         with:
