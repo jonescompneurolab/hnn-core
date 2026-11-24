@@ -320,6 +320,10 @@ def _drive_cell_event_times(
     elif len(matches) > 1:
         raise ValueError("Ambiguous external drive: %s" % drive_type)
 
+    drive_tstop = dynamics.get("tstop")
+    if drive_tstop is None:
+        drive_tstop = tstop
+
     event_times = np.array([])
     if drive_type == "poisson":
         if target_type == "any":
@@ -331,7 +335,7 @@ def _drive_cell_event_times(
         if target_type == "any" or target_type in dynamics["rate_constant"]:
             event_times = _create_extpois(
                 t0=dynamics["tstart"],
-                T=dynamics["tstop"],
+                T=drive_tstop,
                 lamtha=rate_constant,
                 prng=prng,
             )
@@ -346,7 +350,7 @@ def _drive_cell_event_times(
         event_times = _create_bursty_input(
             t0=dynamics["tstart"],
             t0_stdev=dynamics["tstart_std"],
-            tstop=dynamics["tstop"],
+            tstop=drive_tstop,
             f_input=dynamics["burst_rate"],
             events_jitter_std=dynamics["burst_std"],
             events_per_cycle=dynamics["numspikes"],

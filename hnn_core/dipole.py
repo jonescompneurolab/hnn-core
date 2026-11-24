@@ -100,19 +100,15 @@ def simulate_dipole(
     if not net.external_drives and not net.external_biases:
         warnings.warn("No external drives or biases loaded", UserWarning)
 
-    for drive_name, drive in net.external_drives.items():
-        # Check if 'dynamics' key exists before trying to access its contents
-        if "dynamics" in drive and "tstop" in drive["dynamics"]:
-            if drive["dynamics"]["tstop"] is None:
-                drive["dynamics"]["tstop"] = tstop
     for bias_name, bias in net.external_biases.items():
         for cell_type, bias_cell_type in bias.items():
-            if bias_cell_type["tstop"] is None:
-                bias_cell_type["tstop"] = tstop
+            bias_tstop = bias_cell_type["tstop"]
+            if bias_tstop is None:
+                bias_tstop = tstop
             # This check is also performed at Network.add_tonic_bias time, but if the
             # user does not specify tstop at that time, then tstop is not known until
             # simulation time, so we need to check it again here.
-            duration = bias_cell_type["tstop"] - bias_cell_type["t0"]
+            duration = bias_tstop - bias_cell_type["t0"]
             if duration < 0.0:
                 raise ValueError("Duration of tonic input cannot be negative")
 

@@ -488,6 +488,8 @@ class NetworkBuilder(object):
                     # cell._create_tonic_bias, but it is passed as a keyword argument to
                     # be concise.
                     if gid in bias_params["gid"]:
+                        if bias_params["tstop"] is None:
+                            bias_params = {**bias_params, "tstop": self.net._tstop}
                         cell._create_tonic_bias(**bias_params)
 
                 cell.record(record_vsec, record_isec, record_ca)
